@@ -2,10 +2,10 @@
 
 /*
 
-           -
-         /   \
-      /         \
-   /    POCKET     \
+-
+/   \
+/         \
+/    POCKET     \
 /    MINECRAFT PHP    \
 |\     @shoghicp     /|
 |.   \           /   .|
@@ -13,9 +13,9 @@
 |    ..    |    ..    |
 |       .. | ..       |
 \          |          /
-   \       |       /
-      \    |    /
-         \ | /
+\       |       /
+\    |    /
+\ | /
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -34,12 +34,12 @@ $client = new PocketMinecraftClient("shoghicp");
 console("[INFO] Searching servers...");
 $list = $client->getServerList();
 foreach($list as $i => $info){
-	console("[Server] #".$i." ".$info["ip"]." ".$info["username"]);
+console("[Server] #".$i." ".$info["ip"]." ".$info["username"]);
 }
 console("[Select Server] #", false, false);
 $i = (int) trim(fgets(STDIN));
 if(isset($list[$i])){
-	$client->start($list[$i]["ip"]);
+$client->start($list[$i]["ip"]);
 }else{
-	console("[Error] Unknown ID");
+console("[Error] Unknown ID");
 }
