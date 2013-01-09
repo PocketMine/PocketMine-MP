@@ -258,6 +258,7 @@ class Player{
 								"session2" => Utils::readLong("\x00\x00\x00\x00\x04\x44\x0b\xa9"),
 							));
 							break;
+							
 						case MC_CLIENT_HANDSHAKE:
 
 							break;
@@ -297,6 +298,8 @@ class Player{
 								"gamemode" => $this->server->gamemode,
 								"eid" => 0,
 							));
+							
+							$this->server->handle("player.login", $data);
 							break;
 						case MC_READY:
 							switch($data["status"]){
