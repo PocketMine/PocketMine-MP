@@ -54,6 +54,16 @@ class PlayerAPI{
 					}
 				}
 				break;
+			case "player.login":
+				console("player.login called");
+				
+				$username = $data['username'];
+				console("player.login username is ".$username);
+				if( $this->checkforban($username) == true ) {
+					$this->server->api->player->get($data['username'])->close("You have been banned!");
+				}
+				break;
+				
 		}
 	}
 
@@ -104,9 +114,10 @@ class PlayerAPI{
 			case "ban":
 				$player_Ban = array_shift($params);
 				console("[INFO] Banning Player: ".$player_Ban);
+				$this->ban($player_Ban);
 				
 				break;
-			case "unban"
+			case "unban":
 				$player_unBan = array_shift($params);
 				console("[INFO] Un-Banning Player: ".$player_unBan);
 				
@@ -116,22 +127,49 @@ class PlayerAPI{
 	public function ban($username)
 	{
 		$fp = fopen("./banned-username.txt", "a");
-		if($fp == NULL)
-		{
+		if($fp == NULL) {
 			console("[INFO] Could not ban: ".$username);
 			console("[INFO] Reason: Could not 'open' file 'banned-username.txt'");
+			return ;
 		}
 		
-		if( fwrite($fp, $username) == FALSE )
-		{
+		if( fwrite($fp, $username."\n") == FALSE ) {
 			console("[INFO] Could not ban: ".$username);
 			console("[INFO] Reason: Could not 'write' file 'banned-username.txt'");
+			return ;
 		}
-		else
-		{
+		else {
 			console("[INFO] Successfully banned: ".$username);
 		}
 	}
+	
+	public function checkforban($username)
+	{
+		console("[DEBUG] username recieved is :".$username.":");
+		$fp = fopen("./banned-username.txt", "r");
+		if($fp == NULL) {
+			console("[INFO] Could not ban: ".$username);
+			console("[INFO] Reason: Could not 'open' file 'banned-username.txt'");
+			return ;
+		}
+		
+		while(!feof($fp)) {
+			$bancheck = fgets($fp, 20);
+			$breaks = array("\r\n", "\n", "\r");
+			$newbancheck = str_replace($breaks, "", $bancheck);
+			console("[DEBUG] Bancheck is :".$bancheck.":");
+			if(strcmp($newbancheck, $username) == 0) {
+				console("[DEBUG] Bancheck Username is banned");
+				return true;
+			}
+			else {
+				console("[DEBUG] Bancheck Username is not banned");
+				return false;
+			}
+		}
+	}
+		
+		
 
 	public function teleport($name, $target){
 		$target = $this->get($target);

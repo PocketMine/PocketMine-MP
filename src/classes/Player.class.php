@@ -263,6 +263,7 @@ class Player{
 
 							break;
 						case MC_LOGIN:
+							console("MC_LOGIN called");
 							$this->username = str_replace(array("\x00", "/", " ", "\r", "\n"), array("", "-", "_", "", ""), $data["username"]);
 							if($this->username == ""){
 								$this->close("bad username", false);
@@ -299,6 +300,7 @@ class Player{
 								"eid" => 0,
 							));
 							
+							$data["username"] = $this->username;
 							$this->server->handle("player.login", $data);
 							break;
 						case MC_READY:
