@@ -26,7 +26,8 @@ libpng-dev \
 libmysqlclient-dev \
 libfreetype6-dev \
 libmcrypt-dev \
-libmhash-dev
+libmhash-dev \
+autoconf
 wget ftp://ftp.gmplib.org/pub/gmp-5.1.0/gmp-5.1.0.tar.bz2 -O gmp-5.1.0.tar.bz2
 tar -jxvf gmp-5.1.0.tar.bz2
 cd gmp-5.1.0
