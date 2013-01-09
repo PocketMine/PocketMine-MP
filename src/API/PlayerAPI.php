@@ -33,10 +33,13 @@ class PlayerAPI{
 
 	public function init(){
 		$this->server->event("server.regeneration", array($this, "handle"));
+		$this->server->event("player.login", array($this, "handle"));
 		$this->server->api->console->register("list", "Shows connected player list", array($this, "commandHandler"));
 		$this->server->api->console->register("kill", "Kills a player", array($this, "commandHandler"));
 		$this->server->api->console->register("tppos", "Teleports a player to a position", array($this, "commandHandler"));
 		$this->server->api->console->register("tp", "Teleports a player to another player", array($this, "commandHandler"));
+		$this->server->api->console->register("ban", "Bans a player", array($this, "commandHandler"));
+		$this->server->api->console->register("unban", "Removes a ban from a player", array($this, "commandHandler"));
 	}
 
 	public function handle($data, $event){
@@ -98,6 +101,35 @@ class PlayerAPI{
 					console("[INFO] ".$c->username." (".$c->ip.":".$c->port."), ClientID ".$c->clientID.", (".round($c->entity->x, 2).", ".round($c->entity->y, 2).", ".round($c->entity->z, 2).")");
 				}
 				break;
+			case "ban":
+				$player_Ban = array_shift($params);
+				console("[INFO] Banning Player: ".$player_Ban);
+				
+				break;
+			case "unban"
+				$player_unBan = array_shift($params);
+				console("[INFO] Un-Banning Player: ".$player_unBan);
+				
+		}
+	}
+	
+	public function ban($username)
+	{
+		$fp = fopen("./banned-username.txt", "a");
+		if($fp == NULL)
+		{
+			console("[INFO] Could not ban: ".$username);
+			console("[INFO] Reason: Could not 'open' file 'banned-username.txt'");
+		}
+		
+		if( fwrite($fp, $username) == FALSE )
+		{
+			console("[INFO] Could not ban: ".$username);
+			console("[INFO] Reason: Could not 'write' file 'banned-username.txt'");
+		}
+		else
+		{
+			console("[INFO] Successfully banned: ".$username);
 		}
 	}
 
