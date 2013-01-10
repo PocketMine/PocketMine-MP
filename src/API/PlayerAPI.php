@@ -120,6 +120,7 @@ class PlayerAPI{
 			case "unban":
 				$player_unBan = array_shift($params);
 				console("[INFO] Un-Banning Player: ".$player_unBan);
+				$this->unban($player_unBan);
 				
 		}
 	}
@@ -128,14 +129,14 @@ class PlayerAPI{
 	{
 		$fp = fopen("./banned-username.txt", "a");
 		if($fp == NULL) {
-			console("[INFO] Could not ban: ".$username);
-			console("[INFO] Reason: Could not 'open' file 'banned-username.txt'");
+			console("[ERROR] Could not ban: ".$username);
+			console("[ERROR] Reason: Could not 'open' file 'banned-username.txt'");
 			return ;
 		}
 		
 		if( fwrite($fp, $username."\n") == FALSE ) {
-			console("[INFO] Could not ban: ".$username);
-			console("[INFO] Reason: Could not 'write' file 'banned-username.txt'");
+			console("[ERROR] Could not ban: ".$username);
+			console("[ERROR] Reason: Could not 'write' file 'banned-username.txt'");
 			return ;
 		}
 		else {
@@ -145,11 +146,10 @@ class PlayerAPI{
 	
 	public function checkforban($username)
 	{
-		console("[DEBUG] username recieved is :".$username.":");
 		$fp = fopen("./banned-username.txt", "r");
 		if($fp == NULL) {
-			console("[INFO] Could not ban: ".$username);
-			console("[INFO] Reason: Could not 'open' file 'banned-username.txt'");
+			console("[ERROR] Ban check for username ".$username." failed");
+			console("[ERROR] Reason: Could not 'open' file 'banned-username.txt'");
 			return ;
 		}
 		
@@ -157,16 +157,63 @@ class PlayerAPI{
 			$bancheck = fgets($fp, 20);
 			$breaks = array("\r\n", "\n", "\r");
 			$newbancheck = str_replace($breaks, "", $bancheck);
-			console("[DEBUG] Bancheck is :".$bancheck.":");
 			if(strcmp($newbancheck, $username) == 0) {
-				console("[DEBUG] Bancheck Username is banned");
 				return true;
 			}
 			else {
-				console("[DEBUG] Bancheck Username is not banned");
 				return false;
 			}
 		}
+	}
+	
+	public function unban($username)
+	{
+		$fp = fopen("./banned-username.txt", "r");
+		if($fp == NULL) {
+			console("[ERROR] Ban check for username ".$username." failed");
+			console("[ERROR] Reason: Could not 'open' file 'banned-username.txt'");
+			return ;
+		}
+		$while_count = 0;
+		$username_was_banned = false;
+		
+		while(!feof($fp)) {
+			$bancheck = fgets($fp, 20);
+			$breaks = array("\r\n", "\n", "\r");
+			$newbancheck = str_replace($breaks, "", $bancheck);
+			if(strcmp($newbancheck, $username) == 0) {
+				$username_was_banned = true;
+			}
+			else {
+				$banned_usernames[$while_count] = $newbancheck;
+			}
+			
+			$while_count = $while_count + 1;
+		}
+		
+		fclose($fp);
+		
+		$fp = fopen("./banned-username.txt", "w");
+		if($fp == NULL) {
+			console("[ERROR] Ban check for username ".$username." failed");
+			console("[ERROR] Reason: Could not 'open' file 'banned-username.txt'");
+			return ;
+		}
+		
+		
+		for($re = 0; $re<=$while_count; $re++)
+		{
+			if( $banned_usernames[$re] )
+				fwrite($fp, $banned_usernames[$re]."\n");
+		}
+		
+		fclose($fp);
+		
+		if($username_was_banned == true)
+			console("[INFO] Successfully unbanned: ".$username);
+		else
+			console("[ERROR] ".$username." was not banned!");
+		
 	}
 		
 		
