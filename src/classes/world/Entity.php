@@ -61,6 +61,7 @@ class Entity extends stdClass{
 	public $speedY;
 	public $speedZ;
 	public $speed;
+	public $maxSpeedY;
 	public $last = array(0, 0, 0, 0, 0, 0);
 	public $yaw;
 	public $pitch;
@@ -104,6 +105,7 @@ class Entity extends stdClass{
 		$this->speedY = /*isset($this->data["speedY"]) ? $this->data["speedY"]:*/0;
 		$this->speedZ = /*isset($this->data["speedZ"]) ? $this->data["speedZ"]:*/0;
 		$this->speed = 0;
+		$this->maxSpeedY = 0;
 		$this->yaw = isset($this->data["yaw"]) ? $this->data["yaw"]:0;
 		$this->pitch = isset($this->data["pitch"]) ? $this->data["pitch"]:0;
 		$this->position = array("x" => &$this->x, "y" => &$this->y, "z" => &$this->z, "yaw" => &$this->yaw, "pitch" => &$this->pitch);
@@ -475,6 +477,84 @@ class Entity extends stdClass{
 		$this->speedY = $speedY;
 		$this->speedZ = $speedZ;		
 		$this->speed = $origin->distance($final) / $diffTime;
+		if($this->speedY > $this->maxSpeedY){
+			$this->maxSpeedY = $this->speedY;
+			//console("New Max Speed: ".$this->maxSpeedY);
+		}
+		if($this->speedY == 0 && $this->maxSpeedY != 0){
+			$this->maxSpeedY = round($this->maxSpeedY);
+			$this->maxSpeedY /= 2;
+			switch($this->maxSpeedY){
+			case 1:
+			case 2:
+			case 3:
+				//This is a placeholder, because the default will kill the person
+			break;
+			case 4:
+				$this->harm(1, "falling");
+			break;
+			case 5:
+				$this->harm(2, "falling");
+			break;
+			case 6:
+				$this->harm(3, "falling");
+			break;
+			case 7:
+				$this->harm(4, "falling");
+			break;
+			case 8:
+				$this->harm(5, "falling");
+			break;
+			case 9:
+				$this->harm(6, "falling");
+			break;
+			case 10:
+				$this->harm(7, "falling");
+			break;
+			case 11:
+				$this->harm(8, "falling");
+			break;
+			case 12:
+				$this->harm(9, "falling");
+			break;
+			case 13:
+				$this->harm(10, "falling");
+			break;
+			case 14:
+				$this->harm(11, "falling");
+			break;
+			case 15:
+				$this->harm(12, "falling");
+			break;
+			case 16:
+				$this->harm(13, "falling");
+			break;
+			case 17:
+				$this->harm(14, "falling");
+			break;
+			case 18:
+				$this->harm(15, "falling");
+			break;
+			case 19:
+				$this->harm(16, "falling");
+			break;
+			case 20:
+				$this->harm(17, "falling");
+			break;
+			case 21:
+				$this->harm(18, "falling");
+			break;
+			case 22:
+				$this->harm(19, "falling");
+			break;
+			case 23:
+			default:
+				$this->harm(20, "falling");
+			break;
+			}
+			$this->maxSpeedY = 0;
+			$this->updateMetadata();
+		}
 	}
 	
 	public function updateLast(){		
