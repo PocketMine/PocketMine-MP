@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 COMPILER_VERSION="0.8"
 
 PHP_VERSION="5.4.11"
