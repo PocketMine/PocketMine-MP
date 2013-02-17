@@ -129,7 +129,7 @@ fi
 set -e
 echo -n " checking..."
 cd php
-./buildconf --force >> ""$DIR/install.log"" 2>&1
+./buildconf --force >> "$DIR/install.log" 2>&1
 ./configure $OPTIMIZATION--prefix="$DIR/php5" \
 --exec-prefix="$DIR/php5" \
 --enable-embedded-mysqli \
