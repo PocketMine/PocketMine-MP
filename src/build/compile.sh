@@ -63,7 +63,7 @@ echo -n " checking..."
 cd libedit
 ./configure --prefix="$DIR/install_data/php/ext/libedit" --enable-static >> "$DIR/install.log" 2>&1
 echo -n " compiling..."
-if make >> "$DIR/install.log" 2>&1; then
+if make -j2 >> "$DIR/install.log" 2>&1; then
 	echo -n " installing..."
 	make install >> "$DIR/install.log" 2>&1
 	HAVE_LIBEDIT="--with-libedit=$DIR/install_data/php/ext/libedit"
@@ -85,7 +85,7 @@ cd zlib
 ./configure --prefix="$DIR/install_data/php/ext/zlib" \
 --static >> "$DIR/install.log" 2>&1
 echo -n " compiling..."
-make >> "$DIR/install.log" 2>&1
+make -j2 >> "$DIR/install.log" 2>&1
 echo -n " installing..."
 make install >> "$DIR/install.log" 2>&1
 echo -n " cleaning..."
@@ -113,7 +113,7 @@ cd curl
 --prefix="$DIR/install_data/php/ext/curl" \
 --disable-shared >> "$DIR/install.log" 2>&1
 echo -n " compiling..."
-make >> "$DIR/install.log" 2>&1
+make -j2 >> "$DIR/install.log" 2>&1
 echo -n " installing..."
 make install >> "$DIR/install.log" 2>&1
 echo -n " cleaning..."
@@ -183,7 +183,7 @@ rm -f ./configure >> "$DIR/install.log" 2>&1
 --without-pdo-sqlite \
 --with-zend-vm=$ZEND_VM >> "$DIR/install.log" 2>&1
 echo -n " compiling..."
-make >> "$DIR/install.log" 2>&1
+make -j2 >> "$DIR/install.log" 2>&1
 echo -n " installing..."
 make install >> "$DIR/install.log" 2>&1
 echo " done!"
