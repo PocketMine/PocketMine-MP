@@ -118,7 +118,7 @@ class Entity extends Position{
 			case ENTITY_MOB:
 				$this->setHealth(isset($this->data["Health"]) ? $this->data["Health"]:10, "generic");
 				$this->update();
-				//$this->setName((isset($mobs[$this->type]) ? $mobs[$this->type]:$this->type));
+				$this->setName((isset($mobs[$this->type]) ? $mobs[$this->type]:$this->type));
 				$this->size = 1;
 				break;
 			case ENTITY_FALLING:
