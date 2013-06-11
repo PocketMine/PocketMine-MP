@@ -25,16 +25,10 @@ the Free Software Foundation, either version 3 of the License, or
 
 */
 
-interface LevelGenerator{
-	public function __construct(array $options = array());
-	
-	public function init(Level $level, Random $random);
+class VectorMath{
 
-	public function generateChunk($chunkX, $chunkZ);
+	public static function getDirection2D($azimuth){
+		return new Vector2(cos($azimuth), sin($azimuth));
+	}
 	
-	public function populateChunk($chunkX, $chunkZ);
-	
-	public function populateLevel();
-	
-	public function getSpawn();
 }
