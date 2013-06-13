@@ -260,7 +260,7 @@ class BlockAPI{
 			return $this->cancelAction($target, $player, false);
 		}
 		
-		if((!$target->isBreakable($item, $player) and $this->server->api->dhandle("player.block.break.invalid", array("player" => $player, "target" => $target, "item" => $item)) !== true) or ($player->gamemode & 0x02) === 0x02 or (($player->lastBreak - 0.05) + $target->getBreakTime($item, $player)) >= microtime(true)){
+		if((!$target->isBreakable($item, $player) and $this->server->api->dhandle("player.block.break.invalid", array("player" => $player, "target" => $target, "item" => $item)) !== true) or ($player->gamemode & 0x02) === 0x02 or (($player->lastBreak - $player->getLag() / 1000) + $target->getBreakTime($item, $player) - 0.1) >= microtime(true)){
 			return $this->cancelAction($target, $player, false);
 		}
 		$player->lastBreak = microtime(true);
@@ -751,6 +751,7 @@ class BlockAPI{
 		$level = $block->onUpdate($type);
 		if($level === BLOCK_UPDATE_NORMAL){
 			$this->blockUpdateAround($block, $level);
+			$this->server->api->entity->updateRadius($pos, 3);
 		}elseif($level === BLOCK_UPDATE_RANDOM){
 			$this->scheduleBlockUpdate($pos, Utils::getRandomUpdateTicks(), BLOCK_UPDATE_RANDOM);
 		}

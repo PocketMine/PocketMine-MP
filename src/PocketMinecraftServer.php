@@ -28,7 +28,7 @@ the Free Software Foundation, either version 3 of the License, or
 class PocketMinecraftServer{
 	public $tCnt;
 	public $serverID, $interface, $database, $version, $invisible, $api, $tickMeasure, $preparedSQL, $seed, $gamemode, $name, $maxClients, $clients, $eidCnt, $custom, $description, $motd, $port, $saveEnabled;
-	private $serverip, $evCnt, $handCnt, $events, $eventsID, $handlers, $serverType, $lastTick, $ticks, $memoryStats;
+	private $serverip, $evCnt, $handCnt, $events, $eventsID, $handlers, $serverType, $lastTick, $ticks, $memoryStats, $async = array(), $asyncID = 0;
 	
 	private function load(){
 		$this->version = new VersionString();
@@ -73,6 +73,7 @@ class PocketMinecraftServer{
 		$this->reloadConfig();
 		$this->stop = false;
 		$this->ticks = 0;
+		$this->asyncThread = new AsyncMultipleQueue();
 	}
 
 	function __construct($name, $gamemode = SURVIVAL, $seed = false, $port = 19132, $serverip = "0.0.0.0"){
@@ -96,7 +97,7 @@ class PocketMinecraftServer{
 	public function titleTick(){
 		$time = microtime(true);
 		if(ENABLE_ANSI === true){
-			echo "\x1b]0;PocketMine-MP ".MAJOR_VERSION." | Online ". count($this->clients)."/".$this->maxClients." | RAM ".round((memory_get_usage() / 1024) / 1024, 2)."MB | U ".round(($this->interface->bandwidth[0] / max(1, $time - $this->interface->bandwidth[2])) / 1024, 2)." D ".round(($this->interface->bandwidth[1] / max(1, $time - $this->interface->bandwidth[2])) / 1024, 2)." kB/s | TPS ".$this->getTPS()."\x07";
+			echo "\x1b]0;PocketMine-MP ".MAJOR_VERSION." | Online ". count($this->clients)."/".$this->maxClients." | RAM ".round((memory_get_usage() / 1024) / 1024, 2)."MB | U ".round(($this->interface->bandwidth[1] / max(1, $time - $this->interface->bandwidth[2])) / 1024, 2)." D ".round(($this->interface->bandwidth[0] / max(1, $time - $this->interface->bandwidth[2])) / 1024, 2)." kB/s | TPS ".$this->getTPS()."\x07";
 		}
 		$this->interface->bandwidth = array(0, 0, $time);
 	}
@@ -107,6 +108,7 @@ class PocketMinecraftServer{
 		}
 		$this->schedule(20 * 15, array($this, "checkTicks"), array(), true);
 		$this->schedule(20 * 60 * 10, array($this, "checkMemory"), array(), true);
+		$this->schedule(20, array($this, "asyncOperationChecker"), array(), true);
 	}
 	
 	public function checkTicks(){
@@ -119,7 +121,7 @@ class PocketMinecraftServer{
 		$info = $this->debugInfo();
 		$data = $info["memory_usage"].",".$info["players"].",".$info["entities"];
 		$i = count($this->memoryStats) - 1;
-		if($i > -1 and $this->memoryStats[$i] !== $data){
+		if($i === -1 or $this->memoryStats[$i] !== $data){
 			$this->memoryStats[] = $data;
 		}
 	}
@@ -190,6 +192,7 @@ class PocketMinecraftServer{
 			$this->stop = true;
 			$this->trigger("server.close", $reason);
 			$this->interface->close();
+			@$this->asyncThread->stop = true;
 		}
 	}
 
@@ -204,6 +207,59 @@ class PocketMinecraftServer{
 				break;
 		}
 
+	}
+	
+	public function asyncOperation($type, array $data, callable $callable = null){
+		$d = "";
+		$type = (int) $type;
+		switch($type){
+			case ASYNC_CURL_GET:
+				$d .= Utils::writeShort(strlen($data["url"])).$data["url"].(isset($data["timeout"]) ? Utils::writeShort($data["timeout"]) : Utils::writeShort(10));
+				break;
+			case ASYNC_CURL_POST:
+				$d .= Utils::writeShort(strlen($data["url"])).$data["url"].(isset($data["timeout"]) ? Utils::writeShort($data["timeout"]) : Utils::writeShort(10));
+				$d .= Utils::writeShort(count($data["data"]));
+				foreach($data["data"] as $key => $value){
+					$d .= Utils::writeShort(strlen($key)).$key . Utils::writeInt(strlen($value)).$value;
+				}
+				break;
+			default:
+				return false;
+		}
+		$ID = $this->asyncID++;
+		$this->async[$ID] = $callable;
+		$this->asyncThread->input .= Utils::writeInt($ID).Utils::writeShort($type).$d;
+		return $ID;
+	}
+	
+	public function asyncOperationChecker(){
+		if(isset($this->asyncThread->output{5})){
+			$offset = 0;
+			$ID = Utils::readInt(substr($this->asyncThread->output, $offset, 4));
+			$offset += 4;
+			$type = Utils::readShort(substr($this->asyncThread->output, $offset, 2));
+			$offset += 2;
+			$data = array();
+			switch($type){
+				case ASYNC_CURL_GET:
+				case ASYNC_CURL_POST:
+					$len = Utils::readInt(substr($this->asyncThread->output, $offset, 4));
+					$offset += 2;
+					$data["result"] = substr($this->asyncThread->output, $offset, $len);
+					$offset += $len;
+					break;
+			}
+			$this->asyncThread->output = substr($this->asyncThread->output, $offset);
+			if(isset($this->async[$ID]) and $this->async[$ID] !== null and is_callable($this->async[$ID])){
+				if(is_array($this->async[$ID])){
+					$method = $this->async[$ID][1];
+					$result = $this->async[$ID][0]->$method($data, $type, $ID);
+				}else{
+					$result = $this->async[$ID]($data, $type, $ID);
+				}
+			}
+			unset($this->async[$ID]);
+		}
 	}
 
 	public function addHandler($event,callable $callable, $priority = 5){
@@ -222,6 +278,10 @@ class PocketMinecraftServer{
 		$this->query("INSERT INTO handlers (ID, name, priority) VALUES (".$hnid.", '".str_replace("'", "\\'", $event)."', ".$priority.");");
 		console("[INTERNAL] New handler ".(is_array($callable) ? get_class($callable[0])."::".$callable[1]:$callable)." to special event ".$event." (ID ".$hnid.")", true, true, 3);
 		return $hnid;
+	}
+	
+	public function dhandle($e, $d){
+		return $this->handle($e, $d);
 	}
 
 	public function handle($event, &$data){
@@ -469,14 +529,16 @@ class PocketMinecraftServer{
 					$port = $data[2];
 					$MTU = $data[3];
 					$clientID = $data[4];
-					$this->clients[$CID] = new Player($clientID, $packet["ip"], $packet["port"], $MTU); //New Session!
-					$this->send(0x08, array(
-						RAKNET_MAGIC,
-						$this->serverID,
-						$this->port,
-						$data[3],
-						0,
-					), false, $packet["ip"], $packet["port"]);
+					if(count($this->clients) < $this->maxClients){
+						$this->clients[$CID] = new Player($clientID, $packet["ip"], $packet["port"], $MTU); //New Session!
+						$this->send(0x08, array(
+							RAKNET_MAGIC,
+							$this->serverID,
+							$this->port,
+							$data[3],
+							0,
+						), false, $packet["ip"], $packet["port"]);
+					}
 					break;
 			}
 		}

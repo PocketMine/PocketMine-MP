@@ -236,15 +236,17 @@ class ConsoleAPI{
 				$params = array();
 			}
 			
-			if($this->server->api->dhandle("console.command.".$cmd, array("cmd" => $cmd, "parameters" => $params, "issuer" => $issuer, "alias" => $alias)) === false
-			or $this->server->api->dhandle("console.command", array("cmd" => $cmd, "parameters" => $params, "issuer" => $issuer, "alias" => $alias)) === false){
-				$output = "You don't have permission to use this command.\n";
-			}else{
+			if(($d1 = $this->server->api->dhandle("console.command.".$cmd, array("cmd" => $cmd, "parameters" => $params, "issuer" => $issuer, "alias" => $alias))) === false
+			or ($d2 = $this->server->api->dhandle("console.command", array("cmd" => $cmd, "parameters" => $params, "issuer" => $issuer, "alias" => $alias))) === false){
+				$output = "You don't have permissions to use this command.\n";
+			}elseif($d1 !== true and $d2 !== true){
 				if(isset($this->cmds[$cmd]) and is_callable($this->cmds[$cmd])){
 					$output = @call_user_func($this->cmds[$cmd], $cmd, $params, $issuer, $alias);
 				}elseif($this->server->api->dhandle("console.command.unknown", array("cmd" => $cmd, "params" => $params, "issuer" => $issuer, "alias" => $alias)) !== false){
 					$output = $this->defaultCommands($cmd, $params, $issuer, $alias);
 				}
+			}else{
+				$output = "";
 			}
 			if($output != "" and ($issuer instanceof Player)){
 				$issuer->sendChat(trim($output));

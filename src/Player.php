@@ -153,12 +153,12 @@ class Player{
 			return false;
 		}
 
-		foreach($this->chunkCount as $i => $count){
-			if(isset($this->recoveryQueue[$count])){
+		foreach($this->chunkCount as $count => $t){
+			if(isset($this->recoveryQueue[$count]) or isset($this->resendQueue[$count])){
 				$this->server->schedule(MAX_CHUNK_RATE, array($this, "getNextChunk"));
 				return;
 			}else{
-				unset($this->chunkCount[$i]);
+				unset($this->chunkCount[$count]);
 			}
 		}
 
@@ -186,11 +186,15 @@ class Player{
 				$Yndex |= 1 << $iY;
 			}
 		}
-		$this->chunkCount = $this->dataPacket(MC_CHUNK_DATA, array(
+		$cnt = $this->dataPacket(MC_CHUNK_DATA, array(
 			"x" => $X,
 			"z" => $Z,
 			"data" => $this->level->getOrderedChunk($X, $Z, $Yndex),
 		));
+		$this->chunkCount = array();
+		foreach($cnt as $i => $count){
+			$this->chunkCount[$count] = true;
+		}
 		/*$this->chunkCount = $this->dataPacket(MC_CHUNK_DATA, array(
 			"x" => $X,
 			"z" => $Z,
@@ -276,11 +280,11 @@ class Player{
 			$add = 0;
 			foreach($inv as $s => $item){
 				if($item->getID() === AIR){
-					$add = min(64, $count);
+					$add = min($item->getMaxStackSize(), $count);
 					$inv[$s] = BlockAPI::getItem($type, $damage, $add);
 					break;
 				}elseif($item->getID() === $type and $item->getMetadata() === $damage){
-					$add = min(64 - $item->count, $count);
+					$add = min($item->getMaxStackSize() - $item->count, $count);
 					if($add <= 0){
 						continue;
 					}
@@ -301,14 +305,14 @@ class Player{
 			$add = 0;
 			foreach($this->inventory as $s => $item){
 				if($item->getID() === AIR){
-					$add = min(64, $count);
+					$add = min($item->getMaxStackSize(), $count);
 					$this->inventory[$s] = BlockAPI::getItem($type, $damage, $add);
 					if($send === true){
 						$this->sendInventorySlot($s);
 					}
 					break;
 				}elseif($item->getID() === $type and $item->getMetadata() === $damage){
-					$add = min(64 - $item->count, $count);
+					$add = min($item->getMaxStackSize() - $item->count, $count);
 					if($add <= 0){
 						continue;
 					}
@@ -468,19 +472,6 @@ class Player{
 				$this->dataPacket(MC_PLAYER_EQUIPMENT, $data);
 
 				break;
-			case "entity.move":
-				if($data->eid === $this->eid or $data->level !== $this->level){
-					break;
-				}
-				$this->dataPacket(MC_MOVE_ENTITY_POSROT, array(
-					"eid" => $data->eid,
-					"x" => $data->x,
-					"y" => $data->y,
-					"z" => $data->z,
-					"yaw" => $data->yaw,
-					"pitch" => $data->pitch,
-				));
-				break;
 			case "entity.motion":
 				if($data->eid === $this->eid or $data->level !== $this->level){
 					break;
@@ -570,9 +561,12 @@ class Player{
 					}
 				}
 			}
-			$this->dataPacket(MC_CHAT, array(				
-				"message" => $m,
-			));	
+			
+			if($m !== ""){			
+				$this->dataPacket(MC_CHAT, array(				
+					"message" => $m,
+				));
+			}
 		}
 	}
 	
@@ -866,6 +860,9 @@ class Player{
 						if($p["counter"] > $this->receiveCount){
 							$this->receiveCount = $p["counter"];
 						}elseif($p["counter"] !== 0){
+							if(($p["counter"] - $this->receiveCount) > 16){
+								continue;
+							}
 							switch($p["id"]){
 								case 0x01:
 								case MC_PONG:
@@ -897,11 +894,15 @@ class Player{
 		}
 
 		if(($resendCnt = count($this->resendQueue)) > 0){
-			foreach($this->resendQueue as $count => $data){
+			foreach($this->resendQueue as $count => $data){				
 				unset($this->resendQueue[$count]);
 				$this->packetStats[1]++;
 				$this->lag[] = microtime(true) - $data["sendtime"];
-				$this->directDataPacket($data["id"], $data, $data["pid"]);
+				$cnt = $this->directDataPacket($data["id"], $data, $data["pid"]);
+				if(isset($this->chunkCount[$count])){
+					unset($this->chunkCount[$count]);
+					$this->chunkCount[$cnt[0]] = true;
+				}
 			}
 		}
 	}
@@ -1044,7 +1045,7 @@ class Player{
 				}
 				
 				if(!($this->data instanceof Config)){
-					$u->close("no config created", false);
+					$this->close("no config created", false);
 					return;
 				}
 				
@@ -1112,7 +1113,6 @@ class Player{
 				$this->entity->data["CID"] = $this->CID;
 				$this->evid[] = $this->server->event("server.chat", array($this, "eventHandler"));
 				$this->evid[] = $this->server->event("entity.remove", array($this, "eventHandler"));
-				$this->evid[] = $this->server->event("entity.move", array($this, "eventHandler"));
 				$this->evid[] = $this->server->event("entity.motion", array($this, "eventHandler"));
 				$this->evid[] = $this->server->event("entity.animate", array($this, "eventHandler"));
 				$this->evid[] = $this->server->event("entity.event", array($this, "eventHandler"));
@@ -1213,12 +1213,25 @@ class Player{
 				}
 				break;
 			case MC_REQUEST_CHUNK:
-				if($this->spawned === false){
-					break;
-				}
 				break;
 			case MC_USE_ITEM:
-				if($this->spawned === false){
+				if($this->spawned === false or $this->blocked === true){
+					$target = $this->level->getBlock(new Vector3($data["x"], $data["y"], $data["z"]));
+					$block = $target->getSide($data["face"]);
+					$this->dataPacket(MC_UPDATE_BLOCK, array(
+						"x" => $target->x,
+						"y" => $target->y,
+						"z" => $target->z,
+						"block" => $target->getID(),
+						"meta" => $target->getMetadata()		
+					));
+					$this->dataPacket(MC_UPDATE_BLOCK, array(
+						"x" => $block->x,
+						"y" => $block->y,
+						"z" => $block->z,
+						"block" => $block->getID(),
+						"meta" => $block->getMetadata()		
+					));
 					break;
 				}
 				$this->craftingItems = array();
@@ -1261,7 +1274,7 @@ class Player{
 				}
 				break;
 			case MC_PLAYER_ACTION:
-				if($this->spawned === false){
+				if($this->spawned === false or $this->blocked === true){
 					break;
 				}
 				$this->craftingItems = array();
@@ -1289,10 +1302,15 @@ class Player{
 				$this->entity->updateMetadata();
 				break;
 			case MC_REMOVE_BLOCK:
-				if($this->spawned === false){
-					break;
-				}
-				if($this->blocked === true or $this->entity->distance(new Vector3($data["x"], $data["y"], $data["z"])) > 8){
+				if($this->spawned === false or $this->blocked === true or $this->entity->distance(new Vector3($data["x"], $data["y"], $data["z"])) > 8){
+					$target = $this->level->getBlock(new Vector3($data["x"], $data["y"], $data["z"]));
+					$this->dataPacket(MC_UPDATE_BLOCK, array(
+						"x" => $target->x,
+						"y" => $target->y,
+						"z" => $target->z,
+						"block" => $target->getID(),
+						"meta" => $target->getMetadata()		
+					));
 					break;
 				}
 				$this->craftingItems = array();
@@ -1300,7 +1318,7 @@ class Player{
 				$this->server->api->block->playerBlockBreak($this, new Vector3($data["x"], $data["y"], $data["z"]));
 				break;
 			case MC_PLAYER_ARMOR_EQUIPMENT:
-				if($this->spawned === false){
+				if($this->spawned === false or $this->blocked === true){
 					break;
 				}
 				$this->craftingItems = array();
@@ -1333,7 +1351,7 @@ class Player{
 				}
 				break;
 			case MC_INTERACT:
-				if($this->spawned === false){
+				if($this->spawned === false or $this->blocked === true){
 					break;
 				}
 				$this->craftingItems = array();
@@ -1442,7 +1460,7 @@ class Player{
 			case MC_SET_HEALTH: //Not used
 				break;
 			case MC_ENTITY_EVENT:
-				if($this->spawned === false){
+				if($this->spawned === false or $this->blocked === true){
 					break;
 				}
 				$this->craftingItems = array();
@@ -1486,7 +1504,7 @@ class Player{
 				}
 				break;
 			case MC_DROP_ITEM:
-				if($this->spawned === false){
+				if($this->spawned === false or $this->blocked === true){
 					break;
 				}
 				$this->craftingItems = array();
@@ -1502,7 +1520,7 @@ class Player{
 				}
 				break;
 			case MC_SIGN_UPDATE:
-				if($this->spawned === false){
+				if($this->spawned === false or $this->blocked === true){
 					break;
 				}
 				$this->craftingItems = array();
@@ -1545,7 +1563,7 @@ class Player{
 				));
 				break;
 			case MC_CONTAINER_SET_SLOT:
-				if($this->spawned === false){
+				if($this->spawned === false or $this->blocked === true){
 					break;
 				}
 				
@@ -1597,6 +1615,9 @@ class Player{
 						}
 						$this->craftingItems = array();				
 					}
+				}else{
+					$this->toCraft = array();
+					$this->craftingItems = array();
 				}
 				if(!isset($this->windows[$data["windowid"]])){
 					break;
