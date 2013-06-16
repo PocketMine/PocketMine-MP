@@ -61,7 +61,7 @@ class ChatAPI{
 				}else{
 					$sender = $issuer->username;
 				}
-				$this->broadcast("* $sender ".implode(" ", $params));
+				$this->broadcast("[CHAT] * $sender ".implode(" ", $params));
 				break;
 			case "tell":
 				if(!isset($params[0]) or !isset($params[1])){
@@ -79,7 +79,7 @@ class ChatAPI{
 					$target = $target->username;
 				}else{
 					$target = strtolower($n);
-					if($t === "server" or $t === "console" or $t === "rcon"){
+					if($target === "server" or $target === "console" or $target === "rcon"){
 						$target = "Console";
 					}
 				}
@@ -88,7 +88,7 @@ class ChatAPI{
 				if($target !== "Console" and $target !== "Rcon"){
 					$this->sendTo(false, "[".$sender." -> me] ".$mes, $target);
 				}
-				console("[INFO] [".$sender." -> ".$target."] ".$mes);
+				console("[PRIVAT] [".$sender." -> ".$target."] ".$mes);
 				break;
 		}
 		return $output;
@@ -113,7 +113,7 @@ class ChatAPI{
 		}
 		$message .= $text;
 		if($whitelist === false){
-			console("[INFO] ".$message);
+			console("[CHAT] ".$message);
 		}
 		$this->server->handle("server.chat", new Container($message, $whitelist, $blacklist));
 	}
