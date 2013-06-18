@@ -1376,6 +1376,11 @@ class Player{
 				$this->craftingItems = array();
 				$this->toCraft = array();
 				$target = $this->server->api->entity->get($data["target"]);
+				$t = new Vector2($target->x, $target->z);
+				$s = new Vector2($this->server->spawn->x, $this->server->spawn->z);
+				if($t->distance($s) <= $this->server->api->getProperty("spawn-protection")){
+					break;
+				}
 				if($this->gamemode !== VIEW and $this->blocked === false and ($target instanceof Entity) and $this->entity->distance($target) <= 8){
 					$data["targetentity"] = $target;
 					$data["entity"] = $this->entity;
