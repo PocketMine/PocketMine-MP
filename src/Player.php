@@ -1376,10 +1376,12 @@ class Player{
 				$this->craftingItems = array();
 				$this->toCraft = array();
 				$target = $this->server->api->entity->get($data["target"]);
+				$t = new Vector2($target->x, $target->z);
+				$s = new Vector2($this->server->spawn->x, $this->server->spawn->z);
 				if($this->gamemode !== VIEW and $this->blocked === false and ($target instanceof Entity) and $this->entity->distance($target) <= 8){
 					$data["targetentity"] = $target;
 					$data["entity"] = $this->entity;
-					if($target->class === ENTITY_PLAYER and ($this->server->api->getProperty("pvp") == false or $this->server->difficulty <= 0 or ($target->player->gamemode & 0x01) === 0x01)){
+					if($target->class === ENTITY_PLAYER and ($this->server->api->getProperty("pvp") == false or $this->server->difficulty <= 0 or ($target->player->gamemode & 0x01) === 0x01 or $t->distance($s) <= $this->server->api->getProperty("spawn-protection") )){
 						break;
 					}elseif($this->server->handle("player.interact", $data) !== false){
 						$slot = $this->getSlot($this->slot);
