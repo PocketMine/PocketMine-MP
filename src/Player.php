@@ -232,15 +232,19 @@ class Player{
 			));
 			$inv = array();			
 			foreach($this->inventory as $slot => $item){
-				if($slot < (($this->gamemode & 0x01) === 0 ? PLAYER_SURVIVAL_SLOTS:PLAYER_CREATIVE_SLOTS)){
-					$inv[$slot] = array($item->getID(), $item->getMetadata(), $item->count);
+				if($item instanceof Item){
+					if($slot < (($this->gamemode & 0x01) === 0 ? PLAYER_SURVIVAL_SLOTS:PLAYER_CREATIVE_SLOTS)){
+						$inv[$slot] = array($item->getID(), $item->getMetadata(), $item->count);
+					}
 				}
 			}
 			$this->data->set("inventory", $inv);
 			
 			$armor = array();
 			foreach($this->armor as $slot => $item){
-				$armor[$slot] = array($item->getID(), $item->getMetadata());
+				if($item instanceof Item){
+					$armor[$slot] = array($item->getID(), $item->getMetadata());
+				}
 			}
 			$this->data->set("armor", $armor);
 			$this->data->set("gamemode", $this->gamemode);
@@ -1231,7 +1235,10 @@ class Player{
 			case MC_REQUEST_CHUNK:
 				break;
 			case MC_USE_ITEM:
-				if($this->spawned === false or $this->blocked === true){
+				if(!($this->entity instanceof Entity)){
+					break;
+				}
+				if(($this->spawned === false or $this->blocked === true) and $data["face"] >= 0 and $data["face"] <= 5){
 					$target = $this->level->getBlock(new Vector3($data["x"], $data["y"], $data["z"]));
 					$block = $target->getSide($data["face"]);
 					$this->dataPacket(MC_UPDATE_BLOCK, array(
@@ -1367,7 +1374,7 @@ class Player{
 				}
 				break;
 			case MC_INTERACT:
-				if($this->spawned === false or $this->blocked === true){
+				if($this->spawned === false){
 					break;
 				}
 				$this->craftingItems = array();
@@ -1376,9 +1383,7 @@ class Player{
 				if($this->gamemode !== VIEW and $this->blocked === false and ($target instanceof Entity) and $this->entity->distance($target) <= 8){
 					$data["targetentity"] = $target;
 					$data["entity"] = $this->entity;
-					if(!($target instanceof Entity)){
-						break;
-					}elseif($target->class === ENTITY_PLAYER and ($this->server->api->getProperty("pvp") == false or $this->server->difficulty <= 0 or ($target->player->gamemode & 0x01) === 0x01)){
+					if($target->class === ENTITY_PLAYER and ($this->server->api->getProperty("pvp") == false or $this->server->difficulty <= 0 or ($target->player->gamemode & 0x01) === 0x01)){
 						break;
 					}elseif($this->server->handle("player.interact", $data) !== false){
 						$slot = $this->getSlot($this->slot);

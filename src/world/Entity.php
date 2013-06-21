@@ -113,7 +113,7 @@ class Entity extends Position{
 				$this->setHealth(5, "generic");
 				$this->server->schedule(6010, array($this, "update")); //Despawn
 				$this->update();
-				$this->size = 0.5;
+				$this->size = 0.75;
 				break;
 			case ENTITY_MOB:
 				$this->setHealth(isset($this->data["Health"]) ? $this->data["Health"]:10, "generic");
@@ -135,6 +135,9 @@ class Entity extends Position{
 				$this->size = 1;
 				if($this->type === OBJECT_PAINTING){
 					$this->isStatic = true;
+				}elseif($this->type === OBJECT_ARROW){
+					$this->server->schedule(1210, array($this, "update")); //Despawn
+					$this->update();
 				}
 				break;
 		}
@@ -365,7 +368,6 @@ class Entity extends Position{
 		if($this->closed === true){
 			return false;
 		}
-
 		$now = microtime(true);
 		if($this->check === false){
 			$this->lastUpdate = $now;
@@ -432,7 +434,7 @@ class Entity extends Position{
 								if($this->level->getBlock(new Vector3($x, $y, $z))->isSolid === true){
 									$ny = $y + 1;
 									$this->speedY = 0;
-									$this->support = true;
+									$support = true;
 									if($this->class === ENTITY_FALLING){
 										$this->y = $ny;
 										$fall = $this->level->getBlock(new Vector3(intval($this->x - 0.5), intval(ceil($this->y)), intval($this->z - 0.5)));
@@ -781,9 +783,9 @@ class Entity extends Position{
 	}
 	
 	public function isSupport(Vector3 $pos, $radius = 1){
-		$me = new Vector3($this->x - 0.5, $pos->y, $this->z - 0.5);
+		$me = new Vector2($this->x - 0.5, $this->z - 0.5);
 		$diff = $this->y - $pos->y;
-		if($me->distance($pos) < $radius and $diff > 0 and $diff < 1.6){
+		if($me->distance(new Vector2($pos->x, $pos->z)) < $radius and $diff > -0.7 and $diff < 1.6){
 			return true;
 		}
 		return false;
@@ -940,6 +942,10 @@ class Entity extends Position{
 
 	public function getHealth(){
 		return $this->health;
+	}
+	
+	public function __toString(){
+		return "Entity(x={$this->x},y={$this->y},z={$this->z},level=".$this->level->getName().",class={$this->class},type={$this->type})";
 	}
 
 }

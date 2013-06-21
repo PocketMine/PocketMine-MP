@@ -752,7 +752,7 @@ class BlockAPI{
 		$level = $block->onUpdate($type);
 		if($level === BLOCK_UPDATE_NORMAL){
 			$this->blockUpdateAround($block, $level);
-			$this->server->api->entity->updateRadius($pos, 3);
+			$this->server->api->entity->updateRadius($pos, 1);
 		}elseif($level === BLOCK_UPDATE_RANDOM){
 			$this->nextRandomUpdate($pos);
 		}
@@ -785,16 +785,16 @@ class BlockAPI{
 			$offset = 0;
 			while(true){
 				$t = $offset + Utils::getRandomUpdateTicks() * 0.05;
-				$update = $this->server->query("SELECT COUNT(*) FROM blockUpdates WHERE level = '".$pos->level->getName()."' AND type = ".BLOCK_UPDATE_RANDOM." AND delay >= ".($time + $t - 1.5)." AND delay <= ".($time + $t + 1.5).";");
+				$update = $this->server->query("SELECT COUNT(*) FROM blockUpdates WHERE level = '".$pos->level->getName()."' AND type = ".BLOCK_UPDATE_RANDOM." AND delay >= ".($time + $t - 1)." AND delay <= ".($time + $t + 1).";");
 				if($update instanceof SQLite3Result){
 					$update = $update->fetchArray(SQLITE3_NUM);
-					if($update[0] == 0){
+					if($update[0] < 3){
 						break;
 					}
 				}else{
 					break;
 				}
-				$offset += 10;
+				$offset += mt_rand(25, 75);
 			}
 			$this->scheduleBlockUpdate($pos, $t / 0.05, BLOCK_UPDATE_RANDOM);
 		}
