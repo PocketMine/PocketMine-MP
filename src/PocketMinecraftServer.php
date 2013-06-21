@@ -549,12 +549,15 @@ class PocketMinecraftServer{
 	}
 
 	public function process(){
+		$delay = 1
 		while($this->stop === false){
 			$packet = $this->interface->readPacket();
 			if($packet !== false){
 				$this->packetHandler($packet);
+				$delay=1;
 			}else{
-				usleep(1);
+				usleep($delay);
+				if ($delay < 25*1000) $delay += 500;
 			}
 		}
 	}
