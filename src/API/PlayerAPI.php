@@ -51,6 +51,7 @@ class PlayerAPI{
 	}
 
 	public function handle($data, $event){
+    $message="";
 		switch($event){
 			case "server.regeneration":
 				if($this->server->difficulty === 0){

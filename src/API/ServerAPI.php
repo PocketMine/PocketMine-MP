@@ -35,7 +35,8 @@ class ServerAPI{
 	private $asyncCnt = 0;
 	private $rcon;
 	private $query;
-	
+  public $plugin;
+
 	public static function request(){
 		return self::$serverRequest;
 	}
@@ -183,7 +184,8 @@ class ServerAPI{
 	public function sendUsage(){
 		console("[DEBUG] Sending usage data...", true, true, 2);
 		$plist = "";
-		foreach($this->plugin->getList() as $p){
+    $pluglist=$this->plugin->getList();
+		foreach($pluglist as $p){
 			$plist .= str_replace(array(";", ":"), "", $p["name"]).":".str_replace(array(";", ":"), "", $p["version"]).";";
 		}
 		
@@ -245,7 +247,8 @@ class ServerAPI{
 	}
 
 	private function parseProperties(){
-		foreach($this->config->getAll() as $n => $v){
+    $cnf=$this->config->getAll();
+		foreach($cnf as $n => $v){
 			switch($n){
 				case "last-update":
 					if($v === false){

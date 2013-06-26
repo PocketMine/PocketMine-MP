@@ -26,8 +26,8 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 class Level{
-	public $entities, $tiles, $blockUpdates, $nextSave, $players = array();
-	private $level, $time, $startCheck, $startTime, $server, $name, $usedChunks, $changedBlocks, $changedCount;
+	public $entities, $tiles, $blockUpdates, $nextSave, $players = array(),$level;
+	private $time, $startCheck, $startTime, $server, $name, $usedChunks, $changedBlocks, $changedCount;
 	
 	public function __construct(PMFLevel $level, Config $entities, Config $tiles, Config $blockUpdates, $name){
 		$this->server = ServerAPI::request();
@@ -152,7 +152,8 @@ class Level{
 		
 		if($extra !== false){
 			$entities = array();
-			foreach($this->server->api->entity->getAll($this) as $entity){
+      $entitiesA=$this->server->api->entity->getAll($this);
+			foreach($entitiesA as $entity){
 				if($entity->class === ENTITY_MOB){
 					$entities[] = array(
 						"id" => $entity->type,
@@ -174,8 +175,8 @@ class Level{
 						$entities[] = array(
 							"id" => $entity->type,
 							"TileX" => $entity->x,
-							"TileX" => $entity->y,
-							"TileX" => $entity->z,
+							"TileY" => $entity->y,
+							"TileZ" => $entity->z,
 							"Health" => $entity->health,
 							"Motive" => $entity->data["Motive"],
 							"Pos" => array(
@@ -242,7 +243,8 @@ class Level{
 			$this->entities->setAll($entities);
 			$this->entities->save();
 			$tiles = array();
-			foreach($this->server->api->tile->getAll($this) as $tile){		
+      $tilesA=$this->server->api->tile->getAll($this);
+			foreach($tilesA as $tile){
 				$tiles[] = $tile->data;
 			}
 			$this->tiles->setAll($tiles);

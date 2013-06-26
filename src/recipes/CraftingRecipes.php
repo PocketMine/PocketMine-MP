@@ -190,7 +190,8 @@ class CraftingRecipes{
 	private static function parseRecipe($recipe){
 		$recipe = explode("=>", $recipe);
 		$recipeItems = array();
-		foreach(explode(",", $recipe[0]) as $item){
+    $items=explode(",", $recipe[0]);
+		foreach($items as $item){
 			$item = explode("x", $item);
 			$id = explode(":", $item[0]);
 			$meta = array_pop($id);

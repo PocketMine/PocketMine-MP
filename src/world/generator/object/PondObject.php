@@ -35,6 +35,7 @@ class PondObject{
 	}
 	
 	public function canPlaceObject(Level $level, Vector3 $pos){
+    return false;
 	}
 	
 	public function placeObject(Level $level, Vector3 $pos){

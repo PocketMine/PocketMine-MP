@@ -33,7 +33,7 @@ class RedstoneOreBlock extends SolidBlock{
 	public function onUpdate($type){
 		if($type === BLOCK_UPDATE_NORMAL or $type === BLOCK_UPDATE_TOUCH){
 			$this->level->setBlock($this, BlockAPI::get(GLOWING_REDSTONE_ORE, $this->meta), false);
-			$this->level->scheduleBlockUpdate(new Position($this, 0, 0, $this->level), Utils::getRandomUpdateTicks(), BLOCK_UPDATE_RANDOM);
+			$this->level->scheduleBlockUpdate(new Position($this->x, $this->y, $this->z, $this->level), Utils::getRandomUpdateTicks(), BLOCK_UPDATE_RANDOM);
 			return BLOCK_UPDATE_WEAK;
 		}
 		return false;

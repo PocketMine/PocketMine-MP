@@ -253,9 +253,11 @@ class PocketMinecraftServer{
 			if(isset($this->async[$ID]) and $this->async[$ID] !== null and is_callable($this->async[$ID])){
 				if(is_array($this->async[$ID])){
 					$method = $this->async[$ID][1];
-					$result = $this->async[$ID][0]->$method($data, $type, $ID);
+					//$result = $this->async[$ID][0]->$method($data, $type, $ID);
+          $this->async[$ID][0]->$method($data, $type, $ID);
 				}else{
-					$result = $this->async[$ID]($data, $type, $ID);
+					//$result = $this->async[$ID]($data, $type, $ID);
+          $this->async[$ID]($data, $type, $ID);
 				}
 			}
 			unset($this->async[$ID]);
@@ -324,11 +326,11 @@ class PocketMinecraftServer{
 		return $result;
 	}
 
-	public function eventHandler($data, $event){
+	/*public function eventHandler($data, $event){
 		switch($event){
 
 		}
-	}
+	}*/
 
 	public function getGamemode(){
 		switch($this->gamemode){
@@ -381,7 +383,7 @@ class PocketMinecraftServer{
 				usleep(1);
 			}
 			
-			if($this->getTPS() < 19.5){
+			if($this->getTPS() < 19){
 				++$t;
 			}else{
 				break;
@@ -504,8 +506,8 @@ class PocketMinecraftServer{
 					$this->custom["times_".$CID] = ($this->custom["times_".$CID] + 1) % strlen($this->description);
 					break;
 				case 0x05:
-					$version = $data[1];
-					$size = strlen($data[2]);
+					$version =& $data[1];
+					//$size = strlen($data[2]);
 					if($version !== CURRENT_STRUCTURE){
 						console("[DEBUG] Incorrect structure #$version from ".$packet["ip"].":".$packet["port"], true, true, 2);
 						$this->send(0x1a, array(
@@ -526,16 +528,16 @@ class PocketMinecraftServer{
 					if($this->invisible === true){
 						break;
 					}
-					$port = $data[2];
-					$MTU = $data[3];
+					//$port = $data[2];
+					//$MTU = &$data[3];
 					$clientID = $data[4];
 					if(count($this->clients) < $this->maxClients){
-						$this->clients[$CID] = new Player($clientID, $packet["ip"], $packet["port"], $MTU); //New Session!
+						$this->clients[$CID] = new Player($clientID, $packet["ip"], $packet["port"], $data[3]); //New Session!
 						$this->send(0x08, array(
 							RAKNET_MAGIC,
 							$this->serverID,
 							$this->port,
-							$data[3],
+              $data[3],
 							0,
 						), false, $packet["ip"], $packet["port"]);
 					}

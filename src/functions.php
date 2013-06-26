@@ -109,7 +109,8 @@ function require_all($path, &$count = 0){
 function hard_unset(&$var){
 	if(is_object($var)){
 		$unset = new ReflectionClass($var);
-		foreach($unset->getProperties() as $prop){
+    $prp=$unset->getProperties();
+		foreach($prp as $prop){
 			$prop->setAccessible(true);
 			@hard_unset($prop->getValue($var));
 			$prop->setValue($var, null);
@@ -190,7 +191,7 @@ function arguments ( $args ){
 
             $value = preg_split( '/[= ]/', $arg, 2 );
             $com   = substr( array_shift($value), 2 );
-            $value = join($value);
+            $value = join('',$value);
 
             $ret['commands'][$com] = !empty($value) ? $value : true;
             continue;

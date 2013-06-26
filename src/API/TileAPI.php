@@ -93,7 +93,8 @@ class TileAPI{
 	}
 
 	public function spawnToAll(Tile $t){
-		foreach($this->server->api->player->getAll($t->level) as $player){
+    $tiles=$this->server->api->player->getAll($t->level);
+		foreach($tiles as $player){
 			if($player->eid !== false){
 				$t->spawn($player);
 			}
@@ -101,7 +102,8 @@ class TileAPI{
 	}
 
 	public function spawnAll(Player $player){
-		foreach($this->getAll($player->level) as $t){
+    $tiles=$this->getAll($player->level);
+		foreach($tiles as $t){
 			$t->spawn($player);
 		}
 	}

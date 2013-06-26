@@ -32,7 +32,7 @@ class WaterBlock extends LiquidBlock{
 	
 	public function onUpdate($type){
 		return false;
-		$level = $this->meta & 0x03;
+/*		$level = $this->meta & 0x03;
 		if($type !== BLOCK_UPDATE_NORMAL or $level === 0){
 			return false;
 		}
@@ -49,7 +49,7 @@ class WaterBlock extends LiquidBlock{
 		$up = $this->getSide(1);
 		if($up instanceof WaterBlock){
 			
-		}
+		}*/
 	}
 	
 }

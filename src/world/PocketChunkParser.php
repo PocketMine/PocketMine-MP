@@ -26,7 +26,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 class PocketChunkParser{
-	private $location, $raw = b"", $file;
+	private $location, $raw = "", $file;
 	var $sectorLength = 4096; //16 * 16 * 16
 	var $chunkLength = 86016; //21 * $sectorLength
 	var $map;
@@ -110,7 +110,8 @@ class PocketChunkParser{
 			return false;
 		}
 		$chunk = "";
-		foreach($this->map[$X][$Z] as $section => $data){
+    $map=$this->map[$X][$Z];
+		foreach($map as $data){
 			for($i = 0; $i < 256; ++$i){
 				$chunk .= $data[$i];
 			}
@@ -122,7 +123,7 @@ class PocketChunkParser{
 		$X = (int) $X;
 		$Z = (int) $Z;
 		$offset = $this->location[$X][$Z];
-		$len = Utils::readLInt(substr($this->raw, $offset, 4));
+		//$len = Utils::readLInt(substr($this->raw, $offset, 4));
 		$offset += 4;
 		$chunk = array(
 			0 => array(), //Block
@@ -152,7 +153,7 @@ class PocketChunkParser{
 				$this->map[$x][$z] = $this->parseChunk($x, $z);
 			}
 		}
-		$this->raw = b"";
+		$this->raw = "";
 		console("[DEBUG] Chunks loaded!", true, true, 2);
 	}
 

@@ -49,7 +49,7 @@ class MinecraftInterface{
 	}
 
 	public function close(){
-		return $this->socket->close(false);
+		$this->socket->close(false);
 	}
 
 	protected function getStruct($pid){
@@ -107,10 +107,10 @@ class MinecraftInterface{
 					$this->stopChunked($CID);
 					return false;
 				case 3:
-					$this->ackChunked($CID, $data[1]["id"], $data[1]["index"]);
+					$this->ackChunked($CID, $packet->data[1]["id"], $packet->data[1]["index"]);
 					return false;
 				case 4:
-					$this->receiveChunked($CID, $data[1]["id"], $data[1]["index"], $data[1]["count"], $data[1]["data"]);
+					$this->receiveChunked($CID, $packet->data[1]["id"], $packet->data[1]["index"], $packet->data[1]["count"], $packet->data[1]["data"]);
 					return true;
 			}
 		}
@@ -215,7 +215,7 @@ class MinecraftInterface{
 				console("[ERROR] Invalid DEFLATEPacket for ".$this->chunked[$CID][1].":".$this->chunked[$CID][2], true, true, 2);
 			}
 			$offset = 0;
-			while(($plen = Utils::readShort(substr($data, $offset, 2), false)) !== 0xFFFF or $offset >= $len){
+			while(($plen = Utils::readShort(substr($data, $offset, 2), false)) !== 0xFFFF or $offset >= $plen){
 				$offset += 2;
 				$packet = substr($data, $offset, $plen);
 				$this->parsePacket($packet, $this->chunked[$CID][1], $this->chunked[$CID][2]);
@@ -265,5 +265,3 @@ class MinecraftInterface{
 	}
 
 }
-
-?>

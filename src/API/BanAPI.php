@@ -32,7 +32,7 @@
     private $banned;
     private $ops;
     private $bannedIPs;
-    private $cmdWL = array(); //Command WhiteList
+    private $cmdWhitelist = array(); //Command WhiteList
     function __construct()
     {
       $this->server = ServerAPI::request();
@@ -89,8 +89,8 @@
         case "player.block.break":
         case "player.block.place": //Spawn protection detection. Allows OPs to place/break blocks in the spawn area.
           if (!$this->isOp($data["player"]->iusername)) {
-            $t = new Vector2($data["target"]->x, $data["target"]->z);
-            $s = new Vector2($this->server->spawn->x, $this->server->spawn->z);
+            $t = new Vector2($data["target"]->x,$data["target"]->y, $data["target"]->z);
+            $s = new Vector2($this->server->spawn->x,$this->server->spawn->y, $this->server->spawn->z);
             if ($t->distance($s) <= $this->server->api->getProperty("spawn-protection") and $this->server->api->dhandle($event . ".spawn", $data) !== true) {
               return false;
             }
@@ -130,7 +130,8 @@
           break;
         case "lsop":
           $output .= "Op's ";
-          foreach ($this->ops->getAll() as $name => $enabled)
+          $opls=$this->ops->getAll();
+          foreach ($opls as $name => $enabled)
             if ($enabled)
               $output .= $name . ", ";
           $output = substr($output, 0, -2);
