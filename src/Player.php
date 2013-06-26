@@ -1731,13 +1731,12 @@
         if ($this->armor[$i] instanceof Item) {
           $armorId        = $this->armor[$i]->getID();
           $data["slot$i"] = ($armorId !== AIR) ? $armorId - 12 : 0;
-
           //$data["slot$i"] = ($this->armor[$i]->getID() !== AIR) ? $this->armor[$i]->getID() : 0;
         } else {
           $this->armor[$i] = BlockAPI::getItem(AIR, 0, 0);
           $data["slot$i"]  = 0;
         }
-        console($this->iusername ." slot $i, armorId: ". $data["slot$i"]);
+        //console($this->iusername ." slot $i, armorId: ". $data["slot$i"]);
       }
       if ($player instanceof Player) {
         $player->dataPacket(MC_PLAYER_ARMOR_EQUIPMENT, $data);
