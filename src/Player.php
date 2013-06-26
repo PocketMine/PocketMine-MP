@@ -1737,7 +1737,7 @@
           $this->armor[$i] = BlockAPI::getItem(AIR, 0, 0);
           $data["slot$i"]  = 0;
         }
-        console("slot $i, armorId: ". $data["slot$i"]);
+        console($this->iusername ." slot $i, armorId: ". $data["slot$i"]);
       }
       if ($player instanceof Player) {
         $player->dataPacket(MC_PLAYER_ARMOR_EQUIPMENT, $data);

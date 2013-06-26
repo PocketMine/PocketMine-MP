@@ -248,7 +248,7 @@ class BlockAPI{
 			"meta" => $block->getMetadata()		
 		));
 		if($send === true){
-			$player->sendInventorySlot($player->slot);
+			$player->sendInventory();
 		}
 		return false;
 	}
