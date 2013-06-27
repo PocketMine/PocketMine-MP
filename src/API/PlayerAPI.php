@@ -265,6 +265,7 @@ class PlayerAPI{
 
 	public function teleport(&$name, &$target){
 		if(substr($target, 0, 2) === "w:"){
+      $this->server->api->level->loadLevel(substr($target, 2));
 			$lv = $this->server->api->level->get(substr($target, 2));
 			if($lv instanceof Level){
 				$origin = $this->get($name);
