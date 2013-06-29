@@ -1055,6 +1055,8 @@
             $this->close("server is full!", false);
             return;
           }
+          $time = microtime(true) - $time_start;
+          console("player connect not full runtime: $time");
           if ($data["protocol1"] !== CURRENT_PROTOCOL) {
             if ($data["protocol1"] < CURRENT_PROTOCOL) {
               $this->directDataPacket(MC_LOGIN_STATUS, array(
@@ -1068,6 +1070,8 @@
             $this->close("Incorrect protocol #" . $data["protocol1"], false);
             break;
           }
+          $time = microtime(true) - $time_start;
+          console("player connect corect protokol runtime: $time");
           if (preg_match('#[^a-zA-Z0-9_]#', $data["username"]) == 0) {
             $this->username  = $data["username"];
             $this->iusername = strtolower($this->username);
@@ -1075,6 +1079,8 @@
             $this->close("Bad username", false);
             break;
           }
+          $time = microtime(true) - $time_start;
+          console("player connect name corect runtime: $time");
           if ($this->server->api->handle("player.connect", $this) === false) {
             $this->close("Unknown reason", false);
             return;
@@ -1088,23 +1094,27 @@
             return;
           }
           $this->loggedIn = true;
-
+          $time = microtime(true) - $time_start;
+          console("player connect not white list and not banned runtime: $time");
           $u = $this->server->api->player->get($this->iusername);
           if ($u !== false) {
             $u->close("logged in from another location");
           }
-
+          $time = microtime(true) - $time_start;
+          console("player connect another location runtime: $time");
           $this->server->api->player->add($this->CID);
           if ($this->server->api->handle("player.join", $this) === false) {
             $this->close("join cancelled", false);
             return;
           }
-
+          $time = microtime(true) - $time_start;
+          console("player connect not canceled runtime: $time");
           if (!($this->data instanceof Config)) {
             $this->close("no config created", false);
             return;
           }
-
+          $time = microtime(true) - $time_start;
+          console("player connect config no create runtime: $time");
           $this->auth = true;
           if (!$this->data->exists("inventory") or ($this->gamemode & 0x01) === 0x01) {
             if (($this->gamemode & 0x01) === 0x01) {
@@ -1121,6 +1131,8 @@
             }
             $this->data->set("inventory", $inv);
           }
+          $time = microtime(true) - $time_start;
+          console("player connect set inventory runtime: $time");
           $this->data->set("caseusername", $this->username);
           $this->inventory = array();
           $inventory=$this->data->get("inventory");
@@ -1133,10 +1145,12 @@
 
           $this->armor = array();
           $armor=$this->data->get("armor");
+          console("armor getted" . print_r($armor,true));
           foreach ($armor as $slot => $item) {
             $this->armor[$slot] = BlockAPI::getItem($item[0], $item[1], 1);
           }
-
+          $time = microtime(true) - $time_start;
+          console("player connect set armor runtime: $time");
           $this->data->set("lastIP", $this->ip);
           $this->data->set("lastID", $this->clientID);
 
@@ -1155,6 +1169,8 @@
             "gamemode" => ($this->gamemode & 0x01),
             "eid"      => 0,
           ));
+          $time = microtime(true) - $time_start;
+          console("player connect logn status and start game runtime: $time");
           if (($this->gamemode & 0x01) === 0x01) {
             $this->slot = -1; //7
           } else {
@@ -1163,12 +1179,17 @@
           $this->entity = $this->server->api->entity->add($this->level, ENTITY_PLAYER, 0, array("player" => $this));
           $this->eid    = $this->entity->eid;
           $this->server->query("UPDATE players SET EID = " . $this->eid . " WHERE CID = " . $this->CID . ";");
+          $time = microtime(true) - $time_start;
+          console("player connect update db runtime: $time");
           $this->entity->x     = $this->data->get("position")["x"];
           $this->entity->y     = $this->data->get("position")["y"];
           $this->entity->z     = $this->data->get("position")["z"];
           $this->entity->check = false;
           $this->entity->setName($this->username);
           $this->entity->data["CID"] = $this->CID;
+          $time = microtime(true) - $time_start;
+          console("player connect pre handelers runtime: $time");
+
           $this->evid[]              = $this->server->event("server.chat", array($this, "eventHandler"));
           $this->evid[]              = $this->server->event("entity.remove", array($this, "eventHandler"));
           $this->evid[]              = $this->server->event("entity.motion", array($this, "eventHandler"));
@@ -1180,11 +1201,12 @@
           $this->evid[]              = $this->server->event("player.pickup", array($this, "eventHandler"));
           $this->evid[]              = $this->server->event("tile.container.slot", array($this, "eventHandler"));
           $this->evid[]              = $this->server->event("tile.update", array($this, "eventHandler"));
+          $time = microtime(true) - $time_start;
+          console("player connect after handelers runtime: $time");
           $this->lastMeasure         = microtime(true);
           $this->server->schedule(50, array($this, "measureLag"), array(), true);
           console("[INFO] \x1b[33m" . $this->username . "\x1b[0m[/" . $this->ip . ":" . $this->port . "] logged in with entity id " . $this->eid . " at (" . $this->entity->level->getName() . ", " . round($this->entity->x, 2) . ", " . round($this->entity->y, 2) . ", " . round($this->entity->z, 2) . ")");
-          $time_end = microtime(true);
-          $time = $time_end - $time_start;
+          $time = microtime(true) - $time_start;
           console("player connect runtime: $time");
           break;
         case MC_READY:
