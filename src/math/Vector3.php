@@ -162,9 +162,9 @@ class Vector3{
 			return $this->maxPlainDistance($x->x, $x->z);
 		}else{
 			return max(abs($this->x - $x), abs($this->z - $z));
-		}	
+		}
 	}
-	
+
 	public function length(){
 		return sqrt($this->lengthSquared());
 	}

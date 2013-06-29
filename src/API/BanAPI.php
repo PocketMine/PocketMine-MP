@@ -89,9 +89,12 @@
         case "player.block.break":
         case "player.block.place": //Spawn protection detection. Allows OPs to place/break blocks in the spawn area.
           if (!$this->isOp($data["player"]->iusername)) {
-            $t = new Vector2($data["target"]->x,$data["target"]->y, $data["target"]->z);
-            $s = new Vector2($this->server->spawn->x,$this->server->spawn->y, $this->server->spawn->z);
-            if ($t->distance($s) <= $this->server->api->getProperty("spawn-protection") and $this->server->api->dhandle($event . ".spawn", $data) !== true) {
+            $t        = new Vector3($data["target"]->x, $data["target"]->y, $data["target"]->z);
+            $spawn    = $data["player"]->entity->level->getSpawn();
+            $s        = new Vector3($spawn->x, $spawn->y, $spawn->z);
+            $distance = $t->distance($s->x, $s->y, $s->z);
+            console("distance " . $distance . "<=" . $this->server->api->getProperty("spawn-protection"));
+            if ($distance <= $this->server->api->getProperty("spawn-protection") and $this->server->api->dhandle($event . ".spawn", $data) !== true) {
               return false;
             }
           }
@@ -130,7 +133,7 @@
           break;
         case "lsop":
           $output .= "Op's ";
-          $opls=$this->ops->getAll();
+          $opls = $this->ops->getAll();
           foreach ($opls as $name => $enabled)
             if ($enabled)
               $output .= $name . ", ";

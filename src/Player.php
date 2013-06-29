@@ -429,6 +429,7 @@
 
     public function eventHandler($data, $event)
     {
+      $time_start = microtime(true);
       switch ($event) {
         case "tile.update":
           if ($data->level === $this->level) {
@@ -561,6 +562,9 @@
           $this->sendChat(preg_replace('/\x1b\[[0-9;]*m/', "", $message)); //Remove ANSI codes from chat
           break;
       }
+      $time_end = microtime(true);
+      $time = $time_end - $time_start;
+      console("player eventHandler runtime: $time");
     }
 
     public function sendChat($message)
@@ -1042,6 +1046,8 @@
           }
           break;
         case MC_LOGIN:
+          $time_start = microtime(true);
+
           if ($this->loggedIn === true) {
             break;
           }
@@ -1177,6 +1183,9 @@
           $this->lastMeasure         = microtime(true);
           $this->server->schedule(50, array($this, "measureLag"), array(), true);
           console("[INFO] \x1b[33m" . $this->username . "\x1b[0m[/" . $this->ip . ":" . $this->port . "] logged in with entity id " . $this->eid . " at (" . $this->entity->level->getName() . ", " . round($this->entity->x, 2) . ", " . round($this->entity->y, 2) . ", " . round($this->entity->z, 2) . ")");
+          $time_end = microtime(true);
+          $time = $time_end - $time_start;
+          console("player connect runtime: $time");
           break;
         case MC_READY:
           if ($this->loggedIn === false) {

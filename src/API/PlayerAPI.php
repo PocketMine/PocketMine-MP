@@ -51,6 +51,7 @@ class PlayerAPI{
 	}
 
 	public function handle($data, $event){
+    $time_start = microtime(true);
     $message="";
 		switch($event){
 			case "server.regeneration":
@@ -117,6 +118,9 @@ class PlayerAPI{
 				return true;
 				break;
 		}
+    $time_end = microtime(true);
+    $time = $time_end - $time_start;
+    console("player api handle runtime: $time");
 	}
 
 	public function commandHandler($cmd, $params, $issuer, $alias){
@@ -361,6 +365,7 @@ class PlayerAPI{
 	}
 
 	public function add($CID){
+    $time_start = microtime(true);
 		if(isset($this->server->clients[$CID])){
 			$player = $this->server->clients[$CID];
 			$player->data = $this->getOffline($player->username);
@@ -376,6 +381,9 @@ class PlayerAPI{
 			}
 			$this->server->query("INSERT OR REPLACE INTO players (CID, ip, port, name) VALUES (".$player->CID.", '".$player->ip."', ".$player->port.", '".strtolower($player->username)."');");
 		}
+    $time_end = microtime(true);
+    $time = $time_end - $time_start;
+    console("player api add runtime: $time");
 	}
 
 	public function remove($CID){
@@ -399,6 +407,7 @@ class PlayerAPI{
 	}
 
 	public function getOffline($name){
+    $time_start = microtime(true);
 		$iname = strtolower($name);
 		$default = array(
 			"caseusername" => $name,
@@ -434,6 +443,9 @@ class PlayerAPI{
 			$data->set("health", 20);
 		}
 		$this->server->handle("player.offline.get", $data);
+    $time_end = microtime(true);
+    $time = $time_end - $time_start;
+    console("player api getOffline runtime: $time");
 		return $data;
 	}
 
