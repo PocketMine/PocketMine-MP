@@ -1202,7 +1202,7 @@
           console("[INFO] \x1b[33m" . $this->username . "\x1b[0m[/" . $this->ip . ":" . $this->port . "] logged in with entity id " . $this->eid . " at (" . $this->entity->level->getName() . ", " . round($this->entity->x, 2) . ", " . round($this->entity->y, 2) . ", " . round($this->entity->z, 2) . ")");
 
           $time = microtime(true) - $time_start;
-          console("player connect runtime: $time");
+          console("player connect full runtime: $time");
 
           break;
         case MC_READY:
