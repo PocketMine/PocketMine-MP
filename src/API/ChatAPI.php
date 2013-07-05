@@ -53,10 +53,7 @@
             $output .= "Usage: /say <message>\n";
             break;
           }
-          if ($issuer instanceof Player)
-            $sender = "Server";
-          else
-            $sender = $issuer->iusername;
+          $sender = ($issuer instanceof Player) ? "Server":ucfirst($issuer);
           $this->server->api->chat->broadcast("[$sender] " . $s);
           break;
         case "me":
