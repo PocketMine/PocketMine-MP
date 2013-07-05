@@ -77,6 +77,7 @@ class Query{
 			"map" => $this->server->api->level->getDefault()->getName(),
 			"numplayers" => count($this->server->clients),
 			"maxplayers" => $this->server->maxClients,
+			"whitelist" => $this->server->api->getProperty("white-list") === true ? "on":"off",
 			"hostport" => $this->server->api->getProperty("server-port"),
 			//"hostip" => $this->server->api->getProperty("server-ip", "0.0.0.0")
 		);
