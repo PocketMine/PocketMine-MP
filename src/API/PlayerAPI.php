@@ -193,6 +193,11 @@ class PlayerAPI{
 				}
 				if($player->setGamemode($gms[strtolower($params[0])])){
 					$output .= "Gamemode of ".$player->username." changed to ".$player->getGamemode()."\n";
+					if($issuer->username === $player->username){
+						$this->server->api->chat->broadcast("[" . $issuer->username . ": set own gamemode to " . $player->getGamemode() . "mode.]\n");
+					}else{
+						$this->server->api->chat->broadcast("[" . $issuer->username . ": set player" . $player->username . "'s gamemode to " . $player->getGamemode() . "mode.]\n")
+					}
 				}
 				break;
 			case "tp":
