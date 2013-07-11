@@ -196,7 +196,7 @@ class PlayerAPI{
 					if($issuer->username === $player->username){
 						$this->server->api->chat->broadcast("[" . $issuer->username . ": set own gamemode to " . $player->getGamemode() . "mode.]\n");
 					}else{
-						$this->server->api->chat->broadcast("[" . $issuer->username . ": set player" . $player->username . "'s gamemode to " . $player->getGamemode() . "mode.]\n")
+						$this->server->api->chat->broadcast("[" . $issuer->username . ": set player" . $player->username . "'s gamemode to " . $player->getGamemode() . "mode.]\n");
 					}
 				}
 				break;
