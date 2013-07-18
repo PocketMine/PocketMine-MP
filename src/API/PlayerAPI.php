@@ -51,7 +51,6 @@ class PlayerAPI{
 	}
 
 	public function handle($data, $event){
-    $time_start = microtime(true);
     $message="";
 		switch($event){
 			case "server.regeneration":
@@ -118,9 +117,6 @@ class PlayerAPI{
 				return true;
 				break;
 		}
-    $time_end = microtime(true);
-    $time = $time_end - $time_start;
-    console("player api handle runtime: $time");
 	}
 
 	public function commandHandler($cmd, $params, $issuer, $alias){
