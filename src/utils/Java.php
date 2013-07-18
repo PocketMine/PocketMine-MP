@@ -109,7 +109,7 @@ class Java_Random{
 
 	public function nextBytes($bytes){
 		$bytes = (int) $bytes;
-		$b = b"";
+		$b = "";
 		$max = $bytes & ~0x3;
 		for($i = 0; $i < $max; $i += 4){
 			$b .= $this->next(32)->toBytes();

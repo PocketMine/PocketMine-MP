@@ -273,7 +273,7 @@ class Packet{
 							break;
 						}else{
 							$splitCount = 0;
-							$splitID = 0;
+              $splitID = 0;
 							$splitIndex = 0;
 						}
 						

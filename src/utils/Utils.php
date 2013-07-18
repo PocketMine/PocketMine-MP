@@ -246,7 +246,7 @@ class Utils{
 
 	public static function getRandomBytes($length = 16, $secure = true, $raw = true, $startEntropy = "", &$rounds = 0, &$drop = 0){
 		static $lastRandom = "";
-		$output = b"";
+		$output = "";
 		$length = abs((int) $length);
 		$secureValue = "";
 		$rounds = 0;
@@ -581,7 +581,7 @@ class Utils{
 	}
 
 	public static function writeLLong($value){
-		return strrev(Utils::writeLong($str));
+		return strrev(Utils::writeLong($value));
 	}
 
 

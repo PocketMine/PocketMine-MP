@@ -35,7 +35,7 @@ class FlintSteelItem extends Item{
 	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		if($block->getID() === AIR){
 			$level->setBlock($block, new FireBlock(), true, false, true);
-			$block->level->scheduleBlockUpdate(new Position($block, 0, 0, $block->level), Utils::getRandomUpdateTicks(), BLOCK_UPDATE_RANDOM);
+			$block->level->scheduleBlockUpdate(new Position($block->x, $block->y, $block->z, $block->level), Utils::getRandomUpdateTicks(), BLOCK_UPDATE_RANDOM);
 			return true;
 		}
 		$this->useOn($block);

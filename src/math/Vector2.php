@@ -38,6 +38,7 @@ class Vector2{
 	}
 
 	public function getX(){
+
 		return $this->x;
 	}
 
@@ -59,7 +60,7 @@ class Vector2{
 		}else{
 			$this->x += $x;
 			$this->y += $y;
-			return new Vector3($this->x + $x, $this->y + $y);
+			return new Vector2($this->x + $x, $this->y + $y);
 		}
 	}
 
