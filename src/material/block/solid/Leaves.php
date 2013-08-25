@@ -148,5 +148,9 @@ class LeavesBlock extends TransparentBlock{
 			$drops[] = array(APPLE, 0, 1);
 		}
 		return $drops;
+		if($item->isShears())
+                        $drops[] = array(LEAVES, $this-> meta & 0x03, 1);
+                return $drops;
+
 	}
 }
