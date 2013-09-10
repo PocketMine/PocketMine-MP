@@ -49,6 +49,7 @@ class BanAPI{
 		$this->server->addHandler("console.command", array($this, "permissionsCheck"), 1);//Event handler when commands are issued. Used to check permissions of commands that go through the server.
 		$this->server->addHandler("player.block.break", array($this, "permissionsCheck"), 1);//Event handler for blocks
 		$this->server->addHandler("player.block.place", array($this, "permissionsCheck"), 1);//Event handler for blocks
+		$this->server->addHandler("player.equipment.change", array($this, "permissionsCheck"), 1);
 		$this->server->addHandler("player.flying", array($this, "permissionsCheck"), 1);//Flying Event
 	}
 	
@@ -73,6 +74,18 @@ class BanAPI{
 					return true;
 				}
 				break;
+
+			case "player.equipment.change":
+				if(!$this->isOp($data["player"]->iusername)){
+					$t = new Vector2($data["player"]->entity->x, $data["player"]->entity->z);
+					$s = new Vector2($this->server->spawn->x, $this->server->spawn->z);
+					if($t->distance($s) <= $this->server->api->getProperty("spawn-protection") and $this->server->api->dhandle($event.".spawn", $data) !== true){
+						return false;
+					}
+				}
+				return;
+			break;
+
 			case "player.block.break":
 			case "player.block.place"://Spawn protection detection. Allows OPs to place/break blocks in the spawn area.
 				if(!$this->isOp($data["player"]->iusername)){
