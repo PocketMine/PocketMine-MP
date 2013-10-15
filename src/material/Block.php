@@ -94,7 +94,8 @@ abstract class Block extends Position{
 			SUGARCANE_BLOCK => "SugarcaneBlock",
 
 			FENCE => "FenceBlock",
-
+			INVISIBLE_BEDROCK => "InvisibleBedrockBlock",
+			
 			NETHERRACK => "NetherrackBlock",
 			SOUL_SAND => "SoulSandBlock",
 			GLOWSTONE_BLOCK => "GlowstoneBlock",
