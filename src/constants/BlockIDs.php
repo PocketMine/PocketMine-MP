@@ -128,6 +128,7 @@ define("GLOWSTONE_BLOCK", 89);
 
 define("CAKE_BLOCK", 92);
 
+define("INVISIBLE_BEDROCK", 95);
 define("TRAPDOOR", 96);
 
 define("STONE_BRICKS", 98);
