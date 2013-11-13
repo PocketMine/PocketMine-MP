@@ -16,6 +16,16 @@
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
  * 
+ * 
+ * 이 프로그램은 자유 소프트웨어입니다: 당신은 수정하거나 하지 않고 LGPL 버전 
+ * 3 또는 이후 버전 하에서 재배포할 수 있습니다.
+ * 
+ * 
+ * 
+ * Trnslated into Korean by ns827
+ * 한국어 번역: ns827
+ * 
+ * 
  *
 */
 
@@ -108,11 +118,11 @@ class BanAPI{
 				$target = strtolower(array_shift($params));
 				$player = $this->server->api->player->get($target);
 				if(!($player instanceof Player)){
-					$output .= "Player not connected.\n";
+					$output .= "연결되지 않은 플레이어입니다.\n";
 					break;
 				}
 				$this->server->api->console->run(implode(" ", $params), $player);
-				$output .= "Command ran as ".$player->username.".\n";
+				$output .= "다음 플레이어의 권한으로 명령어가 실행되었습니다: ".$player->username.".\n";
 				break;
 			case "op":
 				$user = strtolower($params[0]);
@@ -120,13 +130,13 @@ class BanAPI{
 				if(!($player instanceof Player)){
 					$this->ops->set($user);
 					$this->ops->save($user);
-					$output .= $user." is now op\n";
+					$output .= $user." 는 이제 OP입니다\n";
 					break;
 				}
 				$this->ops->set($player->iusername);
 				$this->ops->save();
-				$output .= $player->iusername." is now op\n";
-				$this->server->api->chat->sendTo(false, "You are now op.", $player->iusername);
+				$output .= $player->iusername." 는 이제 OP입니다\n";
+				$this->server->api->chat->sendTo(false, "당신은 이제 OP입니다.", $player->iusername);
 				break;
 			case "deop":
 				$user = strtolower($params[0]);
@@ -134,30 +144,30 @@ class BanAPI{
 				if(!($player instanceof Player)){
 					$this->ops->remove($user);
 					$this->ops->save();
-					$output .= $user." is no longer op\n";
+					$output .= $user." 는 더 이상 OP가 아닙니다.\n";
 					break;
 				}
 				$this->ops->remove($player->iusername);
 				$this->ops->save();
-				$output .= $player->iusername." is no longer op\n";
-				$this->server->api->chat->sendTo(false, "You are no longer op.", $player->iusername);
+				$output .= $player->iusername." 는 더 이상 OP가 아닙니다.\n";
+				$this->server->api->chat->sendTo(false, "당신은 이제 더 이상 OP가 아닙니다..", $player->iusername);
 				break;
 			case "kick":
 				if(!isset($params[0])){
-					$output .= "Usage: /kick <player> [reason ...]\n";
+					$output .= "사용법: /kick <플레이어> [이유 ...]\n";
 				}else{
 					$name = strtolower(array_shift($params));
 					$player = $this->server->api->player->get($name);
 					if($player === false){
-						$output .= "Player \"".$name."\" does not exist\n";
+						$output .= "플레이어 \"".$name."\" 는 존재하지 않습니다.\n";
 					}else{
 						$reason = implode(" ", $params);
-						$reason = $reason == "" ? "No reason":$reason;
-						$player->close("You have been kicked: ".$reason);
+						$reason = $reason == "" ? "이유 없음":$reason;
+						$player->close("당신은 강제 퇴장당했습니다: ".$reason);
 						if($issuer instanceof Player){
-							$this->server->api->chat->broadcast($player->username." has been kicked by ".$issuer->username.": $reason\n");
+							$this->server->api->chat->broadcast($player->username." 는 이 사람에 의해 강제 퇴장당했습니다 ".$issuer->username.": $reason\n");
 						}else{
-							$this->server->api->chat->broadcast($player->username." has been kicked: $reason\n");
+							$this->server->api->chat->broadcast($player->username." 는 강제 퇴장당했습니다: $reason\n");
 						}
 					}
 				}
@@ -169,19 +179,19 @@ class BanAPI{
 						$user = strtolower($params[0]);
 						$this->whitelist->remove($user);
 						$this->whitelist->save();
-						$output .= "Player \"$user\" removed from white-list\n";
+						$output .= "Player \"$user\" 는 화이트리스트에서 제거되었습니다\n";
 						break;
 					case "add":
 						$user = strtolower($params[0]);
 						$this->whitelist->set($user);
 						$this->whitelist->save();
-						$output .= "Player \"$user\" added to white-list\n";
+						$output .= "Player \"$user\" 는 화이트리스트에 추가되었습니다\n";
 						break;
 					case "reload":
 						$this->whitelist = new Config(DATA_PATH."white-list.txt", CONFIG_LIST);
 						break;
 					case "list":
-						$output .= "White-list: ".implode(", ", $this->whitelist->getAll(true))."\n";
+						$output .= "화이트리스트: ".implode(", ", $this->whitelist->getAll(true))."\n";
 						break;
 					case "on":
 					case "true":
