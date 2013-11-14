@@ -34,7 +34,7 @@ class ConsoleAPI{
 		if(!defined("NO_THREADS")){
 			$this->loop = new ConsoleLoop();
 		}
-		$this->register("help", "[page|command name]", array($this, "defaultCommands"));
+		$this->register("help", "[페이지|커맨드 이름]", array($this, "defaultCommands"));
 		$this->register("status", "", array($this, "defaultCommands"));
 		$this->register("difficulty", "<0|1|2|3>", array($this, "defaultCommands"));
 		$this->register("stop", "", array($this, "defaultCommands"));
@@ -72,35 +72,35 @@ class ConsoleAPI{
 							"v" => VIEW,
 						);
 						if(!isset($gms[strtolower($params[0])])){
-							$output .= "Usage: /$cmd <mode>\n";
+							$output .= "사용법: /$cmd <모드>\n";
 							break;
 						}
 						$this->server->api->setProperty("gamemode", $gms[strtolower($params[0])]);
-						$output .= "Default Gamemode is now ".strtoupper($this->server->getGamemode()).".\n";
+						$output .= "기본 게임모드는 이제 ".strtoupper($this->server->getGamemode())." 입니다.\n";
 						break;
 					case "status":
 						if(!($issuer instanceof Player) and $issuer === "console"){
 							$this->server->debugInfo(true);
 						}
 						$info = $this->server->debugInfo();
-						$output .= "TPS: ".$info["tps"].", Memory usage: ".$info["memory_usage"]." (Peak ".$info["memory_peak_usage"].")\n";
+						$output .= "TPS: ".$info["tps"].", 메모리 사용량: ".$info["memory_usage"]." (최고 ".$info["memory_peak_usage"].")\n";
 						break;
 					case "update-done":
 						$this->server->api->setProperty("last-update", time());
 						break;
 					case "stop":
 						$this->loop->stop = true;
-						$output .= "Stopping the server\n";
+						$output .= "서버를 중지하는 중...\n";
 						$this->server->close();
 						break;
 					case "difficulty":
 						$s = trim(array_shift($params));
 						if($s === "" or (((int) $s) > 3 and ((int) $s) < 0)){
-							$output .= "Usage: /difficulty <0|1|2|3>\n";
+							$output .= "사용법: /difficulty <0|1|2|3>\n";
 							break;
 						}
 						$this->server->api->setProperty("difficulty", (int) $s);
-						$output .= "Difficulty changed to ".$this->server->difficulty."\n";
+						$output .= "난이도가 ".$this->server->difficulty." 로 변경되었습니다.\n";
 						break;
 					case "?":
 						if($issuer !== "console" and $issuer !== "rcon"){
@@ -114,7 +114,7 @@ class ConsoleAPI{
 								if($this->server->api->dhandle("console.command.".$c, array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false or $this->server->api->dhandle("console.command", array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false){
 									break;
 								}
-								$output .= "Usage: /$c ".$this->help[$c]."\n";
+								$output .= "사용법: /$c ".$this->help[$c]."\n";
 								break;
 							}
 						}
@@ -128,7 +128,7 @@ class ConsoleAPI{
 						
 						$max = ceil(count($cmds) / 5);
 						$page = (int) (isset($params[0]) ? min($max, max(1, intval($params[0]))):1);						
-						$output .= "\x1b[31;1m-\x1b[0m Showing help page $page of $max (/help <page>) \x1b[31;1m-\x1b[0m\n";
+						$output .= "\x1b[31;1m-\x1b[0m $page / $max 표시 중(/help <페이지>) \x1b[31;1m-\x1b[0m\n";
 						$current = 1;
 						foreach($cmds as $c => $h){
 							$curpage = (int) ceil($current / 5);
@@ -141,7 +141,7 @@ class ConsoleAPI{
 						}
 						break;
 					default:
-						$output .= "Command doesn't exist! Use /help\n";
+						$output .= "커맨드가 없습니다! /help를 이용하여 알아보세요.\n";
 						break;
 				}
 		return $output;
