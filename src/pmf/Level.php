@@ -222,7 +222,7 @@ class PMFLevel extends PMF{
 			if(($info[0] & $t) === $t){
 				// 4096 + 2048 + 2048, Block Data, Meta, Light
 				if(strlen($this->chunks[$index][$Y] = gzread($chunk, 8192)) < 8192){
-					console("[NOTICE]잘못된 청크 발견: [$X,$Z,:$Y], 복구 중");
+					console("[NOTICE] 잘못된 청크 발견: [$X,$Z,:$Y], 복구 중");
 					$this->fillMiniChunk($X, $Z, $Y);
 				}
 			}else{
