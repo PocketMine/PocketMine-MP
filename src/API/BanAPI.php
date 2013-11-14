@@ -196,17 +196,17 @@ class BanAPI{
 					case "on":
 					case "true":
 					case "1":
-						$output .= "White-list turned on\n";
+						$output .= "화이트리스트가 활성화되었습니다\n";
 						$this->server->api->setProperty("white-list", true);
 						break;
 					case "off":
 					case "false":
 					case "0":
-						$output .= "White-list turned off\n";
+						$output .= "화이트리스트가 비활성화되었습니다\n";
 						$this->server->api->setProperty("white-list", false);
 						break;
 					default:
-						$output .= "Usage: /whitelist <on|off|list|add|remove|reload> [username]\n";
+						$output .= "사용법: /whitelist <on|off|list|add|remove|reload> [username]\n";
 						break;
 				}
 				break;
