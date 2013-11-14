@@ -29,9 +29,9 @@ class PlayerAPI{
 		$this->server->schedule(20 * 15, array($this, "handle"), 1, true, "server.regeneration");
 		$this->server->addHandler("player.death", array($this, "handle"), 1);
 		$this->server->api->console->register("list", "", array($this, "commandHandler"));
-		$this->server->api->console->register("kill", "<player>", array($this, "commandHandler"));
-		$this->server->api->console->register("gamemode", "<mode> [player]", array($this, "commandHandler"));
-		$this->server->api->console->register("tp", "[target player] <destination player|w:world> OR /tp [target player] <x> <y> <z>", array($this, "commandHandler"));
+		$this->server->api->console->register("kill", "<플레이어>", array($this, "commandHandler"));
+		$this->server->api->console->register("gamemode", "<모드> [플레이어]", array($this, "commandHandler"));
+		$this->server->api->console->register("tp", "[대상 플레이어] <목적지 플레이어|w:월드> 또는 /tp [대상 플레이어] <x> <y> <z>", array($this, "commandHandler"));
 		$this->server->api->console->register("spawnpoint", "[player] [x] [y] [z]", array($this, "commandHandler"));
 		$this->server->api->console->register("spawn", "", array($this, "commandHandler"));
 		$this->server->api->console->register("ping", "", array($this, "commandHandler"));
@@ -68,44 +68,44 @@ class PlayerAPI{
 					if($e instanceof Entity){
 						switch($e->class){
 							case ENTITY_PLAYER:
-								$message = " was killed by ".$e->name;
+								$message = " 는 다음 사람에 의해 죽었습니다: ".$e->name;
 								break;
 							default:
-								$message = " was killed";
+								$message = " 는 죽었습니다";
 								break;
 						}
 					}
 				}else{
 					switch($data["cause"]){
 						case "cactus":
-							$message = " was pricked to death";
+							$message = " 는 찔려 죽었습니다";
 							break;
 						case "lava":
-							$message = " tried to swim in lava";
+							$message = " 는 용암에 빠져 죽었습니다";
 							break;
 						case "fire":
-							$message = " went up in flames";
+							$message = " 는 화염에 휩싸여 죽었습니다";
 							break;
 						case "burning":
-							$message = " burned to death";
+							$message = " 는 타 죽었습니다";
 							break;
 						case "suffocation":
-							$message = " suffocated in a wall";
+							$message = " 는 벽 속에 껴 죽었습니다";
 							break;
 						case "water":
-							$message = " drowned";
+							$message = " 는 익사했습니다";
 							break;
 						case "void":
-							$message = " fell out of the world";
+							$message = " 는 맵 밖으로 떨어졌습니다";
 							break;
 						case "fall":
-							$message = " hit the ground too hard";
+							$message = " 는 낙사했습니다";
 							break;
 						case "explosion":
-							$message = " blew up";
+							$message = " 는 폭발로 죽었습니다";
 							break;
 						default:
-							$message = " died";
+							$message = " 는 죽었습니다";
 							break;
 					}
 				}
@@ -120,7 +120,7 @@ class PlayerAPI{
 		switch($cmd){
 			case "spawnpoint":
 				if(!($issuer instanceof Player)){					
-					$output .= "Please run this command in-game.\n";
+					$output .= "게임 내에서 이 커맨드를 실행하세요.\n";
 					break;
 				}
 
@@ -131,7 +131,7 @@ class PlayerAPI{
 				}
 				
 				if(!($target instanceof Player)){
-					$output .= "That player cannot be found.\n";
+					$output .= "플레이어를 알 수 없습니다.\n";
 					break;
 				}
 				
@@ -143,21 +143,21 @@ class PlayerAPI{
 				
 				$target->setSpawn($spawn);
 				
-				$output .= "Spawnpoint set correctly!\n";
+				$output .= "스폰 포인트가 잘못되었습니다!\n";
 				break;
 			case "spawn":
 				if(!($issuer instanceof Player)){					
-					$output .= "Please run this command in-game.\n";
+					$output .= "게임 내에서 이 커맨드를 실행하세요.\n";
 					break;
 				}
 				$issuer->teleport($this->server->spawn);
 				break;
 			case "ping":
 				if(!($issuer instanceof Player)){					
-					$output .= "Please run this command in-game.\n";
+					$output .= "게임 내에서 이 커맨드를 실행하세요.\n";
 					break;
 				}
-				$output .= "ping ".round($issuer->getLag(), 2)."ms, packet loss ".round($issuer->getPacketLoss() * 100, 2)."%, ".round($issuer->getBandwidth() / 1024, 2)." KB/s\n";
+				$output .= "핑 ".round($issuer->getLag(), 2)."밀리초, 패킷 손실률 ".round($issuer->getPacketLoss() * 100, 2)."%, ".round($issuer->getBandwidth() / 1024, 2)." KB/s\n";
 				break;
 			case "gamemode":
 				$player = false;
@@ -184,11 +184,11 @@ class PlayerAPI{
 					$player = $this->server->api->player->get($params[1]);
 				}
 				if(!($player instanceof Player) or !isset($gms[strtolower($params[0])])){
-					$output .= "Usage: /$cmd <mode> [player]\n";
+					$output .= "사용법: /$cmd <모드> [플레이어]\n";
 					break;
 				}
 				if($player->setGamemode($gms[strtolower($params[0])])){
-					$output .= "Gamemode of ".$player->username." changed to ".$player->getGamemode()."\n";
+					$output .= "".$player->username." 의 게임모드가 다음으로 변경되었습니다: ".$player->getGamemode()."\n";
 				}
 				break;
 			case "tp":
@@ -200,13 +200,13 @@ class PlayerAPI{
 						$name = array_shift($params);
 						$target = implode(" ", $params);
 					}else{
-						$output .= "Usage: /$cmd [target player] <destination player>\n";
+						$output .= "사용법: /$cmd [대상 플레이어] <목적 플레이어>\n";
 						break;
 					}
 					if($this->teleport($name, $target) !== false){
-						$output .= "\"$name\" teleported to \"$target\"\n";
+						$output .= "\"$name\" 가 다음 플레이어에게로 이동했습니다: \"$target\"\n";
 					}else{
-						$output .= "Couldn't teleport.\n";
+						$output .= "텔레포트 실패.\n";
 					}
 				}else{
 					if(!isset($params[3]) and isset($params[2]) and isset($params[1]) and isset($params[0]) and ($issuer instanceof Player)){
@@ -220,13 +220,13 @@ class PlayerAPI{
 						$y = $params[2];
 						$z = $params[3];
 					}else{
-						$output .= "Usage: /$cmd [player] <x> <y> <z>\n";
+						$output .= "사용법: /$cmd [플레이어] <x> <y> <z>\n";
 						break;
 					}
 					if($this->tppos($name, $x, $y, $z)){
-						$output .= "\"$name\" teleported to ($x, $y, $z)\n";
+						$output .= "\"$name\" 는 다음 좌표로 이동했습니다: ($x, $y, $z)\n";
 					}else{
-						$output .= "Couldn't teleport.\n";
+						$output .= "텔레포트 실패.\n";
 					}
 				}
 				break;
@@ -239,7 +239,7 @@ class PlayerAPI{
 				}
 				if($player instanceof Player){
 					$player->entity->harm(1000, "console", true);
-					$player->sendChat("Ouch. That looks like it hurt.\n");
+					$player->sendChat("아야. 좀 아프군요.\n");
 				}else{
 					$output .= "Usage: /$cmd [player]\n";
 				}
