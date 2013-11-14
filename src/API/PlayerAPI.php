@@ -241,11 +241,11 @@ class PlayerAPI{
 					$player->entity->harm(1000, "console", true);
 					$player->sendChat("아야. 좀 아프군요.\n");
 				}else{
-					$output .= "Usage: /$cmd [player]\n";
+					$output .= "사용법: /$cmd [플레이어]\n";
 				}
 				break;
 			case "list":
-				$output .= "There are ".count($this->server->clients)."/".$this->server->maxClients." players online:\n";
+				$output .= "현재 ".count($this->server->clients)."/".$this->server->maxClients."명이 접속했습니다:\n";
 				if(count($this->server->clients) == 0){
 					break;
 				}
