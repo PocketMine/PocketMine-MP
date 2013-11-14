@@ -222,7 +222,7 @@ class ServerAPI{
 			$value = array("M" => 1, "G" => 1024);
 			$real = ((int) substr($memory, 0, -1)) * $value[substr($memory, -1)];
 			if($real < 128){
-				console("[WARNING] PocketMine-MP may not work right with less than 128MB of RAM", true, true, 0);
+				console("[WARNING] PocketMine-MP는 최소 128MB 이상의 램 할당을 요구합니다.", true, true, 0);
 			}
 			@ini_set("memory_limit", $memory);
 		}else{
@@ -299,7 +299,7 @@ class ServerAPI{
 		}
 		$this->__destruct();
 		if($this->getProperty("upnp-forwarding") === true ){
-			console("[INFO] [UPnP] Removing port forward...");
+			console("[INFO] [UPnP] 포트 포워딩 비활성화 중...");
 			UPnP_RemovePortForward($this->getProperty("server-port"));
 		}
 		return $this->restart;
@@ -405,7 +405,7 @@ class ServerAPI{
 			}
 			$file = $dir.$class.".php";
 			if(!file_exists($file)){
-				console("[ERROR] API ".$name." [".$class."] in ".$dir." doesn't exist", true, true, 0);
+				console("[ERROR] API ".$name." [".$class."] 디렉토리 ".$dir." 가 없습니다", true, true, 0);
 				return false;
 			}
 			require_once($file);
