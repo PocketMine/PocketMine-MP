@@ -26,9 +26,9 @@ class ChatAPI{
 	}
 	
 	public function init(){
-		$this->server->api->console->register("tell", "<player> <private message ...>", array($this, "commandHandler"));
-		$this->server->api->console->register("me", "<action ...>", array($this, "commandHandler"));
-		$this->server->api->console->register("say", "<message ...>", array($this, "commandHandler"));
+		$this->server->api->console->register("tell", "<플레이어> <귓속말 ...>", array($this, "commandHandler"));
+		$this->server->api->console->register("me", "<행동 ...>", array($this, "commandHandler"));
+		$this->server->api->console->register("say", "<메시지 ...>", array($this, "commandHandler"));
 		$this->server->api->ban->cmdWhitelist("tell");
 		$this->server->api->ban->cmdWhitelist("me");
 	}
