@@ -204,7 +204,7 @@ class BlockAPI{
 		switch($cmd){
 			case "give":
 				if(!isset($params[0]) or !isset($params[1])){
-					$output .= "Usage: /give <player> <item[:damage]> [amount]\n";
+					$output .= "사용법: /give <플레이어> <아이템[:데미지]> [수량]\n";
 					break;
 				}
 				$player = $this->server->api->player->get($params[0]);
@@ -218,17 +218,17 @@ class BlockAPI{
 
 				if($player instanceof Player){
 					if(($player->gamemode & 0x01) === 0x01){
-						$output .= "Player is in creative mode.\n";
+						$output .= "플레이어가 크리에이티브 모드입니다.\n";
 						break;
 					}
 					if($item->getID() == 0) {
-						$output .= "You cannot give an air block to a player.\n";
+						$output .= "플레이어에게 빈 블럭을 줄 수 없습니다..\n";
 						break;
 					}
 					$player->addItem($item->getID(), $item->getMetadata(), $item->count);
 					$output .= "Giving ".$item->count." of ".$item->getName()." (".$item->getID().":".$item->getMetadata().") to ".$player->username."\n";
 				}else{
-					$output .= "Unknown player.\n";
+					$output .= "없는 플레이어입니다..\n";
 				}
 
 				break;
