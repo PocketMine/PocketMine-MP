@@ -45,13 +45,13 @@ class BanAPI{
 		$this->bannedIPs = new Config(DATA_PATH."banned-ips.txt", CONFIG_LIST);//Open Banned IPs list file
 		$this->banned = new Config(DATA_PATH."banned.txt", CONFIG_LIST);//Open Banned Usernames list file
 		$this->ops = new Config(DATA_PATH."ops.txt", CONFIG_LIST);//Open list of OPs
-		$this->server->api->console->register("banip", "<add|remove|list|reload> [IP|player]", array($this, "commandHandler"));
-		$this->server->api->console->register("ban", "<add|remove|list|reload> [username]", array($this, "commandHandler"));
-		$this->server->api->console->register("kick", "<player> [reason ...]", array($this, "commandHandler"));
-		$this->server->api->console->register("whitelist", "<on|off|list|add|remove|reload> [username]", array($this, "commandHandler"));
-		$this->server->api->console->register("op", "<player>", array($this, "commandHandler"));
-		$this->server->api->console->register("deop", "<player>", array($this, "commandHandler"));
-		$this->server->api->console->register("sudo", "<player>", array($this, "commandHandler"));
+		$this->server->api->console->register("banip", "<add|remove|list|reload> [IP|플레이어]", array($this, "commandHandler"));
+		$this->server->api->console->register("ban", "<add|remove|list|reload> [플레이어 이름]", array($this, "commandHandler"));
+		$this->server->api->console->register("kick", "<플레이어> [이유 ...]", array($this, "commandHandler"));
+		$this->server->api->console->register("whitelist", "<on|off|list|add|remove|reload> [플레이어 이름]", array($this, "commandHandler"));
+		$this->server->api->console->register("op", "<플레이어>", array($this, "commandHandler"));
+		$this->server->api->console->register("deop", "<플레이어>", array($this, "commandHandler"));
+		$this->server->api->console->register("sudo", "<플레이어>", array($this, "commandHandler"));
 		$this->server->api->console->alias("ban-ip", "banip add");
 		$this->server->api->console->alias("banlist", "ban list");
 		$this->server->api->console->alias("pardon", "ban remove");
