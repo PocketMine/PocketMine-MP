@@ -32,7 +32,7 @@ class TimeAPI{
 	}
 
 	public function init(){
-		$this->server->api->console->register("time", "<check|set|add> [time]", array($this, "commandHandler"));
+		$this->server->api->console->register("time", "<check|set|add> [시간]", array($this, "commandHandler"));
 	}
 
 	public function commandHandler($cmd, $params, $issuer, $alias){
@@ -46,22 +46,22 @@ class TimeAPI{
 				$p = strtolower(array_shift($params));
 				switch($p){
 					case "check":
-						$output .= "Time: ".$this->getDate($level).", ".$this->getPhase($level)." (".$this->get(true, $level).")\n";
+						$output .= "현재 시간: ".$this->getDate($level).", ".$this->getPhase($level)." (".$this->get(true, $level).")\n";
 						break;
 					case "add":
-						$output .= "Set the time to ".$this->add(array_shift($params), $level)."\n";
+						$output .= "시간을 다음으로 조정합니다: ".$this->add(array_shift($params), $level)."\n";
 						break;
 					case "set":
-						$output .= "Set the time to ".$this->set(array_shift($params), $level)."\n";
+						$output .= "시간을 다음으로 조정합니다: ".$this->set(array_shift($params), $level)."\n";
 						break;
 					case "sunrise":
 					case "day":
 					case "sunset":
 					case "night":
-						$output .= "Set the time to ".$this->set($p, $level)."\n";
+						$output .= "시간을 다음으로 조정합니다: ".$this->set($p, $level)."\n";
 						break;
 					default:
-						$output .= "Usage: /time <check|set|add> [time]\n";
+						$output .= "사용법: /time <check|set|add> [시간]\n";
 						break;
 				}
 				break;
