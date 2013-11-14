@@ -262,7 +262,7 @@ class Player{
 				$this->save();
 			}
 			$reason = $reason == "" ? "server stop":$reason;
-			$this->sendChat("You have been kicked. Reason: ".$reason."\n");
+			$this->sendChat("당신은 강제 퇴장 당했습니다. 이유: ".$reason."\n");
 			$this->sendBuffer();
 			$this->directDataPacket(MC_DISCONNECT);
 			$this->connected = false;
@@ -278,9 +278,9 @@ class Player{
 			$this->server->interface->stopChunked($this->CID);
 			$this->server->api->player->remove($this->CID);
 			if($msg === true and $this->username != ""){
-				$this->server->api->chat->broadcast($this->username." left the game");
+				$this->server->api->chat->broadcast($this->username." 이 게임을 나갔습니다");
 			}
-			console("[INFO] ".FORMAT_AQUA.$this->username.FORMAT_RESET."[/".$this->ip.":".$this->port."] logged out due to ".$reason);
+			console("[INFO] ".FORMAT_AQUA.$this->username.FORMAT_RESET."[/".$this->ip.":".$this->port."] 이 로그아웃했습니다. 이유: ".$reason);
 			$this->windows = array();
 			$this->armor = array();
 			$this->inventory = array();
@@ -893,14 +893,14 @@ class Player{
 				}
 			}
 			$this->gamemode = $gm;
-			$this->sendChat("Your gamemode has been changed to ".$this->getGamemode().".\n");
+			$this->sendChat("당신의 게임모드가 ".$this->getGamemode()." 으로 변경되었습니다.\n");
 		}else{
 			foreach($this->inventory as $slot => $item){
 				$inv[$slot] = BlockAPI::getItem(AIR, 0, 0);
 			}
 			$this->blocked = true;
 			$this->gamemode = $gm;
-			$this->sendChat("Your gamemode has been changed to ".$this->getGamemode().", you've to do a forced reconnect.\n");
+			$this->sendChat("당신의 게임모드는 ".$this->getGamemode()." 으로 변경되었습니다. 나간 후 재연결하세요.\n");
 			$this->server->schedule(30, array($this, "close"), "gamemode change"); //Forces a kick
 		}
 		$this->inventory = $inv;
