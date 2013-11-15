@@ -105,7 +105,7 @@ class PlayerAPI{
 							$message = " 는 폭발로 죽었습니다";
 							break;
 						default:
-							$message = " 는 죽었습니다";
+							$message = " 는 알수 없는 이유로  죽었습니다";
 							break;
 					}
 				}
