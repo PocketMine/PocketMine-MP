@@ -16,6 +16,16 @@
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
  * 
+ * 
+ * 이 프로그램은 자유 소프트웨어입니다: 당신은 수정하거나 하지 않고 LGPL 버전 
+ * 3 또는 이후 버전 하에서 재배포할 수 있습니다.
+ * 
+ * 
+ * 
+ * Trnslated into Korean by ns827
+ * 한국어 번역: ns827
+ * 
+ * 
  *
 */
 
@@ -35,13 +45,13 @@ class BanAPI{
 		$this->bannedIPs = new Config(DATA_PATH."banned-ips.txt", CONFIG_LIST);//Open Banned IPs list file
 		$this->banned = new Config(DATA_PATH."banned.txt", CONFIG_LIST);//Open Banned Usernames list file
 		$this->ops = new Config(DATA_PATH."ops.txt", CONFIG_LIST);//Open list of OPs
-		$this->server->api->console->register("banip", "<add|remove|list|reload> [IP|player]", array($this, "commandHandler"));
-		$this->server->api->console->register("ban", "<add|remove|list|reload> [username]", array($this, "commandHandler"));
-		$this->server->api->console->register("kick", "<player> [reason ...]", array($this, "commandHandler"));
-		$this->server->api->console->register("whitelist", "<on|off|list|add|remove|reload> [username]", array($this, "commandHandler"));
-		$this->server->api->console->register("op", "<player>", array($this, "commandHandler"));
-		$this->server->api->console->register("deop", "<player>", array($this, "commandHandler"));
-		$this->server->api->console->register("sudo", "<player>", array($this, "commandHandler"));
+		$this->server->api->console->register("banip", "<add|remove|list|reload> [IP|플레이어]", array($this, "commandHandler"));
+		$this->server->api->console->register("ban", "<add|remove|list|reload> [플레이어 이름]", array($this, "commandHandler"));
+		$this->server->api->console->register("kick", "<플레이어> [이유 ...]", array($this, "commandHandler"));
+		$this->server->api->console->register("whitelist", "<on|off|list|add|remove|reload> [플레이어 이름]", array($this, "commandHandler"));
+		$this->server->api->console->register("op", "<플레이어>", array($this, "commandHandler"));
+		$this->server->api->console->register("deop", "<플레이어>", array($this, "commandHandler"));
+		$this->server->api->console->register("sudo", "<플레이어>", array($this, "commandHandler"));
 		$this->server->api->console->alias("ban-ip", "banip add");
 		$this->server->api->console->alias("banlist", "ban list");
 		$this->server->api->console->alias("pardon", "ban remove");
@@ -108,11 +118,11 @@ class BanAPI{
 				$target = strtolower(array_shift($params));
 				$player = $this->server->api->player->get($target);
 				if(!($player instanceof Player)){
-					$output .= "Player not connected.\n";
+					$output .= "연결되지 않은 플레이어입니다.\n";
 					break;
 				}
 				$this->server->api->console->run(implode(" ", $params), $player);
-				$output .= "Command ran as ".$player->username.".\n";
+				$output .= "다음 플레이어의 권한으로 명령어가 실행되었습니다: ".$player->username.".\n";
 				break;
 			case "op":
 				$user = strtolower($params[0]);
@@ -120,13 +130,13 @@ class BanAPI{
 				if(!($player instanceof Player)){
 					$this->ops->set($user);
 					$this->ops->save($user);
-					$output .= $user." is now op\n";
+					$output .= $user." 는 이제 OP입니다\n";
 					break;
 				}
 				$this->ops->set($player->iusername);
 				$this->ops->save();
-				$output .= $player->iusername." is now op\n";
-				$this->server->api->chat->sendTo(false, "You are now op.", $player->iusername);
+				$output .= $player->iusername." 는 이제 OP입니다\n";
+				$this->server->api->chat->sendTo(false, "당신은 이제 OP입니다.", $player->iusername);
 				break;
 			case "deop":
 				$user = strtolower($params[0]);
@@ -134,30 +144,30 @@ class BanAPI{
 				if(!($player instanceof Player)){
 					$this->ops->remove($user);
 					$this->ops->save();
-					$output .= $user." is no longer op\n";
+					$output .= $user." 는 더 이상 OP가 아닙니다.\n";
 					break;
 				}
 				$this->ops->remove($player->iusername);
 				$this->ops->save();
-				$output .= $player->iusername." is no longer op\n";
-				$this->server->api->chat->sendTo(false, "You are no longer op.", $player->iusername);
+				$output .= $player->iusername." 는 더 이상 OP가 아닙니다.\n";
+				$this->server->api->chat->sendTo(false, "당신은 이제 더 이상 OP가 아닙니다..", $player->iusername);
 				break;
 			case "kick":
 				if(!isset($params[0])){
-					$output .= "Usage: /kick <player> [reason ...]\n";
+					$output .= "사용법: /kick <플레이어> [이유 ...]\n";
 				}else{
 					$name = strtolower(array_shift($params));
 					$player = $this->server->api->player->get($name);
 					if($player === false){
-						$output .= "Player \"".$name."\" does not exist\n";
+						$output .= "플레이어 \"".$name."\" 는 존재하지 않습니다.\n";
 					}else{
 						$reason = implode(" ", $params);
-						$reason = $reason == "" ? "No reason":$reason;
-						$player->close("You have been kicked: ".$reason);
+						$reason = $reason == "" ? "이유 없음":$reason;
+						$player->close("당신은 강제 퇴장당했습니다: ".$reason);
 						if($issuer instanceof Player){
-							$this->server->api->chat->broadcast($player->username." has been kicked by ".$issuer->username.": $reason\n");
+							$this->server->api->chat->broadcast($player->username." 는 이 사람에 의해 강제 퇴장당했습니다 ".$issuer->username.": $reason\n");
 						}else{
-							$this->server->api->chat->broadcast($player->username." has been kicked: $reason\n");
+							$this->server->api->chat->broadcast($player->username." 는 강제 퇴장당했습니다: $reason\n");
 						}
 					}
 				}
@@ -169,34 +179,34 @@ class BanAPI{
 						$user = strtolower($params[0]);
 						$this->whitelist->remove($user);
 						$this->whitelist->save();
-						$output .= "Player \"$user\" removed from white-list\n";
+						$output .= "Player \"$user\" 는 화이트리스트에서 제거되었습니다\n";
 						break;
 					case "add":
 						$user = strtolower($params[0]);
 						$this->whitelist->set($user);
 						$this->whitelist->save();
-						$output .= "Player \"$user\" added to white-list\n";
+						$output .= "Player \"$user\" 는 화이트리스트에 추가되었습니다\n";
 						break;
 					case "reload":
 						$this->whitelist = new Config(DATA_PATH."white-list.txt", CONFIG_LIST);
 						break;
 					case "list":
-						$output .= "White-list: ".implode(", ", $this->whitelist->getAll(true))."\n";
+						$output .= "화이트리스트: ".implode(", ", $this->whitelist->getAll(true))."\n";
 						break;
 					case "on":
 					case "true":
 					case "1":
-						$output .= "White-list turned on\n";
+						$output .= "화이트리스트가 활성화되었습니다\n";
 						$this->server->api->setProperty("white-list", true);
 						break;
 					case "off":
 					case "false":
 					case "0":
-						$output .= "White-list turned off\n";
+						$output .= "화이트리스트가 비활성화되었습니다\n";
 						$this->server->api->setProperty("white-list", false);
 						break;
 					default:
-						$output .= "Usage: /whitelist <on|off|list|add|remove|reload> [username]\n";
+						$output .= "사용법: /whitelist <on|off|list|add|remove|reload> [username]\n";
 						break;
 				}
 				break;
@@ -208,7 +218,7 @@ class BanAPI{
 						$ip = strtolower($params[0]);
 						$this->bannedIPs->remove($ip);
 						$this->bannedIPs->save();
-						$output .= "IP \"$ip\" removed from ban list\n";
+						$output .= "IP \"$ip\" 는 차단 리스트에서 제거되었습니다\n";
 						break;
 					case "add":
 					case "ban":
@@ -220,16 +230,16 @@ class BanAPI{
 						}
 						$this->bannedIPs->set($ip);
 						$this->bannedIPs->save();
-						$output .= "IP \"$ip\" added to ban list\n";
+						$output .= "IP \"$ip\" 는 차단되었습니다\n";
 						break;
 					case "reload":
 						$this->bannedIPs = new Config(DATA_PATH."banned-ips.txt", CONFIG_LIST);
 						break;
 					case "list":
-						$output .= "IP ban list: ".implode(", ", $this->bannedIPs->getAll(true))."\n";
+						$output .= "IP 차단 목록: ".implode(", ", $this->bannedIPs->getAll(true))."\n";
 						break;
 					default:
-						$output .= "Usage: /banip <add|remove|list|reload> [IP|player]\n";
+						$output .= "사용법: /banip <add|remove|list|reload> [IP|player]\n";
 						break;
 				}
 				break;
@@ -241,7 +251,7 @@ class BanAPI{
 						$user = strtolower($params[0]);
 						$this->banned->remove($user);
 						$this->banned->save();
-						$output .= "Player \"$user\" removed from ban list\n";
+						$output .= "플레이어 \"$user\" 는 차단 리스트에서 제거되었습니다.\n";
 						break;
 					case "add":
 					case "ban":
@@ -250,15 +260,15 @@ class BanAPI{
 						$this->banned->save();
 						$player = $this->server->api->player->get($user);
 						if($player !== false){
-							$player->close("You have been banned");
+							$player->close("당신은 차단되었습니다.");
 						}
 						if($issuer instanceof Player){
-							$this->server->api->chat->broadcast($user." has been banned by ".$issuer->username."\n");
+							$this->server->api->chat->broadcast($user." 는 다음 사람에 의해 차단되었습니다: ".$issuer->username."\n");
 						}else{
-							$this->server->api->chat->broadcast($user." has been banned\n");
+							$this->server->api->chat->broadcast($user." 는 차단되었습니다\n");
 						}
 						$this->kick($user, "Banned");
-						$output .= "Player \"$user\" added to ban list\n";
+						$output .= "플레이어 \"$user\" 는 차단되었습니다\n";
 						break;
 					case "reload":
 						$this->banned = new Config(DATA_PATH."banned.txt", CONFIG_LIST);
@@ -267,7 +277,7 @@ class BanAPI{
 						$output .= "Ban list: ".implode(", ", $this->banned->getAll(true))."\n";
 						break;
 					default:
-						$output .= "Usage: /ban <add|remove|list|reload> [username]\n";
+						$output .= "사용법: /ban <add|remove|list|reload> [username]\n";
 						break;
 				}
 				break;
@@ -291,7 +301,7 @@ class BanAPI{
 		$this->commandHandler("banip", array("pardon", $ip), "console", "");
 	}
 	
-	public function kick($username, $reason = "No Reason"){
+	public function kick($username, $reason = "이유 없음"){
 		$this->commandHandler("kick", array($username, $reason), "console", "");
 	}
 	

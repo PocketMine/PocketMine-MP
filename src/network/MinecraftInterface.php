@@ -30,7 +30,7 @@ class MinecraftInterface{
 	function __construct($object, $server, $port = 25565, $listen = false, $client = false, $serverip = "0.0.0.0"){
 		$this->socket = new UDPSocket($server, $port, (bool) $listen, $serverip);
 		if($this->socket->connected === false){
-			console("[ERROR] Couldn't bind to $serverip:".$port, true, true, 0);
+			console("[ERROR] 다음 IP로 연결 실패: $serverip:".$port, true, true, 0);
 			exit(1);
 		}
 		$this->bandwidth = array(0, 0, microtime(true));
@@ -81,7 +81,7 @@ class MinecraftInterface{
 				"ip" => $source,
 				"port" => $port
 			)) !== true){
-				console("[ERROR] Unknown Packet ID 0x".Utils::strToHex(chr($pid)), true, true, 2);
+				console("[ERROR] 알 수 없는 패킷 ID 0x".Utils::strToHex(chr($pid)), true, true, 2);
 			}
 			return false;
 		}

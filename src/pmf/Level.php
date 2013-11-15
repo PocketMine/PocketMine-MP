@@ -143,7 +143,7 @@ class PMFLevel extends PMF{
 		}
 		$lastseek = ftell($this->fp);
 		if(($len = $this->read(2)) === false or ($this->levelData["extra"] = @gzinflate($this->read(Utils::readShort($len, false)))) === false){ //Corruption protection
-			console("[NOTICE] Empty/corrupt location table detected, forcing recovery");
+			console("[NOTICE] 잘못된 위치 테이블 발견. 복구 중...");
 			fseek($this->fp, $lastseek);
 			$c = gzdeflate("");
 			$this->write(Utils::writeShort(strlen($c)).$c);
@@ -222,7 +222,7 @@ class PMFLevel extends PMF{
 			if(($info[0] & $t) === $t){
 				// 4096 + 2048 + 2048, Block Data, Meta, Light
 				if(strlen($this->chunks[$index][$Y] = gzread($chunk, 8192)) < 8192){
-					console("[NOTICE] Empty corrupt chunk detected [$X,$Z,:$Y], recovering contents");
+					console("[NOTICE] 잘못된 청크 발견: [$X,$Z,:$Y], 복구 중");
 					$this->fillMiniChunk($X, $Z, $Y);
 				}
 			}else{

@@ -70,10 +70,10 @@ class LevelAPI{
 					$output .= "Seed: ".$issuer->level->getSeed()."\n";
 				}elseif(isset($params[0])){
 					if(($lv = $this->server->api->level->get(trim(implode(" ", $params)))) !== false){
-						$output .= "Seed: ".$lv->getSeed()."\n";
+						$output .= "시드: ".$lv->getSeed()."\n";
 					}
 				}else{
-					$output .= "Seed: ".$this->server->api->level->getDefault()->getSeed()."\n";
+					$output .= "시드: ".$this->server->api->level->getDefault()->getSeed()."\n";
 				}
 		}
 		return $output;			
@@ -122,7 +122,7 @@ class LevelAPI{
 		if($name === $this->default and $force !== true){
 			return false;
 		}
-		console("[INFO] Unloading level \"".$name."\"");
+		console("[INFO] 다음 레벨 언로딩증: \"".$name."\"");
 		$level->nextSave = PHP_INT_MAX;
 		$level->save();
 		foreach($this->server->api->player->getAll($level) as $player){
@@ -145,11 +145,11 @@ class LevelAPI{
 		if($this->get($name) !== false){
 			return true;
 		}elseif($this->levelExists($name) === false){
-			console("[NOTICE] Level \"".$name."\" not found");
+			console("[NOTICE] 레벨 \"".$name."\" 을 찾을 수 없습니다");
 			return false;
 		}
 		$path = DATA_PATH."worlds/".$name."/";
-		console("[INFO] Preparing level \"".$name."\"");
+		console("[INFO] 다음 레벨 준비 중: \"".$name."\"");
 		$level = new PMFLevel($path."level.pmf");
 		$entities = new Config($path."entities.yml", CONFIG_YAML);
 		if(file_exists($path."tileEntities.yml")){
@@ -230,7 +230,7 @@ class LevelAPI{
 				$level->import();
 			}
 			$this->level = new PMFLevel($this->mapDir."level.pmf");
-			console("[INFO] Preparing level \"".$this->level->getData("name")."\"");
+			console("[INFO] 다음 레벨 준비 중: \"".$this->level->getData("name")."\"");
 			$this->time = (int) $this->level->getData("time");
 			$this->seed = (int) $this->level->getData("seed");
 			$this->spawn = $this->level->getSpawn();

@@ -1,3 +1,6 @@
+//보통 라이센스는 영어 원본 그대로 하는것이 예의 입니다.
+
+
 ![](http://www.pocketmine.net/favicon.png)
 
 # PocketMine-MP [![Build Status](https://travis-ci.org/PocketMine/PocketMine-MP.png?branch=master)](https://travis-ci.org/PocketMine/PocketMine-MP)

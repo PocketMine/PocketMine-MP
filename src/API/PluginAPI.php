@@ -52,7 +52,7 @@ class PluginAPI extends stdClass{
 			$info = strstr($content, "*/", true);
 			$content = str_repeat(PHP_EOL, substr_count($info, "\n")).substr(strstr($content, "*/"),2);
 			if(preg_match_all('#([a-zA-Z0-9\-_]*)=([^\r\n]*)#u', $info, $matches) == 0){ //false or 0 matches
-				console("[ERROR] Failed parsing of ".basename($file));
+				console("[ERROR] 플러그인을 파싱하지 못했습니다: ".basename($file));
 				return false;
 			}
 			$info = array();
@@ -76,29 +76,29 @@ class PluginAPI extends stdClass{
 			$info["class"] = trim(strtolower($info["class"]));
 		}
 		if(!isset($info["name"]) or !isset($info["version"]) or !isset($info["class"]) or !isset($info["author"])){
-			console("[ERROR] Failed parsing of ".basename($file));
+			console("[ERROR] 플러그인을 파싱하지 못했습니다: ".basename($file));
 			return false;
 		}
 		console("[INFO] Loading plugin \"".FORMAT_GREEN.$info["name"].FORMAT_RESET."\" ".FORMAT_AQUA.$info["version"].FORMAT_RESET." by ".FORMAT_AQUA.$info["author"].FORMAT_RESET);
 		if($info["class"] !== "none" and class_exists($info["class"])){
-			console("[ERROR] Failed loading plugin: class already exists");
+			console("[ERROR] 플러그인을 로딩하는 데 실패했습니다: 클래스가 중복되었습니다");
 			return false;
 		}
 		if(eval($info["code"]) === false or ($info["class"] !== "none" and !class_exists($info["class"]))){
-			console("[ERROR] Failed loading {$info['name']}: evaluation error");
+			console("[ERROR] 다음 플러그인을 로딩하는 데 실패했습니다: {$info['name']}: 문법 오류");
 			return false;
 		}
 		
 		$className = $info["class"];
 		$apiversion = array_map("intval", explode(",", (string) $info["apiversion"]));
 		if(!in_array((string) CURRENT_API_VERSION, $apiversion)){
-			console("[WARNING] Plugin \"".$info["name"]."\" may not be compatible with the API (".$info["apiversion"]." != ".CURRENT_API_VERSION.")! It can crash or corrupt the server!");
+			console("[WARNING] 플러그인 \"".$info["name"]."\" 은 API 버전 ".$info["apiversion"]." != ".CURRENT_API_VERSION." 와 호환되지 않습니다! 서버에 문제가 생길 있습니다!");
 		}
 		
 		if($info["class"] !== "none"){			
 			$object = new $className($this->server->api, false);
 			if(!($object instanceof Plugin)){
-				console("[ERROR] Plugin \"".$info["name"]."\" doesn't use the Plugin Interface");
+				console("[ERROR] 플러그인 \"".$info["name"]."\" 은 정상적인 구조가 아닙니다");
 				if(method_exists($object, "__destruct")){
 					$object->__destruct();
 				}
@@ -189,7 +189,7 @@ class PluginAPI extends stdClass{
 	}
 	
 	public function initAll(){
-		console("[INFO] Starting plugins...");
+		console("[INFO] 플러그인 시작 중...");
 		foreach($this->plugins as $p){
 			$p[0]->init(); //ARGHHH!!! Plugin loading randomly fails!!
 		}

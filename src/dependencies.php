@@ -37,42 +37,42 @@ set_error_handler("error_handler", E_ALL);
 $errors = 0;
 
 if(version_compare("5.4.0", PHP_VERSION) > 0){
-	console("[ERROR] Use PHP >= 5.4.0", true, true, 0);
+	console("[ERROR] PHP 버전 5.4.0 이상을 사용하세요.", true, true, 0);
 	++$errors;
 }
 
 if(php_sapi_name() !== "cli"){
-	console("[ERROR] You must run PocketMine-MP using the CLI.", true, true, 0);
+	console("[ERROR] CLI를 사용하여 PocketMine-MP를 실행하세요..", true, true, 0);
 	++$errors;
 }
 
 if(!extension_loaded("sockets") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "sockets." . PHP_SHLIB_SUFFIX) === false){
-	console("[ERROR] Unable to find the Socket extension.", true, true, 0);
+	console("[ERROR] 소켓 확장 프로그램을 찾을 수 없습니다.", true, true, 0);
 	++$errors;
 }
 
 if(!extension_loaded("pthreads") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "pthreads." . PHP_SHLIB_SUFFIX) === false){
-	console("[ERROR] Unable to find the pthreads extension.", true, true, 0);
+	console("[ERROR] pthreads 확장 프로그램을 찾을 수 없습니다.", true, true, 0);
 	++$errors;
 }
 
 if(!extension_loaded("curl") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "curl." . PHP_SHLIB_SUFFIX) === false){
-	console("[ERROR] Unable to find the cURL extension.", true, true, 0);
+	console("[ERROR] cURL 확장 프로그램을 찾을 수 없습니다.", true, true, 0);
 	++$errors;
 }
 
 if(!extension_loaded("sqlite3") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "sqlite3." . PHP_SHLIB_SUFFIX) === false){
-	console("[ERROR] Unable to find the SQLite3 extension.", true, true, 0);
+	console("[ERROR] SQLite3 확장 프로그램을 찾을 수 없습니다.", true, true, 0);
 	++$errors;
 }
 
 if(!extension_loaded("zlib") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "zlib." . PHP_SHLIB_SUFFIX) === false){
-	console("[ERROR] Unable to find the Zlib extension.", true, true, 0);
+	console("[ERROR] Zlib 확장 프로그램을 찾을 수 없습니다.", true, true, 0);
 	++$errors;
 }
 
 if($errors > 0){
-	console("[ERROR] Please use the installer provided on the homepage.", true, true, 0);
+	console("[ERROR] 홈페이지에서 제공하는 인스톨러를 사용하세요.", true, true, 0);
 	exit(1); //Exit with error
 }
 

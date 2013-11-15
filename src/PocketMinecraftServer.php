@@ -29,7 +29,7 @@ class PocketMinecraftServer{
 		/*if(defined("DEBUG") and DEBUG >= 0){
 			@cli_set_process_title("PocketMine-MP ".MAJOR_VERSION);
 		}*/
-		console("[INFO] Starting Minecraft PE server on ".($this->serverip === "0.0.0.0" ? "*":$this->serverip).":".$this->port);
+		console("[INFO] MineCraft PE 서버를 시작하는 중: ".($this->serverip === "0.0.0.0" ? "*":$this->serverip).":".$this->port);
 		define("BOOTUP_RANDOM", Utils::getRandomBytes(16));
 		$this->serverID = $this->serverID === false ? Utils::readLong(Utils::getRandomBytes(8, false)):$this->serverID;
 		$this->seed = $this->seed === false ? Utils::readInt(Utils::getRandomBytes(4, false)):$this->seed;

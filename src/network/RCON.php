@@ -30,16 +30,16 @@ class RCON{
 	public function __construct($password, $port = 19132, $interface = "0.0.0.0", $threads = 1, $clientsPerThread = 50){
 		$this->workers = array();
 		$this->password = (string) $password;
-		console("[INFO] Starting remote control listener");
+		console("[INFO] 원격 조정 클라이언트 시작 중");
 		if($this->password === ""){
-			console("[ERROR] RCON can't be started: Empty password");
+			console("[ERROR] RCON 시작 실패: 비밀번호가 없음");
 			return;
 		}
 		$this->threads = (int) max(1, $threads);
 		$this->clientsPerThread = (int) max(1, $clientsPerThread);
 		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if($this->socket === false or !socket_bind($this->socket, $interface, (int) $port) or !socket_listen($this->socket)){
-			console("[ERROR] RCON can't be started: ".socket_strerror(socket_last_error()));
+			console("[ERROR] RCON 시작 실패: ".socket_strerror(socket_last_error()));
 			return;
 		}
 		@socket_set_block($this->socket);
@@ -47,7 +47,7 @@ class RCON{
 			$this->workers[$n] = new RCONInstance($this->socket, $this->password, $this->clientsPerThread);
 		}
 		@socket_getsockname($this->socket, $addr, $port);
-		console("[INFO] RCON running on $addr:$port");
+		console("[INFO] RCON 실행 중: $addr:$port");
 		ServerAPI::request()->schedule(2, array($this, "check"), array(), true);
 	}
 	
@@ -180,7 +180,7 @@ class RCONInstance extends Thread{
 								}
 								if($payload === $this->password){
 									@socket_getpeername($client, $addr, $port);
-									$this->response = "[INFO] Successful Rcon connection from: /$addr:$port";
+									$this->response = "[INFO] Rcon 연결 성공: /$addr:$port";
 									$this->wait();
 									$this->response = "";
 									$this->writePacket($client, $requestID, 2, "");
