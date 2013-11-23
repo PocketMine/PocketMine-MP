@@ -127,7 +127,7 @@ abstract class Block extends Position{
 			BIRCH_WOOD_STAIRS => "BirchWoodStairsBlock",
 			JUNGLE_WOOD_STAIRS => "JungleWoodStairsBlock",
 			
-			COBBLESTONE_WALL => "CobblestoneWall",
+			COBBLESTONE_WALL => "CobblestoneWallBlock",
 
 			QUARTZ_BLOCK => "QuartzBlock",
 			QUARTZ_STAIRS => "QuartzStairsBlock",
