@@ -21,7 +21,7 @@
 
 class FenceBlock extends TransparentBlock{
 	public function __construct(){
-		parent::__construct(STONE_WALL, 0, "Stone Wall");
+		parent::__construct(COBBLESTONE_WALL, 0, "CobblestoneWall");
 		$this->isFullBlock = false;
 		$this->hardness = 30;
 	}
