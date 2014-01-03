@@ -29,7 +29,7 @@ class PocketMinecraftServer{
 		/*if(defined("DEBUG") and DEBUG >= 0){
 			@cli_set_process_title("PocketMine-MP ".MAJOR_VERSION);
 		}*/
-		console("[INFO] MineCraft PE 서버를 시작하는 중: ".($this->serverip === "0.0.0.0" ? "*":$this->serverip).":".$this->port);
+		console("[정보] MineCraft PE 서버를 시작하는 중: ".($this->serverip === "0.0.0.0" ? "*":$this->serverip).":".$this->port);
 		define("BOOTUP_RANDOM", Utils::getRandomBytes(16));
 		$this->serverID = $this->serverID === false ? Utils::readLong(Utils::getRandomBytes(8, false)):$this->serverID;
 		$this->seed = $this->seed === false ? Utils::readInt(Utils::getRandomBytes(4, false)):$this->seed;
@@ -105,7 +105,7 @@ class PocketMinecraftServer{
 	
 	public function checkTicks(){
 		if($this->getTPS() < 12){
-			console("[WARNING] Can't keep up! Is the server overloaded?");
+			console("[주의] 서버데이터를유지할수없습니다. 추정-서버과부하 /신경쓰지않아도됩니다.");
 		}
 	}
 	
