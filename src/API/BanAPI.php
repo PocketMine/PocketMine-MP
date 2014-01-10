@@ -47,6 +47,7 @@ class BanAPI{
 		$this->server->api->console->register("kick", "<player> [reason ...]", array($this, "commandHandler"));
 		$this->server->api->console->register("whitelist", "<on|off|list|add|remove|reload> [username]", array($this, "commandHandler"));
 		$this->server->api->console->register("op", "<player>", array($this, "commandHandler"));
+		$this->server->api->console->register("lsop", "<player>", array($this, "commandHandler"));
 		$this->server->api->console->register("deop", "<player>", array($this, "commandHandler"));
 		$this->server->api->console->register("sudo", "<player>", array($this, "commandHandler"));
 		$this->server->api->console->alias("ban-ip", "banip add");
@@ -157,6 +158,16 @@ class BanAPI{
 				$output .= $player->iusername." is now op\n";
 				$this->server->api->chat->sendTo(false, "You are now op.", $player->iusername);
 				break;
+			case "lsop":
+        			$tmp = array();
+        			$opls = $this->ops->getAll();
+        			foreach ($opls as $name => $enabled){
+          				if ($enabled){
+            					$tmp[] = $name;
+          				}
+        			}
+        			$output = "Op's ". implode(', ',$tmp) ." \n";
+        		break;
 			case "deop":
 				$user = strtolower($params[0]);
 				$player = $this->server->api->player->get($user);
