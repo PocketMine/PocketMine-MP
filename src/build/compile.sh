@@ -236,6 +236,7 @@ if [ "$1" == "crosscompile" ]; then
 fi
 ./configure $OPTIMIZATION--prefix="$DIR/php5" \
 --exec-prefix="$DIR/php5" \
+--with-mysqli \
 --with-curl="$HAVE_CURL" \
 --with-zlib="$DIR/install_data/php/ext/zlib" \
 --with-zlib-dir="$DIR/install_data/php/ext/zlib" \
