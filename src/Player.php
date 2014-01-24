@@ -41,7 +41,7 @@ class Player{
 	private $username;
 	private $iusername;
 	private $eid = false;
-	private $startAction = false;
+	private $startAction = false; 
 	private $isSleeping = false;
 	public $data;
     /** @var \Entity */
