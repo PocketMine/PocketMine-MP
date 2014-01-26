@@ -1,13 +1,21 @@
-players/*
-worlds/*
-plugins/*
-logs/*
-bin/*
-.idea/*
+############
+## Server
+############
+logs/
+players/
+plugins/
+worlds/
 *.log
 *.pmf
 *.txt
 server.properties
+
+############
+## IDE
+############
+.idea/
+.project
+.buildpath
 
 
 ############
