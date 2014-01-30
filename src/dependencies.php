@@ -80,10 +80,10 @@ if(!extension_loaded("yaml") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . 
 	++$errors;
 }
 
-if(!extension_loaded("event") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "event." . PHP_SHLIB_SUFFIX) === false){
+/*if(!extension_loaded("event") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "event." . PHP_SHLIB_SUFFIX) === false){
 	console("[ERROR] Unable to find the Event extension.", true, true, 0);
 	++$errors;
-}
+}*/
 
 if(!extension_loaded("zlib") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "zlib." . PHP_SHLIB_SUFFIX) === false){
 	console("[ERROR] Unable to find the Zlib extension.", true, true, 0);
