@@ -235,7 +235,7 @@ echo " done!"
 
 #PHP Event
 echo -n "[PHP Event] downloading $PHPEVENT_VERSION..."
-wget http://pecl.php.net/get/yaml-$PHPEVENT_VERSION.tgz --no-check-certificate -q -O - | tar -zx >> "$DIR/install.log" 2>&1
+wget http://pecl.php.net/get/event-$PHPEVENT_VERSION.tgz --no-check-certificate -q -O - | tar -zx >> "$DIR/install.log" 2>&1
 mv event-$PHPEVENT_VERSION "$DIR/install_data/php/ext/event"
 echo " done!"
 
