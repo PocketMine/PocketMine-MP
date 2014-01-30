@@ -1,5 +1,5 @@
 #!/bin/bash
-COMPILER_VERSION="0.15"
+COMPILER_VERSION="0.16"
 
 PHP_VERSION="5.5.8"
 ZEND_VM="GOTO"
@@ -9,6 +9,8 @@ ZLIB_VERSION="1.2.8"
 PTHREADS_VERSION="0.1.0"
 PHPYAML_VERSION="1.1.1"
 YAML_VERSION="0.1.4"
+PHPEVENT_VERSION="1.9.0"
+LIBEVENT_VERSION="2.0.21-stable"
 CURL_VERSION="curl-7_34_0"
 
 echo "[PocketMine] PHP installer and compiler for Linux & Mac"
@@ -230,6 +232,30 @@ cd ..
 rm -r -f ./yaml
 echo " done!"
 
+
+#PHP Event
+echo -n "[PHP Event] downloading $PHPEVENT_VERSION..."
+wget http://pecl.php.net/get/yaml-$PHPEVENT_VERSION.tgz --no-check-certificate -q -O - | tar -zx >> "$DIR/install.log" 2>&1
+mv event-$PHPEVENT_VERSION "$DIR/install_data/php/ext/event"
+echo " done!"
+
+#libevent
+echo -n "[libevent] downloading $LIBEVENT_VERSION..."
+wget https://github.com/downloads/libevent/libevent/libevent-$LIBEVENT_VERSION.tar.gz -q -O - | tar -zx >> "$DIR/install.log" 2>&1
+mv libevent-$LIBEVENT_VERSION libevent
+echo -n " checking..."
+cd libevent
+RANLIB=$RANLIB ./configure --prefix="$DIR/install_data/php/ext/event" \
+--enable-static --disable-shared --disable-openssl >> "$DIR/install.log" 2>&1
+echo -n " compiling..."
+make -j $THREADS >> "$DIR/install.log" 2>&1
+echo -n " installing..."
+make install >> "$DIR/install.log" 2>&1
+echo -n " cleaning..."
+cd ..
+rm -r -f ./libevent
+echo " done!"
+
 echo -n "[PHP]"
 set +e
 if which free >/dev/null; then
@@ -262,6 +288,7 @@ fi
 --with-zlib="$DIR/install_data/php/ext/zlib" \
 --with-zlib-dir="$DIR/install_data/php/ext/zlib" \
 --with-yaml="$DIR/install_data/php/ext/yaml" \
+--with-event-core="$DIR/install_data/php/ext/event" --with-event-extra --disable-event-debug \
 $HAVE_LIBEDIT \
 --disable-libxml \
 --disable-xml \
