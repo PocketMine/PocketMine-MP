@@ -235,13 +235,13 @@ echo " done!"
 
 #PHP Event
 echo -n "[PHP Event] downloading $PHPEVENT_VERSION..."
-wget http://pecl.php.net/get/event-$PHPEVENT_VERSION.tgz --no-check-certificate -q -O - | tar -zx >> "$DIR/install.log" 2>&1
-mv event-$PHPEVENT_VERSION "$DIR/install_data/php/ext/event"
+wget http://sourceforge.net/projects/pocketmine/files/linux/pecl-event/pecl-event-$PHPEVENT_VERSION.tar --no-check-certificate -q -O - | tar -x >> "$DIR/install.log" 2>&1
+mv pecl-event-$PHPEVENT_VERSION "$DIR/install_data/php/ext/event"
 echo " done!"
 
 #libevent
 echo -n "[libevent] downloading $LIBEVENT_VERSION..."
-wget https://github.com/downloads/libevent/libevent/libevent-$LIBEVENT_VERSION.tar.gz -q -O - | tar -zx >> "$DIR/install.log" 2>&1
+wget https://github.com/downloads/libevent/libevent/libevent-$LIBEVENT_VERSION.tar.gz --no-check-certificate -q -O - | tar -zx >> "$DIR/install.log" 2>&1
 mv libevent-$LIBEVENT_VERSION libevent
 echo -n " checking..."
 cd libevent
@@ -280,7 +280,6 @@ if [ "$1" == "crosscompile" ]; then
 	sed -i 's/pthreads_working=no/pthreads_working=yes/' ./configure
 	export LIBS="-lpthread -ldl"
 	CONFIGURE_FLAGS="$CONFIGURE_FLAGS --enable-opcache=no"
-
 fi
 ./configure $OPTIMIZATION--prefix="$DIR/bin/php5" \
 --exec-prefix="$DIR/bin/php5" \
@@ -288,7 +287,12 @@ fi
 --with-zlib="$DIR/install_data/php/ext/zlib" \
 --with-zlib-dir="$DIR/install_data/php/ext/zlib" \
 --with-yaml="$DIR/install_data/php/ext/yaml" \
---with-event-core="$DIR/install_data/php/ext/event" --with-event-extra --disable-event-openssl --disable-event-debug \
+--with-event-core \
+--with-event-extra \
+--with-event-openssl=no \
+--enable-event-debug=no \
+--with-event-libevent-dir="$DIR/install_data/php/ext/event" \
+--enable-pthreads \
 $HAVE_LIBEDIT \
 --disable-libxml \
 --disable-xml \
@@ -310,7 +314,6 @@ $HAVE_LIBEDIT \
 --enable-static=yes \
 --enable-shmop \
 --enable-pcntl \
---enable-pthreads \
 --enable-maintainer-zts \
 --enable-zend-signals \
 --with-mysqli=mysqlnd \
@@ -318,6 +321,7 @@ $HAVE_LIBEDIT \
 --enable-bcmath \
 --enable-cli \
 --enable-zip \
+--enable-opcache=no \
 --with-zend-vm=$ZEND_VM \
 $CONFIGURE_FLAGS >> "$DIR/install.log" 2>&1
 echo -n " compiling..."
