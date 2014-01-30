@@ -288,7 +288,7 @@ fi
 --with-zlib="$DIR/install_data/php/ext/zlib" \
 --with-zlib-dir="$DIR/install_data/php/ext/zlib" \
 --with-yaml="$DIR/install_data/php/ext/yaml" \
---with-event-core="$DIR/install_data/php/ext/event" --with-event-extra --disable-event-debug \
+--with-event-core="$DIR/install_data/php/ext/event" --with-event-extra --disable-event-openssl --disable-event-debug \
 $HAVE_LIBEDIT \
 --disable-libxml \
 --disable-xml \
