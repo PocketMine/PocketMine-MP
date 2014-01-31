@@ -1262,6 +1262,7 @@ class Player{
 				}
 				$this->realmsData = array("clientId" => $data["clientId"], "realms_data" => $data["realms_data"]);
 				if(count($this->server->clients) > $this->server->maxClients){
+    if($this->server->handle("player.connect.rejected", array("reason" => "server.full", "player" => $data["username"]) !== false)
 					$this->close("server is full!", false);
 					return;
 				}
@@ -1874,8 +1875,8 @@ class Player{
 				switch($data["event"]){
 					case 9: //Eating
 						$items = array(
-							APPLE => 2,
-							MUSHROOM_STEW => 10,
+							APPLE => 4,
+							MUSHROOM_STEW => 8,
 							BEETROOT_SOUP => 10,
 							BREAD => 5,
 							RAW_PORKCHOP => 3,
