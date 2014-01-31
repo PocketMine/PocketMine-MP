@@ -1262,7 +1262,7 @@ class Player{
 				}
 				$this->realmsData = array("clientId" => $data["clientId"], "realms_data" => $data["realms_data"]);
 				if(count($this->server->clients) > $this->server->maxClients){
-    if($this->server->handle("player.connect.rejected", array("reason" => "server.full", "player" => $this) !== false)
+    if($this->server->handle("player.connect.rejected", array("reason" => "server.full", "player" => $data["username"]) !== false)
 					$this->close("server is full!", false);
 					return;
 				}
