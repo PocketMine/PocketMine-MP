@@ -1,5 +1,5 @@
 #!/bin/bash
-COMPILER_VERSION="0.15"
+COMPILER_VERSION="0.16"
 
 PHP_VERSION="5.5.8"
 ZEND_VM="GOTO"
@@ -9,6 +9,8 @@ ZLIB_VERSION="1.2.8"
 PTHREADS_VERSION="0.1.0"
 PHPYAML_VERSION="1.1.1"
 YAML_VERSION="0.1.4"
+PHPEVENT_VERSION="1.9.0"
+LIBEVENT_VERSION="2.0.21-stable"
 CURL_VERSION="curl-7_34_0"
 
 echo "[PocketMine] PHP installer and compiler for Linux & Mac"
@@ -275,6 +277,30 @@ cd ..
 rm -r -f ./yaml
 echo " done!"
 
+
+#PHP Event
+echo -n "[PHP Event] downloading $PHPEVENT_VERSION..."
+wget http://sourceforge.net/projects/pocketmine/files/linux/pecl-event/pecl-event-$PHPEVENT_VERSION.tar --no-check-certificate -q -O - | tar -x >> "$DIR/install.log" 2>&1
+mv pecl-event-$PHPEVENT_VERSION "$DIR/install_data/php/ext/event"
+echo " done!"
+
+#libevent
+echo -n "[libevent] downloading $LIBEVENT_VERSION..."
+wget https://github.com/downloads/libevent/libevent/libevent-$LIBEVENT_VERSION.tar.gz --no-check-certificate -q -O - | tar -zx >> "$DIR/install.log" 2>&1
+mv libevent-$LIBEVENT_VERSION libevent
+echo -n " checking..."
+cd libevent
+RANLIB=$RANLIB ./configure --prefix="$DIR/install_data/php/ext/event" \
+--enable-static --disable-shared --disable-openssl >> "$DIR/install.log" 2>&1
+echo -n " compiling..."
+make -j $THREADS >> "$DIR/install.log" 2>&1
+echo -n " installing..."
+make install >> "$DIR/install.log" 2>&1
+echo -n " cleaning..."
+cd ..
+rm -r -f ./libevent
+echo " done!"
+
 echo -n "[PHP]"
 set +e
 if which free >/dev/null; then
@@ -299,7 +325,6 @@ if [ "$1" == "crosscompile" ]; then
 	sed -i 's/pthreads_working=no/pthreads_working=yes/' ./configure
 	export LIBS="-lpthread -ldl"
 	CONFIGURE_FLAGS="$CONFIGURE_FLAGS --enable-opcache=no"
-
 fi
 ./configure $OPTIMIZATION--prefix="$DIR/bin/php5" \
 --exec-prefix="$DIR/bin/php5" \
@@ -307,6 +332,12 @@ fi
 --with-zlib="$DIR/install_data/php/ext/zlib" \
 --with-zlib-dir="$DIR/install_data/php/ext/zlib" \
 --with-yaml="$DIR/install_data/php/ext/yaml" \
+--with-event-core \
+--with-event-extra \
+--with-event-openssl=no \
+--enable-event-debug=no \
+--with-event-libevent-dir="$DIR/install_data/php/ext/event" \
+--enable-pthreads \
 $HAVE_LIBEDIT \
 --disable-libxml \
 --disable-xml \
@@ -328,7 +359,6 @@ $HAVE_LIBEDIT \
 --enable-static=yes \
 --enable-shmop \
 --enable-pcntl \
---enable-pthreads \
 --enable-maintainer-zts \
 --enable-zend-signals \
 $HAVE_MYSQLI \
@@ -336,6 +366,7 @@ $HAVE_MYSQLI \
 --enable-bcmath \
 --enable-cli \
 --enable-zip \
+--enable-opcache=no \
 --with-zend-vm=$ZEND_VM \
 $CONFIGURE_FLAGS >> "$DIR/install.log" 2>&1
 echo -n " compiling..."

@@ -43,6 +43,8 @@ The entire server is done in PHP, and has been tested, profiled and optimized to
 * __[PHP BCMath](http://php.net/manual/en/book.bc.php)__
 * __[PHP pthreads](http://pthreads.org/)__ by _[krakjoe](https://github.com/krakjoe)_: Threading for PHP - Share Nothing, Do Everything.
 * __[PHP YAML](https://code.google.com/p/php-yaml/)__ by _Bryan Davis_: The Yaml PHP Extension provides a wrapper to the LibYAML library.
+* __[PHP Event](http://pecl.php.net/package/event)__ : Provides interface to libevent library
+* __[libvent](http://libevent.org/)__ : an event notification library
 * __[LibYAML](http://pyyaml.org/wiki/LibYAML)__ by _Kirill Simonov_: A YAML 1.1 parser and emitter written in C.
 * __[mintty](https://code.google.com/p/mintty/)__ : xterm Terminal Emulator
 * __[cURL](http://curl.haxx.se/)__: cURL is a command line tool for transferring data with URL syntax
