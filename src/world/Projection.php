@@ -30,7 +30,7 @@ class Projection {
 	 * @param double $yaw yaw in degrees at the first tick
 	 * @param double $pitch=0 pitch in degrees at the first tick
 	 * @param double $force=1 force in blocks/tick if there is no air resistance
-	 * @param double $airResistence=0 air resistance in percentage (for vertical movement only). Useful for plugins when they want to make a hyper-gravity zone or whatever, or something that floats up from water
+	 * @param double $airResistence=0 air resistance in percentage (for vertical movement only). Useful for plugins when they want to make a parachutes or whatever, or something that floats up from water
 	*/
 	public function __construct(Position &$projected, $yaw, $pitch=0, $force=1, $airResistance=0 /*, $projectionId*/) { // TODO testing needed to find the optimal force
 		$this->object =& $projected;
@@ -41,11 +41,19 @@ class Projection {
 		ServerAPI::request()->schedule(1, array($this, "tick"));
 	}
 	public function tick() {
-		$planeX = sin($this->initYaw) * $this->strength;
-		$planeZ = cos($this->initYaw) * $this->strength;
+		$deltaX = sin($this->initYaw) * $this->strength;
+		$deltaZ = cos($this->initYaw) * $this->strength;
 		$deltaY = sin($this->initPitch) * $this->strength + $this->ticks * $this->gravity;
-		$planeX *= ($planePitch = cos($this->initPitch) * $this->strength);
-		$planeZ *= $planePitch;
+		$deltaX *= ($planePitch = cos($this->initPitch) * $this->strength);
+		$dtaZ *= $planePitch;
+		if ($this->object instanceof Entity)
+			$pos=$this->object;
+			$this->object->setPosition (new Vector3 ($pos->x + $deltaX, $pos->y + $deltaY, $pos->z + $deltaZ)); // TODO $yaw and $pitch
+		else{	
+			$this->object->x+=$deltaX;
+			$this->object->y+=$deltaY;
+			$this->object->z+=$deltaZ;
+		}
 		$server=ServerAPI::request();
 		if (($ret = $server->handle("projection.tick", array("projection" => $this, "position" => $this->object)) === true))
 			$server->schedule(1, array($this, "tick"));
