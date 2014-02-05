@@ -19,11 +19,11 @@
  *
 */
 
-define ("GRAVITY", -9.8); // TODO testing needed to find the optimal gravity
+define ("GRAVITY", -9.8/20); // TODO testing needed to find the optimal gravity
 class Projection {
 	private $object;
-	private $ticks, $initYaw, $initPitch, $force, $gravity;
-	//private $id;
+	private $ticks, $initYaw, $initPitch, $force, $gravity, $paused=true;
+	private $id;
 	/**
 	 * Create a projection
 	 * @param Position $projected Entity to project, or Position to write the result to
@@ -32,7 +32,7 @@ class Projection {
 	 * @param double $force=1 force in blocks/tick if there is no air resistance
 	 * @param double $airResistence=0 air resistance in percentage (for vertical movement only). Useful for plugins when they want to make a parachutes or whatever, or something that floats up from water
 	*/
-	public function __construct(Position &$projected, $yaw, $pitch=0, $force=1, $airResistance=0 /*, $projectionId*/) { // TODO testing needed to find the optimal force
+	public function __construct(Position &$projected, $yaw, $pitch=0, $force=0.05, $airResistance=0) { // TODO testing needed to find the optimal force
 		$this->object =& $projected;
 		$this->initYaw = $yaw;
 		$this->initPitch = $pitch;
@@ -41,23 +41,29 @@ class Projection {
 		ServerAPI::request()->schedule(1, array($this, "tick"));
 	}
 	public function tick() {
+		if($this->paused===false) return;
 		$deltaX = sin($this->initYaw) * $this->strength;
 		$deltaZ = cos($this->initYaw) * $this->strength;
 		$deltaY = sin($this->initPitch) * $this->strength + $this->ticks * $this->gravity;
 		$deltaX *= ($planePitch = cos($this->initPitch) * $this->strength);
-		$dtaZ *= $planePitch;
-		if ($this->object instanceof Entity)
+		$deltaZ *= $planePitch;
+		if (($ret = $server->handle("projection.tick", array("projection" => $this, "position" => $this->object, "deltas" => new Vector3($deltaX, $deltaY, $deltaZ))) === true)){
+		if ($this->object instanceof Entity){
 			$pos=$this->object;
 			$this->object->setPosition (new Vector3 ($pos->x + $deltaX, $pos->y + $deltaY, $pos->z + $deltaZ)); // TODO $yaw and $pitch
+		}
 		else{	
 			$this->object->x+=$deltaX;
 			$this->object->y+=$deltaY;
 			$this->object->z+=$deltaZ;
 		}
-		$server=ServerAPI::request();
-		if (($ret = $server->handle("projection.tick", array("projection" => $this, "position" => $this->object)) === true))
-			$server->schedule(1, array($this, "tick"));
-		/*elseif ($ret === false)
-			$server->api->projectile->remove($this->projectileId);*/
+		}
+		if($this->paused === false) $server->schedule(1, array($this, "tick"));
+	}
+	public function pause(){
+		$this->paused = true;
+	}
+	public function resume(){
+		$this->paused = false;
 	}
 }
