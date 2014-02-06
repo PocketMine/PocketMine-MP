@@ -131,13 +131,16 @@ class EntityAPI{
 			"item" => $item,
 		);
 		if($this->server->api->handle("item.drop", $data) !== false){
+			$ret = array();
 			for($count = $item->count; $count > 0; ){
 				$item->count = min($item->getMaxStackSize(), $count);
 				$count -= $item->count;
 				$e = $this->add($pos->level, ENTITY_ITEM, $item->getID(), $data);
 				$this->spawnToAll($e);
 				$this->server->api->handle("entity.motion", $e);
+				$ret[] = $e;
 			}
+			return $ret;
 		}
 	}
 

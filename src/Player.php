@@ -1880,7 +1880,7 @@ class Player{
 					case 9: //Eating
 						$items = array(
 							APPLE => 4,
-							MUSHROOM_STEW => 10,
+							MUSHROOM_STEW => 8,
 							BEETROOT_SOUP => 10,
 							BREAD => 5,
 							RAW_PORKCHOP => 3,
@@ -1925,8 +1925,9 @@ class Player{
 				$this->toCraft = array();
 				$data["item"] = $this->getSlot($this->slot);
 				if($this->blocked === false and $this->server->handle("player.drop", $data) !== false){
-					$this->server->api->entity->drop(new Position($this->entity->x - 0.5, $this->entity->y, $this->entity->z - 0.5, $this->level), $data["item"]);
+					$dropped=$this->server->api->entity->drop(new Position($this->entity->x - 0.5, $this->entity->y, $this->entity->z - 0.5, $this->level), $data["item"]);
 					$this->setSlot($this->slot, BlockAPI::getItem(AIR, 0, 0), false);
+					new Projection($dropped, $this->entity->yaw, $this->entity->pitch);
 				}
 				if($this->entity->inAction === true){
 					$this->entity->inAction = false;

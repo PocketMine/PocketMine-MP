@@ -77,6 +77,13 @@ class ServerAPI{
 	 */
 	public $tile;
 
+	/*
+	/**
+	 * @var ProjectionAPI
+	*//*
+	public $projection;
+	*/
+
 	/**
 	 * @return PocketMinecraftServer
 	 */
@@ -210,6 +217,7 @@ class ServerAPI{
 		$this->loadAPI("tile", "TileAPI");
 		$this->loadAPI("player", "PlayerAPI");
 		$this->loadAPI("time", "TimeAPI");
+	 	$this->loadAPI("projection", "ProjectionAPI");
 		
 		foreach($this->apiList as $ob){
 			if(is_callable(array($ob, "init"))){
