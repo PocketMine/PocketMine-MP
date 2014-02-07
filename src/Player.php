@@ -434,11 +434,11 @@ class Player{
 		return true;
 	}
 
-	public function removeItem($type, $damage, $count, $send = true){
+	public function removeItem($type, $damage=false, $count=1, $send = true){
 		while($count > 0){
 			$remove = 0;
 			foreach($this->inventory as $s => $item){
-				if($item->getID() === $type and $item->getMetadata() === $damage){
+				if($item->getID() === $type and ($damage===false or $damage==="any"?true:$item->getMetadata() === $damage)){
 					$remove = min($count, $item->count);
 					if($remove < $item->count){
 						$item->count -= $remove;
