@@ -16,6 +16,8 @@ server.properties
 
 # Windows image file caches
 Thumbs.db
+push.bat
+#remove push.bat if I forgot
 
 # Folder config file
 Desktop.ini
