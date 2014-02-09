@@ -193,7 +193,7 @@ class PlayerAPI{
                         break;
                     }
                 }
-                if(!($player instanceof Player) or !isset($gms[strtolower($setgm)])){
+                if(!($player instanceof Player) /*or !isset($gms[strtolower($setgm)])*/){
                     $output .= "Usage: /$cmd <mode> [player] or /$cmd [player] <mode>\n";
                     break;
                 }
