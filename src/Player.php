@@ -1315,7 +1315,7 @@ class Player{
 					$this->close("Bad username", false);
 					return;
 				}
-				if($this->server->api->handle("player.connect", $this) === false){
+				if(EventHandler::callEvent(new PlayerConnectEvent($this)) === BaseEvent::DENY){
 					$this->close("Unknown reason", false);
 					return;
 				}
@@ -1339,7 +1339,8 @@ class Player{
 				}
 
 				$this->server->api->player->add($this->CID);
-				if($this->server->api->handle("player.join", $this) === false){
+
+				if(EventHandler::callEvent(new PlayerJoinEvent($this)) === BaseEvent::DENY){
 					$this->close("join cancelled", false);
 					return;
 				}
