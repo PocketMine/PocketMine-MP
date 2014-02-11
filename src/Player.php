@@ -1311,7 +1311,7 @@ class Player{
 					$this->close("Incorrect protocol #".$packet->protocol1, false);
 					return;
 				}
-				if(preg_match('#[^a-zA-Z0-9_]#', $packet->username) > 0 or $packet->username === ""){
+				if(preg_match('#[^a-zA-Z0-9_]#', $packet->username) > 0 or $packet->username === "" or $packet->username === "console" or $packet->username === "rcon"){
 					$this->close("Bad username", false);
 					return;
 				}
