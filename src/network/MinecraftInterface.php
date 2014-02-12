@@ -26,7 +26,7 @@ class MinecraftInterface{
 	function __construct($server, $port = 25565, $serverip = "0.0.0.0"){
 		$this->socket = new UDPSocket($server, $port, true, $serverip);
 		if($this->socket->connected === false){
-			console("[SEVERE] Couldn't bind to $serverip:".$port, true, true, 0);
+			console("[SERVER] Couldn't bind to $serverip:".$port, true, true, 0);
 			exit(1);
 		}
 		$this->bandwidth = array(0, 0, microtime(true));
