@@ -178,9 +178,6 @@ class PlayerAPI{
                     "spectator" => VIEW,
                     "v" => VIEW,
                 );
-                if($issuer instanceof Player){
-                    $player = $issuer;
-                }
                 if(isset($params[1])){
                     if($this->server->api->player->get($params[1]) instanceof Player){
                         $player = $this->server->api->player->get($params[1]);
@@ -192,6 +189,16 @@ class PlayerAPI{
                         $output .= "Usage: /$cmd <mode> [player] or /$cmd [player] <mode>\n";
                         break;
                     }
+                }elseif(isset($params[0])){
+                    if(!($this->server->api->player->get($params[0]) instanceof Player)){
+                    	if($issuer instanceof Player){
+                    	    $setgm = $params[0];
+                    	    $player = $issuer;
+                    	}
+                    }
+                }else{
+                   $output .= "Usage: /$cmd <mode> [player] or /$cmd [player] <mode>\n";
+                    break; 
                 }
                 if(!($player instanceof Player) or !isset($gms[strtolower($setgm)])){
                     $output .= "Usage: /$cmd <mode> [player] or /$cmd [player] <mode>\n";
