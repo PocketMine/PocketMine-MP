@@ -20,7 +20,7 @@
 */
 
 
-class ProtocolInfo{
+abstract class ProtocolInfo{
 
 	const CURRENT_PROTOCOL = 18;
 
