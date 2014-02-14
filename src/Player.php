@@ -1294,7 +1294,7 @@ class Player{
 				$this->username = $packet->username;
 				$this->iusername = strtolower($this->username);
 				$this->loginData = array("clientId" => $packet->clientId, "loginData" => $packet->loginData);
-				if(count($this->server->clients) > $this->server->maxClients and !$this->server->api->ban->isOp($this->iusername)){
+				if(count($this->server->clients) > $this->server->maxClients and !($this->server->getProperty("allow-op-bypass-player-limit") and $this->server->api->ban->isOp($this->iusername))){
 					$this->close("server is full!", false);
 					return;
 				}

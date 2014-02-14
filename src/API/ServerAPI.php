@@ -140,6 +140,7 @@ class ServerAPI{
 			"rcon.password" => substr(base64_encode(Utils::getRandomBytes(20, false)), 3, 10),
 			"send-usage" => true,
 			"auto-save" => true,
+			"allow-op-bypass-player-limit" => true
 		));
 		
 		$this->parseProperties();
