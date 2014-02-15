@@ -19,10 +19,6 @@
  *
 */
 
-/***REM_START***/
-require_once("LevelGenerator.php");
-/***REM_END***/
-
 class NormalGenerator implements LevelGenerator{
 
 	private $populators = array();
@@ -74,7 +70,7 @@ class NormalGenerator implements LevelGenerator{
 		$tallGrass = new TallGrassPopulator();
 		$tallGrass->setBaseAmount(5);
 		$tallGrass->setRandomAmount(0);
-		$this->populators[] = $tallGrass;		
+		$this->populators[] = $tallGrass;
 	}
 	
 	public function generateChunk($chunkX, $chunkZ){

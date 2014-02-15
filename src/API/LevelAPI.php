@@ -92,7 +92,7 @@ class LevelAPI{
 			$generator = new $generator($options);
 		}else{
 			if(strtoupper($this->server->api->getProperty("level-type")) == "FLAT"){
-				$generator = new SuperflatGenerator($options);
+				$generator = new FlatGenerator($options);
 			}else{
 				$generator = new NormalGenerator($options);
 			}

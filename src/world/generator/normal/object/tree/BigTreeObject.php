@@ -20,7 +20,7 @@
 */
 
 /***REM_START***/
-require_once("src/world/generator/object/tree/TreeObject.php");
+require_once("TreeObject.php");
 /***REM_END***/
 
 class BigTreeObject extends TreeObject{
