@@ -120,7 +120,7 @@ class TimeAPI{
 			$level = $this->server->api->level->getDefault();
 		}
 		if(is_string($time) and isset(TimeAPI::$phases[$time])){
-			$time = TimeAPI::$phases[$time]);
+			$time = TimeAPI::$phases[$time];
 		}
 		$level->setTime($raw === ? (int) $time:(($rt = $this->get(true, $level)) - $rt % 19200 + $time % 19200));
 		return $level->getTime();
