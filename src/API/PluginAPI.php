@@ -241,21 +241,3 @@ class PluginAPI extends stdClass{
 		}
 	}
 }
-
-
-interface Plugin{
-	public function __construct(ServerAPI $api, $server = false);
-	public function init();
-	public function __destruct();
-}
-
-class DummyPlugin implements Plugin{
-	public function __construct(ServerAPI $api, $server = false){	
-	}
-	
-	public function init(){
-	}
-	
-	public function __destruct(){
-	}
-}

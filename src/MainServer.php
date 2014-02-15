@@ -19,7 +19,7 @@
  *
 */
 
-class PocketMinecraftServer{
+class MainServer{
 	public $tCnt;
 	public $serverID, $interface, $database, $version, $invisible, $tickMeasure, $preparedSQL, $seed, $gamemode, $name, $maxClients, $clients, $eidCnt, $custom, $description, $motd, $port, $saveEnabled;
 	private $serverip, $evCnt, $handCnt, $events, $eventsID, $handlers, $serverType, $lastTick, $ticks, $memoryStats, $async = array(), $asyncID = 0;
@@ -484,7 +484,7 @@ class PocketMinecraftServer{
 
 	public function packetHandler(Packet $packet){
 		$data =& $packet;
-		$CID = PocketMinecraftServer::clientID($packet->ip, $packet->port);
+		$CID = MainServer::clientID($packet->ip, $packet->port);
 		if(isset($this->clients[$CID])){
 			$this->clients[$CID]->handlePacket($packet);
 		}else{
