@@ -52,7 +52,7 @@ class TimeAPI{
 						$output .= "Set the time to ".$this->add(array_shift($params), $level)."\n";
 						break;
 					case "set":
-						$output .= "Set the time to ".$this->set(array_shift($params), $level)."\n";
+						$output .= "Set the time to ".$this->set(array_shift($params), $level, array_shift($params) === "raw")."\n";
 						break;
 					case "sunrise":
 					case "day":
@@ -115,15 +115,14 @@ class TimeAPI{
 		return $time;
 	}
 
-	public function set($time, $level = false){
+	public function set($time, $level = false, $raw = false){
 		if(!($level instanceof Level)){
 			$level = $this->server->api->level->getDefault();
 		}
 		if(is_string($time) and isset(TimeAPI::$phases[$time])){
-			$level->setTime(TimeAPI::$phases[$time]);
-		}else{
-			$level->setTime((int) $time);
+			$time = TimeAPI::$phases[$time]);
 		}
+		$level->setTime($raw === ? (int) $time:(($rt = $this->get(true, $level)) - $rt % 19200 + $time % 19200));
 		return $level->getTime();
 	}
 
