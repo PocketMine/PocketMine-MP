@@ -46,7 +46,7 @@ class TimeAPI{
 				$p = strtolower(array_shift($params));
 				switch($p){
 					case "check":
-						$output .= "Time: ".$this->getDate($level).", ".$this->getPhase($level)." (".$this->get(true, $level).")\n";
+						$output .= "Time: ".$this->getDate($level).", ".$this->getPhase($level)." (".$this->get(true, $level).") (The ".$this->toDayIdx($this->get(true, $level))." day)\n";
 						break;
 					case "add":
 						$output .= "Set the time to ".$this->add(array_shift($params), $level)."\n";
@@ -125,6 +125,20 @@ class TimeAPI{
 		$level->setTime($raw === ? (int) $time:(($rt = $this->get(true, $level)) - $rt % 19200 + $time % 19200));
 		return $level->getTime();
 	}
-
+	public function toDayIdx($time){
+		$output = "";
+		$output .= (int) ($time / 19200 + 1);
+		$time %= 100;
+		$suf = "th";
+		if($time < 10 or $time > 20){ // who made this rule of 11th 12 th...
+			switch($time % 10){
+			case 1: $suf = "st"; break;
+			case 2: $suf = "nd"; break;
+			case 3: $suf = "rd"; break;
+			}
+		}
+		$output .= $suf;
+		return $output;
+	}
 
 }
