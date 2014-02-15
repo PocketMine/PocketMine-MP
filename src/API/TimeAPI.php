@@ -46,13 +46,13 @@ class TimeAPI{
 				$p = strtolower(array_shift($params));
 				switch($p){
 					case "check":
-						$output .= "Time: ".$this->getDate($level).", ".$this->getPhase($level)." (".$this->get(true, $level).")\n";
+						$output .= "Time: ".$this->getDate($level).", ".$this->getPhase($level)." (".$this->get(true, $level).") (The ".$this->toDayIdx($this->get(true, $level))." day)\n";
 						break;
 					case "add":
 						$output .= "Set the time to ".$this->add(array_shift($params), $level)."\n";
 						break;
 					case "set":
-						$output .= "Set the time to ".$this->set(array_shift($params), $level)."\n";
+						$output .= "Set the time to ".$this->set(array_shift($params), $level, array_shift($params) === "raw")."\n";
 						break;
 					case "sunrise":
 					case "day":
@@ -115,17 +115,30 @@ class TimeAPI{
 		return $time;
 	}
 
-	public function set($time, $level = false){
+	public function set($time, $level = false, $raw = false){
 		if(!($level instanceof Level)){
 			$level = $this->server->api->level->getDefault();
 		}
 		if(is_string($time) and isset(TimeAPI::$phases[$time])){
-			$level->setTime(TimeAPI::$phases[$time]);
-		}else{
-			$level->setTime((int) $time);
+			$time = TimeAPI::$phases[$time];
 		}
+		$level->setTime($raw === true ? (int) $time:(($rt = $this->get(true, $level)) - $rt % 19200 + $time % 19200));
 		return $level->getTime();
 	}
-
+	public function toDayIdx($time){
+		$output = "";
+		$output .= (int) ($time / 19200 + 1);
+		$time %= 100;
+		$suf = "th";
+		if($time < 10 or $time > 20){ // who made this rule of 11th 12 th...
+			switch($time % 10){
+			case 1: $suf = "st"; break;
+			case 2: $suf = "nd"; break;
+			case 3: $suf = "rd"; break;
+			}
+		}
+		$output .= $suf;
+		return $output;
+	}
 
 }
