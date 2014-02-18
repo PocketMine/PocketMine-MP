@@ -1326,6 +1326,10 @@ class Player{
 					$this->close("Incorrect protocol #".$packet->protocol1, false);
 					return;
 				}
+				$namelength = 14;
+				if ($data["username"] > $namelength) {
+					$this->close("Username is too long", false);
+				}
 				if(preg_match('#[^a-zA-Z0-9_]#', $this->username) > 0 or $this->username === "" or $this->iusername === "rcon" or $this->iusername === "console"){
 					$this->close("Bad username", false);
 					return;
