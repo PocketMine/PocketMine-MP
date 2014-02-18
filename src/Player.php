@@ -1330,6 +1330,10 @@ class Player{
 					$this->close("Bad username", false);
 					return;
 				}
+				$namelenght = 14;
+				if ($packet->username > $namelength) {
+					$this->close("Username too long", false);
+				}
 				if($this->server->api->handle("player.connect", $this) === false){
 					$this->close("Unknown reason", false);
 					return;
