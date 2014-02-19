@@ -209,7 +209,6 @@ class Player{
 		$Y = $id[1];
 		$x = $X << 4;
 		$z = $Z << 4;
-		$y = $Y << 4;
 		$this->level->useChunk($X, $Z, $this);
 		$Yndex = 1 << $Y;
 		for($iY = 0; $iY < 8; ++$iY){
@@ -318,7 +317,7 @@ class Player{
 			$this->chunksLoaded = array();
 			$this->chunksOrder = array();
 			$this->chunkCount = array();
-			$this->cratingItems = array();
+			$this->craftingItems = array();
 			$this->received = array();
 		}
 	}
@@ -687,11 +686,10 @@ class Player{
 						return;
 					}else{
 						$message = $data->get();
-						$this->sendChat(preg_replace('/\x1b\[[0-9;]*m/', "", $message["message"]), $message["player"]); //Remove ANSI codes from chat
+						$this->sendChat($message["message"], $message["player"]);
 					}
 				}else{
-					$message = (string) $data;
-					$this->sendChat(preg_replace('/\x1b\[[0-9;]*m/', "", (string) $data)); //Remove ANSI codes from chat
+					$this->sendChat((string) $data);
 				}
 				break;
 		}
@@ -1350,8 +1348,8 @@ class Player{
 								$inv[] = array($item[0], $item[1], 1);
 							}
 						}
+						$this->data->set("inventory", $inv);
 					}
-					$this->data->set("inventory", $inv);
 				}
 				$this->achievements = $this->data->get("achievements");
 				$this->data->set("caseusername", $this->username);
@@ -1948,6 +1946,7 @@ class Player{
 				$packet->item = $this->getSlot($this->slot);
 				$this->craftingItems = array();
 				$this->toCraft = array();
+				$data = array();
 				$data["eid"] = $packet->eid;
 				$data["unknown"] = $packet->unknown;
 				$data["item"] = $packet->item;
@@ -2313,7 +2312,7 @@ class Player{
 		return $cnts;
 	}
 	
-	public function directDataPacket(RakNetDataPacket $packet, $reliability = 0, $recover = true){
+	public function directDataPacket(RakNetDataPacket $packet, $recover = true){
 		if($this->connected === false){
 			return false;
 		}
@@ -2321,7 +2320,6 @@ class Player{
 		if(EventHandler::callEvent(new DataPacketSendEvent($this, $packet)) === BaseEvent::DENY){
 			return array();
 		}
-		
 		$packet->encode();
 		$pk = new RakNetPacket(RakNetInfo::DATA_PACKET_0);
 		$pk->data[] = $packet;

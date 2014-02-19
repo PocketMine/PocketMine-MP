@@ -96,7 +96,7 @@ class PMFLevel extends PMF{
 	}
 	
 	private function createBlank(){
-		$this->saveData(false);
+		$this->saveData();
 		$this->locationTable = array();
 		$cnt = pow($this->levelData["width"], 2);
 		@mkdir(dirname($this->file)."/chunks/", 0755);
