@@ -103,7 +103,7 @@ class Player{
 		$this->server = ServerAPI::request();
 		$this->lastBreak = microtime(true);
 		$this->clientID = $clientID;
-		$this->CID = PocketMinecraftServer::clientID($ip, $port);
+		$this->CID = MainServer::clientID($ip, $port);
 		$this->ip = $ip;
 		$this->port = $port;
 		$this->spawnPosition = $this->server->spawn;
