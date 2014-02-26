@@ -230,5 +230,11 @@ else
 		fi
 	fi
 fi
+rm -f .gitattributes
+rm -f .gitignore
+rm -f .travis.yml
+rm -f CONTRIBUTING.md
+rm -f LICENSE
+rm -f README.md
 echo "[INFO] Everything done! Run ./start.sh to start PocketMine-MP"
 exit 0
