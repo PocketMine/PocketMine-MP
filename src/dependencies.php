@@ -93,10 +93,10 @@ if($errors > 0){
 $sha1sum = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 /***REM_START***/
 require_once(FILE_PATH."/src/math/Vector3.php");
-require_once(FILE_PATH."/src/world/Position.php");
+require_once(FILE_PATH."/src/math/Position.php");
 require_once(FILE_PATH."/src/pmf/PMF.php");
 
-require_all(FILE_PATH . "src/");
+require_all(FILE_PATH . "src/", array("entity", "Entity.php")); //REMOVE LATER!!!!
 
 $inc = get_included_files();
 $inc[] = array_shift($inc);

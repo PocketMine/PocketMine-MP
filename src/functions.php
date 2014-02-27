@@ -80,12 +80,11 @@ function kill($pid){
 	}
 }
 
-
-function require_all($path, &$count = 0){
+function require_all($path, array $ignore = array(), &$count = 0){
 	$dir = dir($path."/");
 	$dirs = array();
 	while(false !== ($file = $dir->read())){
-		if($file !== "." and $file !== ".."){
+		if($file !== "." and $file !== ".." and !in_array($file, $ignore, true)){
 			if(!is_dir($path.$file) and strtolower(substr($file, -3)) === "php"){
 				require_once($path.$file);
 				++$count;
@@ -95,7 +94,7 @@ function require_all($path, &$count = 0){
 		}
 	}
 	foreach($dirs as $dir){
-		require_all($dir, $count);
+		require_all($dir, $ignore, $count);
 	}
 
 }
@@ -135,7 +134,7 @@ function arg($name, $default = false){
 	}
 }
 
-function arguments ( $args ){
+function arguments($args){
 	if(!is_array($args)){
 		$args = array();
 	}
@@ -182,7 +181,7 @@ function arguments ( $args ){
 function console($message, $EOL = true, $log = true, $level = 1){
 	if(!defined("DEBUG") or DEBUG >= $level){
 		$message .= $EOL === true ? PHP_EOL:"";
-		$time = (ENABLE_ANSI === true ? FORMAT_AQUA . date("H:i:s") . FORMAT_RESET:date("H:i:s")) . " ";
+		$time = (ENABLE_ANSI === true ? TextFormat::AQUA . date("H:i:s") . TextFormat::RESET:date("H:i:s")) . " ";
 		$replaced = TextFormat::clean(preg_replace('/\x1b\[[0-9;]*m/', "", $time . $message));
 		if($log === true and (!defined("LOG") or LOG === true)){
 			logg(date("Y-m-d")." ".$replaced, "console", false, $level);
@@ -193,24 +192,24 @@ function console($message, $EOL = true, $log = true, $level = 1){
 				switch($matches[1]){
 					case "ERROR":
 					case "SEVERE":
-						$add .= FORMAT_RED;
+						$add .= TextFormat::RED;
 						break;
 					case "INTERNAL":
 					case "DEBUG":
-						$add .= FORMAT_GRAY;
+						$add .= TextFormat::GRAY;
 						break;
 					case "WARNING":
-						$add .= FORMAT_YELLOW;
+						$add .= TextFormat::YELLOW;
 						break;
 					case "NOTICE":
-						$add .= FORMAT_AQUA;
+						$add .= TextFormat::AQUA;
 						break;
 					default:
 						$add = "";
 						break;
 				}
 			}
-			$message = TextFormat::toANSI($time . $add . $message . FORMAT_RESET);
+			$message = TextFormat::toANSI($time . $add . $message . TextFormat::RESET);
 		}else{
 			$message = $replaced;
 		}
@@ -225,8 +224,10 @@ function getTrace($start = 1){
 	$j = 0;
 	for($i = (int) $start; isset($trace[$i]); ++$i, ++$j){
 		$params = "";
-		foreach($trace[$i]["args"] as $name => $value){
-			$params .= (is_object($value) ? get_class($value)." ".(method_exists($value, "__toString") ? $value->__toString() : "object"):gettype($value)." ".@strval($value)).", ";
+		if(isset($trace[$i]["args"])){
+			foreach($trace[$i]["args"] as $name => $value){
+				$params .= (is_object($value) ? get_class($value)." ".(method_exists($value, "__toString") ? $value->__toString() : "object"):gettype($value)." ".@strval($value)).", ";
+			}
 		}
 		$messages[] = "#$j ".(isset($trace[$i]["file"]) ? $trace[$i]["file"]:"")."(".(isset($trace[$i]["line"]) ? $trace[$i]["line"]:"")."): ".(isset($trace[$i]["class"]) ? $trace[$i]["class"].$trace[$i]["type"]:"").$trace[$i]["function"]."(".substr($params, 0, -2).")";
 	}

@@ -19,19 +19,67 @@
  *
 */
 
-class NBTTag_Compound extends NamedNBTTag{
+class NBTTag_Compound extends NamedNBTTag implements ArrayAccess, Iterator{
 	
 	public function getType(){
 		return NBTTag::TAG_Compound;
 	}
 	
-	public function __get($name){
-		return isset($this->value[$name]) ? $this->value[$name]->getValue() : false;
+	public function rewind(){
+		reset($this->value);
 	}
-
+	
+	public function current(){
+		return current($this->value);
+	}
+	
+	public function key(){
+		return key($this->value);
+	}
+	
+	public function next(){
+		return next($this->value);
+	}
+	
+	public function valid(){
+		$key = key($this->value);
+		return $key !== null and $key !== false;
+	}
+	
+	public function offsetExists($name){
+		return $this->__isset($name);
+	}
+	
+	public function &offsetGet($name){
+		return $this->__get($name);
+	}
+	
+	public function offsetSet($name, $value){
+		$this->__set($name, $value);
+	}
+	
+	public function offsetUnset($name){
+		$this->__unset($name);
+	}
+	
+	public function &__get($name){
+		$ret = isset($this->value[$name]) ? $this->value[$name] : false;
+		if(!is_object($ret) or $ret instanceof ArrayAccess){
+			return $ret;
+		}else{
+			return $ret->getValue();
+		}
+	}
+		
 	public function __set($name, $value){
-		if(isset($this->value[$name])){
-			$this->value[$name]->setValue($value);
+		if($value instanceof NBTTag){
+			$this->value[$name] = $value;
+		}elseif(isset($this->value[$name])){
+			if($value instanceof NamedNBTTag and $value->getName() !== "" and $value->getName() !== false){
+				$this->value[$value->getName()]->setValue($value);
+			}else{
+				$this->value[$name]->setValue($value);
+			}
 		}
 	}
 	
@@ -49,7 +97,7 @@ class NBTTag_Compound extends NamedNBTTag{
 			$tag = $nbt->readTag();
 			if($tag instanceof NamedNBTTag and $tag->getName() !== ""){
 				$this->value[$tag->getName()] = $tag;
-			}else{
+			}elseif(!($tag instanceof NBTTag_End)){
 				$this->value[] = $tag;
 			}
 		}while(!($tag instanceof NBTTag_End) and !$nbt->feof());
@@ -57,7 +105,10 @@ class NBTTag_Compound extends NamedNBTTag{
 	
 	public function write(NBT $nbt){
 		foreach($this->value as $tag){
-			$nbt->writeTag($tag);
+			if(!($tag instanceof NBTTag_End)){
+				$nbt->writeTag($tag);
+			}
 		}
+		$nbt->writeTag(new NBTTag_End);
 	}
 }

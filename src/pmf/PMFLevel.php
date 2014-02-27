@@ -20,8 +20,9 @@
 */
 
 class PMFLevel extends PMF{
-	const VERSION = 0x01;
-	const DEFLATE_LEVEL = 9;
+	const VERSION = 2;
+	const ZLIB_LEVEL = 6;
+	const ZLIB_ENCODING = 15; //15 = zlib, -15 = raw deflate, 31 = gzip
 	
 	public $level;
 	public $levelData = array();
@@ -90,21 +91,13 @@ class PMFLevel extends PMF{
 		$this->write(Utils::writeShort(strlen($this->levelData["generator"])).$this->levelData["generator"]);
 		$settings = serialize($this->levelData["generatorSettings"]);
 		$this->write(Utils::writeShort(strlen($settings)).$settings);
-		$extra = gzdeflate($this->levelData["extra"], PMFLevel::DEFLATE_LEVEL);
+		$extra = zlib_encode($this->levelData["extra"], PMFLevel::ZLIB_ENCODING, PMFLevel::ZLIB_LEVEL);
 		$this->write(Utils::writeShort(strlen($extra)).$extra);
 	}
 	
 	private function createBlank(){
 		$this->saveData();
 		@mkdir(dirname($this->file)."/chunks/", 0755);
-		if(!file_exists(dirname($this->file)."/entities.yml")){
-			$entities = new Config(dirname($this->file)."/entities.yml", CONFIG_YAML);
-			$entities->save();
-		}
-		if(!file_exists(dirname($this->file)."/tiles.yml")){
-			$tiles = new Config(dirname($this->file)."/tiles.yml", CONFIG_YAML);
-			$tiles->save();
-		}
 	}
 	
 	protected function parseLevel(){
@@ -135,10 +128,13 @@ class PMFLevel extends PMF{
 			$this->levelData["generatorSettings"] = unserialize($this->read(Utils::readShort($this->read(2), false)));
 			
 		}
-		$this->levelData["extra"] = @gzinflate($this->read(Utils::readShort($this->read(2), false)));
+		$this->levelData["extra"] = @zlib_decode($this->read(Utils::readShort($this->read(2), false)));
 
 		if($this->levelData["version"] === 0){
 			$this->upgrade_From0_To1();
+		}
+		if($this->levelData["version"] === 1){
+			$this->upgrade_From1_To2();
 		}
 	}
 	
@@ -162,9 +158,31 @@ class PMFLevel extends PMF{
 			gzclose($chunkOld);
 			@unlink($oldPath);
 		}
-		$this->levelData["version"] = 0x01;
+		$this->levelData["version"] = 1;
 		$this->levelData["generator"] = "NormalGenerator";
 		$this->levelData["generatorSettings"] = "";
+		$this->saveData();
+	}
+	
+	private function upgrade_From1_To2(){
+		console("[NOTICE] Old PMF Level format version #1 detected, upgrading to version #2");
+		$nbt = new NBT(NBT::BIG_ENDIAN);
+		$nbt->setData(new NBTTag_Compound("", array(
+			"Entities" => new NBTTag_List("Entities", array()),
+			"TileEntities" => new NBTTag_List("TileEntities", array())
+		)));
+		$nbt->Entities->setTagType(NBTTag::TAG_Compound);
+		$nbt->TileEntities->setTagType(NBTTag::TAG_Compound);
+		$namedtag = $nbt->write();
+		$namedtag = Utils::writeInt(strlen($namedtag)) . $namedtag;
+		foreach(glob(dirname($this->file)."/chunks/*/*.*.pmc") as $chunkFile){
+			$oldChunk = zlib_decode(file_get_contents($chunkFile));
+			$newChunk = substr($oldChunk, 0, 5);
+			$newChunk .= $namedtag;
+			$newChunk .= substr($oldChunk, 5);
+			file_put_contents($chunkFile, zlib_encode($newChunk, PMFLevel::ZLIB_ENCODING, PMFLevel::ZLIB_LEVEL));
+		}
+		$this->levelData["version"] = 2;
 		$this->saveData();
 	}
 	
@@ -233,29 +251,39 @@ class PMFLevel extends PMF{
 			return true;
 		}
 	
-		$chunk = @gzopen($path, "rb");
+		$chunk = file_get_contents($path);
 		if($chunk === false){
 			return false;
 		}
+		$chunk = zlib_decode($chunk);
+		$offset = 0;
+		
 		$this->chunkInfo[$index] = array(
-			0 => ord(gzread($chunk, 1)),
-			1 => Utils::readInt(gzread($chunk, 4)),
+			0 => ord($chunk{0}),
+			1 => Utils::readInt(substr($chunk, 1, 4)),
 		);
+		$offset += 5;
+		$len = Utils::readInt(substr($chunk, $offset, 4));
+		$offset += 4;
+		$nbt = new NBT(NBT::BIG_ENDIAN);
+		$nbt->read(substr($chunk, $offset, $len));
+		$this->chunkInfo[$index][2] = $nbt;
+		$offset += $len;
 		$this->chunks[$index] = array();
 		$this->chunkChange[$index] = array(-1 => false);
 		for($Y = 0; $Y < $this->chunkInfo[$index][0]; ++$Y){
 			$t = 1 << $Y;
 			if(($this->chunkInfo[$index][0] & $t) === $t){
 				// 4096 + 2048 + 2048, Block Data, Meta, Light
-				if(strlen($this->chunks[$index][$Y] = gzread($chunk, 8192)) < 8192){
+				if(strlen($this->chunks[$index][$Y] = substr($chunk, $offset, 8192)) < 8192){
 					console("[NOTICE] Empty corrupt chunk detected [$X,$Z,:$Y], recovering contents", true, true, 2);
 					$this->fillMiniChunk($X, $Z, $Y);
 				}
+				$offset += 8192;
 			}else{
 				$this->chunks[$index][$Y] = false;
 			}
 		}
-		@gzclose($chunk);
 		if($this->isGenerating === 0 and !$this->isPopulated($X, $Z)){
 			$this->populateChunk($X, $Z);
 		}
@@ -537,14 +565,31 @@ class PMFLevel extends PMF{
 		return false;
 	}
 	
-	public function saveChunk($X, $Z){
+	public function getChunkNBT($X, $Z){	
+		if(!$this->isChunkLoaded($X, $Z) and $this->loadChunk($X, $Z) === false){
+			return false;
+		}
+		$index = self::getIndex($X, $Z);
+		return $this->chunkInfo[$index][2];
+	}
+	
+	public function setChunkNBT($X, $Z, NBT $nbt){	
+		if(!$this->isChunkLoaded($X, $Z) and $this->loadChunk($X, $Z) === false){
+			return false;
+		}
+		$index = self::getIndex($X, $Z);
+		$this->chunkChange[$index][-1] = true;
+		$this->chunkInfo[$index][2] = $nbt;
+	}
+	
+	public function saveChunk($X, $Z, $force = false){
 		$X = (int) $X;
 		$Z = (int) $Z;
 		if(!$this->isChunkLoaded($X, $Z)){
 			return false;
 		}
 		$index = self::getIndex($X, $Z);
-		if(!isset($this->chunkChange[$index]) or $this->chunkChange[$index][-1] === false){//No changes in chunk
+		if($force !== true and (!isset($this->chunkChange[$index]) or $this->chunkChange[$index][-1] === false)){//No changes in chunk
 			return true;
 		}
 		
@@ -561,16 +606,18 @@ class PMFLevel extends PMF{
 			}
 			$this->chunkChange[$index][$Y] = 0;
 		}
-		$chunk = @gzopen($path, "wb".PMFLevel::DEFLATE_LEVEL);
-		gzwrite($chunk, chr($bitmap));
-		gzwrite($chunk, Utils::writeInt($this->chunkInfo[$index][1]));
+		$chunk = b"";
+		$chunk .= chr($bitmap);
+		$chunk .= Utils::writeInt($this->chunkInfo[$index][1]);
+		$namedtag = $this->chunkInfo[$index][2]->write();
+		$chunk .= Utils::writeInt(strlen($namedtag)).$namedtag;
 		for($Y = 0; $Y < 8; ++$Y){
 			$t = 1 << $Y;
 			if(($bitmap & $t) === $t){
-				gzwrite($chunk, $this->chunks[$index][$Y]);
+				$chunk .= $this->chunks[$index][$Y];
 			}
 		}
-		gzclose($chunk);
+		file_put_contents($path, zlib_encode($chunk, PMFLevel::ZLIB_ENCODING, PMFLevel::ZLIB_LEVEL));
 		$this->chunkChange[$index][-1] = false;
 		$this->chunkInfo[$index][0] = $bitmap;
 		return true;
@@ -604,10 +651,10 @@ class PMFLevel extends PMF{
 		return file_exists($this->getChunkPath($X, $Z));
 	}
 	
-	public function doSaveRound(){
+	public function doSaveRound($force = false){
 		foreach($this->chunks as $index => $chunk){
 			self::getXZ($index, $X, $Z);
-			$this->saveChunk($X, $Z);
+			$this->saveChunk($X, $Z, $force);
 		}
 	}
 

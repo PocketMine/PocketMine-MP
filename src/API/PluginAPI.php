@@ -111,7 +111,7 @@ class PluginAPI extends stdClass{
 			console("[ERROR] Failed parsing of ".basename($file));
 			return false;
 		}
-		console("[INFO] Loading plugin \"".FORMAT_GREEN.$info["name"].FORMAT_RESET."\" ".FORMAT_AQUA.$info["version"].FORMAT_RESET." by ".FORMAT_AQUA.$info["author"].FORMAT_RESET);
+		console("[INFO] Loading plugin \"".TextFormat::GREEN.$info["name"].TextFormat::RESET."\" ".TextFormat::AQUA.$info["version"].TextFormat::RESET." by ".TextFormat::AQUA.$info["author"].TextFormat::RESET);
 		if($info["class"] !== "none" and class_exists($info["class"])){
 			console("[ERROR] Failed loading plugin: class already exists");
 			return false;
@@ -191,7 +191,7 @@ class PluginAPI extends stdClass{
 			return false;
 		}
 		$path = $this->configPath($plugin);
-		$cnf = new Config($path."config.yml", CONFIG_YAML, $default);
+		$cnf = new Config($path."config.yml", Config::YAML, $default);
 		$cnf->save();
 		return $path;
 	}

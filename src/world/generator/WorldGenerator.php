@@ -39,10 +39,8 @@ class WorldGenerator{
 			"generatorSettings" => $this->generator->getSettings(),
 			"extra" => ""
 		));
-		$entities = new Config($this->path."entities.yml", CONFIG_YAML);
-		$tiles = new Config($this->path."tiles.yml", CONFIG_YAML);
-		$blockUpdates = new Config($this->path."bupdates.yml", CONFIG_YAML);
-		$this->level = new Level($level, $entities, $tiles, $blockUpdates, $name);
+		$blockUpdates = new Config($this->path."bupdates.yml", Config::YAML);
+		$this->level = new Level($level, $name);
 	}
 	
 	public function generate(){

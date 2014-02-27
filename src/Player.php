@@ -196,16 +196,12 @@ class Player{
 		}
 		
 		if(is_array($this->lastChunk)){
-			$tiles = $this->server->query("SELECT ID FROM tiles WHERE spawnable = 1 AND level = '".$this->level->getName()."' AND x >= ".($this->lastChunk[0] - 1)." AND x < ".($this->lastChunk[0] + 17)." AND z >= ".($this->lastChunk[1] - 1)." AND z < ".($this->lastChunk[1] + 17).";");
-			$this->lastChunk = false;
-			if($tiles !== false and $tiles !== true){
-				while(($tile = $tiles->fetchArray(SQLITE3_ASSOC)) !== false){
-					$tile = $this->server->api->tile->getByID($tile["ID"]);
-					if($tile instanceof Tile){
-						$tile->spawn($this);
-					}
+			foreach($this->level->getChunkTiles($this->lastChunk[0], $this->lastChunk[1]) as $tile){
+				if($tile instanceof SpawnableTile){
+					$tile->spawn($this);
 				}
-			}			
+			}
+			$this->lastChunk = false;
 		}
 
 		$c = key($this->chunksOrder);
@@ -220,8 +216,6 @@ class Player{
 		$X = $id[0];
 		$Z = $id[2];
 		$Y = $id[1];
-		$x = $X << 4;
-		$z = $Z << 4;
 		$this->level->useChunk($X, $Z, $this);
 		$Yndex = 1 << $Y;
 		for($iY = 0; $iY < 8; ++$iY){
@@ -244,7 +238,7 @@ class Player{
 			$this->chunkCount[$count] = true;
 		}
 		
-		$this->lastChunk = array($x, $z);
+		$this->lastChunk = array($X, $Z);
 		
 		$this->server->schedule(MAX_CHUNK_RATE, array($this, "getNextChunk"));
 	}
@@ -320,7 +314,7 @@ class Player{
 				$this->server->api->chat->broadcast($this->username." left the game");
 			}
 			$this->spawned = false;
-			console("[INFO] ".FORMAT_AQUA.$this->username.FORMAT_RESET."[/".$this->ip.":".$this->port."] logged out due to ".$reason);
+			console("[INFO] ".TextFormat::AQUA.$this->username.TextFormat::RESET."[/".$this->ip.":".$this->port."] logged out due to ".$reason);
 			$this->windows = array();
 			$this->armor = array();
 			$this->inventory = array();
@@ -562,7 +556,7 @@ class Player{
 		switch($event){
 			case "tile.update":
 				if($data->level === $this->level){
-					if($data->class === TILE_FURNACE){
+					if($data->class === Tile::FURNACE){
 						foreach($this->windows as $id => $w){
 							if($w === $data){
 								$pk = new ContainerSetDataPacket;
@@ -1453,7 +1447,7 @@ class Player{
 				$this->evid[] = $this->server->event("tile.update", array($this, "eventHandler"));
 				$this->lastMeasure = microtime(true);
 				$this->server->schedule(50, array($this, "measureLag"), array(), true);
-				console("[INFO] ".FORMAT_AQUA.$this->username.FORMAT_RESET."[/".$this->ip.":".$this->port."] logged in with entity id ".$this->eid." at (".$this->entity->level->getName().", ".round($this->entity->x, 2).", ".round($this->entity->y, 2).", ".round($this->entity->z, 2).")");
+				console("[INFO] ".TextFormat::AQUA.$this->username.TextFormat::RESET."[/".$this->ip.":".$this->port."] logged in with entity id ".$this->eid." at (".$this->entity->level->getName().", ".round($this->entity->x, 2).", ".round($this->entity->y, 2).", ".round($this->entity->z, 2).")");
 				break;
 			case ProtocolInfo::READY_PACKET:
 				if($this->loggedIn === false){
@@ -2058,7 +2052,7 @@ class Player{
 							$pk->case2 = 0;
 							$this->server->api->player->broadcastPacket($this->level->players, $pk);
 						}
-					}elseif($this->windows[$packet->windowid]->class === TILE_CHEST){
+					}elseif($this->windows[$packet->windowid]->class === Tile::CHEST){
 						$pk = new TileEventPacket;
 						$pk->x = $this->windows[$packet->windowid]->x;
 						$pk->y = $this->windows[$packet->windowid]->y;
@@ -2136,14 +2130,14 @@ class Player{
 
 				if(is_array($this->windows[$packet->windowid])){
 					$tiles = $this->windows[$packet->windowid];
-					if($packet->slot >= 0 and $packet->slot < CHEST_SLOTS){
+					if($packet->slot >= 0 and $packet->slot < ChestTile::SLOTS){
 						$tile = $tiles[0];
 						$slotn = $packet->slot;
 						$offset = 0;
-					}elseif($packet->slot >= CHEST_SLOTS and $packet->slot <= (CHEST_SLOTS << 1)){
+					}elseif($packet->slot >= ChestTile::SLOTS and $packet->slot <= (ChestTile::SLOTS << 1)){
 						$tile = $tiles[1];
-						$slotn = $packet->slot - CHEST_SLOTS;
-						$offset = CHEST_SLOTS;
+						$slotn = $packet->slot - ChestTile::SLOTS;
+						$offset = ChestTile::SLOTS;
 					}else{
 						break;
 					}
@@ -2185,7 +2179,7 @@ class Player{
 					$tile->setSlot($slotn, $item, true, $offset);
 				}else{
 					$tile = $this->windows[$packet->windowid];
-					if(($tile->class !== TILE_CHEST and $tile->class !== TILE_FURNACE) or $packet->slot < 0 or ($tile->class === TILE_CHEST and $packet->slot >= CHEST_SLOTS) or ($tile->class === TILE_FURNACE and $packet->slot >= FURNACE_SLOTS)){
+					if(($tile->class !== Tile::CHEST and $tile->class !== Tile::FURNACE) or $packet->slot < 0 or ($tile->class === Tile::CHEST and $packet->slot >= ChestTile::SLOTS) or ($tile->class === Tile::FURNACE and $packet->slot >= FurnaceTile::SLOTS)){
 						break;
 					}
 					$item = BlockAPI::getItem($packet->item->getID(), $packet->item->getMetadata(), $packet->item->count);
@@ -2206,7 +2200,7 @@ class Player{
 						break;
 					}
 
-					if($tile->class === TILE_FURNACE and $packet->slot == 2){
+					if($tile->class === Tile::FURNACE and $packet->slot == 2){
 						switch($slot->getID()){
 							case IRON_INGOT:
 								AchievementAPI::grantAchievement($this, "acquireIron");
@@ -2244,14 +2238,14 @@ class Player{
 				}
 				$this->craftingItems = array();
 				$this->toCraft = array();
-				$t = $this->server->api->tile->get(new Position($packet->x, $packet->y, $packet->z, $this->level));
-				if(($t instanceof Tile) and $t->class === TILE_SIGN){
-					if($t->data["creator"] !== $this->username){
+				$t = $this->level->getTile(new Vector3($packet->x, $packet->y, $packet->z));
+				if($t instanceof SignTile){
+					if($t->namedtag->creator !== $this->username){
 						$t->spawn($this);
 					}else{
 						$nbt = new NBT();
 						$nbt->read($packet->namedtag);
-						if($nbt->id !== TILE_SIGN){
+						if($nbt->id !== Tile::SIGN){
 							$t->spawn($this);
 						}else{
 							$t->setText($nbt->Text1, $nbt->Text2, $nbt->Text3, $nbt->Text4);
