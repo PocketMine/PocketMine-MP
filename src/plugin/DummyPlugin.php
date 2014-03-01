@@ -24,7 +24,7 @@ require_once("Plugin.php");
 /***REM_END***/
 
 class DummyPlugin implements Plugin{
-	public function __construct(ServerAPI $api, $server = false){	
+	public function __construct(){	
 	}
 	
 	public function init(){
