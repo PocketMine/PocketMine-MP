@@ -23,7 +23,7 @@
 require_once("Plugin.php");
 /***REM_END***/
 
-class DummyPlugin extends Plugin{
+class DummyPlugin implements Plugin{
 	public function __construct(ServerAPI $api, $server = false){	
 	}
 	
