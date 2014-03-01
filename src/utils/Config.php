@@ -25,14 +25,14 @@
  * Config Class for simple config manipulation of multiple formats.
  */
 class Config{
-	const Config::DETECT = -1; //Detect by file extension
-	const Config::PROPERTIES = 0; // .properties
-	const Config::CNF = Config::PROPERTIES; // .cnf
-	const Config::JSON = 1; // .js, .json
-	const Config::YAML = 2; // .yml, .yaml
+	const DETECT = -1; //Detect by file extension
+	const PROPERTIES = 0; // .properties
+	const CNF = Config::PROPERTIES; // .cnf
+	const JSON = 1; // .js, .json
+	const YAML = 2; // .yml, .yaml
 	//const Config::EXPORT = 3; // .export, .xport
-	const Config::SERIALIZED = 4; // .sl
-	const Config::LIST = 5; // .txt, .list
+	const SERIALIZED = 4; // .sl
+	const LIST = 5; // .txt, .list
 
     /**
      * @var array
