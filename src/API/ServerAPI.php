@@ -389,7 +389,7 @@ class ServerAPI{
 		return $this->server->handle($e, $d);
 	}
 
-	public function schedule($t, $c, $d, $r = false, $e = "server.schedule"){
+	public function schedule($t, $c, $d = array(), $r = false, $e = "server.schedule"){
 		return $this->server->schedule($t, $c, $d, $r, $e);
 	}
 
@@ -397,7 +397,7 @@ class ServerAPI{
 		return $this->server->event($e, $d);
 	}
 
-	public function trigger($e, $d){
+	public function trigger($e, $d = ""){
 		return $this->server->trigger($e, $d);
 	}
 
