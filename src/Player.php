@@ -1958,7 +1958,7 @@ class Player{
 					case 9: //Eating
 						$items = array(
 							APPLE => 4,
-							MUSHROOM_STEW => 10,
+							MUSHROOM_STEW => 8,
 							BEETROOT_SOUP => 10,
 							BREAD => 5,
 							RAW_PORKCHOP => 3,
