@@ -181,9 +181,11 @@ define("WOOD_SLAB", 158);
 define("WOODEN_SLAB", 158);
 define("WOOD_SLABS", 158);
 define("WOODEN_SLABS", 158);
+define("STAINED_CLAY", 172);
 
 define("HAY_BALE", 170);
 define("CARPET", 171);
+define("HARDENED_CLAY", 172);
 
 define("COAL_BLOCK", 173);
 
