@@ -113,7 +113,7 @@ class ConsoleAPI{
 							$c = trim(strtolower($params[0]));
 							if(isset($this->help[$c]) or isset($this->alias[$c])){
 								$c = isset($this->help[$c]) ? $c : $this->alias[$c];
-								if($this->server->api->dhandle("console.command.".$c, array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false or $this->server->api->dhandle("console.command", array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false){
+								if($this->server->api->dhandle("console.command.permission.check.".$c, array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false or $this->server->api->dhandle("console.command.permission.check", array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false){
 									break;
 								}
 								$output .= "Usage: /$c ".$this->help[$c]."\n";
@@ -122,7 +122,7 @@ class ConsoleAPI{
 						}
 						$cmds = array();
 						foreach($this->help as $c => $h){
-							if($this->server->api->dhandle("console.command.".$c, array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false or $this->server->api->dhandle("console.command", array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false){
+							if($this->server->api->dhandle("console.command.permission.check.".$c, array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false or $this->server->api->dhandle("console.command.permission.check", array("cmd" => $c, "parameters" => array(), "issuer" => $issuer, "alias" => false)) === false){
 								continue;
 							}
 							$cmds[$c] = $h;
