@@ -24,6 +24,8 @@ class SaplingBlock extends FlowableBlock{
 	const SPRUCE = 1;
 	const BIRCH = 2;
 	const JUNGLE = 3;
+	const ACACIA = 4;
+	const DARK_OAK = 5;
 	const BURN_TIME = 5;
 	
 	public function __construct($meta = Sapling::OAK){
@@ -34,6 +36,8 @@ class SaplingBlock extends FlowableBlock{
 			1 => "Spruce Sapling",
 			2 => "Birch Sapling",
 			3 => "Jungle Sapling",
+			4 => "Acacia Sapling",
+			5 => "Dark Oak Sapling
 		);
 		$this->name = $names[$this->meta & 0x03];
 		$this->hardness = 0;
