@@ -397,7 +397,7 @@ class ServerAPI{
 		return $this->server->event($e, $d);
 	}
 
-	public function trigger($e, $d){
+	public function trigger($e, $d = ""){
 		return $this->server->trigger($e, $d);
 	}
 
