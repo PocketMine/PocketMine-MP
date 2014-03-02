@@ -15,6 +15,7 @@ Before contributing to PocketMine-MP, please read this. Also, take a look if you
  * And no, we won't update a Plugin because you need it.
 * When reporting, give as much info as you can, and if the Issue is a crash, give the Crash Dump.
 * Issues should be written in English.
+* If you are putting error dump, put them in the code format, between a pair of three ` ` `s.
 
 ## I want to contribute code
 * Use the [Pull Request](https://github.com/PocketMine/PocketMine-MP/pull/new) system, your request will be checked and discussed.
