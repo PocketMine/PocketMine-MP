@@ -38,6 +38,7 @@ class ConsoleAPI{
 		$this->register("difficulty", "<0|1|2|3>", array($this, "defaultCommands"));
 		$this->register("stop", "", array($this, "defaultCommands"));
 		$this->register("defaultgamemode", "<mode>", array($this, "defaultCommands"));
+		$this->register("clear", "", array($this, "defaultCommands"));
 		$this->server->api->ban->cmdWhitelist("help");
 	}
 
@@ -140,6 +141,11 @@ class ConsoleAPI{
 								break;
 							}
 							++$current;
+						}
+						break;
+					case "clear":
+						for($i = 0; $i <= PLAYER_SURVIVAL_SLOTS; $i++) {
+							$player->setSlot($i, BlockAPI::getItem(AIR));
 						}
 						break;
 					default:
