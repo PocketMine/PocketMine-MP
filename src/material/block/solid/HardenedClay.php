@@ -19,7 +19,7 @@
  *
 */
 
-class WoolBlock extends SolidBlock{
+class HardenedClayBlock extends SolidBlock{
 	public function __construct($meta = 0){
 		parent::__construct(WOOL, $meta, "Wool");
 		$names = array(
