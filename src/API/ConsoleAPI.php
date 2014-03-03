@@ -37,6 +37,7 @@ class ConsoleAPI{
 		$this->register("status", "", array($this, "defaultCommands"));
 		$this->register("difficulty", "<0|1|2|3>", array($this, "defaultCommands"));
 		$this->register("stop", "", array($this, "defaultCommands"));
+		$this->register("clear", "[Username]", array($this, "defaultCommands"));
 		$this->register("defaultgamemode", "<mode>", array($this, "defaultCommands"));
 		$this->server->api->ban->cmdWhitelist("help");
 	}
@@ -95,6 +96,22 @@ class ConsoleAPI{
 						$output .= "Stopping the server\n";
 						$this->server->close();
 						break;
+					case "clear":
+					if(count($arg) != 1){
+					return("Usage: \n/clear [Username]");
+						}
+						$username = strtolower($arg[0]);
+							$player = $this->api->player->get($arg[0]);
+					if($player instanceof Player){
+							$username = strtolower($player->iusername);
+					}
+					for($i = 0; $i <= PLAYER_SURVIVAL_SLOTS; $i++) {
+
+					$data->setSlot($i, BlockAPI::getItem(AIR));
+
+						}
+					return("Players Invantory has been cleard");
+					break;
 					case "difficulty":
 						$s = trim(array_shift($params));
 						if($s === "" or (((int) $s) > 3 and ((int) $s) < 0)){
