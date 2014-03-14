@@ -151,7 +151,7 @@ class Item{
 		return false;
 	}
 	
-	final public function isTool(){
+	public function isTool(){
 		return ($this->id === FLINT_STEEL or $this->id === SHEARS or $this->isPickaxe() !== false or $this->isAxe() !== false or $this->isShovel() !== false or $this->isSword() !== false);
 	}
 	
