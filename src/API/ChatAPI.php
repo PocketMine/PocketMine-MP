@@ -50,8 +50,7 @@ class ChatAPI{
 					$output .= "Usage: /say <message>\n";
 					break;
 				}
-				$sender = ($issuer instanceof Player) ? "Server":ucfirst($issuer);
-				$this->server->api->chat->broadcast("[$sender] ".$s);
+				$this->server->api->chat->broadcast("[Server] ".$s);
 				break;
 			case "me":
 				if(!($issuer instanceof Player)){
