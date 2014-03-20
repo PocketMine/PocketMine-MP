@@ -135,9 +135,7 @@ abstract class Block extends Position{
 			QUARTZ_STAIRS => "QuartzStairsBlock",
 			DOUBLE_WOOD_SLAB => "DoubleWoodSlabBlock",
 			WOOD_SLAB => "WoodSlabBlock",
-			HARDENED_CLAY => "HardenedClayBlock",
-			STAINED_CLAY => "StainedHardenedBlock",
-		
+
 			HAY_BALE => "HayBaleBlock",
 			CARPET => "CarpetBlock",
 			
