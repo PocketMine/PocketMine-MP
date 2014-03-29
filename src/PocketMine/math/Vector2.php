@@ -53,7 +53,7 @@ class Vector2{
 			$this->x += $x;
 			$this->y += $y;
 
-			return new Vector3($this->x + $x, $this->y + $y);
+			return new Vector2($this->x + $x, $this->y + $y);
 		}
 	}
 
