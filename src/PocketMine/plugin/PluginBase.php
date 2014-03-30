@@ -213,7 +213,7 @@ abstract class PluginBase implements Plugin, CommandExecutor{
 
 	public function saveConfig(){
 		if($this->getConfig()->save() === false){
-			console("[SEVERE] Could not save config to " . $this->configFile);
+			console("[SERVER] Could not save config to " . $this->configFile);
 		}
 	}
 
@@ -234,7 +234,7 @@ abstract class PluginBase implements Plugin, CommandExecutor{
 	 * @return Server
 	 */
 	public final function getServer(){
-		return $this->dataFolder;
+		return $this->server;
 	}
 
 	/**
