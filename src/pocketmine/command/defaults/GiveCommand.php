@@ -70,7 +70,6 @@ class GiveCommand extends VanillaCommand{
 			}
 			if($item->getID() == 0){
 				$sender->sendMessage(TextFormat::RED . "There is no item called " . $args[1] . ".");
-
 				return true;
 			}
 			$pk = new AddItemEntityPacket;
