@@ -337,7 +337,7 @@ class Human extends Creature implements ProjectileSource, InventorySource{
 		return true;
 	}
 
-	public function addItem(Item $item){
+	public function addItem(Item $item, $drop = false){
 		while($item->getCount() > 0){
 			$add = 0;
 			foreach($this->inventory as $s => $i){
@@ -359,6 +359,9 @@ class Human extends Creature implements ProjectileSource, InventorySource{
 				}
 			}
 			if($add <= 0){
+				if($drop === true){
+					// TODO drop item
+				}
 				return false;
 			}
 			$item->setCount($item->getCount() - $add);

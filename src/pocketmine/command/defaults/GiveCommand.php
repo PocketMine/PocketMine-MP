@@ -24,7 +24,10 @@ namespace pocketmine\command\defaults;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
+use pocketmine\network\protocol\AddItemEntityPacket;
+use pocketmine\network\protocol\RemoveEntityPacket;
 use pocketmine\Player;
+use pocketmine\scheduler\CallbackTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
@@ -67,10 +70,25 @@ class GiveCommand extends VanillaCommand{
 			}
 			if($item->getID() == 0){
 				$sender->sendMessage(TextFormat::RED . "There is no item called " . $args[1] . ".");
-
 				return true;
 			}
-			$player->addItem(clone $item);
+			$pk = new AddItemEntityPacket;
+			$eid = 0; // TODO fix this
+			$pk->eid = $eid;
+			$pk->item = $item;
+			$pk->x = $player->x;
+			$pk->y = $player->y + 2;
+			$pk->z = $player->z;
+			$pk->yaw = 0;
+			$pk->pitch = 0;
+			$pk->roll = 0;
+			$player->dataPacket($pk);
+			Server::getInstance()->getScheduler()->scheduleDelayedTask(
+					new CallbackTask(array($player, "addItem"), array(clone $item)), 15);
+			$pk = new RemoveEntityPacket;
+			$pk->eid = $eid;
+			Server::getInstance()->getScheduler()->scheduleDelayedTask(
+					new CallbackTask(array($player, "dataPacket"), array(clone $item)), 15);
 		}else{
 			$sender->sendMessage(TextFormat::RED . "Can't find player " . $args[0]);
 
