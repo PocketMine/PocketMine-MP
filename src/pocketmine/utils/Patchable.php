@@ -14,27 +14,18 @@
  * (at your option) any later version.
  *
  * @author PocketMine Team
-
+ * @link http://www.pocketmine.net/
  *
  *
 */
 
-namespace pocketmine\scheduler;
+namespace pocketmine\utils;
 
-use pocketmine\utils\Utils;
 
-class SendUsageTask extends AsyncTask{
-
-	public $endpoint;
-	public $data;
-
-	public function __construct($endpoint, array $data){
-		$this->endpoint = $endpoint;
-		$this->data = serialize($data);
-	}
-
-	public function onRun(){
-		Utils::postURL($this->endpoint, unserialize($this->data));
-	}
+/**
+ * All classes or interfaces (including plugins) that want to be able to be patched in runtime
+ * need to implement this interface
+ */
+interface Patchable{
 
 }

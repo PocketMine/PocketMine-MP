@@ -1,6 +1,6 @@
 <?php
 
-require_once("SplAutoloader.php");
+require("SplAutoloader.php");
 
 /**
  * SplClassLoader implementation that implements the technical interoperability
@@ -122,7 +122,15 @@ class SplClassLoader implements SplAutoloader{
 	 * {@inheritdoc}
 	 */
 	public function add($resource, $resourcePath = null){
-		$this->resources[$resource] = (array) $resourcePath;
+		if(isset($this->resources[$resource])){
+			foreach((array) $resourcePath as $path){
+				if(!in_array($path, $this->resources[$resource], true)){
+					$this->resources[$resource][] = $path;
+				}
+			}
+		}else{
+			$this->resources[$resource] = (array) $resourcePath;
+		}
 	}
 
 	/**
@@ -130,7 +138,11 @@ class SplClassLoader implements SplAutoloader{
 	 */
 	public function load($resourceName){
 		$resourceAbsolutePath = $this->getResourceAbsolutePath($resourceName);
-
+		if($resourceAbsolutePath == ""){
+			throw new \RuntimeException(
+				sprintf('Autoloader couldn\'t find a file to include for %s', $resourceName)
+			);
+		}
 		switch(true){
 			case ($this->mode & self::MODE_SILENT):
 				if($resourceAbsolutePath !== false){

@@ -14,27 +14,31 @@
  * (at your option) any later version.
  *
  * @author PocketMine Team
-
+ * @link http://www.pocketmine.net/
  *
  *
 */
 
-namespace pocketmine\scheduler;
+namespace pocketmine\plugin;
 
-use pocketmine\utils\Utils;
+class PluginLogger{
 
-class SendUsageTask extends AsyncTask{
+	private $pluginName;
 
-	public $endpoint;
-	public $data;
-
-	public function __construct($endpoint, array $data){
-		$this->endpoint = $endpoint;
-		$this->data = serialize($data);
+	/**
+	 * @param Plugin $context
+	 */
+	public function __construct(Plugin $context){
+		$prefix = $context->getDescription()->getPrefix();
+		$this->pluginName = $prefix != null ? "[$prefix] " : "[".$context->getDescription()->getName()."] ";
 	}
 
-	public function onRun(){
-		Utils::postURL($this->endpoint, unserialize($this->data));
+	/**
+	 * Logs a message to the console
+	 *
+	 * @param string $message
+	 */
+	public function log($message){
+		console($this->pluginName . $message);
 	}
-
 }

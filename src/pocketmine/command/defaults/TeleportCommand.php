@@ -51,6 +51,7 @@ class TeleportCommand extends VanillaCommand{
 		}
 
 		$target = null;
+		$origin = $sender;
 
 		if(count($args) === 1 or count($args) === 3){
 			if($sender instanceof Player){
@@ -65,12 +66,20 @@ class TeleportCommand extends VanillaCommand{
 				$sender->sendMessage(TextFormat::RED . "Can't find player ".$args[0]);
 				return true;
 			}
+			if(count($args) === 2){
+				$origin = $target;
+				$target = Server::getInstance()->getPlayer($args[1]);
+				if($target === null){
+					$sender->sendMessage(TextFormat::RED . "Can't find player ".$args[1]);
+					return true;
+				}
+			}
 		}
 
 		if(count($args) < 3){
-			$pos = new Position((int) $sender->x, (int) $sender->y, (int) $sender->z, $sender->getLevel());
-			$target->setSpawn($pos);
-			Command::broadcastCommandMessage($sender, "Set ".$target->getName()."'s spawnpoint to ".$pos->x.", ".$pos->y.", ".$pos->z);
+			$pos = new Position($target->x, $target->y, $target->z, $target->getLevel());
+			$origin->teleport($pos);
+			Command::broadcastCommandMessage($sender, "Teleported ".$origin->getName()." to ".$target->getName());
 			return true;
 		}elseif($target->getLevel() !== null){
 			$pos = count($args) === 4 ? 1:0;

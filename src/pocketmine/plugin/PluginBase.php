@@ -25,10 +25,11 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandExecutor;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
+use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 
-abstract class PluginBase implements Plugin, CommandExecutor{
+abstract class PluginBase implements Plugin{
 
 	/** @var PluginLoader */
 	private $loader;
@@ -51,6 +52,9 @@ abstract class PluginBase implements Plugin, CommandExecutor{
 	/** @var string */
 	private $configFile;
 	private $file;
+
+	/** @var PluginLogger */
+	private $logger;
 
 	/**
 	 * Called when the plugin is loaded, before calling onEnable()
@@ -112,32 +116,36 @@ abstract class PluginBase implements Plugin, CommandExecutor{
 			$this->dataFolder = rtrim($dataFolder, "\\/") . "/";
 			$this->file = rtrim($file, "\\/") . "/";
 			$this->configFile = $this->dataFolder . "config.yml";
+			$this->logger = new PluginLogger($this);
 		}
 	}
 
+	/**
+	 * @return PluginLogger
+	 */
+	public function getLogger(){
+		return $this->logger;
+	}
+
+	/**
+	 * @return bool
+	 */
 	public final function isInitialized(){
 		return $this->initialized;
 	}
 
 	/**
-	 * @param CommandSender $sender
-	 * @param Command       $command
-	 * @param string        $label
-	 * @param string[]      $args
+	 * @param string $name
 	 *
-	 * @return bool
+	 * @return PluginIdentifiableCommand
 	 */
-	public function onCommand(CommandSender $sender, Command $command, $label, array $args){
-		return false;
-	}
-
 	public function getCommand($name){
 		$command = $this->getServer()->getPluginCommand($name);
 		if($command === null or $command->getPlugin() !== $this){
 			$command = $this->getServer()->getPluginCommand(strtolower($this->description->getName()) . ":" . $name);
 		}
 
-		if($command instanceof PluginCommand and $command->getPlugin() === $this){
+		if($command instanceof PluginIdentifiableCommand and $command->getPlugin() === $this){
 			return $command;
 		}else{
 			return null;

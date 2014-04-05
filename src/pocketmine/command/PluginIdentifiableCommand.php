@@ -14,27 +14,17 @@
  * (at your option) any later version.
  *
  * @author PocketMine Team
-
+ * @link http://www.pocketmine.net/
  *
  *
 */
 
-namespace pocketmine\scheduler;
+namespace pocketmine\command;
 
-use pocketmine\utils\Utils;
+interface PluginIdentifiableCommand{
 
-class SendUsageTask extends AsyncTask{
-
-	public $endpoint;
-	public $data;
-
-	public function __construct($endpoint, array $data){
-		$this->endpoint = $endpoint;
-		$this->data = serialize($data);
-	}
-
-	public function onRun(){
-		Utils::postURL($this->endpoint, unserialize($this->data));
-	}
-
+	/**
+	 * @return \pocketmine\plugin\plugin
+	 */
+	public function getPlugin();
 }

@@ -1262,7 +1262,8 @@ class Player extends Human implements CommandSender, IPlayer{
 				if($this->loggedIn === true){
 					break;
 				}
-				$this->username = $packet->username;
+
+				$this->username = TextFormat::clean($packet->username);
 				$this->displayName = $this->username;
 				$this->iusername = strtolower($this->username);
 				$this->loginData = array("clientId" => $packet->clientId, "loginData" => $packet->loginData);
@@ -1286,7 +1287,7 @@ class Player extends Human implements CommandSender, IPlayer{
 
 					return;
 				}
-				if(preg_match('#^[a-zA-Z0-9_]{3,16}$#', $this->username) == 0 or $this->username === "" or $this->iusername === "rcon" or $this->iusername === "console"){
+				if(preg_match('#^[a-zA-Z0-9_]{3,16}$#', $packet->username) == 0 or $this->username === "" or $this->iusername === "rcon" or $this->iusername === "console"){
 					$this->close("", "Bad username");
 
 					return;
@@ -1318,7 +1319,12 @@ class Player extends Human implements CommandSender, IPlayer{
 
 				foreach($this->server->getOnlinePlayers() as $p){
 					if($p !== $this and strtolower($p->getName()) === strtolower($this->getName())){
-						$p->close($p->getName() . " has left the game", "logged in from another location");
+						if($p->kick("logged in from another location") === false){
+							$this->close($this->getName() . " has left the game", "already logged in");
+							return;
+						}else{
+							break;
+						}
 					}
 				}
 

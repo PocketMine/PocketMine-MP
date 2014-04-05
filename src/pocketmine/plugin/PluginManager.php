@@ -151,6 +151,11 @@ class PluginManager{
 					if(($plugin = $loader->loadPlugin($path)) instanceof Plugin){
 						$this->plugins[$plugin->getDescription()->getName()] = $plugin;
 
+						$pluginCommands = $this->parseYamlCommands($plugin);
+
+						if(count($pluginCommands) > 0){
+							$this->commandMap->registerAll($plugin->getDescription()->getName(), $pluginCommands);
+						}
 						return $plugin;
 					}
 				}
@@ -167,6 +172,7 @@ class PluginManager{
 	 * @return Plugin[]
 	 */
 	public function loadPlugins($directory, $newLoaders = null){
+
 		if(is_dir($directory)){
 			$plugins = array();
 			$loadedPlugins = array();
@@ -249,7 +255,7 @@ class PluginManager{
 				foreach($plugins as $name => $file){
 					if(isset($dependencies[$name])){
 						foreach($dependencies[$name] as $key => $dependency){
-							if(isset($loadedPlugins[$dependency])){
+							if(isset($loadedPlugins[$dependency]) or $this->getPlugin($dependency) instanceof Plugin){
 								unset($dependencies[$name][$key]);
 							}elseif(!isset($plugins[$dependency])){
 								console("[SEVERE] Could not load plugin '" . $name . "': Unknown dependency");
@@ -264,7 +270,7 @@ class PluginManager{
 
 					if(isset($softDependencies[$name])){
 						foreach($softDependencies[$name] as $key => $dependency){
-							if(isset($loadedPlugins[$dependency])){
+							if(isset($loadedPlugins[$dependency]) or $this->getPlugin($dependency) instanceof Plugin){
 								unset($softDependencies[$name][$key]);
 							}
 						}
@@ -500,11 +506,6 @@ class PluginManager{
 	 */
 	public function enablePlugin(Plugin $plugin){
 		if(!$plugin->isEnabled()){
-			$pluginCommands = $this->parseYamlCommands($plugin);
-
-			if(count($pluginCommands) > 0){
-				$this->commandMap->registerAll($plugin->getDescription()->getName(), $pluginCommands);
-			}
 
 			foreach($plugin->getDescription()->getPermissions() as $perm){
 				$this->addPermission($perm);

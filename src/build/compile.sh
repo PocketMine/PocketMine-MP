@@ -4,11 +4,12 @@ ZEND_VM="GOTO"
 
 ZLIB_VERSION="1.2.8"
 OPENSSL_VERSION="1.0.0l"
-CURL_VERSION="curl-7_35_0"
+CURL_VERSION="curl-7_36_0"
 READLINE_VERSION="6.3"
 NCURSES_VERSION="5.9"
 PHPNCURSES_VERSION="1.0.2"
 PTHREADS_VERSION="2.0.4"
+UOPZ_VERSION="2.0.3"
 WEAKREF_VERSION="0.2.2"
 PHPYAML_VERSION="1.1.1"
 YAML_VERSION="0.1.4"
@@ -89,13 +90,13 @@ while getopts "::t:oj:srcxff:" OPTION; do
 			echo "[opt] Enabling abusive optimizations..."
 			DO_OPTIMIZE="yes"
 			ffast_math="-fno-math-errno -funsafe-math-optimizations -fno-trapping-math -ffinite-math-only -fno-rounding-math -fno-signaling-nans -fcx-limited-range" #workaround SQLite3 fail
-			CFLAGS="$CFLAGS -O2 -DSQLITE_HAVE_ISNAN $ffast_math -fno-signed-zeros -funsafe-loop-optimizations -fomit-frame-pointer -frename-registers -funroll-loops -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize -ftracer -ftree-loop-im -fivopts -ftree-parallelize-loops=4"
+			CFLAGS="$CFLAGS -O2 -DSQLITE_HAVE_ISNAN $ffast_math -fno-signed-zeros -funsafe-loop-optimizations -fomit-frame-pointer -frename-registers -funroll-loops -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize -ftracer -ftree-loop-im -fivopts"
 			if [ "$OPTARG" == "arm" ]; then
 				CFLAGS="$CFLAGS -mfloat-abi=softfp -mfpu=vfp"
 			elif [ "$OPTARG" == "x86_64" ]; then
-				CFLAGS="$CFLAGS -mmx -msse -msse2 -msse3 -mfpmath=sse -free -msahf"
+				CFLAGS="$CFLAGS -mmx -msse -msse2 -msse3 -mfpmath=sse -free -msahf -ftree-parallelize-loops=4"
 			elif [ "$OPTARG" == "x86" ]; then
-				CFLAGS="$CFLAGS -mmx -msse -msse2 -mfpmath=sse -m128bit-long-double -malign-double"
+				CFLAGS="$CFLAGS -mmx -msse -msse2 -mfpmath=sse -m128bit-long-double -malign-double -ftree-parallelize-loops=4"
 			fi
 			;;
 		\?)
@@ -136,7 +137,6 @@ if [ "$IS_CROSSCOMPILE" == "yes" ]; then
 		CFLAGS="-static -uclibc -Wl,-Bdynamic $CFLAGS"
 		echo "[INFO] Cross-compiling for Android ARMv6"
 		OPENSSL_TARGET="android"
-		HAVE_MYSQLI="--without-mysqli"
 	elif [ "$COMPILE_TARGET" == "android-armv7" ]; then
 		COMPILE_FOR_ANDROID=yes
 		[ -z "$march" ] && march=armv7-a;
@@ -147,7 +147,6 @@ if [ "$IS_CROSSCOMPILE" == "yes" ]; then
 		CFLAGS="-static -uclibc -Wl,-Bdynamic $CFLAGS"
 		echo "[INFO] Cross-compiling for Android ARMv7"
 		OPENSSL_TARGET="android-armv7"
-		HAVE_MYSQLI="--without-mysqli"
 	elif [ "$COMPILE_TARGET" == "rpi" ]; then
 		TOOLCHAIN_PREFIX="arm-linux-gnueabihf"
 		[ -z "$march" ] && march=armv6zk;
@@ -181,7 +180,6 @@ if [ "$IS_CROSSCOMPILE" == "yes" ]; then
 		export CC="$TOOLCHAIN_PREFIX-gcc"
 		CONFIGURE_FLAGS="--host=$TOOLCHAIN_PREFIX --target=$TOOLCHAIN_PREFIX -miphoneos-version-min=4.2"
 		OPENSSL_TARGET="BSD-generic32"
-		HAVE_MYSQLI="--without-mysqli"
 	elif [ "$COMPILE_TARGET" == "ios-armv7" ]; then
 		[ -z "$march" ] && march=armv7-a;
 		[ -z "$mtune" ] && mtune=cortex-a8;
@@ -189,7 +187,6 @@ if [ "$IS_CROSSCOMPILE" == "yes" ]; then
 		export CC="$TOOLCHAIN_PREFIX-gcc"
 		CONFIGURE_FLAGS="--host=$TOOLCHAIN_PREFIX --target=$TOOLCHAIN_PREFIX -miphoneos-version-min=4.2"
 		OPENSSL_TARGET="BSD-generic32"
-		HAVE_MYSQLI="--without-mysqli"
 		if [ "$DO_OPTIMIZE" == "yes" ]; then
 			CFLAGS="$CFLAGS -mfpu=neon"
 		fi
@@ -508,6 +505,13 @@ download_file "http://pecl.php.net/get/pthreads-$PTHREADS_VERSION.tgz" | tar -zx
 mv pthreads-$PTHREADS_VERSION "$DIR/install_data/php/ext/pthreads"
 echo " done!"
 
+
+#uopz
+#echo -n "[PHP uopz] downloading $UOPZ_VERSION..."
+#download_file "http://pecl.php.net/get/uopz-$UOPZ_VERSION.tgz" | tar -zx >> "$DIR/install.log" 2>&1
+#mv uopz-$UOPZ_VERSION "$DIR/install_data/php/ext/uopz"
+#echo " done!"
+
 #WeakRef
 #echo -n "[PHP WeakRef] downloading $WEAKREF_VERSION..."
 #download_file "http://pecl.php.net/get/Weakref-$WEAKREF_VERSION.tgz" | tar -zx >> "$DIR/install.log" 2>&1
@@ -606,6 +610,8 @@ if [ "$IS_CROSSCOMPILE" == "yes" ]; then
 	else
 		export LIBS="$LIBS -lpthread"
 	fi
+	mv ext/mysqlnd/config9.m4 ext/mysqlnd/config.m4
+	sed  -i=".backup" "s{ext/mysqlnd/php_mysqlnd_config.h{config.h{" ext/mysqlnd/mysqlnd_portability.h
 	CONFIGURE_FLAGS="$CONFIGURE_FLAGS --enable-opcache=no"
 fi
 
@@ -700,6 +706,7 @@ echo "short_open_tag=0" >> "$DIR/bin/php5/bin/php.ini"
 echo "asp_tags=0" >> "$DIR/bin/php5/bin/php.ini"
 echo "phar.readonly=0" >> "$DIR/bin/php5/bin/php.ini"
 echo "phar.require_hash=1" >> "$DIR/bin/php5/bin/php.ini"
+echo "zend_extension=uopz.so" >> "$DIR/bin/php5/bin/php.ini"
 if [ "$IS_CROSSCOMPILE" != "crosscompile" ]; then
 	echo "zend_extension=opcache.so" >> "$DIR/bin/php5/bin/php.ini"
 	echo "opcache.enable=1" >> "$DIR/bin/php5/bin/php.ini"
