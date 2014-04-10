@@ -27,7 +27,7 @@ namespace pocketmine\utils;
  *
  * Config Class for simple config manipulation of multiple formats.
  */
-class Config{
+class Config implements \ArrayAccess{
 	const DETECT = -1; //Detect by file extension
 	const PROPERTIES = 0; // .properties
 	const CNF = Config::PROPERTIES; // .cnf
@@ -334,6 +334,40 @@ class Config{
 	 */
 	public function setDefaults(array $defaults){
 		$this->fillDefaults($defaults, $this->config);
+	}
+
+	/**
+	 * @param mixed $offset
+	 * 
+	 * @return bool
+	 */
+	public function offsetExists($offset){
+		return array_key_exists($offset, $this->config);
+	}
+
+	/**
+	 * @param mixed $offset
+	 * 
+	 * @return mixed
+	 */
+	public function offsetGet($offset){
+		return $this->config[$offset]; // let it throw an E_NOTICE error if not exists, like what happens in accessing normal arrays' undefined items
+	}
+
+	/**
+	 * @param mixed $offset
+	 * @param mixed $value
+	 */
+	public function offsetSet($offset, $value){
+		if(is_null($offset)) $this->config[] = $value;
+		else $this->config[$offset] = $value;
+	}
+
+	/**
+	 * @param mixed $offset
+	 */
+	public function offsetUnset($offset){
+		unset($this->config[$offset]);
 	}
 
 	/**
