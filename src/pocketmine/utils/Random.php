@@ -24,24 +24,28 @@ namespace pocketmine\utils;
 
 /**
  * Unsecure Random Number Generator, used for fast seeded values
+ * WARNING: This class is available on the PocketMine-MP Zephir project.
+ * If this class is modified, remember to modify the PHP C extension.
  */
 class Random{
-	private $z, $w;
+
+	protected $seed;
 
 	/**
-	 * @param int|bool $seed Integer to be used as seed. If false, generates a Random one
+	 * @param int $seed Integer to be used as seed.
 	 */
-	public function __construct($seed = false){
+	public function __construct($seed = -1){
+		if($seed == -1){
+			$seed = time();
+		}
 		$this->setSeed($seed);
 	}
 
 	/**
-	 * @param int|bool $seed Integer to be used as seed. If false, generates a Random one
+	 * @param int $seed Integer to be used as seed.
 	 */
-	public function setSeed($seed = false){
-		$seed = $seed !== false ? (int) $seed : Utils::readInt(Utils::getRandomBytes(4, false));
-		$this->z = $seed ^ 0xdeadbeef;
-		$this->w = $seed ^ 0xc0de1337;
+	public function setSeed($seed){
+		$this->seed = crc32(Binary::writeInt($seed));
 	}
 
 	/**
@@ -50,7 +54,7 @@ class Random{
 	 * @return int
 	 */
 	public function nextInt(){
-		return Utils::readInt($this->nextBytes(4)) & 0x7FFFFFFF;
+		return $this->nextSignedInt() & 0x7fffffff;
 	}
 
 	/**
@@ -59,7 +63,13 @@ class Random{
 	 * @return int
 	 */
 	public function nextSignedInt(){
-		return Utils::readInt($this->nextBytes(4));
+		$t = crc32(Binary::writeInt($this->seed));
+		$this->seed ^= $t;
+
+		if($t > 2147483647){
+			$t -= 4294967296;
+		}
+		return (int) $t;
 	}
 
 	/**
@@ -68,7 +78,7 @@ class Random{
 	 * @return float
 	 */
 	public function nextFloat(){
-		return $this->nextInt() / 0x7FFFFFFF;
+		return $this->nextInt() / 0x7fffffff;
 	}
 
 	/**
@@ -77,25 +87,7 @@ class Random{
 	 * @return float
 	 */
 	public function nextSignedFloat(){
-		return $this->nextSignedInt() / 0x7FFFFFFF;
-	}
-
-	/**
-	 * Returns $byteCount random bytes
-	 *
-	 * @param $byteCount
-	 *
-	 * @return string
-	 */
-	public function nextBytes($byteCount){
-		$bytes = "";
-		while(strlen($bytes) < $byteCount){
-			$this->z = 36969 * ($this->z & 65535) + ($this->z >> 16);
-			$this->w = 18000 * ($this->w & 65535) + ($this->w >> 16);
-			$bytes .= pack("N", ($this->z << 16) + $this->w);
-		}
-
-		return substr($bytes, 0, $byteCount);
+		return $this->nextSignedInt() / 0x7fffffff;
 	}
 
 	/**

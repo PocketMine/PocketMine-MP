@@ -156,7 +156,7 @@ then
 	rm -rf libtool-2.4.2
 	export LIBTOOL="$COMPILEDIR/crosscompile/ios-armv6/libtool/bin/libtool"
 	export LIBTOOLIZE="$COMPILEDIR/crosscompile/ios-armv6/libtool/bin/libtoolize"
-    PATH="/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:$PATH" $SCRIPT -t ios-armv6 -o -j 1 -c -x
+    PATH="/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:$PATH" $SCRIPT -t ios-armv6 -o -j 1 -c -x -f arm
     
     cp -r $COMPILEDIR/crosscompile/ios-armv6/{install.log,bin/*} $ARCHIVE/crosscompile/ios-armv6/
 	if [ ! -f $COMPILEDIR/crosscompile/ios-armv6/bin/php5/bin/php ]; then
@@ -177,7 +177,7 @@ then
 	rm -rf libtool-2.4.2
 	export LIBTOOL="$COMPILEDIR/crosscompile/ios-armv7/libtool/bin/libtool"
 	export LIBTOOLIZE="$COMPILEDIR/crosscompile/ios-armv7/libtool/bin/libtoolize"
-    PATH="/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:$PATH" $SCRIPT -t ios-armv6 -o -j 1 -c -x
+    PATH="/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:$PATH" $SCRIPT -t ios-armv6 -o -j 1 -c -x -f arm
     
     cp -r $COMPILEDIR/crosscompile/ios-armv7/{install.log,bin/*} $ARCHIVE/crosscompile/ios-armv7/
 	if [ ! -f $COMPILEDIR/crosscompile/ios-armv7/bin/php5/bin/php ]; then

@@ -3,12 +3,13 @@ PHP_VERSION="5.5.11"
 ZEND_VM="GOTO"
 
 ZLIB_VERSION="1.2.8"
-OPENSSL_VERSION="1.0.0l"
+OPENSSL_VERSION="1.0.1g"
 CURL_VERSION="curl-7_36_0"
 READLINE_VERSION="6.3"
 NCURSES_VERSION="5.9"
 PHPNCURSES_VERSION="1.0.2"
 PTHREADS_VERSION="2.0.4"
+PHP_POCKETMINE_VERSION="0.0.4"
 UOPZ_VERSION="2.0.3"
 WEAKREF_VERSION="0.2.2"
 PHPYAML_VERSION="1.1.1"
@@ -52,11 +53,12 @@ COMPILE_TARGET=""
 COMPILE_OPENSSL="no"
 COMPILE_CURL="default"
 COMPILE_FANCY="no"
+HAS_ZEPHIR="no"
 IS_CROSSCOMPILE="no"
 IS_WINDOWS="no"
 DO_OPTIMIZE="no"
 DO_STATIC="no"
-while getopts "::t:oj:srcxff:" OPTION; do
+while getopts "::t:oj:srcxzff:" OPTION; do
 	case $OPTION in
 		t)
 			echo "[opt] Set target to $OPTARG"
@@ -86,11 +88,15 @@ while getopts "::t:oj:srcxff:" OPTION; do
 			echo "[opt] Will compile everything statically"
 			DO_STATIC="yes"
 			;;
+		z)
+			echo "[opt] Will add PocketMine C PHP extension"
+			HAS_ZEPHIR="yes"
+			;;
 		f)
 			echo "[opt] Enabling abusive optimizations..."
 			DO_OPTIMIZE="yes"
-			ffast_math="-fno-math-errno -funsafe-math-optimizations -fno-trapping-math -ffinite-math-only -fno-rounding-math -fno-signaling-nans -fcx-limited-range" #workaround SQLite3 fail
-			CFLAGS="$CFLAGS -O2 -DSQLITE_HAVE_ISNAN $ffast_math -fno-signed-zeros -funsafe-loop-optimizations -fomit-frame-pointer -frename-registers -funroll-loops -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize -ftracer -ftree-loop-im -fivopts"
+			ffast_math="-fno-math-errno -funsafe-math-optimizations -fno-signed-zeros -fno-trapping-math -ffinite-math-only -fno-rounding-math -fno-signaling-nans -fcx-limited-range" #workaround SQLite3 fail
+			CFLAGS="$CFLAGS -O2 -DSQLITE_HAVE_ISNAN $ffast_math -funsafe-loop-optimizations -fomit-frame-pointer -frename-registers -funswitch-loops -fpredictive-commoning -ftree-vectorize -ftracer -ftree-loop-im -fivopts"
 			if [ "$OPTARG" == "arm" ]; then
 				CFLAGS="$CFLAGS -mfloat-abi=softfp -mfpu=vfp"
 			elif [ "$OPTARG" == "x86_64" ]; then
@@ -505,6 +511,15 @@ download_file "http://pecl.php.net/get/pthreads-$PTHREADS_VERSION.tgz" | tar -zx
 mv pthreads-$PTHREADS_VERSION "$DIR/install_data/php/ext/pthreads"
 echo " done!"
 
+HAS_POCKETMINE=""
+if [ "$HAS_ZEPHIR" == "yes" ]; then
+	echo -n "[C PocketMine extension] downloading $PHP_POCKETMINE_VERSION..."
+	download_file https://github.com/PocketMine/PocketMine-MP-Zephir/archive/$PHP_POCKETMINE_VERSION.tar.gz | tar -zx >> "$DIR/install.log" 2>&1
+	mv PocketMine-MP-Zephir-$PHP_POCKETMINE_VERSION/pocketmine/ext "$DIR/install_data/php/ext/pocketmine"
+	rm -r PocketMine-MP-Zephir-$PHP_POCKETMINE_VERSION/
+	HAS_POCKETMINE="--enable-pocketmine"
+	echo " done!"
+fi
 
 #uopz
 #echo -n "[PHP uopz] downloading $UOPZ_VERSION..."
@@ -631,6 +646,7 @@ RANLIB=$RANLIB ./configure $PHP_OPTIMIZATION --prefix="$DIR/bin/php5" \
 --with-yaml="$DIR/bin/php5" \
 $HAVE_NCURSES \
 $HAVE_READLINE \
+$HAS_POCKETMINE \
 --enable-mbstring \
 --enable-calendar \
 --enable-pthreads \
@@ -706,7 +722,7 @@ echo "short_open_tag=0" >> "$DIR/bin/php5/bin/php.ini"
 echo "asp_tags=0" >> "$DIR/bin/php5/bin/php.ini"
 echo "phar.readonly=0" >> "$DIR/bin/php5/bin/php.ini"
 echo "phar.require_hash=1" >> "$DIR/bin/php5/bin/php.ini"
-echo "zend_extension=uopz.so" >> "$DIR/bin/php5/bin/php.ini"
+#echo "zend_extension=uopz.so" >> "$DIR/bin/php5/bin/php.ini"
 if [ "$IS_CROSSCOMPILE" != "crosscompile" ]; then
 	echo "zend_extension=opcache.so" >> "$DIR/bin/php5/bin/php.ini"
 	echo "opcache.enable=1" >> "$DIR/bin/php5/bin/php.ini"

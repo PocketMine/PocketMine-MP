@@ -77,6 +77,7 @@ namespace {
 }
 
 namespace pocketmine {
+	use pocketmine\utils\Binary;
 	use pocketmine\utils\TextFormat;
 	use pocketmine\utils\Utils;
 	use pocketmine\wizard\Installer;
@@ -324,7 +325,17 @@ namespace pocketmine {
 	}
 
 	if(!extension_loaded("uopz")){
-		console("[NOTICE] Couldn't find the uopz extension. Some functions may be limited", true, true, 0);
+		//console("[NOTICE] Couldn't find the uopz extension. Some functions may be limited", true, true, 0);
+	}
+
+	if(extension_loaded("pocketmine")){
+		if(version_compare(phpversion("pocketmine"), "0.0.1") < 0){
+			console("[ERROR] You have the native PocketMine extension, but your version is lower than 0.0.1.", true, true, 0);
+			++$errors;
+		}elseif(version_compare(phpversion("pocketmine"), "0.0.4") > 0){
+			console("[ERROR] You have the native PocketMine extension, but your version is lower than 0.0.4.", true, true, 0);
+			++$errors;
+		}
 	}
 
 	if(!extension_loaded("curl")){
@@ -358,6 +369,8 @@ namespace pocketmine {
 		define("pocketmine\\GIT_COMMIT", str_repeat("00", 20));
 	}
 
+	@define("ENDIANNESS", (pack("d", 1) === "\77\360\0\0\0\0\0\0" ? Binary::BIG_ENDIAN : Binary::LITTLE_ENDIAN));
+	@define("INT32_MASK", is_int(0xffffffff) ? 0xffffffff : -1);
 	@ini_set("opcache.mmap_base", bin2hex(Utils::getRandomBytes(8, false))); //Fix OPCache address errors
 
 	if(!file_exists(\pocketmine\DATA . "server.properties") and !isset($opts["no-wizard"])){
