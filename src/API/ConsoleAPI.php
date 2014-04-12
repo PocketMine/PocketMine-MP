@@ -130,7 +130,7 @@ class ConsoleAPI{
 						
 						$max = ceil(count($cmds) / 5);
 						$page = (int) (isset($params[0]) ? min($max, max(1, intval($params[0]))):1);						
-						$output .= FORMAT_RED."-".FORMAT_RESET." Showing help page $page of $max (/help <page>) ".FORMAT_RED."-".FORMAT_RESET."\n";
+						$output .= FORMAT_RED."-".FORMAT_RESET." Showing help page $page of $max (help <page>) ".FORMAT_RED."-".FORMAT_RESET."\n";
 						$current = 1;
 						foreach($cmds as $c => $h){
 							$curpage = (int) ceil($current / 5);
@@ -143,7 +143,7 @@ class ConsoleAPI{
 						}
 						break;
 					default:
-						$output .= "Command doesn't exist! Use /help\n";
+						$output .= "Command doesn't exist! Use \"help\"\n";
 						break;
 				}
 		return $output;
