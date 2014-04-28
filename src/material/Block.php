@@ -135,7 +135,7 @@ abstract class Block extends Position{
 			QUARTZ_STAIRS => "QuartzStairsBlock",
 			DOUBLE_WOOD_SLAB => "DoubleWoodSlabBlock",
 			WOOD_SLAB => "WoodSlabBlock",
-		
+
 			HAY_BALE => "HayBaleBlock",
 			CARPET => "CarpetBlock",
 			
@@ -145,6 +145,8 @@ abstract class Block extends Position{
 			STONECUTTER => "StonecutterBlock",
 			GLOWING_OBSIDIAN => "GlowingObsidianBlock",
 			NETHER_REACTOR => "NetherReactorBlock",
+			HARDENED_CLAY => "HardenedClayBlock",
+			STAINED_CLAY => "StainedHardenedBlock"
 	);
 	protected $id;
 	protected $meta;

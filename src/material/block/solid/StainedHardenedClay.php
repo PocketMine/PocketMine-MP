@@ -19,29 +19,29 @@
  *
 */
 
-class WoolBlock extends SolidBlock{
+class StainedHardenedBlock extends SolidBlock{
 	public function __construct($meta = 0){
-		parent::__construct(WOOL, $meta, "Wool");
+		parent::__construct(STAINED_CLAY, $meta, "stained_hardened_clay");
 		$names = array(
-			0 => "White Wool",
-			1 => "Orange Wool",
-			2 => "Magenta Wool",
-			3 => "Light Blue Wool",
-			4 => "Yellow Wool",
-			5 => "Lime Wool",
-			6 => "Pink Wool",
-			7 => "Gray Wool",
-			8 => "Light Gray Wool",
-			9 => "Cyan Wool",
-			10 => "Purple Wool",
-			11 => "Blue Wool",
-			12 => "Brown Wool",
-			13 => "Green Wool",
-			14 => "Red Wool",
-			15 => "Black Wool",
+			0 => "White Stained Clay",
+			1 => "Orange Stained Clay",
+			2 => "Magenta Stained Clay",
+			3 => "Light Blue Stained Clay",
+			4 => "Yellow Stained Clay",
+			5 => "Lime Stained Clay",
+			6 => "Pink Stained Clay",
+			7 => "Gray Stained Clay",
+			8 => "Light Gray Stained Clay",
+			9 => "Cyan Stained Clay",
+			10 => "Purple Stained Clay",
+			11 => "Blue Stained Clay",
+			12 => "Brown Stained Clay",
+			13 => "Green Stained Clay",
+			14 => "Red Stained Clay",
+			15 => "Black Stained Clay",
 		);
 		$this->name = $names[$this->meta];
-		$this->hardness = 4;
+		$this->hardness = 30;
 	}
 	
 }
