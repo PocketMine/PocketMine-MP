@@ -50,5 +50,9 @@ class PlayerJoinEvent extends PlayerEvent{
 	public function getJoinMessage(){
 		return $this->joinMessage;
 	}
+	
+	public function getPlayer(){
+		return $this->player;
+	}
 
 }
