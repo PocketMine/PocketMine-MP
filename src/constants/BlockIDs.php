@@ -133,6 +133,7 @@ define("LIT_PUMPKIN", 91);
 define("JACK_O_LANTERN", 91);
 define("CAKE_BLOCK", 92);
 
+define("INVISIBLE_BEDROCK", 95);
 define("TRAPDOOR", 96);
 
 define("STONE_BRICKS", 98);
