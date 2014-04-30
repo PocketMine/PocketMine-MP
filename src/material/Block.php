@@ -103,6 +103,7 @@ abstract class Block extends Position{
 			LIT_PUMPKIN => "LitPumpkinBlock",
 			CAKE_BLOCK => "CakeBlock",
 			
+                        INVISIBLE_BEDROCK => "InvisibleBedrockBlock",
 			TRAPDOOR => "TrapdoorBlock",
 
 			STONE_BRICKS => "StoneBricksBlock",
