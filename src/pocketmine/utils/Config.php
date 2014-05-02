@@ -93,7 +93,7 @@ class Config{
 	 */
 	public static function fixYAMLIndexes($str){
 		$result = preg_replace("#^([ ]*)([a-zA-Z_]{1}[^\:]*)\:#m", "$1\"$2\":", $str);
-		while(preg_match_all("#".PHP_EOL."([\t]{1,})#", $result, $matches) > 0){
+		while(preg_match_all("#".PHP_EOL."([\t]{1,})#m", $result, $matches) > 0){
 			$match = $matches[0][0];
 			$tmp = strstr($result, $match, true);
 			$tmp2 = str_replace("\t", "    ", $match);
