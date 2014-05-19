@@ -39,6 +39,6 @@ class PluginLogger{
 	 * @param string $message
 	 */
 	public function log($message){
-		console($this->pluginName . $message);
+		console($this->pluginName . " " . $message);
 	}
 }
