@@ -39,7 +39,7 @@ class Config{
 	const ENUMERATION = Config::ENUM;
 
 	/** @var array */
-	private $config;
+	public $config;
 	/** @var string */
 	private $file;
 	/** @var boolean */
