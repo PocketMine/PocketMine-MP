@@ -38,8 +38,14 @@ class EntityLevelChangeEvent extends EntityEvent implements Cancellable{
 	public function getYaw(){
 		return $this->yaw;
 	}
+	public function setYaw($yaw){
+		$this->yaw = $yaw;
+	}
 	public function getPitch(){
 		return $this->pitch;
+	}
+	public function setPitch($pitch){
+		$this->pitch = $pitch;
 	}
 	public function getTo(){
 		return $this->newPosition;
