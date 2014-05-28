@@ -916,7 +916,9 @@ abstract class Entity extends Position implements Metadatable{
 	public function teleport(Vector3 $pos, $yaw = false, $pitch = false){
 		$this->setMotion(new Vector3(0, 0, 0));
 		$this->server->getPluginManager()->callEvent($event = new EntityTeleportEvent($this, $pos, $yaw, $pitch));
-		if(!$event->isCancelled() and $this->setPositionAndRotation($pos, $yaw === false ? $this->yaw : $yaw, $pitch === false ? $this->pitch : $pitch) !== false){
+		$yaw = $event->getYaw();
+		$pitch = $event->getPitch();
+		if(!$event->isCancelled() and $this->setPositionAndRotation($event->getTo(), $yaw === false ? $this->yaw : $yaw, $pitch === false ? $this->pitch : $pitch) !== false){
 			if($this instanceof Player){
 				$this->airTicks = 300;
 				$this->fallDistance = 0;
