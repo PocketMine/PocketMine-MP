@@ -41,7 +41,10 @@ class EntityLevelChangeEvent extends EntityEvent implements Cancellable{
 	public function getPitch(){
 		return $this->pitch;
 	}
-	public function getNewPosition(){
+	public function getTo(){
 		return $this->newPosition;
+	}
+	public function setTo(Vector3 $pos){
+		$this->newPosition = $pos;
 	}
 }
