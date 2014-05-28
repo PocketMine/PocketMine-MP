@@ -29,6 +29,7 @@ use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
 use pocketmine\event\entity\EntityMoveEvent;
 use pocketmine\event\entity\EntitySpawnEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\level\format\pmf\LevelFormat;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -914,7 +915,8 @@ abstract class Entity extends Position implements Metadatable{
 
 	public function teleport(Vector3 $pos, $yaw = false, $pitch = false){
 		$this->setMotion(new Vector3(0, 0, 0));
-		if($this->setPositionAndRotation($pos, $yaw === false ? $this->yaw : $yaw, $pitch === false ? $this->pitch : $pitch) !== false){
+		$this->server->getPluginManager()->callEvent($event = new EntityTeleportEvent($this, $pos, $yaw, $pitch));
+		if(!$event->isCancelled() and $this->setPositionAndRotation($pos, $yaw === false ? $this->yaw : $yaw, $pitch === false ? $this->pitch : $pitch) !== false){
 			if($this instanceof Player){
 				$this->airTicks = 300;
 				$this->fallDistance = 0;
