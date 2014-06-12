@@ -22,6 +22,6 @@
 namespace pocketmine\entity;
 
 
-class Mooshroom extends Animal{
+class Mooshroom extends Cow{
 
 }
