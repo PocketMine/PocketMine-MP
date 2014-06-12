@@ -27,7 +27,6 @@ use pocketmine\block\Lava;
 use pocketmine\block\Liquid;
 use pocketmine\block\Water;
 use pocketmine\entity\Cow;
-use pocketmine\entity\Mooshroom;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
@@ -47,7 +46,7 @@ class Bucket extends Item{
 				}
 
 				return true;
-			}elseif($target instanceof Cow || $target instanceof Mooshroom){
+			}elseif($target instanceof Cow){
 				if(($player->gamemode & 0x01) === 0){
 					$this->meta = 1;
 				}
