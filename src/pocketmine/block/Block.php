@@ -149,7 +149,9 @@ abstract class Block extends Position implements Metadatable{
 	const LIT_PUMPKIN = 91;
 	const JACK_O_LANTERN = 91;
 	const CAKE_BLOCK = 92;
-
+	
+	
+	const INVISIBLE_BEDROCK = 95
 	const TRAPDOOR = 96;
 
 	const STONE_BRICKS = 98;
