@@ -48,7 +48,7 @@ class KillCommand extends VanillaCommand{
 			//$ev->setLastDamageCause()
 			$sender->setHealth(0);
 			//TODO: set update
-			$sender->sendMessage("Ouch. That look like it hurt.");
+			$sender->sendMessage("Ouch! That looked like it hurt.");
 		}else{
 			$sender->sendMessage(TextFormat::RED . "You can only perform this command as a player");
 		}
