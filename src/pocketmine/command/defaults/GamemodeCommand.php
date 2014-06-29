@@ -35,7 +35,7 @@ class GamemodeCommand extends VanillaCommand{
 			"Changes the player to a specific game mode",
 			"/gamemode <mode> [player]"
 		);
-		$this->setPermission("pocketmine.command.gamemode");
+		$this->setPermission("pocketmine.command.gamemode.survival;pocketmine.command.gamemode.creative;pocketmine.command.gamemode.adventure;pocketmine.command.gamemode.spectator");
 	}
 
 	public function execute(CommandSender $sender, $currentAlias, array $args){
@@ -71,6 +71,18 @@ class GamemodeCommand extends VanillaCommand{
 		}
 
 		if($gameMode !== $target->getGamemode()){
+			$names = array(
+				Player::SURVIVAL => "survival",
+				Player::CREATIVE => "creative",
+				Player::ADVENTURE => "adventure",
+				Player::SPECTATOR => "spectator"
+			);
+			$name = $names[$gameMode];
+			if(!$sender->hasPermission("pocketmine.command.gamemode.$name")){
+				$sender->sendMessage(TextFormat::RED . "You don't have permission to change gamemode to $name");
+				return true;
+			}
+
 			$target->setGamemode($gameMode);
 			if($gameMode !== $target->getGamemode()){
 				$sender->sendMessage("Game mode change for " . $target->getName() . " failed!");
