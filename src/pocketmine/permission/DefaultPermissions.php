@@ -103,8 +103,16 @@ abstract class DefaultPermissions{
 		self::registerPermission(new Permission(self::ROOT . ".command.plugins", "Allows the user to view the list of plugins", Permission::DEFAULT_OP), $commands);
 		self::registerPermission(new Permission(self::ROOT . ".command.reload", "Allows the user to reload the server settings", Permission::DEFAULT_OP), $commands);
 		self::registerPermission(new Permission(self::ROOT . ".command.version", "Allows the user to view the version of the server", Permission::DEFAULT_TRUE), $commands);
-		self::registerPermission(new Permission(self::ROOT . ".command.gamemode", "Allows the user to change the gamemode of players", Permission::DEFAULT_OP), $commands);
-		self::registerPermission(new Permission(self::ROOT . ".command.defaultgamemode", "Allows the user to change the default gamemode", Permission::DEFAULT_OP), $commands);
+		$gamemode = self::registerPermission(new Permission(self::ROOT . ".command.gamemode", "Allows the user to change the gamemode of players to anything", Permission::DEFAULT_OP), $commands);
+		self::registerPermission(new Permission(self::ROOT . ".command.gamemode.survival", "Allows the user to change the gamemode of players to survival", Permission::DEFAULT_OP), $gamemode);
+		self::registerPermission(new Permission(self::ROOT . ".command.gamemode.creative", "Allows the user to change the gamemode of players to creative", Permission::DEFAULT_OP), $gamemode);
+		self::registerPermission(new Permission(self::ROOT . ".command.gamemode.adventure", "Allows the user to change the gamemode of players to adventure", Permission::DEFAULT_OP), $gamemode);
+		self::registerPermission(new Permission(self::ROOT . ".command.gamemode.spectator", "Allows the user to change the gamemode of players to spectator", Permission::DEFAULT_OP), $gamemode);
+		$defaultGamemode = self::registerPermission(new Permission(self::ROOT . ".command.defaultgamemode", "Allows the user to change the default gamemode to anything", Permission::DEFAULT_OP), $commands);
+		self::registerPermission(new Permission(self::ROOT . ".command.defaultgamemode.survival", "Allows the user to change the default gamemode of players to survival", Permission::DEFAULT_OP), $defaultGamemode);
+		self::registerPermission(new Permission(self::ROOT . ".command.defaultgamemode.creative", "Allows the user to change the default gamemode of players to creative", Permission::DEFAULT_OP), $defaultGamemode);
+		self::registerPermission(new Permission(self::ROOT . ".command.defaultgamemode.adventure", "Allows the user to change the default gamemode of players to adventure", Permission::DEFAULT_OP), $defaultGamemode);
+		self::registerPermission(new Permission(self::ROOT . ".command.defaultgamemode.spectator", "Allows the user to change the default gamemode of players to spectator", Permission::DEFAULT_OP), $defaultGamemode);
 		self::registerPermission(new Permission(self::ROOT . ".command.seed", "Allows the user to view the seed of the world", Permission::DEFAULT_OP), $commands);
 		self::registerPermission(new Permission(self::ROOT . ".command.status", "Allows the user to view the server performance", Permission::DEFAULT_OP), $commands);
 		self::registerPermission(new Permission(self::ROOT . ".command.spawnpoint", "Allows the user to change player's spawnpoint", Permission::DEFAULT_OP), $commands);

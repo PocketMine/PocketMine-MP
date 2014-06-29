@@ -33,7 +33,7 @@ class DefaultGamemodeCommand extends VanillaCommand{
 			"Set the default gamemode",
 			"/defaultgamemode <mode>"
 		);
-		$this->setPermission("pocketmine.command.defaultgamemode");
+		$this->setPermission("pocketmine.command.defaultgamemode.survival;pocketmine.command.defaultgamemode.creative;pocketmine.defaultgamemode.adventure;pocketmine.defaultgamemode.spectator");
 	}
 
 	public function execute(CommandSender $sender, $currentAlias, array $args){
@@ -50,6 +50,18 @@ class DefaultGamemodeCommand extends VanillaCommand{
 		$gameMode = Server::getGamemodeFromString($args[0]);
 
 		if($gameMode !== -1){
+			$names = array(
+				Player::SURVIVAL => "survival",
+				Player::CREATIVE => "creative",
+				Player::ADVENTURE => "adventure",
+				Player::SPECTATOR => "spectator"
+			);
+			$name = $names[$gameMode];
+			if(!$sender->hasPermission("pocketmine.command.defaultgamemode.$name")){
+				$sender->sendMessage(TextFormat::RED . "You don't have permission to change the default gamemode to $name");
+				return true;
+			}
+
 			$sender->getServer()->setConfigInt("gamemode", $gameMode);
 			$sender->sendMessage("Default game mode set to " . strtolower(Server::getGamemodeString($gameMode)));
 		}else{
