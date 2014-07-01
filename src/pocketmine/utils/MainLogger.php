@@ -26,6 +26,7 @@ use LogLevel;
 class MainLogger extends \ThreadedLogger{
 	protected $logFile;
 	protected $logStream;
+	protected $logStreamWithColor;
 	protected $shutdown;
 	protected $hasANSI;
 	protected $logDebug;
@@ -50,6 +51,7 @@ class MainLogger extends \ThreadedLogger{
 		$this->hasANSI = (bool) $hasANSI;
 		$this->logDebug = (bool) $logDebug;
 		$this->logStream = "";
+		$this->logStreamWithColor = "";
 		$this->start(PTHREADS_INHERIT_NONE);
 	}
 
@@ -146,6 +148,7 @@ class MainLogger extends \ThreadedLogger{
 			echo $message;
 		}
 		$this->logStream .= date("Y-m-d", $now) . " " . $cleanMessage;
+		$this->logStreamWithColor .= $message;
 	}
 
 	public function run(){
