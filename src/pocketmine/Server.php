@@ -41,6 +41,7 @@ use pocketmine\inventory\InventoryType;
 use pocketmine\inventory\Recipe;
 use pocketmine\item\Item;
 use pocketmine\level\format\LevelProviderManager;
+use pocketmine\level\generator\ExternalGenerationRequestManager;
 use pocketmine\level\generator\GenerationRequestManager;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\Level;
@@ -1483,7 +1484,11 @@ class Server{
 
 		$this->enablePlugins(PluginLoadOrder::STARTUP);
 
-		$this->generationManager = new GenerationRequestManager($this);
+		if ($this->getConfigBoolean("external-generation", false)) {
+			$this->generationManager = new ExternalGenerationRequestManager($this);
+		} else {
+			$this->generationManager = new GenerationRequestManager($this);
+		}
 
 		LevelProviderManager::addProvider($this, "pocketmine\\level\\format\\anvil\\Anvil");
 
