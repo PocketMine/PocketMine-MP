@@ -450,17 +450,6 @@ class Level implements ChunkManager, Metadatable{
 		$this->processChunkRequest();
 
 		if($this->nextSave < microtime(true)){
-			$X = null;
-			$Z = null;
-			foreach($this->usedChunks as $i => $c){
-				if(count($c) === 0){
-					unset($this->usedChunks[$i]);
-					Level::getXZ($i, $X, $Z);
-					if(!$this->isSpawnChunk($X, $Z)){
-						$this->unloadChunkRequest($X, $Z, true);
-					}
-				}
-			}
 			$this->save(false);
 		}
 	}
@@ -1462,7 +1451,7 @@ class Level implements ChunkManager, Metadatable{
 	 * @return bool
 	 */
 	public function isChunkInUse($x, $z){
-		return isset($this->usedChunks[static::chunkHash($x, $z)]);
+		return isset($this->usedChunks[static::chunkHash($x, $z)]) and count($this->usedChunks[static::chunkHash($x, $z)]) > 0;
 	}
 
 	/**
@@ -1490,7 +1479,7 @@ class Level implements ChunkManager, Metadatable{
 	}
 
 	protected function queueUnloadChunk($x, $z){
-		//TODO
+		$this->unloadQueue[Level::chunkHash($x, $z)] = microtime(true);
 	}
 
 	public function unloadChunkRequest($x, $z, $safe = true){
@@ -1512,7 +1501,7 @@ class Level implements ChunkManager, Metadatable{
 			return false;
 		}
 
-		$this->provider->unloadChunk($x, $z);
+		$this->provider->unloadChunk($x, $z, $safe);
 		Cache::remove("world:" . $this->getID() . ":$x:$z");
 
 		return true;
@@ -1679,15 +1668,28 @@ class Level implements ChunkManager, Metadatable{
 	}
 
 	public function doChunkGarbageCollection(){
-		if(count($this->unloadQueue) > 0){
-			foreach($this->unloadQueue as $index => $chunk){
+		$X = null;
+		$Z = null;
 
-				if($this->autoSave){
-					$this->provider->saveChunk($chunk->getX(), $chunk->getZ());
+		if(count($this->unloadQueue) > 0){
+			foreach($this->unloadQueue as $index => $time){
+				Level::getXZ($index, $X, $Z);
+
+				if($this->getAutoSave()){
+					$this->provider->saveChunk($X, $Z);
 				}
 				//If the chunk can't be unloaded, it stays on the queue
-				if($this->unloadChunk($chunk->getX(), $chunk->getZ(), $this->getAutoSave())){
+				if($this->unloadChunk($X, $Z, true)){
 					unset($this->unloadQueue[$index]);
+				}
+			}
+		}
+
+		foreach($this->usedChunks as $i => $c){
+			if(count($c) === 0){
+				Level::getXZ($i, $X, $Z);
+				if(!$this->isSpawnChunk($X, $Z)){
+					$this->unloadChunkRequest($X, $Z, true);
 				}
 			}
 		}
