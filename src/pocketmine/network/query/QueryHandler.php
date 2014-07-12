@@ -60,7 +60,7 @@ class QueryHandler{
 		$str = "";
 		$plist = "PocketMine-MP " . $this->server->getPocketMineVersion();
 		$pl = $this->server->getPluginManager()->getPlugins();
-		if(count($pl) > 0){
+		if(count($pl) > 0 and $this->server->getProperty("settings.query-plugins", true) === true){
 			$plist .= ":";
 			foreach($pl as $p){
 				$d = $p->getDescription();
@@ -122,7 +122,7 @@ class QueryHandler{
 				break;
 			case self::STATISTICS: //Stat
 				$token = Binary::readInt(substr($payload, 0, 4));
-				if($token !== self::getTokenString($this->token, $address) and $token !== self::getTokenString($this->lastToken, $ip)){
+				if($token !== self::getTokenString($this->token, $address) and $token !== self::getTokenString($this->lastToken, $address)){
 					break;
 				}
 				$reply = chr(self::STATISTICS);

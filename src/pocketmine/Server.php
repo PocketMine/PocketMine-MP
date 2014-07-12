@@ -633,11 +633,11 @@ class Server{
 					new Double(2, $spawn->z)
 				)),
 				new String("Level", $this->getDefaultLevel()->getName()),
-				new String("SpawnLevel", $this->getDefaultLevel()->getName()),
-				new Int("SpawnX", (int) $spawn->x),
-				new Int("SpawnY", (int) $spawn->y),
-				new Int("SpawnZ", (int) $spawn->z),
-				new Byte("SpawnForced", 1), //TODO
+				//new String("SpawnLevel", $this->getDefaultLevel()->getName()),
+				//new Int("SpawnX", (int) $spawn->x),
+				//new Int("SpawnY", (int) $spawn->y),
+				//new Int("SpawnZ", (int) $spawn->z),
+				//new Byte("SpawnForced", 1), //TODO
 				new Enum("Inventory", []),
 				new Compound("Achievements", []),
 				new Int("playerGameType", $this->getGamemode()),
@@ -689,11 +689,11 @@ class Server{
 					if(isset($nbt->Inventory[$itemSlot + 9])){
 						$item = $nbt->Inventory[$itemSlot + 9];
 						$nbt->Inventory[$slot] = new Compound(false, array(
-							new Short("id", $item->id),
-							new Short("Damage", $item->Damage),
-							new Byte("Count", $item->Count),
+							new Short("id", $item["id"]),
+							new Short("Damage", $item["Damage"]),
+							new Byte("Count", $item["Count"]),
 							new Byte("Slot", $slot),
-							new Byte("TrueSlot", $item->TrueSlot)
+							new Byte("TrueSlot", $item["TrueSlot"])
 						));
 					}
 				}
@@ -1980,7 +1980,7 @@ class Server{
 
 	public function titleTick(){
 		if(defined("pocketmine\\DEBUG") and \pocketmine\DEBUG >= 0 and \pocketmine\ANSI === true){
-			echo "\x1b]0;PocketMine-MP " . $this->getPocketMineVersion() . " | Online " . count($this->players) . "/" . $this->getMaxPlayers() . " | RAM " . round((memory_get_usage() / 1024) / 1024, 2) . "/" . round((memory_get_usage(true) / 1024) / 1024, 2) . " MB | U -1 D -1 kB/s | TPS " . $this->getTicksPerSecond() . "\x07";
+			echo "\x1b]0;PocketMine-MP " . $this->getPocketMineVersion() . " | Online " . count($this->players) . "/" . $this->getMaxPlayers() . " | RAM " . round((memory_get_usage() / 1024) / 1024, 2) . "/" . round((memory_get_usage(true) / 1024) / 1024, 2) . " MB | U ". round($this->mainInterface->getUploadUsage() / 1024, 2) ." D ". round($this->mainInterface->getDownloadUsage() / 1024, 2) ." kB/s | TPS " . $this->getTicksPerSecond() . "\x07";
 		}
 	}
 

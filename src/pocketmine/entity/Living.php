@@ -58,17 +58,37 @@ abstract class Living extends Entity implements Damageable{
 	public abstract function getName();
 
 	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
+		
+		if($this instanceof Player and ($this->getGamemode() & 0x01) === 1){
+			if($source instanceof EntityDamageEvent){
+				$cause = $source->getCause();
+			}else{
+				$cause = $source;
+			}
+			
+			if(
+				$cause !== EntityDamageEvent::CAUSE_MAGIC
+				and $cause !== EntityDamageEvent::CAUSE_SUICIDE
+				and $cause !== EntityDamageEvent::CAUSE_VOID
+			){
+				return;
+			}
+		}
+		
 		//TODO: attack tick limit
 		$pk = new EntityEventPacket();
 		$pk->eid = $this->getID();
 		$pk->event = 2; //Ouch!
 		Server::broadcastPacket($this->hasSpawned, $pk);
 		$this->setLastDamageCause($source);
-		$motion = new Vector3(0, 0.25, 0);
+		$motion = new Vector3(0, 0, 0);
 		if($source instanceof EntityDamageByEntityEvent){
 			$e = $source->getDamager();
-			$motion->x = -cos(deg2rad($e->pitch)) * sin(deg2rad($e->yaw)) * 0.5;
-			$motion->z = cos(deg2rad($e->pitch)) * sin(deg2rad($e->yaw)) * 0.5;
+			$deltaX = $this->x - $e->x;
+			$deltaZ = $this->z - $e->z;
+			$yaw = atan2($deltaX, $deltaZ);
+			$motion->x = sin($yaw) * 0.5;
+			$motion->z = cos($yaw) * 0.5;
 		}
 		$this->setMotion($motion);
 		$this->setHealth($this->getHealth() - $damage);

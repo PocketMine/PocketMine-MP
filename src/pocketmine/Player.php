@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -502,6 +502,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			$pk->chunkX = $x;
 			$pk->chunkZ = $z;
 			$this->dataPacket($pk);
+			$this->getLevel()->freeChunk($x, $z, $this);
 			unset($this->usedChunks[$index]);
 		}
 		unset($this->loadQueue[$index]);
@@ -512,7 +513,12 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 	 * @return Position
 	 */
 	public function getSpawn(){
-		return $this->spawnPosition;
+		if($this->spawnPosition instanceof Position and $this->spawnPosition->getLevel() instanceof Level){
+			return $this->spawnPosition;
+		}else{
+			$level = $this->server->getDefaultLevel();
+			return $level->getSpawn();
+		}
 	}
 
 	/**
@@ -616,8 +622,6 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				return;
 			}
 
-			//TODO
-			//$this->heal($this->data->get("health"), "spawn", true);
 			$this->spawned = true;
 
 			$this->sendSettings();
@@ -946,14 +950,16 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 		$this->namedtag->playerGameType = new Int("playerGameType", $this->gamemode);
 
+		$spawnPosition = $this->getSpawn();
+
 		$pk = new StartGamePacket;
 		$pk->seed = $this->getLevel()->getSeed();
 		$pk->x = $this->x;
 		$pk->y = $this->y;
 		$pk->z = $this->z;
-		$pk->spawnX = (int) $this->spawnPosition->x;
-		$pk->spawnY = (int) $this->spawnPosition->y;
-		$pk->spawnZ = (int) $this->spawnPosition->z;
+		$pk->spawnX = (int) $spawnPosition->x;
+		$pk->spawnY = (int) $spawnPosition->y;
+		$pk->spawnZ = (int) $spawnPosition->z;
 		$pk->generator = 1; //0 old, 1 infinite, 2 flat
 		$pk->gamemode = $this->gamemode & 0x01;
 		$pk->eid = 0; //Always use EntityID as zero for the actual player
@@ -1227,18 +1233,21 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				$pk->status = 0;
 				$this->dataPacket($pk);
 
-				if(($level = $this->server->getLevelByName($this->namedtag["SpawnLevel"])) instanceof Level){
+				if(isset($this->namedtag->SpawnLevel) and ($level = $this->server->getLevelByName($this->namedtag["SpawnLevel"])) instanceof Level){
 					$this->spawnPosition = new Position($this->namedtag["SpawnX"], $this->namedtag["SpawnY"], $this->namedtag["SpawnZ"], $level);
 				}
 
+				$spawnPosition = $this->getSpawn();
+
+				$this->dead = false;
 				$pk = new StartGamePacket;
 				$pk->seed = $this->getLevel()->getSeed();
 				$pk->x = $this->x;
 				$pk->y = $this->y;
 				$pk->z = $this->z;
-				$pk->spawnX = (int) $this->spawnPosition->x;
-				$pk->spawnY = (int) $this->spawnPosition->y;
-				$pk->spawnZ = (int) $this->spawnPosition->z;
+				$pk->spawnX = (int) $spawnPosition->x;
+				$pk->spawnY = (int) $spawnPosition->y;
+				$pk->spawnZ = (int) $spawnPosition->z;
 				$pk->generator = 1; //0 old, 1 infinite, 2 flat
 				$pk->gamemode = $this->gamemode & 0x01;
 				$pk->eid = 0; //Always use EntityID as zero for the actual player
@@ -1249,14 +1258,17 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				$this->dataPacket($pk);
 
 				$pk = new SetSpawnPositionPacket;
-				$pk->x = (int) $this->spawnPosition->x;
-				$pk->y = (int) $this->spawnPosition->y;
-				$pk->z = (int) $this->spawnPosition->z;
+				$pk->x = (int) $spawnPosition->x;
+				$pk->y = (int) $spawnPosition->y;
+				$pk->z = (int) $spawnPosition->z;
 				$this->dataPacket($pk);
 
 				$pk = new SetHealthPacket();
 				$pk->health = $this->getHealth();
 				$this->dataPacket($pk);
+				if($this->getHealth() <= 0){
+					$this->dead = true;
+				}
 
 				$this->server->getLogger()->info(TextFormat::AQUA . $this->username . TextFormat::WHITE . "[/" . $this->ip . ":" . $this->port . "] logged in with entity id " . $this->id . " at (" . $this->getLevel()->getName() . ", " . round($this->x, 4) . ", " . round($this->y, 4) . ", " . round($this->z, 4) . ")");
 
@@ -1296,6 +1308,17 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					}
 				}else{*/
 
+				$dy = $newPos->y - $this->y;
+
+				if(count($this->getLevel()->getCollisionBlocks($this->boundingBox->getOffsetBoundingBox(0, $dy - 0.1, 0))) > 0){
+					$isColliding = true;
+				}else{
+					$isColliding = false;
+				}
+
+				$this->onGround = ($dy <= 0 and $isColliding);
+				$this->updateFallState($dy, $this->onGround);
+
 				if(!$this->setPositionAndRotation($newPos, $packet->yaw, $packet->pitch)){
 					$pk = new MovePlayerPacket();
 					$pk->eid = 0;
@@ -1307,7 +1330,6 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					$pk->yaw = $this->yaw;
 					$this->directDataPacket($pk);
 				}
-				//}
 
 				break;
 			case ProtocolInfo::PLAYER_EQUIPMENT_PACKET:
@@ -1703,9 +1725,10 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				Server::broadcastPacket($this->getViewers(), $pk);
 				break;
 			case ProtocolInfo::RESPAWN_PACKET:
-				if($this->spawned === false or $this->dead !== true){
+				if($this->spawned === false or $this->dead === false){
 					break;
 				}
+
 				$this->craftingType = 0;
 
 				$this->server->getPluginManager()->callEvent($ev = new PlayerRespawnEvent($this, $this->spawnPosition));
@@ -1713,6 +1736,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				$this->teleport($ev->getRespawnPosition());
 				//$this->entity->fire = 0;
 				//$this->entity->air = 300;
+
 				$this->setHealth(20);
 				$this->dead = false;
 				//$this->entity->updateMetadata();
@@ -2090,10 +2114,12 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 	public function save(){
 		parent::saveNBT();
 		$this->namedtag["Level"] = $this->getLevel()->getName();
-		$this->namedtag["SpawnLevel"] = $this->getLevel()->getName();
-		$this->namedtag["SpawnX"] = (int) $this->spawnPosition->x;
-		$this->namedtag["SpawnY"] = (int) $this->spawnPosition->y;
-		$this->namedtag["SpawnZ"] = (int) $this->spawnPosition->z;
+		if($this->spawnPosition instanceof Position and $this->spawnPosition->getLevel() instanceof Level){
+			$this->namedtag["SpawnLevel"] = $this->spawnPosition->getLevel()->getName();
+			$this->namedtag["SpawnX"] = (int) $this->spawnPosition->x;
+			$this->namedtag["SpawnY"] = (int) $this->spawnPosition->y;
+			$this->namedtag["SpawnZ"] = (int) $this->spawnPosition->z;
+		}
 
 		foreach($this->achievements as $achievement => $status){
 			$this->namedtag->Achievements[$achievement] = new Byte($achievement, $status === true ? 1 : 0);
@@ -2101,8 +2127,6 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 		$this->namedtag["playerGameType"] = $this->gamemode;
 		$this->namedtag["lastPlayed"] = floor(microtime(true) * 1000);
-
-		//$this->data->set("health", $this->getHealth());
 
 		if($this->username != "" and $this->isOnline() and $this->namedtag instanceof Compound){
 			$this->server->saveOfflinePlayerData($this->username, $this->namedtag);
@@ -2119,7 +2143,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 	}
 
 	public function kill(){
-		if($this->dead or $this->spawned === false){
+		if($this->dead === true or $this->spawned === false){
 			return;
 		}
 		parent::kill();
@@ -2148,17 +2172,28 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			case EntityDamageEvent::CAUSE_SUICIDE:
 
 				break;
+			case EntityDamageEvent::CAUSE_VOID:
+				$message = $this->getName() ." fell out of the world";
+				break;
+			case EntityDamageEvent::CAUSE_FALL:
+				if($ev instanceof EntityDamageEvent){
+					if($ev->getFinalDamage() > 2){
+						$message = $this->getName() ." fell from a high place";
+						break;
+					}
+				}
+				$message = $this->getName() ." hit the ground too hard";
+				break;
+
 			case EntityDamageEvent::CAUSE_CONTACT:
 			case EntityDamageEvent::CAUSE_PROJECTILE:
 			case EntityDamageEvent::CAUSE_SUFFOCATION:
-			case EntityDamageEvent::CAUSE_FALL:
 			case EntityDamageEvent::CAUSE_FIRE:
 			case EntityDamageEvent::CAUSE_FIRE_TICK:
 			case EntityDamageEvent::CAUSE_LAVA:
 			case EntityDamageEvent::CAUSE_DROWNING:
 			case EntityDamageEvent::CAUSE_BLOCK_EXPLOSION:
 			case EntityDamageEvent::CAUSE_ENTITY_EXPLOSION:
-			case EntityDamageEvent::CAUSE_VOID:
 			case EntityDamageEvent::CAUSE_MAGIC:
 			case EntityDamageEvent::CAUSE_CUSTOM:
 
@@ -2180,11 +2215,34 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 	}
 
 	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
+		if($this->dead === true){
+			return;
+		}
 		$pk = new EntityEventPacket();
 		$pk->eid = 0;
 		$pk->event = 2;
 		$this->dataPacket($pk);
 		parent::attack($damage, $source);
+	}
+
+	public function teleport(Vector3 $pos, $yaw = null, $pitch = null){
+		if(parent::teleport($pos, $yaw, $pitch)){
+			$this->airTicks = 300;
+			$this->fallDistance = 0;
+			$this->orderChunks();
+			$this->chunkLoadTask->setNextRun(0);
+			$this->forceMovement = $pos;
+
+			$pk = new MovePlayerPacket;
+			$pk->eid = 0;
+			$pk->x = $this->x;
+			$pk->y = $this->y;
+			$pk->z = $this->z;
+			$pk->bodyYaw = $this->yaw;
+			$pk->pitch = $this->pitch;
+			$pk->yaw = $this->yaw;
+			$this->dataPacket($pk);
+		}
 	}
 
 
