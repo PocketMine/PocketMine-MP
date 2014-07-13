@@ -150,7 +150,9 @@ class MainLogger extends \AttachableThreadedLogger{
 			$this->attachment->call($level, $message);
 		}
 
+		$this->lock();
 		$this->logStream .= date("Y-m-d", $now) . " " . $cleanMessage;
+		$this->unlock();
 	}
 
 	public function run(){
@@ -161,16 +163,14 @@ class MainLogger extends \AttachableThreadedLogger{
 		}
 
 		while($this->shutdown === false){
-			if(strlen($this->logStream) >= 4096){
+			if($this->logStream){
 				$this->lock();
-				$chunks = strlen($this->logStream) >> 12;
-				$chunk = substr($this->logStream, 0, $chunks << 12);
-				$this->logStream = substr($this->logStream, $chunks << 12);
+				$chunks = $this->logStream;
+				$this->logStream = '';
 				$this->unlock();
-				fwrite($this->logResource, $chunk);
-			}else{
-				usleep(250000); //sleep for 0.25 seconds
+				fwrite($this->logResource, $chunks);
 			}
+			time_nanosleep(0,250000000);
 		}
 		if(strlen($this->logStream) > 0){
 			fwrite($this->logResource, $this->logStream);
