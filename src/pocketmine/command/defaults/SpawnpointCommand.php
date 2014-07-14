@@ -66,13 +66,24 @@ class SpawnpointCommand extends VanillaCommand{
 
 		if(count($args) === 4){
 			if($level !== null){
-				$x = (int) $this->getRelativeDouble($sender->x, $sender, $args[1]);
-				$y = (int) $this->getRelativeDouble($sender->y, $sender, $args[2], 0, 128);
-				$z = (int) $this->getRelativeDouble($sender->z, $sender, $args[3]);
-				$target->setSpawn(new Position($x, $y, $z, $level));
-				Command::broadcastCommandMessage($sender, "Set " . $target->getName() . "'s spawnpoint to " . $x . ", " . $y . ", " . $z);
+                if($sender instanceof Player){
+                    $x = (int) $this->getRelativeDouble($sender->x, $sender, $args[1]);
+                    $y = (int) $this->getRelativeDouble($sender->y, $sender, $args[2], 0, 128);
+                    $z = (int) $this->getRelativeDouble($sender->z, $sender, $args[3]);
+                    $target->setSpawn(new Position($x, $y, $z, $level));
+                    Command::broadcastCommandMessage($sender, "Set " . $target->getName() . "'s spawnpoint to " . $x . ", " . $y . ", " . $z);
 
-				return true;
+                    return true;
+                }
+                else{//Console, or RCON. Because they don't have $sender->x to use getRelativeDouble on.
+                    $x = (int) $args[1];
+                    $y = (int) $args[2];
+                    $z = (int) $args[3];
+                    $target->setSpawn(new Position($x, $y, $z, $level));
+                    Command::broadcastCommandMessage($sender, "Set " . $target->getName() . "'s spawnpoint to " . $x . ", " . $y . ", " . $z);
+
+                    return true;
+                }
 			}
 		}elseif(count($args) <= 1){
 			if($sender instanceof Player){
