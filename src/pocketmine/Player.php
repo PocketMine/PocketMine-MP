@@ -499,10 +499,10 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					$entity->despawnFrom($this);
 				}
 			}
-			$pk = new UnloadChunkPacket();
+			/*$pk = new UnloadChunkPacket();
 			$pk->chunkX = $x;
 			$pk->chunkZ = $z;
-			$this->dataPacket($pk);
+			$this->dataPacket($pk);*/
 			$this->getLevel()->freeChunk($x, $z, $this);
 			unset($this->usedChunks[$index]);
 
@@ -584,7 +584,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			$this->chunkLoadTask->setNextRun($this->chunkLoadTask->getNextRun() + 30);
 		}else{
 			$count = 0;
-			$limit = (int) $this->server->getProperty("chunk-sending.per-tick", 1);
+			$limit = (int) $this->server->getProperty("chunk-sending.per-tick", 4);
 			foreach($this->loadQueue as $index => $distance){
 				if($count >= $limit){
 					break;
@@ -594,8 +594,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				$Z = null;
 				Level::getXZ($index, $X, $Z);
 				if(!$this->getLevel()->isChunkPopulated($X, $Z)){
-					$this->chunkLoadTask->setNextRun($this->chunkLoadTask->getNextRun() + 5);
-					return;
+					continue;
 				}
 
 				unset($this->loadQueue[$index]);
@@ -713,10 +712,10 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					$entity->despawnFrom($this);
 				}
 			}
-			$pk = new UnloadChunkPacket();
+			/*$pk = new UnloadChunkPacket();
 			$pk->chunkX = $X;
 			$pk->chunkZ = $Z;
-			$this->dataPacket($pk);
+			$this->dataPacket($pk);*/
 			unset($this->usedChunks[$index]);
 		}
 	}
@@ -1652,7 +1651,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					}elseif($target instanceof Player){
 						if(($target->getGamemode() & 0x01) > 0){
 							break;
-						}elseif($this->server->getConfigBoolean("pvp") === false or $this->server->getDifficulty() === 0){
+						}elseif($this->server->getConfigBoolean("pvp") !== true or $this->server->getDifficulty() === 0){
 							$cancelled = true;
 						}
 
@@ -2222,6 +2221,22 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 		if($this->dead === true){
 			return;
 		}
+		if(($this->getGamemode() & 0x01) === 1){
+			if($source instanceof EntityDamageEvent){
+				$cause = $source->getCause();
+			}else{
+				$cause = $source;
+			}
+
+			if(
+				$cause !== EntityDamageEvent::CAUSE_MAGIC
+				and $cause !== EntityDamageEvent::CAUSE_SUICIDE
+				and $cause !== EntityDamageEvent::CAUSE_VOID
+			){
+				return;
+			}
+		}
+
 		$pk = new EntityEventPacket();
 		$pk->eid = 0;
 		$pk->event = 2;

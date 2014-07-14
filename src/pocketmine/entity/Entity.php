@@ -414,6 +414,8 @@ abstract class Entity extends Position implements Metadatable{
 
 	public function entityBaseTick(){
 		//TODO: check vehicles
+
+
 		if($this->dead === true and !($this instanceof Player)){
 			$this->close();
 
@@ -494,7 +496,7 @@ abstract class Entity extends Position implements Metadatable{
 			Server::broadcastPacket($this->hasSpawned, $pk);
 		}
 
-		if(!($this instanceof Player) and ($this->lastMotionX != $this->motionX or $this->lastMotionY != $this->motionY or $this->lastMotionZ != $this->motionZ)){
+		if(($this->lastMotionX != $this->motionX or $this->lastMotionY != $this->motionY or $this->lastMotionZ != $this->motionZ)){
 			$this->lastMotionX = $this->motionX;
 			$this->lastMotionY = $this->motionY;
 			$this->lastMotionZ = $this->motionZ;
@@ -504,6 +506,12 @@ abstract class Entity extends Position implements Metadatable{
 				[$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
 			];
 			Server::broadcastPacket($this->hasSpawned, $pk);
+
+			if($this instanceof Player){
+				$this->motionX = 0;
+				$this->motionY = 0;
+				$this->motionZ = 0;
+			}
 		}
 	}
 
@@ -640,10 +648,10 @@ abstract class Entity extends Position implements Metadatable{
 						$entity->despawnFrom($this);
 					}
 
-					$pk = new UnloadChunkPacket();
+					/*$pk = new UnloadChunkPacket();
 					$pk->chunkX = $X;
 					$pk->chunkZ = $Z;
-					$this->dataPacket($pk);
+					$this->dataPacket($pk);*/
 				}
 				$this->getLevel()->freeAllChunks($this);
 			}
