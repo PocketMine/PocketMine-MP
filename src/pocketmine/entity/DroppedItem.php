@@ -107,14 +107,6 @@ class DroppedItem extends Entity{
 		return true;
 	}
 
-	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
-
-	}
-
-	public function heal($amount){
-
-	}
-
 	public function saveNBT(){
 		$this->namedtag->Item = new Compound("Item", [
 			"id" => new Short("id", $this->item->getID()),
