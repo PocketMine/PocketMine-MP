@@ -80,11 +80,11 @@ abstract class Living extends Entity implements Damageable{
 	}
 
 	public function heal($amount){
+		$this->setHealth($this->getHealth() + $amount);
 		$this->server->getPluginManager()->callEvent($ev = new EntityRegainHealthEvent($this, $amount));
 		if($ev->isCancelled()){
 			return;
 		}
-		$this->setHealth($this->getHealth() + $amount);
 	}
 
 	public function kill(){
