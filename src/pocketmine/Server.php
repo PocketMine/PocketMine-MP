@@ -512,6 +512,13 @@ class Server{
 	}
 
 	/**
+	 * @return ConsoleComamndSender
+	 */
+	public function getConsoleSender(){
+		return $this->consoleSender;
+	}
+
+	/**
 	 * @return ServerScheduler
 	 */
 	public function getScheduler(){
