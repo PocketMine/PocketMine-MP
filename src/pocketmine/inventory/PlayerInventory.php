@@ -83,7 +83,7 @@ class PlayerInventory extends BaseInventory{
 		if($item instanceof Item){
 			return $item;
 		}else{
-			return Item::get(Item::AIR);
+			return Item::get(Item::AIR, 0, 0);
 		}
 	}
 
@@ -333,7 +333,7 @@ class PlayerInventory extends BaseInventory{
 					$pk->hotbar[] = $index <= -1 ? -1 : $index + 9;
 				}
 			}
-			if(($id = $player->getWindowId($this)) === -1){
+			if(($id = $player->getWindowId($this)) === -1 or $player->spawned !== true){
 				$this->close($player);
 				continue;
 			}

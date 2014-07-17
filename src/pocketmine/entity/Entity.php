@@ -33,6 +33,7 @@ use pocketmine\event\entity\EntityMotionEvent;
 use pocketmine\event\entity\EntityMoveEvent;
 use pocketmine\event\entity\EntitySpawnEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
+use pocketmine\event\Timings;
 use pocketmine\level\format\Chunk;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -42,6 +43,8 @@ use pocketmine\metadata\Metadatable;
 use pocketmine\metadata\MetadataValue;
 use pocketmine\nbt\tag\Byte;
 use pocketmine\nbt\tag\Compound;
+use pocketmine\nbt\tag\Double;
+use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Float;
 use pocketmine\nbt\tag\Short;
 use pocketmine\network\protocol\MoveEntityPacket;
@@ -201,22 +204,28 @@ abstract class Entity extends Position implements Metadatable{
 	}
 
 	public function saveNBT(){
-		$this->namedtag["Pos"][0] = $this->x;
-		$this->namedtag["Pos"][1] = $this->y;
-		$this->namedtag["Pos"][2] = $this->z;
+		$this->namedtag->Pos = new Enum("Pos", [
+			new Double(0, $this->x),
+			new Double(1, $this->y),
+			new Double(2, $this->z)
+		]);
 
-		$this->namedtag["Motion"][0] = $this->motionX;
-		$this->namedtag["Motion"][1] = $this->motionY;
-		$this->namedtag["Motion"][2] = $this->motionZ;
+		$this->namedtag->Motion = new Enum("Motion", [
+			new Double(0, $this->motionX),
+			new Double(1, $this->motionY),
+			new Double(2, $this->motionZ)
+		]);
 
-		$this->namedtag["Rotation"][0] = $this->yaw;
-		$this->namedtag["Rotation"][1] = $this->pitch;
+		$this->namedtag->Rotation = new Enum("Rotation", [
+			new Float(0, $this->yaw),
+			new Float(1, $this->pitch)
+		]);
 
-		$this->namedtag["FallDistance"] = $this->fallDistance;
-		$this->namedtag["Fire"] = $this->fireTicks;
-		$this->namedtag["Air"] = $this->airTicks;
-		$this->namedtag["OnGround"] = $this->onGround == true ? 1 : 0;
-		$this->namedtag["Invulnerable"] = $this->invulnerable == true ? 1 : 0;
+		$this->namedtag->FallDistance = new Float("FallDistance", $this->fallDistance);
+		$this->namedtag->Fire = new Short("Fire", $this->fireTicks);
+		$this->namedtag->Air = new Short("Air", $this->airTicks);
+		$this->namedtag->OnGround = new Byte("OnGround", $this->onGround == true ? 1 : 0);
+		$this->namedtag->Invulnerable = new Byte("Invulnerable", $this->invulnerable == true ? 1 : 0);
 	}
 
 	protected abstract function initEntity();
@@ -405,6 +414,8 @@ abstract class Entity extends Position implements Metadatable{
 
 	public function entityBaseTick(){
 		//TODO: check vehicles
+
+
 		if($this->dead === true and !($this instanceof Player)){
 			$this->close();
 
@@ -485,7 +496,7 @@ abstract class Entity extends Position implements Metadatable{
 			Server::broadcastPacket($this->hasSpawned, $pk);
 		}
 
-		if(!($this instanceof Player) and ($this->lastMotionX != $this->motionX or $this->lastMotionY != $this->motionY or $this->lastMotionZ != $this->motionZ)){
+		if(($this->lastMotionX != $this->motionX or $this->lastMotionY != $this->motionY or $this->lastMotionZ != $this->motionZ)){
 			$this->lastMotionX = $this->motionX;
 			$this->lastMotionY = $this->motionY;
 			$this->lastMotionZ = $this->motionZ;
@@ -495,6 +506,12 @@ abstract class Entity extends Position implements Metadatable{
 				[$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
 			];
 			Server::broadcastPacket($this->hasSpawned, $pk);
+
+			if($this instanceof Player){
+				$this->motionX = 0;
+				$this->motionY = 0;
+				$this->motionZ = 0;
+			}
 		}
 	}
 
@@ -631,10 +648,10 @@ abstract class Entity extends Position implements Metadatable{
 						$entity->despawnFrom($this);
 					}
 
-					$pk = new UnloadChunkPacket();
+					/*$pk = new UnloadChunkPacket();
 					$pk->chunkX = $X;
 					$pk->chunkZ = $Z;
-					$this->dataPacket($pk);
+					$this->dataPacket($pk);*/
 				}
 				$this->getLevel()->freeAllChunks($this);
 			}
@@ -668,6 +685,8 @@ abstract class Entity extends Position implements Metadatable{
 		if($dx == 0 and $dz == 0 and $dy == 0){
 			return;
 		}
+
+		Timings::$entityMoveTimer->startTiming();
 
 		$ox = $this->x;
 		$oy = $this->y;
@@ -832,6 +851,7 @@ abstract class Entity extends Position implements Metadatable{
 
 		//TODO: vehicle collision events (first we need to spawn them!)
 
+		Timings::$entityMoveTimer->stopTiming();
 
 	}
 
@@ -986,6 +1006,8 @@ abstract class Entity extends Position implements Metadatable{
 
 		$this->setMotion(new Vector3(0, 0, 0));
 		if($this->setPositionAndRotation($pos, $yaw === null ? $this->yaw : $yaw, $pitch === null ? $this->pitch : $pitch, true) !== false){
+			$this->fallDistance = 0;
+			$this->onGround = true;
 			return true;
 		}
 

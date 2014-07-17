@@ -47,6 +47,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
+use pocketmine\event\Timings;
 use pocketmine\inventory\BaseTransaction;
 use pocketmine\inventory\BigShapelessRecipe;
 use pocketmine\inventory\CraftingTransactionGroup;
@@ -498,15 +499,16 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					$entity->despawnFrom($this);
 				}
 			}
-			$pk = new UnloadChunkPacket();
+			/*$pk = new UnloadChunkPacket();
 			$pk->chunkX = $x;
 			$pk->chunkZ = $z;
-			$this->dataPacket($pk);
+			$this->dataPacket($pk);*/
 			$this->getLevel()->freeChunk($x, $z, $this);
 			unset($this->usedChunks[$index]);
+
+			$this->orderChunks();
 		}
 		unset($this->loadQueue[$index]);
-		$this->orderChunks();
 	}
 
 	/**
@@ -582,7 +584,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			$this->chunkLoadTask->setNextRun($this->chunkLoadTask->getNextRun() + 30);
 		}else{
 			$count = 0;
-			$limit = (int) $this->server->getProperty("chunk-sending.per-tick", 1);
+			$limit = (int) $this->server->getProperty("chunk-sending.per-tick", 4);
 			foreach($this->loadQueue as $index => $distance){
 				if($count >= $limit){
 					break;
@@ -592,8 +594,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				$Z = null;
 				Level::getXZ($index, $X, $Z);
 				if(!$this->getLevel()->isChunkPopulated($X, $Z)){
-					$this->chunkLoadTask->setNextRun($this->chunkLoadTask->getNextRun() + 5);
-					return;
+					continue;
 				}
 
 				unset($this->loadQueue[$index]);
@@ -624,10 +625,6 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 			$this->spawned = true;
 
-			$this->sendSettings();
-			$this->inventory->sendContents($this);
-			$this->inventory->sendArmorContents($this);
-
 			$this->blocked = false;
 
 			$pk = new SetTimePacket;
@@ -641,6 +638,10 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			$this->server->getPluginManager()->callEvent($ev = new PlayerRespawnEvent($this, $pos));
 
 			$this->teleport($ev->getRespawnPosition());
+
+			$this->sendSettings();
+			$this->inventory->sendContents($this);
+			$this->inventory->sendArmorContents($this);
 
 			$this->spawnToAll();
 
@@ -711,10 +712,10 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					$entity->despawnFrom($this);
 				}
 			}
-			$pk = new UnloadChunkPacket();
+			/*$pk = new UnloadChunkPacket();
 			$pk->chunkX = $X;
 			$pk->chunkZ = $Z;
-			$this->dataPacket($pk);
+			$this->dataPacket($pk);*/
 			unset($this->usedChunks[$index]);
 		}
 	}
@@ -1410,11 +1411,11 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					if($blockVector->distance($this) > 10){
 
 					}elseif(($this->gamemode & 0x01) === 1){
-						$item = $this->inventory->getItemInHand();;
+						$item = $this->inventory->getItemInHand();
 						if($this->getLevel()->useItemOn($blockVector, $item, $packet->face, $packet->fx, $packet->fy, $packet->fz, $this) === true){
 							break;
 						}
-					}elseif($this->inventory->getItemInHand()->getID() !== $packet->item or ($this->inventory->getItemInHand()->isTool() === false and $this->inventory->getItemInHand()->getDamage() !== $packet->meta)){
+					}elseif($this->inventory->getItemInHand()->getID() !== $packet->item or (($damage = $this->inventory->getItemInHand()->getDamage()) !== $packet->meta and $damage !== null)){
 						$this->inventory->sendHeldItem($this);
 					}else{
 						$item = clone $this->inventory->getItemInHand();
@@ -1611,6 +1612,14 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				$this->craftingType = 0;
 
 				$target = $this->getLevel()->getEntity($packet->target);
+				
+				if(
+					$target instanceof Player and
+					$this->server->getConfigBoolean("pvp",true) === false
+				
+				){
+					$cancelled = true;
+				}
 
 				if($target instanceof Entity and $this->getGamemode() !== Player::VIEW and $this->blocked === false and $this->dead !== true and $target->dead !== true){
 					$cancelled = false;
@@ -1642,7 +1651,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					];
 
 					$damage = [
-						EntityDamageByEntityEvent::MODIFIER_BASE => isset($damageTable[$item->getID()]) ? $damageTable[$item->getID()] : 1,
+						EntityDamageEvent::MODIFIER_BASE => isset($damageTable[$item->getID()]) ? $damageTable[$item->getID()] : 1,
 					];
 
 					if($this->distance($target) > 8){
@@ -1650,7 +1659,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					}elseif($target instanceof Player){
 						if(($target->getGamemode() & 0x01) > 0){
 							break;
-						}elseif($this->server->getConfigBoolean("pvp") === false or $this->server->getDifficulty() === 0){
+						}elseif($this->server->getConfigBoolean("pvp") !== true or $this->server->getDifficulty() === 0){
 							$cancelled = true;
 						}
 
@@ -1845,7 +1854,9 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 						break;
 					}
 					if(substr($ev->getMessage(), 0, 1) === "/"){ //Command
+						Timings::$playerCommandTimer->startTiming();
 						$this->server->dispatchCommand($ev->getPlayer(), substr($ev->getMessage(), 1));
+						Timings::$playerCommandTimer->stopTiming();
 					}else{
 						$this->server->getPluginManager()->callEvent($ev = new PlayerChatEvent($this, $ev->getMessage()));
 						if(!$ev->isCancelled()){
@@ -2209,15 +2220,33 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 	public function setHealth($amount){
 		parent::setHealth($amount);
-		$pk = new SetHealthPacket();
-		$pk->health = $this->getHealth();
-		$this->dataPacket($pk);
+		if($this->spawned === true){
+			$pk = new SetHealthPacket();
+			$pk->health = $this->getHealth();
+			$this->dataPacket($pk);
+		}
 	}
 
 	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
 		if($this->dead === true){
 			return;
 		}
+		if(($this->getGamemode() & 0x01) === 1){
+			if($source instanceof EntityDamageEvent){
+				$cause = $source->getCause();
+			}else{
+				$cause = $source;
+			}
+
+			if(
+				$cause !== EntityDamageEvent::CAUSE_MAGIC
+				and $cause !== EntityDamageEvent::CAUSE_SUICIDE
+				and $cause !== EntityDamageEvent::CAUSE_VOID
+			){
+				return;
+			}
+		}
+
 		$pk = new EntityEventPacket();
 		$pk->eid = 0;
 		$pk->event = 2;

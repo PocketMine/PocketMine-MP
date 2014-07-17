@@ -77,8 +77,10 @@ class ServerScheduler{
 	 * @return void
 	 */
 	public function scheduleAsyncTask(AsyncTask $task){
+		$id = $this->nextId();
+		$task->setTaskId($id);
 		$this->asyncPool->submit($task);
-		$this->asyncTaskStorage[spl_object_hash($task)] = $task;
+		$this->asyncTaskStorage[$id] = $task;
 		++$this->asyncTasks;
 	}
 
@@ -178,7 +180,7 @@ class ServerScheduler{
 			$period = 1;
 		}
 
-		return $this->handle(new TaskHandler($task, $this->nextId(), $delay, $period));
+		return $this->handle(new TaskHandler(get_class($task), $task, $this->nextId(), $delay, $period));
 	}
 
 	private function handle(TaskHandler $handler){
@@ -201,12 +203,15 @@ class ServerScheduler{
 	public function mainThreadHeartbeat($currentTick){
 		$this->currentTick = $currentTick;
 		while($this->isReady($this->currentTick)){
+			/** @var TaskHandler $task */
 			$task = $this->queue->extract();
 			if($task->isCancelled()){
 				unset($this->tasks[$task->getTaskId()]);
 				continue;
 			}else{
+				$task->timings->startTiming();
 				$task->run($this->currentTick);
+				$task->timings->stopTiming();
 			}
 			if($task->isRepeating()){
 				$task->setNextRun($this->currentTick + $task->getPeriod());
@@ -219,6 +224,12 @@ class ServerScheduler{
 
 		if($this->asyncTasks > 0){ //Garbage collector
 			$this->asyncPool->collect([$this, "collectAsyncTask"]);
+
+			foreach($this->asyncTaskStorage as $asyncTask){
+				if($asyncTask->isFinished() and !$asyncTask->isCompleted()){
+					$this->collectAsyncTask($asyncTask);
+				}
+			}
 		}
 	}
 
@@ -227,7 +238,7 @@ class ServerScheduler{
 			--$this->asyncTasks;
 			$task->onCompletion(Server::getInstance());
 			$task->setCompleted();
-			unset($this->asyncTaskStorage[spl_object_hash($task)]);
+			unset($this->asyncTaskStorage[$task->getTaskId()]);
 			return true;
 		}
 		return false;
