@@ -33,7 +33,7 @@ class Stone extends Solid{
 	const POLISHED_ANDESITE = 6;
 
 	public function __construct($meta = 0){
-		parent::__construct(self::STONE, $meta, "Stone");
+		parent::__construct(parent::STONE, $meta, "Stone");
 		$names = [
 			self::NORMAL => "Stone",
 			self::GRANITE => "Granite",
