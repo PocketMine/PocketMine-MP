@@ -31,7 +31,7 @@ use pocketmine\plugin\Plugin;
 abstract class PluginEvent extends Event{
 
 	/** @var Plugin */
-	private $plugin;
+	protected $plugin;
 
 	public function __construct(Plugin $plugin){
 		$this->plugin = $plugin;
