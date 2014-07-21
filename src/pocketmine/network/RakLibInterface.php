@@ -73,6 +73,7 @@ use pocketmine\network\protocol\UnloadChunkPacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\network\protocol\UseItemPacket;
 use pocketmine\Player;
+use pocketmine\scheduler\CallbackTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use raklib\protocol\EncapsulatedPacket;
@@ -96,6 +97,11 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 	/** @var ServerHandler */
 	private $interface;
 
+	private $tickTask;
+
+	private $upload = 0;
+	private $download = 0;
+
 	public function __construct(Server $server){
 		$this->server = $server;
 		$this->identifers = new \SplObjectStorage();
@@ -103,11 +109,15 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 		$server = new RakLibServer($this->server->getLogger(), $this->server->getLoader(), $this->server->getPort(), $this->server->getIp() === "" ? "0.0.0.0" : $this->server->getIp());
 		$this->interface = new ServerHandler($server, $this);
 		$this->setName($this->server->getMotd());
+		$this->tickTask = $this->server->getScheduler()->scheduleRepeatingTask(new CallbackTask([$this, "doTick"]), 1);
+	}
 
+	public function doTick(){
+		$this->interface->sendTick();
 	}
 
 	public function process(){
-		$this->interface->handlePacket();
+		return $this->interface->handlePacket();
 	}
 
 	public function closeSession($identifier, $reason){
@@ -130,10 +140,12 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 	}
 
 	public function shutdown(){
+		$this->tickTask->cancel();
 		$this->interface->shutdown();
 	}
 
 	public function emergencyShutdown(){
+		$this->tickTask->cancel();
 		$this->interface->emergencyShutdown();
 	}
 
@@ -153,6 +165,14 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 		}
 	}
 
+	public function handleRaw($address, $port, $payload){
+		$this->server->handlePacket($address, $port, $payload);
+	}
+
+	public function putRaw($address, $port, $payload){
+		$this->interface->sendRaw($address, $port, $payload);
+	}
+
 	public function notifyACK($identifier, $identifierACK){
 		if(isset($this->players[$identifier])){
 			$this->players[$identifier]->handleACK($identifierACK);
@@ -164,7 +184,19 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 	}
 
 	public function handleOption($name, $value){
-		//TODO
+		if($name === "bandwidth"){
+			$v = unserialize($value);
+			$this->upload = $v["up"];
+			$this->download = $v["down"];
+		}
+	}
+
+	public function getUploadUsage(){
+		return $this->upload;
+	}
+
+	public function getDownloadUsage(){
+		return $this->download;
 	}
 
 	public function putPacket(Player $player, DataPacket $packet, $needACK = false, $immediate = false){

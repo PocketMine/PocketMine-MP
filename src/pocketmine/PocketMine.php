@@ -74,9 +74,9 @@ namespace pocketmine {
 	use raklib\RakLib;
 
 	const VERSION = "Alpha_1.4dev";
-	const API_VERSION = "1.0.0";
+	const API_VERSION = "1.1.0";
 	const CODENAME = "絶好(Zekkou)ケーキ(Cake)";
-	const MINECRAFT_VERSION = "v0.9.0 alpha";
+	const MINECRAFT_VERSION = "v0.9.4 alpha";
 	const PHP_VERSION = "5.5";
 
 	if(\Phar::running(true) !== ""){
@@ -85,24 +85,21 @@ namespace pocketmine {
 		@define("pocketmine\\PATH", \getcwd() . DIRECTORY_SEPARATOR);
 	}
 
+	if(!extension_loaded("pthreads")){
+		echo "[CRITICAL] Unable to find the pthreads extension." . PHP_EOL;
+		echo "[CRITICAL] Please use the installer provided on the homepage.". PHP_EOL;
+		exit(1);
+	}
+
 	if(!class_exists("SplClassLoader", false)){
 		require_once(\pocketmine\PATH . "src/spl/SplClassLoader.php");
 	}
 
-	if(!class_exists("Logger", false)){
-		require_once(\pocketmine\PATH . "src/spl/Logger.php");
-		require_once(\pocketmine\PATH . "src/spl/LogLevel.php");
-	}
-
-	if(!class_exists("ThreadedLogger", false)){
-		require_once(\pocketmine\PATH . "src/spl/ThreadedLogger.php");
-	}
-
-
 	$autoloader = new \SplClassLoader();
-	$autoloader->add("pocketmine", array(
+	$autoloader->setMode(\SplAutoloader::MODE_DEBUG);
+	$autoloader->add("pocketmine", [
 		\pocketmine\PATH . "src"
-	));
+	]);
 
 	$autoloader->register(true);
 	if(!class_exists("raklib\\RakLib", false)){
@@ -144,7 +141,7 @@ namespace pocketmine {
 		}
 	}
 
-	gc_enable();
+	gc_disable();
 	error_reporting(E_ALL | E_STRICT);
 	ini_set("allow_url_fopen", 1);
 	ini_set("display_errors", 1);
@@ -244,18 +241,13 @@ namespace pocketmine {
 		++$errors;
 	}
 
-	if(!extension_loaded("pthreads")){
-		$logger->critical("Unable to find the pthreads extension.");
+	$pthreads_version = phpversion("pthreads");
+	if(substr_count($pthreads_version, ".") < 2){
+		$pthreads_version = "0.$pthreads_version";
+	}
+	if(version_compare($pthreads_version, "2.0.4") < 0){
+		$logger->critical("pthreads >= 2.0.4 is required, while you have $pthreads_version.");
 		++$errors;
-	}else{
-		$pthreads_version = phpversion("pthreads");
-		if(substr_count($pthreads_version, ".") < 2){
-			$pthreads_version = "0.$pthreads_version";
-		}
-		if(version_compare($pthreads_version, "2.0.4") < 0){
-			$logger->critical("pthreads >= 2.0.4 is required, while you have $pthreads_version.");
-			++$errors;
-		}
 	}
 
 	if(!extension_loaded("uopz")){

@@ -81,7 +81,9 @@ class RegionLoader{
 	public function readChunk($x, $z, $generate = true){
 		$index = self::getChunkOffset($x, $z);
 		if($index < 0 or $index >= 4096){
-			return false;
+			//Regenerate chunk due to corruption
+			$this->locationTable[$index][0] = 0;
+			$this->locationTable[$index][1] = 1;
 		}
 
 		if(!$this->isChunkGenerated($index)){
@@ -114,13 +116,14 @@ class RegionLoader{
 			$this->writeLocationIndex($index);
 		}elseif($compression !== self::COMPRESSION_ZLIB and $compression !== self::COMPRESSION_GZIP){
 			trigger_error("Invalid compression type", E_USER_WARNING);
-
 			return false;
 		}
 
 		$nbt = new NBT(NBT::BIG_ENDIAN);
 		$nbt->readCompressed(fread($this->filePointer, $length - 1), $compression);
 		$chunk = $nbt->getData();
+
+
 		if(!isset($chunk->Level) or !($chunk->Level instanceof Compound)){
 			return false;
 		}

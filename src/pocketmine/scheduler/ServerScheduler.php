@@ -29,7 +29,7 @@ use pocketmine\Server;
 use pocketmine\utils\ReversePriorityQueue;
 
 class ServerScheduler{
-	public static $WORKERS = 3;
+	public static $WORKERS = 4;
 	/**
 	 * @var ReversePriorityQueue<Task>
 	 */
@@ -44,6 +44,9 @@ class ServerScheduler{
 	protected $asyncPool;
 
 	protected $asyncTasks = 0;
+
+	/** @var AsyncTask[] */
+	protected $asyncTaskStorage = [];
 
 	/** @var int */
 	private $ids = 1;
@@ -74,7 +77,10 @@ class ServerScheduler{
 	 * @return void
 	 */
 	public function scheduleAsyncTask(AsyncTask $task){
+		$id = $this->nextId();
+		$task->setTaskId($id);
 		$this->asyncPool->submit($task);
+		$this->asyncTaskStorage[$id] = $task;
 		++$this->asyncTasks;
 	}
 
@@ -168,13 +174,13 @@ class ServerScheduler{
 			$delay = -1;
 		}
 
-		if($period === 1){
-			$period = 1;
-		}elseif($period < -1){
+		if($period <= -1){
 			$period = -1;
+		}elseif($period < 1){
+			$period = 1;
 		}
 
-		return $this->handle(new TaskHandler($task, $this->nextId(), $delay, $period));
+		return $this->handle(new TaskHandler(get_class($task), $task, $this->nextId(), $delay, $period));
 	}
 
 	private function handle(TaskHandler $handler){
@@ -197,12 +203,15 @@ class ServerScheduler{
 	public function mainThreadHeartbeat($currentTick){
 		$this->currentTick = $currentTick;
 		while($this->isReady($this->currentTick)){
+			/** @var TaskHandler $task */
 			$task = $this->queue->extract();
 			if($task->isCancelled()){
 				unset($this->tasks[$task->getTaskId()]);
 				continue;
 			}else{
+				$task->timings->startTiming();
 				$task->run($this->currentTick);
+				$task->timings->stopTiming();
 			}
 			if($task->isRepeating()){
 				$task->setNextRun($this->currentTick + $task->getPeriod());
@@ -214,16 +223,25 @@ class ServerScheduler{
 		}
 
 		if($this->asyncTasks > 0){ //Garbage collector
-			$this->asyncPool->collect(function (AsyncTask $task){
-				if($task->isFinished()){
-					--$this->asyncTasks;
-					$task->onCompletion(Server::getInstance());
-					return true;
-				}
+			$this->asyncPool->collect([$this, "collectAsyncTask"]);
 
-				return false;
-			});
+			foreach($this->asyncTaskStorage as $asyncTask){
+				if($asyncTask->isFinished() and !$asyncTask->isCompleted()){
+					$this->collectAsyncTask($asyncTask);
+				}
+			}
 		}
+	}
+
+	public function collectAsyncTask(AsyncTask $task){
+		if($task->isFinished() and !$task->isCompleted()){
+			--$this->asyncTasks;
+			$task->onCompletion(Server::getInstance());
+			$task->setCompleted();
+			unset($this->asyncTaskStorage[$task->getTaskId()]);
+			return true;
+		}
+		return false;
 	}
 
 	private function isReady($currentTicks){

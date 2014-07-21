@@ -21,12 +21,14 @@
 
 namespace pocketmine\plugin;
 
+use pocketmine\command\defaults\TimingsCommand;
 use pocketmine\command\PluginCommand;
 use pocketmine\command\SimpleCommandMap;
 use pocketmine\event\Event;
 use pocketmine\event\EventPriority;
 use pocketmine\event\HandlerList;
 use pocketmine\event\Listener;
+use pocketmine\event\TimingsHandler;
 use pocketmine\permission\Permissible;
 use pocketmine\permission\Permission;
 use pocketmine\Server;
@@ -81,6 +83,11 @@ class PluginManager{
 	 * @var PluginLoader[]
 	 */
 	protected $fileAssociations = [];
+
+	/** @var TimingsHandler */
+	public static $pluginParentTimer;
+
+	public static $useTimings = false;
 
 	/**
 	 * @param Server           $server
@@ -306,8 +313,10 @@ class PluginManager{
 				}
 			}
 
+			TimingsCommand::$timingStart = microtime(true);
 			return $loadedPlugins;
 		}else{
+			TimingsCommand::$timingStart = microtime(true);
 			return [];
 		}
 	}
@@ -666,9 +675,15 @@ class PluginManager{
 						$ignoreCancelled = true;
 					}
 				}
+
 				$parameters = $method->getParameters();
 				if(count($parameters) === 1 and $parameters[0]->getClass() instanceof \ReflectionClass and is_subclass_of($parameters[0]->getClass()->getName(), "pocketmine\\event\\Event")){
-					$this->registerEvent($parameters[0]->getClass()->getName(), $listener, $priority, new MethodEventExecutor($method->getName()), $plugin, $ignoreCancelled);
+					$class = $parameters[0]->getClass()->getName();
+					$reflection = new \ReflectionClass($class);
+					if(preg_match("/^[\t ]*\\* @deprecated[\t ]{1,}$/m", (string) $reflection->getDocComment(), $matches) > 0 and $this->server->getProperty("settings.deprecated-verbose", true)){
+						$this->server->getLogger()->warning('"'.$plugin->getName().'" has registered a listener for '.$class.' on method "'.get_class($listener).'::'.$method.', but the event is Deprecated.');
+					}
+					$this->registerEvent($class, $listener, $priority, new MethodEventExecutor($method->getName()), $plugin, $ignoreCancelled);
 				}
 			}
 		}
@@ -688,11 +703,14 @@ class PluginManager{
 		if(!is_subclass_of($event, "pocketmine\\event\\Event")){
 			throw new \Exception($event . " is not a valid Event");
 		}
+
 		if(!$plugin->isEnabled()){
 			throw new \Exception("Plugin attempted to register " . $event . " while not enabled");
 		}
 
-		$this->getEventListeners($event)->register(new RegisteredListener($listener, $executor, $priority, $plugin, $ignoreCancelled));
+		$timings = new TimingsHandler("Plugin: ".$plugin->getDescription()->getFullName()." Event: ".get_class($listener)."::".($executor instanceof MethodEventExecutor ? $executor->getMethod() : "???")."(".(new \ReflectionClass($event))->getShortName().")", self::$pluginParentTimer);
+
+		$this->getEventListeners($event)->register(new RegisteredListener($listener, $executor, $priority, $plugin, $ignoreCancelled, $timings));
 	}
 
 	/**
@@ -706,6 +724,20 @@ class PluginManager{
 		}
 
 		return $event::$handlerList;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function useTimings(){
+		return self::$useTimings;
+	}
+
+	/**
+	 * @param bool $use
+	 */
+	public function setUseTimings($use){
+		self::$useTimings = (bool) $use;
 	}
 
 }

@@ -22,12 +22,92 @@
 namespace pocketmine\entity;
 
 
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntityDeathEvent;
+use pocketmine\event\entity\EntityRegainHealthEvent;
+use pocketmine\event\Timings;
+use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\Short;
+use pocketmine\network\protocol\EntityEventPacket;
+use pocketmine\Server;
+use pocketmine\item\Item;
+
 abstract class Living extends Entity implements Damageable{
 
 	protected $gravity = 0.08;
 	protected $drag = 0.02;
 
 	protected function initEntity(){
+		if(isset($this->namedtag->HealF)){
+			$this->namedtag->Health = new Short("Health", (int) $this->namedtag["HealF"]);
+			unset($this->namedtag->HealF);
+		}
 
+		if(!isset($this->namedtag->Health) or !($this->namedtag->Health instanceof Short)){
+			$this->namedtag->Health = new Short("Health", $this->getMaxHealth());
+		}
+
+		$this->setHealth($this->namedtag["Health"]);
+	}
+
+	public function saveNBT(){
+		parent::saveNBT();
+		$this->namedtag->Health = new Short("Health", $this->getHealth());
+	}
+
+	public abstract function getName();
+
+	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
+		//TODO: attack tick limit
+		$pk = new EntityEventPacket();
+		$pk->eid = $this->getID();
+		$pk->event = 2; //Ouch!
+		Server::broadcastPacket($this->hasSpawned, $pk);
+		$this->setLastDamageCause($source);
+		$motion = new Vector3(0, 0, 0);
+		if($source instanceof EntityDamageByEntityEvent){
+			$e = $source->getDamager();
+			$deltaX = $this->x - $e->x;
+			$deltaZ = $this->z - $e->z;
+			$yaw = atan2($deltaX, $deltaZ);
+			$motion->x = sin($yaw) * 0.5;
+			$motion->z = cos($yaw) * 0.5;
+		}
+		$this->setMotion($motion);
+		$this->setHealth($this->getHealth() - $damage);
+
+	}
+
+	public function heal($amount){
+		$this->server->getPluginManager()->callEvent($ev = new EntityRegainHealthEvent($this, $amount));
+		if($ev->isCancelled()){
+			return;
+		}
+		$this->setHealth($this->getHealth() + $amount);
+	}
+
+	public function kill(){
+		if($this->dead){
+			return;
+		}
+		parent::kill();
+		$this->server->getPluginManager()->callEvent($ev = new EntityDeathEvent($this, $this->getDrops()));
+		foreach($ev->getDrops() as $item){
+			$this->getLevel()->dropItem($this, $item);
+		}
+	}
+
+	public function entityBaseTick(){
+		Timings::$timerEntityBaseTick->startTiming();
+		parent::entityBaseTick();
+		Timings::$timerEntityBaseTick->stopTiming();
+	}
+
+	/**
+	 * @return Item[]
+	 */
+	public function getDrops(){
+		return [];
 	}
 }

@@ -95,9 +95,10 @@ abstract class BaseChunk implements Chunk{
 		if(count($biomeColors) === 256){
 			$this->biomeColors = $biomeColors;
 		}else{
-			$this->biomeColors = array_fill(0, 256, Binary::readInt("\x01\x85\xb2\x4a"));
+			$this->biomeColors = array_fill(0, 256, Binary::readInt("\x00\x85\xb2\x4a"));
 		}
 
+		$this->getLevel()->getLevel()->timings->syncChunkLoadEntitiesTimer->startTiming();
 		foreach($entities as $nbt){
 			if($nbt instanceof Compound){
 				if(!isset($nbt->id)){
@@ -115,8 +116,9 @@ abstract class BaseChunk implements Chunk{
 				}
 			}
 		}
+		$this->getLevel()->getLevel()->timings->syncChunkLoadEntitiesTimer->stopTiming();
 
-
+		$this->getLevel()->getLevel()->timings->syncChunkLoadTileEntitiesTimer->startTiming();
 		foreach($tiles as $nbt){
 			if($nbt instanceof Compound){
 				if(!isset($nbt->id)){
@@ -135,6 +137,7 @@ abstract class BaseChunk implements Chunk{
 				}
 			}
 		}
+		$this->getLevel()->getLevel()->timings->syncChunkLoadTileEntitiesTimer->stopTiming();
 	}
 
 	public function getX(){
@@ -153,7 +156,7 @@ abstract class BaseChunk implements Chunk{
 	}
 
 	public function getBlock($x, $y, $z, &$blockId, &$meta = null){
-		return $this->sections[$y >> 4]->getBlock($x, $y & 0x0f, $z, $blockId, $meta);
+		$this->sections[$y >> 4]->getBlock($x, $y & 0x0f, $z, $blockId, $meta);
 	}
 
 	public function setBlock($x, $y, $z, $blockId = null, $meta = null){

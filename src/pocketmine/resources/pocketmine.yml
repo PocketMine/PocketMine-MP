@@ -4,10 +4,13 @@
 
 settings:
  shutdown-message: "Server closed"
+ query-plugins: true
+ deprecated-verbose: true
+ enable-profiling: false
  advanced-cache: false
  upnp-forwarding: false
  send-usage: true
- async-workers: 3
+ async-workers: 4
 
 debug:
  #If > 1, it will show debug messages in the console
@@ -16,8 +19,14 @@ debug:
  commands: false
 
 chunk-sending:
- per-tick: 1
- compression-level: 7
+ per-tick: 4
+ compression-level: 9
+
+chunk-ticking:
+ per-tick: 80
+ tick-radius: 2
+ light-updates: false
+ clear-tick-list: false
 
 chunk-gc:
  period-in-ticks: 600
