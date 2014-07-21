@@ -28,7 +28,7 @@ use pocketmine\event\Cancellable;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 
-class EntityDeathEvent extends EntityEvent{
+class EntityDeathEvent extends EntityEvent implements Cancellable{
 	public static $handlerList = null;
 
 	/** @var Item[] */
