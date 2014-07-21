@@ -1,8 +1,6 @@
-[submodule "src/pocketmine/gui"]
+[submodule "PocketMine-GUI"]
 	path = src/pocketmine/gui
-	url = https://github.com/PocketMine/PocketMine-MP-GUI.git
-	branch = master
-[submodule "src/raklib"]
+	url = https://github.com/PocketMine/PocketMine-MP-GUI
+[submodule "RakLib"]
 	path = src/raklib
-	url = https://github.com/PocketMine/RakLib.git
-	branch = master
+	url = https://github.com/PocketMine/RakLib

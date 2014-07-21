@@ -1,0 +1,9 @@
+@echo off
+git pull
+cd src
+cd raklib
+git pull
+cd ..
+cd pocketmine
+cd gui
+git pull
