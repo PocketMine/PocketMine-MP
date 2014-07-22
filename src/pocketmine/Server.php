@@ -1707,6 +1707,7 @@ class Server{
 		}
 
 		foreach($this->getLevels() as $level){
+			$level->save(true);
 			$this->unloadLevel($level, true);
 		}
 		$this->generationManager->shutdown();
