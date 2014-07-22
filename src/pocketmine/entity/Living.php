@@ -38,6 +38,11 @@ abstract class Living extends Entity implements Damageable{
 	protected $gravity = 0.08;
 	protected $drag = 0.02;
 
+	/**
+	 * @var EntithDeathEvent
+	 */
+	protected $currentDeathEvent = null;
+
 	protected function initEntity(){
 		if(isset($this->namedtag->HealF)){
 			$this->namedtag->Health = new Short("Health", (int) $this->namedtag["HealF"]);
@@ -75,6 +80,12 @@ abstract class Living extends Entity implements Damageable{
 			$motion->z = cos($yaw) * 0.5;
 		}
 		$this->setMotion($motion);
+		if($this->getHealth() <= $damage){
+			$this->server->getPluginManager()->callEvent($this->currentDeathEvent = new EntityDeathEvent($this, $this->getDrops()));
+			if($this->currentDeathEvent->isCancelled()){
+				return;
+			}
+		}
 		$this->setHealth($this->getHealth() - $damage);
 
 	}
@@ -92,10 +103,13 @@ abstract class Living extends Entity implements Damageable{
 			return;
 		}
 		parent::kill();
-		$this->server->getPluginManager()->callEvent($ev = new EntityDeathEvent($this, $this->getDrops()));
-		foreach($ev->getDrops() as $item){
+		if(!($this->currentDeathEvent instanceof EntityDeathEvent)){
+			$this->server->getPluginManager()->callEvent($this->currentDeathEvent = new EntityDeathEvent($this, $this->getDrops()));
+		}
+		foreach($this->currentDeathEvent->getDrops() as $item){
 			$this->getLevel()->dropItem($this, $item);
 		}
+		$this->currentDeathEvent = null;
 	}
 
 	public function entityBaseTick(){
