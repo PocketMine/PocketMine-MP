@@ -26,9 +26,9 @@ use pocketmine\event\Cancellable
 use pocketmine\level\Level;
 use pocketmine\Player
 
-abstract class ChunkUseEvent extends LevelEvent implement Cancellable{
+class ChunkUseEvent extends LevelEvent implement Cancellable{
 
-  /** @var int */
+  	/** @var int */
 	private $x;
 	
 	/** @var int */
