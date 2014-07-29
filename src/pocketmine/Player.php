@@ -2342,6 +2342,9 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 		$this->server->getPlayerMetadata()->removeMetadata($this, $metadataKey, $plugin);
 	}
 
+	public function __toString(){
+		return $this->username;
+	}
 
 }
 
