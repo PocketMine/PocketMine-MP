@@ -54,7 +54,7 @@ class BanCommand extends VanillaCommand{
 		$sender->getServer()->getNameBans()->addBan($name, $reason, null, $sender->getName());
 
 		if(($player = $sender->getServer()->getPlayerExact($name)) instanceof Player){
-			$player->kick("Banned by admin.");
+			$player->kick("Banned by Op.");
 		}
 
 		Command::broadcastCommandMessage($sender, "Banned player " . $name);
