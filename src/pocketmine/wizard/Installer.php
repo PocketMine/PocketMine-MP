@@ -23,19 +23,19 @@
  * Set-up wizard used on the first run
  * Can be disabled with --no-wizard
  */
-namespace pocketmine\wizard;
+namespace PocketMine\Wizard;
 
-use pocketmine\utils\Config;
-use pocketmine\utils\Utils;
+use PocketMine;
+use PocketMine\Utils\Utils as Utils;
 
 class Installer{
 	const DEFAULT_NAME = "Minecraft: PE Server";
 	const DEFAULT_PORT = 19132;
-	const DEFAULT_MEMORY = 256;
+	const DEFAULT_MEMORY = 128;
 	const DEFAULT_PLAYERS = 20;
-	const DEFAULT_GAMEMODE = 0;
+	const DEFAULT_GAMEMODE = SURVIVAL;
 
-	private $lang;
+	private $lang, $config;
 
 	public function __construct(){
 		echo "[*] PocketMine-MP set-up wizard\n";
@@ -50,17 +50,9 @@ class Installer{
 				echo "[!] Couldn't find the language\n";
 				$lang = false;
 			}
-		}while($lang == false);
+		} while($lang == false);
 		$this->lang = new InstallerLang($lang);
-
-
 		echo "[*] " . $this->lang->language_has_been_selected . "\n";
-
-		if(!$this->showLicense()){
-			\pocketmine\kill(getmypid());
-			exit(-1);
-		}
-
 		echo "[?] " . $this->lang->skip_installer . " (y/N): ";
 		if(strtolower($this->getInput()) === "y"){
 			return;
@@ -75,7 +67,7 @@ class Installer{
 		$this->endWizard();
 	}
 
-	private function showLicense(){
+	private function welcome(){
 		echo $this->lang->welcome_to_pocketmine . "\n";
 		echo <<<LICENSE
 
@@ -89,13 +81,8 @@ LICENSE;
 		if(strtolower($this->getInput("n")) != "y"){
 			echo "[!] " . $this->lang->you_have_to_accept_the_license . "\n";
 			sleep(5);
-			return false;
+			exit(0);
 		}
-
-		return true;
-	}
-
-	private function welcome(){
 		echo "[*] " . $this->lang->setting_up_server_now . "\n";
 		echo "[*] " . $this->lang->default_values_info . "\n";
 		echo "[*] " . $this->lang->server_properties . "\n";
@@ -103,7 +90,7 @@ LICENSE;
 	}
 
 	private function generateBaseConfig(){
-		$config = new Config(\pocketmine\DATA . "server.properties", Config::PROPERTIES);
+		$config = new UtilsConfig(\PocketMine\DATA . "server.properties", UtilsConfig::PROPERTIES);
 		echo "[?] " . $this->lang->name_your_server . " (" . self::DEFAULT_NAME . "): ";
 		$config->set("server-name", $this->getInput(self::DEFAULT_NAME));
 		echo "[*] " . $this->lang->port_warning . "\n";
@@ -113,7 +100,7 @@ LICENSE;
 			if($port <= 0 or $port > 65535){
 				echo "[!] " . $this->lang->invalid_port . "\n";
 			}
-		}while($port <= 0 or $port > 65535);
+		} while($port <= 0 or $port > 65535);
 		$config->set("server-port", $port);
 		echo "[*] " . $this->lang->ram_warning . "\n";
 		echo "[?] " . $this->lang->server_ram . " (" . self::DEFAULT_MEMORY . "): ";
@@ -122,7 +109,7 @@ LICENSE;
 		do{
 			echo "[?] " . $this->lang->default_gamemode . ": (" . self::DEFAULT_GAMEMODE . "): ";
 			$gamemode = (int) $this->getInput(self::DEFAULT_GAMEMODE);
-		}while($gamemode < 0 or $gamemode > 3);
+		} while($gamemode < 0 or $gamemode > 3);
 		$config->set("gamemode", $gamemode);
 		echo "[?] " . $this->lang->max_players . " (" . self::DEFAULT_PLAYERS . "): ";
 		$config->set("max-players", (int) $this->getInput(self::DEFAULT_PLAYERS));
@@ -130,7 +117,7 @@ LICENSE;
 		echo "[?] " . $this->lang->spawn_protection . " (Y/n): ";
 		if(strtolower($this->getInput("y")) == "n"){
 			$config->set("spawn-protection", -1);
-		}else{
+		} else{
 			$config->set("spawn-protection", 16);
 		}
 		$config->save();
@@ -142,31 +129,31 @@ LICENSE;
 		$op = strtolower($this->getInput(""));
 		if($op === ""){
 			echo "[!] " . $this->lang->op_warning . "\n";
-		}else{
-			$ops = new Config(\pocketmine\DATA . "ops.txt", Config::ENUM);
+		} else{
+			$ops = new UtilsConfig(\PocketMine\DATA . "ops.txt", UtilsConfig::ENUM);
 			$ops->set($op, true);
 			$ops->save();
 		}
 		echo "[*] " . $this->lang->whitelist_info . "\n";
 		echo "[?] " . $this->lang->whitelist_enable . " (y/N): ";
-		$config = new Config(\pocketmine\DATA . "server.properties", Config::PROPERTIES);
+		$config = new UtilsConfig(\PocketMine\DATA . "server.properties", UtilsConfig::PROPERTIES);
 		if(strtolower($this->getInput("n")) === "y"){
 			echo "[!] " . $this->lang->whitelist_warning . "\n";
 			$config->set("white-list", true);
-		}else{
+		} else{
 			$config->set("white-list", false);
 		}
 		$config->save();
 	}
 
 	private function networkFunctions(){
-		$config = new Config(\pocketmine\DATA . "server.properties", Config::PROPERTIES);
+		$config = new UtilsConfig(\PocketMine\DATA . "server.properties", UtilsConfig::PROPERTIES);
 		echo "[!] " . $this->lang->query_warning1 . "\n";
 		echo "[!] " . $this->lang->query_warning2 . "\n";
 		echo "[?] " . $this->lang->query_disable . " (y/N): ";
 		if(strtolower($this->getInput("n")) === "y"){
 			$config->set("enable-query", false);
-		}else{
+		} else{
 			$config->set("enable-query", true);
 		}
 
@@ -177,17 +164,17 @@ LICENSE;
 			$password = substr(base64_encode(Utils::getRandomBytes(20, false)), 3, 10);
 			$config->set("rcon.password", $password);
 			echo "[*] " . $this->lang->rcon_password . ": " . $password . "\n";
-		}else{
+		} else{
 			$config->set("enable-rcon", false);
 		}
 
-		/*echo "[*] " . $this->lang->usage_info . "\n";
+		echo "[*] " . $this->lang->usage_info . "\n";
 		echo "[?] " . $this->lang->usage_disable . " (y/N): ";
 		if(strtolower($this->getInput("n")) === "y"){
 			$config->set("send-usage", false);
-		}else{
+		} else{
 			$config->set("send-usage", true);
-		}*/
+		}
 		$config->save();
 
 

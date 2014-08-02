@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\wizard;
+namespace PocketMine\Wizard;
 
+use PocketMine;
 
 class InstallerLang{
 	public static $languages = array(
@@ -32,30 +33,28 @@ class InstallerLang{
 		"de" => "Deutsch",
 		//"vi" => "Tiếng Việt",
 		"ko" => "한국어",
-		"nl" => "Nederlands",
 		"fr" => "Français",
 		"it" => "Italiano",
 		//"lv" => "Latviešu",
-		"ms" => "Melayu",
-		"no" => "Norsk",
+		"nl" => "Nederlands",
 		//"pt" => "Português",
 		"sv" => "Svenska",
 		"fi" => "Suomi",
 		"tr" => "Türkçe",
 		//"et" => "Eesti",
 	);
-	private $texts = [];
+	private $texts = array();
 	private $lang;
 	private $langfile;
 
 	public function __construct($lang = ""){
-		if(file_exists(\pocketmine\PATH . "src/pocketmine/lang/Installer/" . $lang . ".ini")){
+		if(file_exists(\PocketMine\PATH . "src/lang/Installer/" . $lang . ".ini")){
 			$this->lang = $lang;
-			$this->langfile = \pocketmine\PATH . "src/pocketmine/lang/Installer/" . $lang . ".ini";
-		}else{
-			$l = glob(\pocketmine\PATH . "src/pocketmine/lang/Installer/" . $lang . "_*.ini");
+			$this->langfile = \PocketMine\PATH . "src/lang/Installer/" . $lang . ".ini";
+		} else{
+			$l = glob(\PocketMine\PATH . "src/lang/Installer/" . $lang . "_*.ini");
 			if(count($l) > 0){
-				$files = [];
+				$files = array();
 				foreach($l as $file){
 					$files[$file] = filesize($file);
 				}
@@ -64,14 +63,14 @@ class InstallerLang{
 				$l = key($files);
 				$l = substr($l, strrpos($l, "/") + 1, -4);
 				$this->lang = isset(self::$languages[$l]) ? $l : $lang;
-				$this->langfile = \pocketmine\PATH . "src/pocketmine/lang/Installer/" . $l . ".ini";
-			}else{
+				$this->langfile = \PocketMine\PATH . "src/lang/Installer/" . $l . ".ini";
+			} else{
 				$this->lang = "en";
-				$this->langfile = \pocketmine\PATH . "src/pocketmine/lang/Installer/en.ini";
+				$this->langfile = \PocketMine\PATH . "src/lang/Installer/en.ini";
 			}
 		}
 
-		$this->loadLang(\pocketmine\PATH . "src/pocketmine/lang/Installer/en.ini", "en");
+		$this->loadLang(\PocketMine\PATH . "src/lang/Installer/en.ini", "en");
 		if($this->lang !== "en"){
 			$this->loadLang($this->langfile, $this->lang);
 		}
@@ -83,28 +82,28 @@ class InstallerLang{
 	}
 
 	public function loadLang($langfile, $lang = "en"){
-		$this->texts[$lang] = [];
-		$texts = explode("\n", str_replace(array("\r", "\\/\\/"), array("", "//"), file_get_contents($langfile)));
+		$this->texts[$lang] = array();
+		$texts = explode("\n", str_replace(array("\r", "\/\/"), array("", "//"), file_get_contents($langfile)));
 		foreach($texts as $line){
 			$line = trim($line);
 			if($line === ""){
 				continue;
 			}
 			$line = explode("=", $line);
-			$this->texts[$lang][trim(array_shift($line))] = trim(str_replace(array("\\n", "\\N",), "\n", implode("=", $line)));
+			$this->texts[$lang][array_shift($line)] = str_replace(array("\\n", "\\N",), "\n", implode("=", $line));
 		}
 	}
 
-	public function get($name, $search = [], $replace = []){
+	public function get($name, $search = array(), $replace = array()){
 		if(!isset($this->texts[$this->lang][$name])){
 			if($this->lang !== "en" and isset($this->texts["en"][$name])){
 				return $this->texts["en"][$name];
-			}else{
+			} else{
 				return $name;
 			}
-		}elseif(count($search) > 0){
+		} elseif(count($search) > 0){
 			return str_replace($search, $replace, $this->texts[$this->lang][$name]);
-		}else{
+		} else{
 			return $this->texts[$this->lang][$name];
 		}
 	}

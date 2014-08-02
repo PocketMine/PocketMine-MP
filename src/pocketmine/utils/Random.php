@@ -19,34 +19,34 @@
  *
 */
 
-namespace pocketmine\utils;
+namespace PocketMine\Utils;
 
+use PocketMine;
 
 /**
+ * Class Random
+ *
  * Unsecure Random Number Generator, used for fast seeded values
- * WARNING: This class is available on the PocketMine-MP Zephir project.
- * If this class is modified, remember to modify the PHP C extension.
+ *
+ * @package PocketMine\Utils
  */
 class Random{
-
-	protected $seed;
+	private $z, $w;
 
 	/**
-	 * @param int $seed Integer to be used as seed.
+	 * @param int|bool $seed Integer to be used as seed. If false, generates a Random one
 	 */
-	public function __construct($seed = -1){
-		if($seed == -1){
-			$seed = time();
-		}
-
+	public function __construct($seed = false){
 		$this->setSeed($seed);
 	}
 
 	/**
-	 * @param int $seed Integer to be used as seed.
+	 * @param int|bool $seed Integer to be used as seed. If false, generates a Random one
 	 */
-	public function setSeed($seed){
-		$this->seed = crc32(Binary::writeInt($seed));
+	public function setSeed($seed = false){
+		$seed = $seed !== false ? (int) $seed : Utils::readInt(Utils::getRandomBytes(4, false));
+		$this->z = $seed ^ 0xdeadbeef;
+		$this->w = $seed ^ 0xc0de1337;
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Random{
 	 * @return int
 	 */
 	public function nextInt(){
-		return $this->nextSignedInt() & 0x7fffffff;
+		return Utils::readInt($this->nextBytes(4)) & 0x7FFFFFFF;
 	}
 
 	/**
@@ -64,14 +64,7 @@ class Random{
 	 * @return int
 	 */
 	public function nextSignedInt(){
-		$t = crc32(Binary::writeInt($this->seed));
-		$this->seed ^= $t;
-
-		if($t > 2147483647){
-			$t -= 4294967296;
-		}
-
-		return (int) $t;
+		return Utils::readInt($this->nextBytes(4));
 	}
 
 	/**
@@ -80,7 +73,7 @@ class Random{
 	 * @return float
 	 */
 	public function nextFloat(){
-		return $this->nextInt() / 0x7fffffff;
+		return $this->nextInt() / 0x7FFFFFFF;
 	}
 
 	/**
@@ -89,7 +82,25 @@ class Random{
 	 * @return float
 	 */
 	public function nextSignedFloat(){
-		return $this->nextSignedInt() / 0x7fffffff;
+		return $this->nextSignedInt() / 0x7FFFFFFF;
+	}
+
+	/**
+	 * Returns $byteCount random bytes
+	 *
+	 * @param $byteCount
+	 *
+	 * @return string
+	 */
+	public function nextBytes($byteCount){
+		$bytes = "";
+		while(strlen($bytes) < $byteCount){
+			$this->z = 36969 * ($this->z & 65535) + ($this->z >> 16);
+			$this->w = 18000 * ($this->w & 65535) + ($this->w >> 16);
+			$bytes .= pack("N", ($this->z << 16) + $this->w);
+		}
+
+		return substr($bytes, 0, $byteCount);
 	}
 
 	/**
@@ -105,7 +116,7 @@ class Random{
 	 * Returns a random integer between $start and $end
 	 *
 	 * @param int $start default 0
-	 * @param int $end   default PHP_INT_MAX
+	 * @param int $end default PHP_INT_MAX
 	 *
 	 * @return int
 	 */

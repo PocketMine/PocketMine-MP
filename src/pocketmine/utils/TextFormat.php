@@ -19,11 +19,16 @@
  *
 */
 
-namespace pocketmine\utils;
+namespace PocketMine\Utils;
 
+use PocketMine;
 
 /**
+ * Class TextFormat
+ *
  * Class used to handle Minecraft chat format, and convert it to other formats like ANSI or HTML
+ *
+ * @package PocketMine\Utils
  */
 class TextFormat{
 	const BLACK = "§0";
@@ -70,194 +75,6 @@ class TextFormat{
 	 */
 	public static function clean($string){
 		return preg_replace(array("/§[0123456789abcdefklmnor]/", "/\\x1b*/"), "", $string);
-	}
-
-	/**
-	 * Returns an JSON-formatted string with colors/markup
-	 *
-	 * @param string|array $string
-	 *
-	 * @return string
-	 */
-	public static function toJSON($string){
-		if(!is_array($string)){
-			$string = self::tokenize($string);
-		}
-		$newString = [];
-		$pointer =& $newString;
-		$color = "white";
-		$bold = false;
-		$italic = false;
-		$underlined = false;
-		$strikethrough = false;
-		$obfuscated = false;
-		$index = 0;
-
-		foreach($string as $token){
-			if(isset($pointer["text"])){
-				if(!isset($newString["extra"])){
-					$newString["extra"] = [];
-				}
-				$newString["extra"][$index] = [];
-				$pointer =& $newString["extra"][$index];
-				if($color !== "white"){
-					$pointer["color"] = $color;
-				}
-				if($bold !== false){
-					$pointer["bold"] = true;
-				}
-				if($italic !== false){
-					$pointer["italic"] = true;
-				}
-				if($underlined !== false){
-					$pointer["underlined"] = true;
-				}
-				if($strikethrough !== false){
-					$pointer["strikethrough"] = true;
-				}
-				if($obfuscated !== false){
-					$pointer["obfuscated"] = true;
-				}
-				++$index;
-			}
-			switch($token){
-				case TextFormat::BOLD:
-					if($bold === false){
-						$pointer["bold"] = true;
-						$bold = true;
-					}
-					break;
-				case TextFormat::OBFUSCATED:
-					if($obfuscated === false){
-						$pointer["obfuscated"] = true;
-						$obfuscated = true;
-					}
-					break;
-				case TextFormat::ITALIC:
-					if($italic === false){
-						$pointer["italic"] = true;
-						$italic = true;
-					}
-					break;
-				case TextFormat::UNDERLINE:
-					if($underlined === false){
-						$pointer["underlined"] = true;
-						$underlined = true;
-					}
-					break;
-				case TextFormat::STRIKETHROUGH:
-					if($strikethrough === false){
-						$pointer["strikethrough"] = true;
-						$strikethrough = true;
-					}
-					break;
-				case TextFormat::RESET:
-					if($color !== "white"){
-						$pointer["color"] = "white";
-						$color = "white";
-					}
-					if($bold !== false){
-						$pointer["bold"] = false;
-						$bold = false;
-					}
-					if($italic !== false){
-						$pointer["italic"] = false;
-						$italic = false;
-					}
-					if($underlined !== false){
-						$pointer["underlined"] = false;
-						$underlined = false;
-					}
-					if($strikethrough !== false){
-						$pointer["strikethrough"] = false;
-						$strikethrough = false;
-					}
-					if($obfuscated !== false){
-						$pointer["obfuscated"] = false;
-						$obfuscated = false;
-					}
-					break;
-
-				//Colors
-				case TextFormat::BLACK:
-					$pointer["color"] = "black";
-					$color = "black";
-					break;
-				case TextFormat::DARK_BLUE:
-					$pointer["color"] = "dark_blue";
-					$color = "dark_blue";
-					break;
-				case TextFormat::DARK_GREEN:
-					$pointer["color"] = "dark_green";
-					$color = "dark_green";
-					break;
-				case TextFormat::DARK_AQUA:
-					$pointer["color"] = "dark_aqua";
-					$color = "dark_aqua";
-					break;
-				case TextFormat::DARK_RED:
-					$pointer["color"] = "dark_red";
-					$color = "dark_red";
-					break;
-				case TextFormat::DARK_PURPLE:
-					$pointer["color"] = "dark_purple";
-					$color = "dark_purple";
-					break;
-				case TextFormat::GOLD:
-					$pointer["color"] = "gold";
-					$color = "gold";
-					break;
-				case TextFormat::GRAY:
-					$pointer["color"] = "gray";
-					$color = "gray";
-					break;
-				case TextFormat::DARK_GRAY:
-					$pointer["color"] = "dark_gray";
-					$color = "dark_gray";
-					break;
-				case TextFormat::BLUE:
-					$pointer["color"] = "blue";
-					$color = "blue";
-					break;
-				case TextFormat::GREEN:
-					$pointer["color"] = "green";
-					$color = "green";
-					break;
-				case TextFormat::AQUA:
-					$pointer["color"] = "aqua";
-					$color = "aqua";
-					break;
-				case TextFormat::RED:
-					$pointer["color"] = "red";
-					$color = "red";
-					break;
-				case TextFormat::LIGHT_PURPLE:
-					$pointer["color"] = "light_purple";
-					$color = "light_purple";
-					break;
-				case TextFormat::YELLOW:
-					$pointer["color"] = "yellow";
-					$color = "yellow";
-					break;
-				case TextFormat::WHITE:
-					$pointer["color"] = "white";
-					$color = "white";
-					break;
-				default:
-					$pointer["text"] = $token;
-					break;
-			}
-		}
-
-		if(isset($newString["extra"])){
-			foreach($newString["extra"] as $k => $d){
-				if(!isset($d["text"])){
-					unset($newString["extra"][$k]);
-				}
-			}
-		}
-
-		return json_encode($newString, JSON_UNESCAPED_SLASHES);
 	}
 
 	/**
@@ -410,28 +227,28 @@ class TextFormat{
 
 				//Colors
 				case TextFormat::BLACK:
-					$newString .= "\x1b[0;30m";
+					$newString .= "\x1b[30m";
 					break;
 				case TextFormat::DARK_BLUE:
-					$newString .= "\x1b[0;34m";
+					$newString .= "\x1b[34m";
 					break;
 				case TextFormat::DARK_GREEN:
-					$newString .= "\x1b[0;32m";
+					$newString .= "\x1b[32m";
 					break;
 				case TextFormat::DARK_AQUA:
-					$newString .= "\x1b[0;36m";
+					$newString .= "\x1b[36m";
 					break;
 				case TextFormat::DARK_RED:
-					$newString .= "\x1b[0;31m";
+					$newString .= "\x1b[31m";
 					break;
 				case TextFormat::DARK_PURPLE:
-					$newString .= "\x1b[0;35m";
+					$newString .= "\x1b[35m";
 					break;
 				case TextFormat::GOLD:
-					$newString .= "\x1b[0;33m";
+					$newString .= "\x1b[33m";
 					break;
 				case TextFormat::GRAY:
-					$newString .= "\x1b[0;37m";
+					$newString .= "\x1b[37m";
 					break;
 				case TextFormat::DARK_GRAY:
 					$newString .= "\x1b[30;1m";

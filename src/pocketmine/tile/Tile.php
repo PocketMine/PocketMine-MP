@@ -23,31 +23,25 @@
  * All the Tile classes and related classes
  * TODO: Add Nether Reactor tile
  */
-namespace pocketmine\tile;
+namespace PocketMine\Tile;
 
-use pocketmine\event\Timings;
-use pocketmine\level\format\Chunk;
-use pocketmine\level\format\FullChunk;
-use pocketmine\level\format\LevelProvider;
-use pocketmine\level\Position;
-use pocketmine\nbt\tag\Compound;
+use PocketMine\Level\Level as Level;
+use PocketMine\NBT\Tag\Compound as Compound;
+use PocketMine\PMF\LevelFormat as LevelFormat;
+use PocketMine\ServerAPI as ServerAPI;
+use PocketMine\Level\Position;
+use PocketMine;
 
 abstract class Tile extends Position{
 	const SIGN = "Sign";
 	const CHEST = "Chest";
 	const FURNACE = "Furnace";
 
-	//TODO: pre-close step NBT data saving method
-
 	public static $tileCount = 1;
+	public static $list = array();
+	public static $needUpdate = array();
 
-	/**
-	 * @var Tile[]
-	 */
-	public static $needUpdate = [];
-
-	/** @var Chunk */
-	public $chunk;
+	public $chunkIndex;
 	public $name;
 	public $id;
 	public $x;
@@ -57,42 +51,40 @@ abstract class Tile extends Position{
 	public $metadata;
 	public $closed;
 	public $namedtag;
-	protected $lastUpdate;
-	protected $server;
+	private $lastUpdate;
+	private $server;
 
-	/** @var \pocketmine\event\TimingsHandler */
-	public $tickTimer;
+	public static function getByID($tileID){
+		return isset(Tile::$list[$tileID]) ? Tile::$list[$tileID] : false;
+	}
 
-	public function __construct(FullChunk $chunk, Compound $nbt){
-		if($chunk->getLevel() === null){
-			throw new \Exception("Invalid garbage Chunk given to Tile");
-		}
-
-		$this->server = $chunk->getLevel()->getLevel()->getServer();
-		$this->chunk = $chunk;
-		$this->setLevel($chunk->getLevel()->getLevel(), true); //Strong reference
-		$this->namedtag = $nbt;
-		$this->closed = false;
-		$this->name = "";
-		$this->lastUpdate = microtime(true);
-		$this->id = Tile::$tileCount++;
-		$this->x = (int) $this->namedtag["x"];
-		$this->y = (int) $this->namedtag["y"];
-		$this->z = (int) $this->namedtag["z"];
-
-		$this->chunk->addTile($this);
-		$this->getLevel()->addTile($this);
-		$this->tickTimer = Timings::getTileEntityTimings($this);
+	public static function getAll(){
+		return Tile::$list;
 	}
 
 	public function getID(){
 		return $this->id;
 	}
 
-	public function saveNBT(){
-		$this->namedtag["x"] = $this->x;
-		$this->namedtag["y"] = $this->y;
-		$this->namedtag["z"] = $this->z;
+
+	public function __construct(Level $level, Compound $nbt){
+		$this->server = ServerAPI::request();
+		$this->level = $level;
+		$this->namedtag = $nbt;
+		$this->closed = false;
+		$this->name = "";
+		$this->lastUpdate = microtime(true);
+		$this->id = Tile::$tileCount++;
+		Tile::$list[$this->id] = $this;
+		$this->x = (int) $this->namedtag->x;
+		$this->y = (int) $this->namedtag->y;
+		$this->z = (int) $this->namedtag->z;
+
+		$index = LevelFormat::getIndex($this->x >> 4, $this->z >> 4);
+		$this->chunkIndex = $index;
+		$this->level->tiles[$this->id] = $this;
+		$this->level->chunkTiles[$this->chunkIndex][$this->id] = $this;
+		$this->server->api->dhandle("tile.add", $this);
 	}
 
 	public function onUpdate(){
@@ -103,17 +95,19 @@ abstract class Tile extends Position{
 		Tile::$needUpdate[$this->id] = $this;
 	}
 
-	public function __destruct(){
-		$this->close();
-	}
-
 	public function close(){
 		if($this->closed === false){
 			$this->closed = true;
 			unset(Tile::$needUpdate[$this->id]);
-			$this->getLevel()->removeTile($this);
-			$this->chunk->removeTile($this);
+			unset($this->level->tiles[$this->id]);
+			unset($this->level->chunkTiles[$this->chunkIndex][$this->id]);
+			unset(Tile::$list[$this->id]);
+			$this->server->api->dhandle("tile.remove", $t);
 		}
+	}
+
+	public function __destruct(){
+		$this->close();
 	}
 
 	public function getName(){

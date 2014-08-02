@@ -19,14 +19,15 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class SendInventoryPacket extends DataPacket{
 	public $eid;
 	public $windowid;
-	public $slots = [];
-	public $armor = [];
+	public $slots = array();
+	public $armor = array();
 
 	public function pid(){
 		return Info::SEND_INVENTORY_PACKET;

@@ -19,64 +19,66 @@
  *
 */
 
-namespace pocketmine\tile;
+namespace PocketMine\Tile;
 
-use pocketmine\level\format\Chunk;
-use pocketmine\level\format\FullChunk;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Int;
-use pocketmine\nbt\tag\String;
+use PocketMine\NBT\NBT as NBT;
+use PocketMine\NBT\Tag\Compound as Compound;
+use PocketMine\NBT\Tag\Int as Int;
+use PocketMine\NBT\Tag\String as String;
+use PocketMine\Network\Protocol\EntityDataPacket as EntityDataPacket;
+use PocketMine;
 
 class Sign extends Spawnable{
 
-	public function __construct(FullChunk $chunk, Compound $nbt){
-		$nbt["id"] = Tile::SIGN;
-		if(!isset($nbt->Text1)){
-			$nbt->Text1 = new String("Text1", "");
-		}
-		if(!isset($nbt->Text2)){
-			$nbt->Text2 = new String("Text2", "");
-		}
-		if(!isset($nbt->Text3)){
-			$nbt->Text3 = new String("Text3", "");
-		}
-		if(!isset($nbt->Text4)){
-			$nbt->Text4 = new String("Text4", "");
-		}
-
-		parent::__construct($chunk, $nbt);
+	public function __construct(Level $level, Compound $nbt){
+		$nbt->id = Tile::SIGN;
+		parent::__construct($level, $nbt);
 	}
 
 	public function setText($line1 = "", $line2 = "", $line3 = "", $line4 = ""){
-		$this->namedtag->Text1 = new String("Text1", $line1);
-		$this->namedtag->Text2 = new String("Text2", $line2);
-		$this->namedtag->Text3 = new String("Text3", $line3);
-		$this->namedtag->Text4 = new String("Text4", $line4);
+		$this->namedtag->Text1 = $line1;
+		$this->namedtag->Text2 = $line2;
+		$this->namedtag->Text3 = $line3;
+		$this->namedtag->Text4 = $line4;
 		$this->spawnToAll();
+		$this->server->handle("tile.update", $this);
 
 		return true;
 	}
 
 	public function getText(){
 		return array(
-			$this->namedtag["Text1"],
-			$this->namedtag["Text2"],
-			$this->namedtag["Text3"],
-			$this->namedtag["Text4"]
+			$this->namedtag->Text1,
+			$this->namedtag->Text2,
+			$this->namedtag->Text3,
+			$this->namedtag->Text4
 		);
 	}
 
-	public function getSpawnCompound(){
-		return new Compound("", array(
-			new String("Text1", $this->namedtag["Text1"]),
-			new String("Text2", $this->namedtag["Text2"]),
-			new String("Text3", $this->namedtag["Text3"]),
-			new String("Text4", $this->namedtag["Text4"]),
+	public function spawnTo(Player $player){
+		if($this->closed){
+			return false;
+		}
+
+		$nbt = new NBT(NBT::LITTLE_ENDIAN);
+		$nbt->setData(new Compound("", array(
+			new String("Text1", $this->namedtag->Text1),
+			new String("Text2", $this->namedtag->Text2),
+			new String("Text3", $this->namedtag->Text3),
+			new String("Text4", $this->namedtag->Text4),
 			new String("id", Tile::SIGN),
 			new Int("x", (int) $this->x),
 			new Int("y", (int) $this->y),
 			new Int("z", (int) $this->z)
-		));
+		)));
+		$pk = new EntityDataPacket;
+		$pk->x = $this->x;
+		$pk->y = $this->y;
+		$pk->z = $this->z;
+		$pk->namedtag = $nbt->write();
+		$player->dataPacket($pk);
+
+		return true;
 	}
 
 }

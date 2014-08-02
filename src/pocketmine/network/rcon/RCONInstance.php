@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\network\rcon;
+namespace PocketMine\Network\RCON;
 
-use pocketmine\utils\Binary;
+use PocketMine;
+use PocketMine\Utils\Utils as Utils;
 
 class RCONInstance extends \Thread{
 	public $stop;
@@ -30,7 +31,6 @@ class RCONInstance extends \Thread{
 	private $socket;
 	private $password;
 	private $maxClients;
-
 
 	public function __construct($socket, $password, $maxClients = 50){
 		$this->stop = false;
@@ -44,16 +44,15 @@ class RCONInstance extends \Thread{
 			$this->{"status" . $n} = 0;
 			$this->{"timeout" . $n} = 0;
 		}
-
 		$this->start();
 	}
 
 	private function writePacket($client, $requestID, $packetType, $payload){
-		$pk = Binary::writeLInt((int) $requestID)
-			. Binary::writeLInt((int) $packetType)
+		$pk = Utils::writeLInt((int) $requestID)
+			. Utils::writeLInt((int) $packetType)
 			. $payload
 			. "\x00\x00"; //Terminate payload and packet
-		return socket_write($client, Binary::writeLInt(strlen($pk)) . $pk);
+		return socket_write($client, Utils::writeLInt(strlen($pk)) . $pk);
 	}
 
 	private function readPacket($client, &$size, &$requestID, &$packetType, &$payload){
@@ -61,18 +60,18 @@ class RCONInstance extends \Thread{
 		$d = socket_read($client, 4);
 		if($this->stop === true){
 			return false;
-		}elseif($d === false){
+		} elseif($d === false){
 			return null;
-		}elseif($d === "" or strlen($d) < 4){
+		} elseif($d === "" or strlen($d) < 4){
 			return false;
 		}
 		@socket_set_block($client);
-		$size = Binary::readLInt($d);
+		$size = Utils::readLInt($d);
 		if($size < 0 or $size > 65535){
 			return false;
 		}
-		$requestID = Binary::readLInt(socket_read($client, 4));
-		$packetType = Binary::readLInt(socket_read($client, 4));
+		$requestID = Utils::readLInt(socket_read($client, 4));
+		$packetType = Utils::readLInt(socket_read($client, 4));
 		$payload = rtrim(socket_read($client, $size + 2)); //Strip two null bytes
 		return true;
 	}
@@ -82,7 +81,6 @@ class RCONInstance extends \Thread{
 	}
 
 	public function run(){
-
 		while($this->stop !== true){
 			usleep(2000);
 			$r = array($socket = $this->socket);
@@ -120,7 +118,7 @@ class RCONInstance extends \Thread{
 						if($p === false){
 							$this->{"status" . $n} = -1;
 							continue;
-						}elseif($p === null){
+						} elseif($p === null){
 							continue;
 						}
 
@@ -137,7 +135,7 @@ class RCONInstance extends \Thread{
 									$this->response = "";
 									$this->writePacket($client, $requestID, 2, "");
 									$this->{"status" . $n} = 1;
-								}else{
+								} else{
 									$this->{"status" . $n} = -1;
 									$this->writePacket($client, -1, 2, "");
 									continue;
@@ -158,7 +156,7 @@ class RCONInstance extends \Thread{
 								break;
 						}
 						usleep(1);
-					}else{
+					} else{
 						@socket_set_option($client, SOL_SOCKET, SO_LINGER, array("l_onoff" => 1, "l_linger" => 1));
 						@socket_shutdown($client, 2);
 						@socket_set_block($client);

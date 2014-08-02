@@ -19,14 +19,13 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class RotateHeadPacket extends DataPacket{
-
-	// eid, yaw
-	/** @var array[] */
-	public $entities = [];
+	public $eid;
+	public $yaw;
 
 	public function pid(){
 		return Info::ROTATE_HEAD_PACKET;
@@ -38,11 +37,8 @@ class RotateHeadPacket extends DataPacket{
 
 	public function encode(){
 		$this->reset();
-		$this->putInt(count($this->entities));
-		foreach($this->entities as $d){
-			$this->putInt($d[0]); //eid
-			$this->putByte((int) ($d[1] / 360));
-		}
+		$this->putInt($this->eid);
+		$this->putByte($this->yaw);
 	}
 
 }

@@ -4,7 +4,7 @@ cd "$DIR"
 
 DO_LOOP="no"
 
-while getopts "p:f:l" OPTION 2> /dev/null; do
+while getopts "p:f:l" OPTION; do
 	case $OPTION in
 		p)
 			PHP_BINARY="$OPTARG"
@@ -16,7 +16,8 @@ while getopts "p:f:l" OPTION 2> /dev/null; do
 			DO_LOOP="yes"
 			;;
 		\?)
-			break
+			echo "Invalid option: -$OPTION$OPTARG" >&2
+			exit 1
 			;;
 	esac
 done
@@ -33,10 +34,10 @@ if [ "$PHP_BINARY" == "" ]; then
 fi
 
 if [ "$POCKETMINE_FILE" == "" ]; then
-	if [ -f ./PocketMine-MP.phar ]; then
+	if [ -f ./src/PocketMine/PocketMine.php ]; then
+		POCKETMINE_FILE="./src/PocketMine/PocketMine.php"
+	elif [ -f ./PocketMine-MP.phar ]; then
 		POCKETMINE_FILE="./PocketMine-MP.phar"
-	elif [ -f ./src/pocketmine/PocketMine.php ]; then
-		POCKETMINE_FILE="./src/pocketmine/PocketMine.php"
 	else
 		echo "Couldn't find a valid PocketMine-MP installation"
 		exit 1
@@ -48,9 +49,9 @@ LOOPS=0
 set +e
 while [ "$LOOPS" -eq 0 ] || [ "$DO_LOOP" == "yes" ]; do
 	if [ "$DO_LOOP" == "yes" ]; then
-		"$PHP_BINARY" "$POCKETMINE_FILE" $@
+		"$PHP_BINARY" -d enable_dl=On "$POCKETMINE_FILE" $@
 	else
-		exec "$PHP_BINARY" "$POCKETMINE_FILE" $@
+		exec "$PHP_BINARY" -d enable_dl=On "$POCKETMINE_FILE" $@
 	fi
 	((LOOPS++))
 done

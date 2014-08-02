@@ -19,14 +19,15 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class SetEntityMotionPacket extends DataPacket{
-
-	// eid, motX, motY, motZ
-	/** @var array[] */
-	public $entities = [];
+	public $eid;
+	public $speedX;
+	public $speedY;
+	public $speedZ;
 
 	public function pid(){
 		return Info::SET_ENTITY_MOTION_PACKET;
@@ -38,13 +39,10 @@ class SetEntityMotionPacket extends DataPacket{
 
 	public function encode(){
 		$this->reset();
-		$this->putInt(count($this->entities));
-		foreach($this->entities as $d){
-			$this->putInt($d[0]); //eid
-			$this->putShort((int) ($d[1] * 8000)); //motX
-			$this->putShort((int) ($d[2] * 8000)); //motY
-			$this->putShort((int) ($d[3] * 8000)); //motZ
-		}
+		$this->putInt($this->eid);
+		$this->putShort((int) ($this->speedX * 400));
+		$this->putShort((int) ($this->speedY * 400));
+		$this->putShort((int) ($this->speedZ * 400));
 	}
 
 }

@@ -22,25 +22,23 @@
 /**
  * Implementation of the UT3 Query Protocol (GameSpot)
  * Source: http://wiki.unrealadmin.org/UT3_query_protocol
- */
-namespace pocketmine\network\query;
+*/
+namespace PocketMine\Network\Query;
 
-use pocketmine\Server;
-use pocketmine\utils\Binary;
-use pocketmine\utils\Utils;
+use PocketMine\Player as Player;
+use PocketMine\ServerAPI as ServerAPI;
+use PocketMine\Utils\Utils as Utils;
+use PocketMine;
 
 class QueryHandler{
 	private $socket, $server, $lastToken, $token, $longData, $timeout;
 
-	const HANDSHAKE = 9;
-	const STATISTICS = 0;
-
 	public function __construct(){
-		$this->server = Server::getInstance();
-		$this->server->getLogger()->info("Starting GS4 status listener");
-		$addr = ($ip = $this->server->getIp()) != "" ? $ip : "0.0.0.0";
-		$port = $this->server->getPort();
-		$this->server->getLogger()->info("Setting query port to $port");
+		console("[INFO] Starting GS4 status listener");
+		$this->server = ServerAPI::request();
+		$addr = ($ip = $this->server->api->getProperty("server-ip")) != "" ? $ip : "0.0.0.0";
+		$port = $this->server->api->getProperty("server-port");
+		console("[INFO] Setting query port to $port");
 		/*
 		The Query protocol is built on top of the existing Minecraft PE UDP network stack.
 		Because the 0xFE packet does not exist in the MCPE protocol,
@@ -50,45 +48,46 @@ class QueryHandler{
 		packets can conflict with the MCPE ones.
 		*/
 
+		$this->server->schedule(20 * 30, array($this, "regenerateToken"), array(), true);
 		$this->regenerateToken();
 		$this->lastToken = $this->token;
 		$this->regenerateInfo();
-		$this->server->getLogger()->info("Query running on $addr:$port");
+		console("[INFO] Query running on $addr:$port");
 	}
 
 	public function regenerateInfo(){
 		$str = "";
-		$plist = "PocketMine-MP " . $this->server->getPocketMineVersion();
-		$pl = $this->server->getPluginManager()->getPlugins();
-		if(count($pl) > 0 and $this->server->getProperty("settings.query-plugins", true) === true){
+		$plist = "PocketMine-MP " . PocketMine\VERSION;
+		$pl = $this->server->api->plugin->getList();
+		if(count($pl) > 0){
 			$plist .= ":";
 			foreach($pl as $p){
-				$d = $p->getDescription();
-				$plist .= " " . str_replace(array(";", ":", " "), array("", "", "_"), $d->getName()) . " " . str_replace(array(";", ":", " "), array("", "", "_"), $d->getVersion()) . ";";
+				$plist .= " " . str_replace(array(";", ":", " "), array("", "", "_"), $p["name"]) . " " . str_replace(array(";", ":", " "), array("", "", "_"), $p["version"]) . ";";
 			}
 			$plist = substr($plist, 0, -1);
 		}
 		$KVdata = array(
 			"splitnum" => chr(128),
-			"hostname" => $this->server->getServerName(),
-			"gametype" => ($this->server->getGamemode() & 0x01) === 0 ? "SMP" : "CMP",
+			"hostname" => $this->server->name,
+			"gametype" => ($this->server->gamemode & 0x01) === 0 ? "SMP" : "CMP",
 			"game_id" => "MINECRAFTPE",
-			"version" => $this->server->getVersion(),
-			"server_engine" => $this->server->getName() . " " . $this->server->getPocketMineVersion(),
+			"version" => PocketMine\MINECRAFT_VERSION,
+			"server_engine" => "PocketMine-MP " . PocketMine\VERSION,
 			"plugins" => $plist,
-			"map" => $this->server->getDefaultLevel()->getName(),
-			"numplayers" => count($this->server->getOnlinePlayers()),
-			"maxplayers" => $this->server->getMaxPlayers(),
-			"whitelist" => $this->server->hasWhitelist() === true ? "on" : "off",
-			"hostport" => $this->server->getPort()
+			"map" => $this->server->api->level->getDefault()->getName(),
+			"numplayers" => count(Player::$list),
+			"maxplayers" => $this->server->maxClients,
+			"whitelist" => $this->server->api->getProperty("white-list") === true ? "on" : "off",
+			"hostport" => $this->server->api->getProperty("server-port"),
+			//"hostip" => $this->server->api->getProperty("server-ip", "0.0.0.0")
 		);
 		foreach($KVdata as $key => $value){
 			$str .= $key . "\x00" . $value . "\x00";
 		}
 		$str .= "\x00\x01player_\x00\x00";
-		foreach($this->server->getOnlinePlayers() as $player){
-			if($player->getName() != ""){
-				$str .= $player->getName() . "\x00";
+		foreach(Player::$list as $player){
+			if($player->getUsername() != ""){
+				$str .= $player->getUsername() . "\x00";
 			}
 		}
 		$str .= "\x00";
@@ -102,40 +101,42 @@ class QueryHandler{
 	}
 
 	public static function getTokenString($token, $salt){
-		return Binary::readInt(substr(hash("sha512", $salt . ":" . $token, true), 7, 4));
+		return Utils::readInt(substr(hash("sha512", $salt . ":" . $token, true), 7, 4));
 	}
 
-	public function handle($address, $port, $packet){
-		$offset = 2;
-		$packetType = ord($packet{$offset++});
-		$sessionID = Binary::readInt(substr($packet, $offset, 4));
-		$offset += 4;
-		$payload = substr($packet, $offset);
-
-		switch($packetType){
-			case self::HANDSHAKE: //Handshake
-				$reply = chr(self::HANDSHAKE);
-				$reply .= Binary::writeInt($sessionID);
-				$reply .= self::getTokenString($this->token, $address) . "\x00";
-
-				$this->server->sendPacket($address, $port, $reply);
+	public function handle(QueryPacket $packet){
+		$packet->decode();
+		switch($packet->packetType){
+			case QueryPacket::HANDSHAKE: //Handshake
+				$pk = new QueryPacket;
+				$pk->ip = $packet->ip;
+				$pk->port = $packet->port;
+				$pk->packetType = QueryPacket::HANDSHAKE;
+				$pk->sessionID = $packet->sessionID;
+				$pk->payload = self::getTokenString($this->token, $packet->ip) . "\x00";
+				$pk->encode();
+				$this->server->send($pk);
 				break;
-			case self::STATISTICS: //Stat
-				$token = Binary::readInt(substr($payload, 0, 4));
-				if($token !== self::getTokenString($this->token, $address) and $token !== self::getTokenString($this->lastToken, $address)){
+			case QueryPacket::STATISTICS: //Stat
+				$token = Utils::readInt(substr($packet->payload, 0, 4));
+				if($token !== self::getTokenString($this->token, $packet->ip) and $token !== self::getTokenString($this->lastToken, $packet->ip)){
 					break;
 				}
-				$reply = chr(self::STATISTICS);
-				$reply .= Binary::writeInt($sessionID);
-				if(strlen($payload) === 8){
+				$pk = new QueryPacket;
+				$pk->ip = $packet->ip;
+				$pk->port = $packet->port;
+				$pk->packetType = QueryPacket::STATISTICS;
+				$pk->sessionID = $packet->sessionID;
+				if(strlen($packet->payload) === 8){
 					if($this->timeout < microtime(true)){
 						$this->regenerateInfo();
 					}
-					$reply .= $this->longData;
-				}else{
-					$reply .= $this->server->getServerName() . "\x00" . (($this->server->getGamemode() & 0x01) === 0 ? "SMP" : "CMP") . "\x00" . $this->server->getDefaultLevel()->getName() . "\x00" . count($this->server->getOnlinePlayers()) . "\x00" . $this->server->getMaxPlayers() . "\x00" . Binary::writeLShort($this->server->getPort()) . $this->server->getIp() . "\x00";
+					$pk->payload = $this->longData;
+				} else{
+					$pk->payload = $this->server->name . "\x00" . (($this->server->gamemode & 0x01) === 0 ? "SMP" : "CMP") . "\x00" . $this->server->api->level->getDefault()->getName() . "\x00" . count(Player::$list) . "\x00" . $this->server->maxClients . "\x00" . Utils::writeLShort($this->server->api->getProperty("server-port")) . $this->server->api->getProperty("server-ip", "0.0.0.0") . "\x00";
 				}
-				$this->server->sendPacket($address, $port, $reply);
+				$pk->encode();
+				$this->server->send($pk);
 				break;
 		}
 	}

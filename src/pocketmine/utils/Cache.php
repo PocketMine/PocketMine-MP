@@ -19,11 +19,12 @@
  *
 */
 
-namespace pocketmine\utils;
+namespace PocketMine\Utils;
 
+use PocketMine;
 
 class Cache{
-	public static $cached = [];
+	public static $cached = array();
 
 	/**
 	 * Adds something to the cache

@@ -22,31 +22,22 @@
 /**
  * Implementation of the Source RCON Protocol to allow remote console commands
  * Source: https://developer.valvesoftware.com/wiki/Source_RCON_Protocol
- */
-namespace pocketmine\network\rcon;
+*/
+namespace PocketMine\Network\RCON;
 
-use pocketmine\command\RemoteConsoleCommandSender;
-use pocketmine\scheduler\CallbackTask;
-use pocketmine\Server;
-use pocketmine\utils\MainLogger;
-use pocketmine\utils\TextFormat;
+use PocketMine;
+use PocketMine\ServerAPI as ServerAPI;
 
 
 class RCON{
-	private $socket;
-	private $password;
-	/** @var RCONInstance[] */
-	private $workers;
-	private $threads;
-	private $clientsPerThread;
-	private $rconSender;
+	private $socket, $password, $workers, $threads, $clientsPerThread;
 
 	public function __construct($password, $port = 19132, $interface = "0.0.0.0", $threads = 1, $clientsPerThread = 50){
-		$this->workers = [];
+		$this->workers = array();
 		$this->password = (string) $password;
-		MainLogger::getLogger()->info("Starting remote control listener");
+		console("[INFO] Starting remote control listener");
 		if($this->password === ""){
-			MainLogger::getLogger()->critical("RCON can't be started: Empty password");
+			console("[ERROR] RCON can't be started: Empty password");
 
 			return;
 		}
@@ -54,23 +45,23 @@ class RCON{
 		$this->clientsPerThread = (int) max(1, $clientsPerThread);
 		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if($this->socket === false or !socket_bind($this->socket, $interface, (int) $port) or !socket_listen($this->socket)){
-			MainLogger::getLogger()->critical("RCON can't be started: " . socket_strerror(socket_last_error()));
+			console("[ERROR] RCON can't be started: " . socket_strerror(socket_last_error()));
 
 			return;
 		}
 		@socket_set_block($this->socket);
-
 		for($n = 0; $n < $this->threads; ++$n){
 			$this->workers[$n] = new RCONInstance($this->socket, $this->password, $this->clientsPerThread);
 		}
 		@socket_getsockname($this->socket, $addr, $port);
-		MainLogger::getLogger()->info("RCON running on $addr:$port");
-		Server::getInstance()->getScheduler()->scheduleRepeatingTask(new CallbackTask(array($this, "check")), 3);
+		console("[INFO] RCON running on $addr:$port");
+		ServerAPI::request()->schedule(2, array($this, "check"), array(), true);
 	}
 
 	public function stop(){
 		for($n = 0; $n < $this->threads; ++$n){
 			$this->workers[$n]->close();
+			$this->workers[$n]->join();
 			usleep(50000);
 			$this->workers[$n]->kill();
 		}
@@ -82,13 +73,12 @@ class RCON{
 		for($n = 0; $n < $this->threads; ++$n){
 			if($this->workers[$n]->isTerminated() === true){
 				$this->workers[$n] = new RCONInstance($this->socket, $this->password, $this->clientsPerThread);
-			}elseif($this->workers[$n]->isWaiting()){
+			} elseif($this->workers[$n]->isWaiting()){
 				if($this->workers[$n]->response !== ""){
-					MainLogger::getLogger()->info($this->workers[$n]->response);
+					console($this->workers[$n]->response);
 					$this->workers[$n]->notify();
-				}else{
-					Server::getInstance()->dispatchCommand($response = new RemoteConsoleCommandSender(), $this->workers[$n]->cmd);
-					$this->workers[$n]->response = TextFormat::clean($response->getMessage());
+				} else{
+					$this->workers[$n]->response = ServerAPI::request()->api->console->run($this->workers[$n]->cmd, "rcon");
 					$this->workers[$n]->notify();
 				}
 			}

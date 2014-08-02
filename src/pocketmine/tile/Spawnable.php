@@ -19,44 +19,16 @@
  *
 */
 
-namespace pocketmine\tile;
+namespace PocketMine\Tile;
 
-use pocketmine\level\format\Chunk;
-use pocketmine\level\format\FullChunk;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\network\protocol\EntityDataPacket;
-use pocketmine\Player;
+use PocketMine;
 
 abstract class Spawnable extends Tile{
-
-	public function spawnTo(Player $player){
-		if($this->closed){
-			return false;
-		}
-
-		$nbt = new NBT(NBT::LITTLE_ENDIAN);
-		$nbt->setData($this->getSpawnCompound());
-		$pk = new EntityDataPacket;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->namedtag = $nbt->write();
-		$player->dataPacket($pk);
-
-		return true;
-	}
-
-	public abstract function getSpawnCompound();
-
-	public function __construct(FullChunk $chunk, Compound $nbt){
-		parent::__construct($chunk, $nbt);
-		$this->spawnToAll();
-	}
+	public abstract function spawnTo(Player $player);
 
 	public function spawnToAll(){
-		foreach($this->getLevel()->getPlayers() as $player){
-			if($player->spawned === true){
+		foreach($this->level->getPlayers() as $player){
+			if($player->eid !== false or $player->spawned !== true){
 				$this->spawnTo($player);
 			}
 		}
