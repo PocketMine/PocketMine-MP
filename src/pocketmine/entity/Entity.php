@@ -1052,6 +1052,12 @@ abstract class Entity extends Position implements Metadatable{
 
 	abstract public function getData();
 
+	public function __toString(){
+		$callback = function($match){
+			return " " . strtolower($match[0]);
+		}
+		return trim(preg_replace_callback("[A-Z]", $callback, array_slice(explode("\\", get_class($this)), -1)[0]));
+	}
 	public function __destruct(){
 		$this->close();
 	}
