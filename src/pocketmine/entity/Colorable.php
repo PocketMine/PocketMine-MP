@@ -24,4 +24,37 @@ namespace pocketmine\entity;
 
 interface Colorable{
 
+    /*
+     * All the colors
+     */
+
+    const INK_SAC = 0;
+    const ROSE_RED = 1;
+    const CACTUS_GREEN = 2;
+    const COCOA_BEANS = 3;
+    const LAPIS_LAZULI = 4;
+    const PURPLE = 5;
+    const CYAN = 6;
+    const LIGHT_GRAY = 7;
+    const GRAY = 8;
+    const PINK = 9;
+    const LIME = 10;
+    const DANDELION_YELLOW = 11;
+    const LIGHT_BLUE = 12;
+    const MAGENTA = 13;
+    const ORANGE = 14;
+    const BONE_MEAL = 15;
+
+    /*
+     * @param int $color
+     *
+     * @return bool
+     */
+    public function setColor($color);
+
+    /*
+     * @return int
+     */
+    public function getColor();
+
 }

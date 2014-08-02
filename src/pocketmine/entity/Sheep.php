@@ -24,4 +24,20 @@ namespace pocketmine\entity;
 
 class Sheep extends Animal implements Colorable{
 
+    /** @var int */
+    private $color = Colorable::BONE_MEAL;
+
+    public function setColor($color){
+        if($color < 16 and $color >= 0){
+            $this->color = $color;
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getColor(){
+        return $this->color;
+    }
+
 }

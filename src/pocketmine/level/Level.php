@@ -30,6 +30,7 @@ use pocketmine\entity\DroppedItem;
 use pocketmine\entity\Entity;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\level\ChunkUseEvent;
 use pocketmine\event\level\LevelSaveEvent;
 use pocketmine\event\level\LevelUnloadEvent;
 use pocketmine\event\level\SpawnChangeEvent;
@@ -343,11 +344,21 @@ class Level implements ChunkManager, Metadatable{
 	 * @param int    $X
 	 * @param int    $Z
 	 * @param Player $player
+	 * 
+	 * @return bool
 	 */
 	public function useChunk($X, $Z, Player $player){
-		$index = Level::chunkHash($X, $Z);
-		$this->loadChunk($X, $Z);
-		$this->usedChunks[$index][$player->getID()] = $player;
+		$this->server->getPluginManager()->callEvent($ev = new ChunkUseEvent($this, $x, $z, $player));
+		if(!$ev->isCancelled()){
+			
+			$index = Level::chunkHash($X, $Z);
+			$this->loadChunk($X, $Z);
+			$this->usedChunks[$index][$player->getID()] = $player;
+			
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	/**
