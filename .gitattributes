@@ -5,7 +5,6 @@
 *.txt text eol=lf
 *.properties text eol=lf
 *.bat text eol=crlf
-*.cmd text eol=crlf
 
 # Custom for Visual Studio
 *.cs     diff=csharp

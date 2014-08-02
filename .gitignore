@@ -1,11 +1,18 @@
 players/*
 worlds/*
 plugins/*
+logs/*
 bin/*
 .idea/*
 *.log
+*.pmf
 *.txt
 server.properties
+
+
+############
+## Windows
+############
 
 # Windows image file caches
 Thumbs.db
@@ -15,6 +22,3 @@ Desktop.ini
 
 # Mac crap
 .DS_Store
-
-# PHPStorm stuff
-.idea
