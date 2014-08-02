@@ -21,21 +21,18 @@
 
 /**
  * Different noise generators for level generation
- *
- * WARNING: This class is available on the PocketMine-MP Zephir project.
- * If this class is modified, remember to modify the PHP C extension.
  */
-namespace pocketmine\level\generator\noise;
+namespace PocketMine\Level\Generator\Noise;
+
+use PocketMine;
 
 
 abstract class Generator{
-	protected $perm = [];
+	protected $perm = array();
 	protected $offsetX = 0;
 	protected $offsetY = 0;
 	protected $offsetZ = 0;
 	protected $octaves = 8;
-	protected $frequency;
-	protected $amplitude;
 
 	public static function floor($x){
 		return $x >= 0 ? (int) $x : (int) ($x - 1);
@@ -61,7 +58,7 @@ abstract class Generator{
 
 	abstract public function getNoise3D($x, $y, $z);
 
-	public function noise2D($x, $z, $normalized = false){
+	public function noise2D($x, $z, $frequency, $amplitude, $normalized = false){
 		$result = 0;
 		$amp = 1;
 		$freq = 1;
@@ -70,8 +67,8 @@ abstract class Generator{
 		for($i = 0; $i < $this->octaves; ++$i){
 			$result += $this->getNoise2D($x * $freq, $z * $freq) * $amp;
 			$max += $amp;
-			$freq *= $this->frequency;
-			$amp *= $this->amplitude;
+			$freq *= $frequency;
+			$amp *= $amplitude;
 		}
 		if($normalized === true){
 			$result /= $max;
@@ -80,7 +77,7 @@ abstract class Generator{
 		return $result;
 	}
 
-	public function noise3D($x, $y, $z, $normalized = false){
+	public function noise3D($x, $y, $z, $frequency, $amplitude, $normalized = false){
 		$result = 0;
 		$amp = 1;
 		$freq = 1;
@@ -89,8 +86,8 @@ abstract class Generator{
 		for($i = 0; $i < $this->octaves; ++$i){
 			$result += $this->getNoise3D($x * $freq, $y * $freq, $z * $freq) * $amp;
 			$max += $amp;
-			$freq *= $this->frequency;
-			$amp *= $this->amplitude;
+			$freq *= $frequency;
+			$amp *= $amplitude;
 		}
 		if($normalized === true){
 			$result /= $max;

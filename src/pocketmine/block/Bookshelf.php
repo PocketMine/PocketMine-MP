@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
+use PocketMine;
 
 class Bookshelf extends Solid{
 	public function __construct(){

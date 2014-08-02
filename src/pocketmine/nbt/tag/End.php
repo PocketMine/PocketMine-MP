@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\nbt\tag;
+namespace PocketMine\NBT\Tag;
 
-use pocketmine\nbt\NBT;
+use PocketMine;
+use PocketMine\NBT\NBT as NBT;
 
 class End extends Tag{
 

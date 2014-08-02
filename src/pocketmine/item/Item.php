@@ -22,14 +22,14 @@
 /**
  * All the Item classes
  */
-namespace pocketmine\item;
-
-use pocketmine\block\Block;
-use pocketmine\entity\Entity;
-use pocketmine\inventory\Fuel;
-use pocketmine\item\Block as ItemBlock;
-use pocketmine\level\Level;
-use pocketmine\Player;
+namespace PocketMine\Item;
+use PocketMine\Block\Block as Block;
+use PocketMine\Entity\Entity as Entity;
+use PocketMine\Item\Block as ItemBlock;
+use PocketMine\Level\Level as Level;
+use PocketMine\Recipes\Fuel as Fuel;
+use PocketMine\Recipes\Smelt as Smelt;
+use PocketMine;
 
 class Item{
 	//All Block IDs are here too
@@ -55,7 +55,6 @@ class Item{
 	const GOLD_ORE = 14;
 	const IRON_ORE = 15;
 	const COAL_ORE = 16;
-	const LOG = 17;
 	const WOOD = 17;
 	const TRUNK = 17;
 	const LEAVES = 18;
@@ -77,7 +76,7 @@ class Item{
 	const WOOL = 35;
 	const DANDELION = 37;
 	const ROSE = 38;
-	const POPPY = 38;
+	const CYAN_FLOWER = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
 	const GOLD_BLOCK = 41;
@@ -171,9 +170,7 @@ class Item{
 	const NETHER_BRICKS_STAIRS = 114;
 
 	const SANDSTONE_STAIRS = 128;
-	const EMERALD_ORE = 129;
 
-	const EMERALD_BLOCK = 133;
 	const SPRUCE_WOOD_STAIRS = 134;
 	const SPRUCE_WOODEN_STAIRS = 134;
 	const BIRCH_WOOD_STAIRS = 135;
@@ -198,22 +195,10 @@ class Item{
 	const WOODEN_SLAB = 158;
 	const WOOD_SLABS = 158;
 	const WOODEN_SLABS = 158;
-	const STAINED_CLAY = 159;
-	const STAINED_HARDENED_CLAY = 159;
-
-	const LEAVES2 = 161;
-	const LEAVE2 = 161;
-	const WOOD2 = 162;
-	const TRUNK2 = 162;
-	const LOG2 = 162;
-	const ACACIA_WOOD_STAIRS = 163;
-	const ACACIA_WOODEN_STAIRS = 163;
-	const DARK_OAK_WOOD_STAIRS = 164;
-	const DARK_OAK_WOODEN_STAIRS = 164;
 
 	const HAY_BALE = 170;
 	const CARPET = 171;
-	const HARDENED_CLAY = 172;
+
 	const COAL_BLOCK = 173;
 
 	const BEETROOT_BLOCK = 244;
@@ -224,23 +209,23 @@ class Item{
 
 	//Normal Item IDs
 
-	const IRON_SHOVEL = 256; //
-	const IRON_PICKAXE = 257; //
-	const IRON_AXE = 258; //
-	const FLINT_STEEL = 259; //
-	const FLINT_AND_STEEL = 259; //
-	const APPLE = 260; //
+	const IRON_SHOVEL = 256; //Implemented
+	const IRON_PICKAXE = 257; //Implemented
+	const IRON_AXE = 258; //Implemented
+	const FLINT_STEEL = 259;
+	const FLINT_AND_STEEL = 259;
+	const APPLE = 260; //Implemented
 	const BOW = 261;
 	const ARROW = 262;
-	const COAL = 263; //
-	const DIAMOND = 264; //
-	const IRON_INGOT = 265; //
-	const GOLD_INGOT = 266; //
+	const COAL = 263; //Implemented
+	const DIAMOND = 264; //Implemented
+	const IRON_INGOT = 265; //Implemented
+	const GOLD_INGOT = 266; //Implemented
 	const IRON_SWORD = 267;
-	const WOODEN_SWORD = 268; //
-	const WOODEN_SHOVEL = 269; //
-	const WOODEN_PICKAXE = 270; //
-	const WOODEN_AXE = 271; //
+	const WOODEN_SWORD = 268; //Implemented
+	const WOODEN_SHOVEL = 269; //Implemented
+	const WOODEN_PICKAXE = 270; //Implemented
+	const WOODEN_AXE = 271; //Implemented
 	const STONE_SWORD = 272;
 	const STONE_SHOVEL = 273;
 	const STONE_PICKAXE = 274;
@@ -249,9 +234,9 @@ class Item{
 	const DIAMOND_SHOVEL = 277;
 	const DIAMOND_PICKAXE = 278;
 	const DIAMOND_AXE = 279;
-	const STICK = 280; //
+	const STICK = 280; //Implemented
 	const STICKS = 280;
-	const BOWL = 281; //
+	const BOWL = 281; //Implemented
 	const MUSHROOM_STEW = 282;
 	const GOLD_SWORD = 283;
 	const GOLD_SHOVEL = 284;
@@ -262,11 +247,11 @@ class Item{
 	const GOLDEN_PICKAXE = 285;
 	const GOLDEN_AXE = 286;
 	const STRING = 287;
-	const FEATHER = 288; //
+	const FEATHER = 288; //Implemented
 	const GUNPOWDER = 289;
 	const WOODEN_HOE = 290;
 	const STONE_HOE = 291;
-	const IRON_HOE = 292; //
+	const IRON_HOE = 292; //Implemented
 	const DIAMOND_HOE = 293;
 	const GOLD_HOE = 294;
 	const GOLDEN_HOE = 294;
@@ -352,8 +337,6 @@ class Item{
 
 	const SPAWN_EGG = 383;
 
-	const EMERALD = 388;
-
 	const CARROT = 391;
 	const CARROTS = 391;
 	const POTATO = 392;
@@ -374,8 +357,7 @@ class Item{
 	const BEETROOT_SOUP = 459;
 
 
-	/** @var Item[] */
-	public static $list = [];
+	public static $list = array();
 	protected $block;
 	protected $id;
 	protected $meta;
@@ -412,36 +394,17 @@ class Item{
 				self::BOWL => new Bowl(),
 				self::FEATHER => new Feather(),
 				self::BRICK => new Brick(),
-				self::IRON_SWORD => new IronSword(),
 				self::IRON_INGOT => new IronIngot(),
 				self::GOLD_INGOT => new GoldIngot(),
 				self::IRON_SHOVEL => new IronShovel(),
 				self::IRON_PICKAXE => new IronPickaxe(),
 				self::IRON_AXE => new IronAxe(),
 				self::IRON_HOE => new IronHoe(),
-				self::DIAMOND_SWORD => new DiamondSword(),
-				self::DIAMOND_SHOVEL => new DiamondShovel(),
-				self::DIAMOND_PICKAXE => new DiamondPickaxe(),
-				self::DIAMOND_AXE => new DiamondAxe(),
-				self::DIAMOND_HOE => new DiamondHoe(),
-				self::GOLD_SWORD => new GoldSword(),
-				self::GOLD_SHOVEL => new GoldShovel(),
-				self::GOLD_PICKAXE => new GoldPickaxe(),
-				self::GOLD_AXE => new GoldAxe(),
-				self::GOLD_HOE => new GoldHoe(),
-				self::STONE_SWORD => new StoneSword(),
-				self::STONE_SHOVEL => new StoneShovel(),
-				self::STONE_PICKAXE => new StonePickaxe(),
-				self::STONE_AXE => new StoneAxe(),
-				self::STONE_HOE => new StoneHoe(),
 				self::WOODEN_SWORD => new WoodenSword(),
 				self::WOODEN_SHOVEL => new WoodenShovel(),
 				self::WOODEN_PICKAXE => new WoodenPickaxe(),
 				self::WOODEN_AXE => new WoodenAxe(),
-				self::WOODEN_HOE => new WoodenHoe(),
 				self::FLINT_STEEL => new FlintSteel(),
-				self::SHEARS => new Shears(),
-				self::BOW => new Bow(),
 			);
 			foreach(Block::$list as $id => $class){
 				self::$list[$id] = new ItemBlock($class);
@@ -453,9 +416,9 @@ class Item{
 	public static function get($id, $meta = 0, $count = 1){
 		if(isset(self::$list[$id])){
 			$item = clone self::$list[$id];
-			$item->setDamage($meta);
+			$item->setMetadata($meta);
 			$item->setCount($count);
-		}else{
+		} else{
 			$item = new Item($id, $meta, $count);
 		}
 
@@ -464,26 +427,26 @@ class Item{
 
 	public static function fromString($str, $multiple = false){
 		if($multiple === true){
-			$blocks = [];
+			$blocks = array();
 			foreach(explode(",", $str) as $b){
 				$blocks[] = self::fromString($b, false);
 			}
 
 			return $blocks;
-		}else{
+		} else{
 			$b = explode(":", str_replace(" ", "_", trim($str)));
 			if(!isset($b[1])){
 				$meta = 0;
-			}else{
+			} else{
 				$meta = ((int) $b[1]) & 0xFFFF;
 			}
 
-			if(defined("pocketmine\\item\\Item::" . strtoupper($b[0]))){
-				$item = self::get(constant("pocketmine\\item\\Item::" . strtoupper($b[0])), $meta);
+			if(defined("PocketMine\\Item\\Item::".strtoupper($b[0]))){
+				$item = self::get(constant("PocketMine\\Item\\Item::".strtoupper($b[0])), $meta);
 				if($item->getID() === self::AIR and strtoupper($b[0]) !== "AIR"){
 					$item = self::get(((int) $b[0]) & 0xFFFF, $meta);
 				}
-			}else{
+			} else{
 				$item = self::get(((int) $b[0]) & 0xFFFF, $meta);
 			}
 
@@ -492,8 +455,8 @@ class Item{
 	}
 
 	public function __construct($id, $meta = 0, $count = 1, $name = "Unknown"){
-		$this->id = $id & 0xffff;
-		$this->meta = $meta !== null ? $meta & 0xffff : null;
+		$this->id = (int) $id;
+		$this->meta = (int) $meta;
 		$this->count = (int) $count;
 		$this->name = $name;
 		if(!isset($this->block) and $this->id <= 0xff and isset(Block::$list[$this->id])){
@@ -525,7 +488,7 @@ class Item{
 	public function getBlock(){
 		if($this->block instanceof Block){
 			return $this->block;
-		}else{
+		} else{
 			return Block::get(self::AIR);
 		}
 	}
@@ -534,12 +497,12 @@ class Item{
 		return $this->id;
 	}
 
-	final public function getDamage(){
+	final public function getMetadata(){
 		return $this->meta;
 	}
 
-	public function setDamage($meta){
-		$this->meta = $meta !== null ? $meta & 0xFFFF : null;
+	public function setMetadata($meta){
+		$this->meta = $meta & 0xFFFF;
 	}
 
 	final public function getMaxStackSize(){
@@ -557,55 +520,163 @@ class Item{
 		return false;
 	}
 
-	/**
-	 * @param Entity|Block $object
-	 *
-	 * @return bool
-	 */
-	public function useOn($object){
+	final public function getSmeltItem(){
+		if(!isset(Smelt::$product[$this->id])){
+			return false;
+		}
+
+		if(isset(Smelt::$product[$this->id][0]) and !is_array(Smelt::$product[$this->id][0])){
+			return self::get(Smelt::$product[$this->id][0], Smelt::$product[$this->id][1]);
+		}
+
+		if(!isset(Smelt::$product[$this->id][$this->meta])){
+			return false;
+		}
+
+		return self::get(Smelt::$product[$this->id][$this->meta][0], Smelt::$product[$this->id][$this->meta][1]);
+
+	}
+
+	public function useOn($object, $force = false){
+		if($this->isTool() or $force === true){
+			if(($object instanceof Entity) and !$this->isSword()){
+				$this->meta += 2;
+			} else{
+				$this->meta++;
+			}
+
+			return true;
+		} elseif($this->isHoe()){
+			if(($object instanceof Block) and ($object->getID() === self::GRASS or $object->getID() === self::DIRT)){
+				$this->meta++;
+			}
+		}
+
 		return false;
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function isTool(){
-		return false;
+	final public function isTool(){
+		return ($this->id === self::FLINT_STEEL or $this->id === self::SHEARS or $this->isPickaxe() !== false or $this->isAxe() !== false or $this->isShovel() !== false or $this->isSword() !== false);
 	}
 
-	/**
-	 * @return int|bool
-	 */
-	public function getMaxDurability(){
-		return false;
+	final public function getMaxDurability(){
+		if(!$this->isTool() and $this->isHoe() === false and $this->id !== self::BOW){
+			return false;
+		}
+
+		$levels = array(
+			2 => 33,
+			1 => 60,
+			3 => 132,
+			4 => 251,
+			5 => 1562,
+			self::FLINT_STEEL => 65,
+			self::SHEARS => 239,
+			self::BOW => 385,
+		);
+
+		if(($type = $this->isPickaxe()) === false){
+			if(($type = $this->isAxe()) === false){
+				if(($type = $this->isSword()) === false){
+					if(($type = $this->isShovel()) === false){
+						if(($type = $this->isHoe()) === false){
+							$type = $this->id;
+						}
+					}
+				}
+			}
+		}
+
+		return $levels[$type];
 	}
 
-	public function isPickaxe(){
-		return false;
+	final public function isPickaxe(){ //Returns false or level of the pickaxe
+		switch($this->id){
+			case self::IRON_PICKAXE:
+				return 4;
+			case self::WOODEN_PICKAXE:
+				return 1;
+			case self::STONE_PICKAXE:
+				return 3;
+			case self::DIAMOND_PICKAXE:
+				return 5;
+			case self::GOLD_PICKAXE:
+				return 2;
+			default:
+				return false;
+		}
 	}
 
-	public function isAxe(){
-		return false;
+	final public function isAxe(){
+		switch($this->id){
+			case self::IRON_AXE:
+				return 4;
+			case self::WOODEN_AXE:
+				return 1;
+			case self::STONE_AXE:
+				return 3;
+			case self::DIAMOND_AXE:
+				return 5;
+			case self::GOLD_AXE:
+				return 2;
+			default:
+				return false;
+		}
 	}
 
-	public function isSword(){
-		return false;
+	final public function isSword(){
+		switch($this->id){
+			case self::IRON_SWORD:
+				return 4;
+			case self::WOODEN_SWORD:
+				return 1;
+			case self::STONE_SWORD:
+				return 3;
+			case self::DIAMOND_SWORD:
+				return 5;
+			case self::GOLD_SWORD:
+				return 2;
+			default:
+				return false;
+		}
 	}
 
-	public function isShovel(){
-		return false;
+	final public function isShovel(){
+		switch($this->id){
+			case self::IRON_SHOVEL:
+				return 4;
+			case self::WOODEN_SHOVEL:
+				return 1;
+			case self::STONE_SHOVEL:
+				return 3;
+			case self::DIAMOND_SHOVEL:
+				return 5;
+			case self::GOLD_SHOVEL:
+				return 2;
+			default:
+				return false;
+		}
 	}
 
 	public function isHoe(){
-		return false;
+		switch($this->id){
+			case self::IRON_HOE:
+			case self::WOODEN_HOE:
+			case self::STONE_HOE:
+			case self::DIAMOND_HOE:
+			case self::GOLD_HOE:
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	public function isShears(){
-		return false;
+		return ($this->id === self::SHEARS);
 	}
 
 	final public function __toString(){
-		return "Item " . $this->name . " (" . $this->id . ":" . ($this->meta === null ? "?" : $this->meta) . ")";
+		return "Item " . $this->name . " (" . $this->id . ":" . $this->meta . ")";
 	}
 
 	public function getDestroySpeed(Block $block, Player $player){
@@ -617,7 +688,7 @@ class Item{
 	}
 
 	public final function equals(Item $item, $checkDamage = false){
-		return $this->id === $item->getID() and ($checkDamage === false or $this->getDamage() === $item->getDamage());
+		return $this->id === $item->getID() and ($checkDamage === false or $this->getMetadata() === $item->getMetadata());
 	}
 
 }

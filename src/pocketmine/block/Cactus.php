@@ -19,13 +19,12 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\math\Vector3 as Vector3;
-use pocketmine\Player;
-use pocketmine\Server;
+use PocketMine\Item\Item as Item;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\ServerAPI as ServerAPI;
+use PocketMine;
 
 class Cactus extends Transparent{
 	public function __construct($meta = 0){
@@ -35,39 +34,39 @@ class Cactus extends Transparent{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			$down = $this->getSide(0);
 			if($down->getID() !== self::SAND and $down->getID() !== self::CACTUS){ //Replace with common break method
-				$this->getLevel()->setBlock($this, new Air(), false);
-				$this->getLevel()->dropItem($this, Item::get($this->id));
+				$this->level->setBlock($this, new Air(), false);
+				ServerAPI::request()->api->entity->drop($this, Item::get($this->id));
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
-		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
+		} elseif($type === BLOCK_UPDATE_RANDOM){
 			if($this->getSide(0)->getID() !== self::CACTUS){
 				if($this->meta == 0x0F){
 					for($y = 1; $y < 3; ++$y){
-						$b = $this->getLevel()->getBlock(new Vector3($this->x, $this->y + $y, $this->z));
+						$b = $this->level->getBlock(new Vector3($this->x, $this->y + $y, $this->z));
 						if($b->getID() === self::AIR){
-							$this->getLevel()->setBlock($b, new Cactus(), true, false, true);
+							$this->level->setBlock($b, new Cactus(), true, false, true);
 							break;
 						}
 					}
 					$this->meta = 0;
-					$this->getLevel()->setBlock($this, $this, false);
-				}else{
+					$this->level->setBlock($this, $this, false);
+				} else{
 					++$this->meta;
-					$this->getLevel()->setBlock($this, $this, false);
+					$this->level->setBlock($this, $this, false);
 				}
 
-				return Level::BLOCK_UPDATE_RANDOM;
+				return BLOCK_UPDATE_RANDOM;
 			}
 		}
 
 		return false;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$down = $this->getSide(0);
 		if($down->getID() === self::SAND or $down->getID() === self::CACTUS){
 			$block0 = $this->getSide(2);
@@ -75,7 +74,7 @@ class Cactus extends Transparent{
 			$block2 = $this->getSide(4);
 			$block3 = $this->getSide(5);
 			if($block0->isTransparent === true and $block1->isTransparent === true and $block2->isTransparent === true and $block3->isTransparent === true){
-				$this->getLevel()->setBlock($this, $this, true, false, true);
+				$this->level->setBlock($this, $this, true, false, true);
 
 				return true;
 			}
@@ -84,7 +83,7 @@ class Cactus extends Transparent{
 		return false;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);

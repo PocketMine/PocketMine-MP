@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class RedstoneOre extends Solid{
 	public function __construct(){
@@ -31,22 +31,22 @@ class RedstoneOre extends Solid{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL or $type === Level::BLOCK_UPDATE_TOUCH){
-			$this->getLevel()->setBlock($this, Block::get(Item::GLOWING_REDSTONE_ORE, $this->meta), false, false, true);
+		if($type === BLOCK_UPDATE_NORMAL or $type === BLOCK_UPDATE_TOUCH){
+			$this->level->setBlock($this, Block::get(GLOWING_REDSTONE_ORE, $this->meta), false, false, true);
 
-			return Level::BLOCK_UPDATE_WEAK;
+			return BLOCK_UPDATE_WEAK;
 		}
 
 		return false;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		if($item->isPickaxe() >= 2){
 			return array(
-				array(Item::REDSTONE_DUST, 0, mt_rand(4, 5)),
+				array(Redstone\REDSTONE_DUST, 0, mt_rand(4, 5)),
 			);
-		}else{
-			return [];
+		} else{
+			return array();
 		}
 	}
 }

@@ -19,29 +19,25 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Enum;
-use pocketmine\nbt\tag\Int;
-use pocketmine\nbt\tag\String;
-use pocketmine\Player;
-use pocketmine\tile\Chest as TileChest;
-use pocketmine\tile\Tile;
+use PocketMine\Item\Item as Item;
+use PocketMine\NBT\Tag\Compound as Compound;
+use PocketMine\NBT\Tag\Enum as Enum;
+use PocketMine\NBT\Tag\Int as Int;
+use PocketMine\NBT\Tag\String as String;
+use PocketMine\Tile\Chest as TileChest;
+use PocketMine\Tile\Tile as Tile;
+use PocketMine;
 
 class Chest extends Transparent{
-
-	const SLOTS = 27;
-
 	public function __construct($meta = 0){
 		parent::__construct(self::CHEST, $meta, "Chest");
 		$this->isActivable = true;
 		$this->hardness = 15;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$faces = array(
 			0 => 4,
 			1 => 2,
@@ -50,34 +46,33 @@ class Chest extends Transparent{
 		);
 
 		$chest = false;
-		$this->meta = $faces[$player instanceof Player ? $player->getDirection() : 0];
+		$this->meta = $faces[$player->getDirection()];
 
 		for($side = 2; $side <= 5; ++$side){
 			if(($this->meta === 4 or $this->meta === 5) and ($side === 4 or $side === 5)){
 				continue;
-			}elseif(($this->meta === 3 or $this->meta === 2) and ($side === 2 or $side === 3)){
+			} elseif(($this->meta === 3 or $this->meta === 2) and ($side === 2 or $side === 3)){
 				continue;
 			}
 			$c = $this->getSide($side);
-			if($c instanceof Chest and $c->getDamage() === $this->meta){
-				$tile = $this->getLevel()->getTile($c);
-				if($tile instanceof TileChest and !$tile->isPaired()){
+			if(($c instanceof TileChest) and $c->getMetadata() === $this->meta){
+				if((($tile = $this->level->getTile($c)) instanceof TileChest) and !$tile->isPaired()){
 					$chest = $tile;
 					break;
 				}
 			}
 		}
 
-		$this->getLevel()->setBlock($block, $this, true, false, true);
+		$this->level->setBlock($block, $this, true, false, true);
 		$nbt = new Compound(false, array(
-			new Enum("Items", []),
-			new String("id", Tile::CHEST),
-			new Int("x", $this->x),
-			new Int("y", $this->y),
-			new Int("z", $this->z)
+			"Items" => new Enum("Items", array()),
+			"id" => new String("id", Tile::CHEST),
+			"x" => new Int("x", $this->x),
+			"y" => new Int("y", $this->y),
+			"z" => new Int("z", $this->z)
 		));
-		$nbt->Items->setTagType(NBT::TAG_Compound);
-		$tile = new TileChest($this->getLevel()->getChunkAt($this->x >> 4, $this->z >> 4), $nbt);
+		$nbt->Items->setTagType(NBT\Tag_Compound);
+		$tile = new TileChest($this->level, $nbt);
 
 		if($chest instanceof TileChest){
 			$chest->pairWith($tile);
@@ -87,59 +82,58 @@ class Chest extends Transparent{
 		return true;
 	}
 
-	public function onBreak(Item $item){
-		$t = $this->getLevel()->getTile($this);
+	public function onBreak(Item $item, PocketMine\Player $player){
+		$t = $this->level->getTile($this);
 		if($t instanceof TileChest){
 			$t->unpair();
 		}
-		$this->getLevel()->setBlock($this, new Air(), true, true, true);
+		$this->level->setBlock($this, new Air(), true, true, true);
 
 		return true;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
-		if($player instanceof Player){
-			$top = $this->getSide(1);
-			if($top->isTransparent !== true){
-				return true;
-			}
-
-			$t = $this->getLevel()->getTile($this);
-			$chest = null;
-			if($t instanceof TileChest){
-				$chest = $t;
-			}else{
-				$nbt = new Compound(false, array(
-					new Enum("Items", []),
-					new String("id", Tile::CHEST),
-					new Int("x", $this->x),
-					new Int("y", $this->y),
-					new Int("z", $this->z)
-				));
-				$nbt->Items->setTagType(NBT::TAG_Compound);
-				$chest = new TileChest($this->getLevel()->getChunkAt($this->x >> 4, $this->z >> 4), $nbt);
-			}
-
-
-			if(($player->gamemode & 0x01) === 0x01){
-				return true;
-			}
-			$player->addWindow($chest->getInventory());
+	public function onActivate(Item $item, PocketMine\Player $player){
+		$top = $this->getSide(1);
+		if($top->isTransparent !== true){
+			return true;
 		}
 
+		$t = $this->level->getTile($this);
+		$chest = false;
+		if($t instanceof TileChest){
+			$chest = $t;
+		} else{
+			$nbt = new Compound(false, array(
+				"Items" => new Enum("Items", array()),
+				"id" => new String("id", Tile::CHEST),
+				"x" => new Int("x", $this->x),
+				"y" => new Int("y", $this->y),
+				"z" => new Int("z", $this->z)
+			));
+			$nbt->Items->setTagType(NBT\Tag_Compound);
+			$chest = new TileChest($this->level, $nbt);
+		}
+
+
+		if(($player->gamemode & 0x01) === 0x01){
+			return true;
+		}
+
+		$chest->openInventory($player);
+
 		return true;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		$drops = array(
 			array($this->id, 0, 1),
 		);
-		$t = $this->getLevel()->getTile($this);
-		if($t instanceof TileChest){
-			for($s = 0; $s < $t->getRealInventory()->getSize(); ++$s){
-				$slot = $t->getRealInventory()->getItem($s);
-				if($slot->getID() > Item::AIR and $slot->getCount() > 0){
-					$drops[] = array($slot->getID(), $slot->getDamage(), $slot->getCount());
+		$t = $this->level->getTile($this);
+		if($t instanceof Chest){
+			for($s = 0; $s < Chest::SLOTS; ++$s){
+				$slot = $t->getSlot($s);
+				if($slot->getID() > AIR and $slot->getCount() > 0){
+					$drops[] = array($slot->getID(), $slot->getMetadata(), $slot->getCount());
 				}
 			}
 		}

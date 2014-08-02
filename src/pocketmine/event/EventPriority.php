@@ -19,17 +19,10 @@
  *
  */
 
-namespace pocketmine\event;
+namespace PocketMine\Event;
 
+use PocketMine;
 
-/**
- * List of event priorities
- *
- * Events will be called in this order:
- * LOWEST -> LOW -> NORMAL -> HIGH -> HIGHEST -> MONITOR
- *
- * MONITOR events should not change the event outcome or contents
- */
 abstract class EventPriority{
 	/**
 	 * Event call is of very low importance and should be ran first, to allow

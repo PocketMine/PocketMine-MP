@@ -19,27 +19,24 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
-//TODO: check orientation
 class Stonecutter extends Solid{
 	public function __construct($meta = 0){
 		parent::__construct(self::STONECUTTER, $meta, "Stonecutter");
 		$this->isActivable = true;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
-		if($player instanceof Player){
-			$player->craftingType = 2;
-		}
+	public function onActivate(Item $item, PocketMine\Player $player){
+		$player->toCraft[-1] = 2;
 
 		return true;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);

@@ -19,11 +19,15 @@
  *
 */
 
-namespace pocketmine\level\generator\object;
+namespace PocketMine\Level\Generator\Object;
 
-use pocketmine\item\Block;
-use pocketmine\level\ChunkManager;
-use pocketmine\utils\Random;
+use PocketMine\Block\Dirt as Dirt;
+use PocketMine\Block\Leaves as Leaves;
+use PocketMine\Block\Wood as Wood;
+use PocketMine\Level\Level as Level;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 class SmallTree extends Tree{
 	public $type = 0;
@@ -35,7 +39,7 @@ class SmallTree extends Tree{
 	private $addLogVines = false;
 	private $addCocoaPlants = false;
 
-	public function canPlaceObject(ChunkManager $level, $x, $y, $z, Random $random){
+	public function canPlaceObject(Level $level, Vector3 $pos, Random $random){
 		$radiusToCheck = 0;
 		for($yy = 0; $yy < $this->trunkHeight + 3; ++$yy){
 			if($yy == 1 or $yy === $this->trunkHeight){
@@ -43,7 +47,7 @@ class SmallTree extends Tree{
 			}
 			for($xx = -$radiusToCheck; $xx < ($radiusToCheck + 1); ++$xx){
 				for($zz = -$radiusToCheck; $zz < ($radiusToCheck + 1); ++$zz){
-					if(!isset($this->overridable[$level->getBlockIdAt($x + $xx, $y + $yy, $z + $zz)])){
+					if(!isset($this->overridable[$level->level->getBlockID($pos->x + $xx, $pos->y + $yy, $pos->z + $zz)])){
 						return false;
 					}
 				}
@@ -53,9 +57,10 @@ class SmallTree extends Tree{
 		return true;
 	}
 
-	public function placeObject(ChunkManager $level, $x, $y, $z, Random $random){
+	public function placeObject(Level $level, Vector3 $pos, Random $random){
 		// The base dirt block
-		$level->setBlockIdAt($x, $y, $z, Block::DIRT);
+		$dirtpos = new Vector3($pos->x, $pos->y - 1, $pos->z);
+		$level->setBlockRaw($dirtpos, new Dirt());
 
 		// Adjust the tree trunk's height randomly
 		//    plot [-14:11] int( x / 8 ) + 5
@@ -80,8 +85,10 @@ class SmallTree extends Tree{
 				for($xx = -$bRadius; $xx <= $bRadius; ++$xx){
 					for($zz = -$bRadius; $zz <= $bRadius; ++$zz){
 						if(sqrt(($xx * $xx) + ($zz * $zz)) <= $radius){
-							$level->setBlockIdAt($x + $xx, $y + $yy, $z + $zz, Block::LEAVES);
-							$level->setBlockDataAt($x + $xx, $y + $yy, $z + $zz, $this->type);
+							$leafpos = new Vector3($pos->x + $xx,
+								$pos->y + $yy,
+								$pos->z + $zz);
+							$level->setBlockRaw($leafpos, new Leaves($this->type));
 						}
 					}
 				}
@@ -90,8 +97,8 @@ class SmallTree extends Tree{
 
 			// Place the trunk last
 			if($leaflevel > 1){
-				$level->setBlockIdAt($x, $y + $yy, $z, Block::TRUNK);
-				$level->setBlockDataAt($x, $y + $yy, $z, $this->type);
+				$trunkpos = new Vector3($pos->x, $pos->y + $yy, $pos->z);
+				$level->setBlockRaw($trunkpos, new Wood($this->type));
 			}
 		}
 	}

@@ -19,11 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class BrownMushroom extends Flowable{
 	public function __construct(){
@@ -32,22 +31,23 @@ class BrownMushroom extends Flowable{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			if($this->getSide(0)->isTransparent === true){ //Replace with common break method
-				$this->getLevel()->dropItem($this, Item::get($this->id));
-				$this->getLevel()->setBlock($this, new Air(), false, false, true);
+				//TODO
+				//ServerAPI::request()->api->entity->drop($this, Item::get($this->id));
+				$this->level->setBlock($this, new Air(), false, false, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
 		}
 
 		return false;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$down = $this->getSide(0);
 		if($down->isTransparent === false){
-			$this->getLevel()->setBlock($block, $this, true, false, true);
+			$this->level->setBlock($block, $this, true, false, true);
 
 			return true;
 		}

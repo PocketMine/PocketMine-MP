@@ -19,17 +19,17 @@
  *
  */
 
-namespace pocketmine\event\entity;
+namespace PocketMine\Event\Entity;
 
-use pocketmine\entity\Entity;
-use pocketmine\event\Cancellable;
-use pocketmine\Event;
-use pocketmine\math\Vector3 as Vector3;
+use PocketMine\Entity\Entity as Entity;
+use PocketMine\Event;
+use PocketMine;
+use PocketMine\Math\Vector3 as Vector3;
 
-class EntityMoveEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityMoveEvent extends EntityEvent implements CancellableEvent{
+	public static $handlers;
+	public static $handlerPriority;
 
-	/** @var \pocketmine\math\Vector3 */
 	private $pos;
 
 	public function __construct(Entity $entity, Vector3 $pos){

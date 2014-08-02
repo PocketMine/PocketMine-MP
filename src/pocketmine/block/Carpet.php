@@ -19,11 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Carpet extends Flowable{
 	public function __construct($meta = 0){
@@ -52,10 +51,10 @@ class Carpet extends Flowable{
 		$this->isSolid = true;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$down = $this->getSide(0);
 		if($down->getID() !== self::AIR){
-			$this->getLevel()->setBlock($block, $this, true, false, true);
+			$this->level->setBlock($block, $this, true, false, true);
 
 			return true;
 		}
@@ -64,12 +63,13 @@ class Carpet extends Flowable{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->getID() === self::AIR){ //TODO: Replace with common break method
-				$this->getLevel()->dropItem($this, Item::get($this->id, $this->meta, 1));
-				$this->getLevel()->setBlock($this, new Air(), true, false, true);
+		if($type === BLOCK_UPDATE_NORMAL){
+			if($this->getSide(0)->getID() === self::AIR){ //Replace with common break method
+				//TODO
+				//ServerAPI::request()->api->entity->drop($this, Item::get($this->id, $this->meta, 1));
+				$this->level->setBlock($this, new Air(), true, false, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
 		}
 

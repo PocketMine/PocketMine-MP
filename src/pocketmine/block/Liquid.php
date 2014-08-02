@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
+use PocketMine;
 
 class Liquid extends Transparent{
 	public function __construct($id, $meta = 0, $name = "Unknown"){

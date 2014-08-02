@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class HayBale extends Solid{
 	public function __construct($meta = 0){
@@ -30,7 +30,7 @@ class HayBale extends Solid{
 		$this->hardness = 10;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$faces = array(
 			0 => 0,
 			1 => 0,
@@ -41,12 +41,12 @@ class HayBale extends Solid{
 		);
 
 		$this->meta = ($this->meta & 0x03) | $faces[$face];
-		$this->getLevel()->setBlock($block, $this, true, false, true);
+		$this->level->setBlock($block, $this, true, false, true);
 
 		return true;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);

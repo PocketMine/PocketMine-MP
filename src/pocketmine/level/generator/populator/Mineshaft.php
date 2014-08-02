@@ -19,10 +19,11 @@
  *
 */
 
-namespace pocketmine\level\generator\populator;
+namespace PocketMine\Level\Generator\Populator;
 
-use pocketmine\level\ChunkManager;
-use pocketmine\utils\Random;
+use PocketMine\Level\Level as Level;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 class Mineshaft extends Populator{
 	private static $DISTANCE = 256;
@@ -31,7 +32,7 @@ class Mineshaft extends Populator{
 	private static $BASE_Y = 35;
 	private static $RAND_Y = 11;
 
-	public function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random){
+	public function populate(Level $level, $chunkX, $chunkZ, Random $random){
 		if($random->nextRange(0, self::$ODD) === 0){
 			//$mineshaft = new Mineshaft($random);
 		}

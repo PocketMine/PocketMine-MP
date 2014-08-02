@@ -19,16 +19,17 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class JungleWoodStairs extends Stair{
 	public function __construct($meta = 0){
 		parent::__construct(self::JUNGLE_WOOD_STAIRS, $meta, "Jungle Wood Stairs");
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);

@@ -19,14 +19,13 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
-use pocketmine\item\Item;
+use PocketMine;
 
 class ContainerSetSlotPacket extends DataPacket{
 	public $windowid;
 	public $slot;
-	/** @var Item */
 	public $item;
 
 	public function pid(){

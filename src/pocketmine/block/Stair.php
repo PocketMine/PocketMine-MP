@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Stair extends Transparent{
 
@@ -30,13 +30,13 @@ class Stair extends Transparent{
 		parent::__construct($id, $meta, $name);
 		if(($this->meta & 0x04) === 0x04){
 			$this->isFullBlock = true;
-		}else{
+		} else{
 			$this->isFullBlock = false;
 		}
 		$this->hardness = 30;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$faces = array(
 			0 => 0,
 			1 => 2,
@@ -47,18 +47,18 @@ class Stair extends Transparent{
 		if(($fy > 0.5 and $face !== 1) or $face === 0){
 			$this->meta |= 0x04; //Upside-down stairs
 		}
-		$this->getLevel()->setBlock($block, $this, true, false, true);
+		$this->level->setBlock($block, $this, true, false, true);
 
 		return true;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		if($item->isPickaxe() >= 1){
 			return array(
 				array($this->id, 0, 1),
 			);
-		}else{
-			return [];
+		} else{
+			return array();
 		}
 	}
 }

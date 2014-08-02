@@ -19,14 +19,12 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\generator\object\TallGrass;
-use pocketmine\level\Level;
-use pocketmine\math\Vector3;
-use pocketmine\Player;
-use pocketmine\utils\Random;
+use PocketMine\Item\Item as Item;
+use PocketMine\Level\Generator\Object\TallGrass as TallGrass;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 class Grass extends Solid{
 	public function __construct(){
@@ -35,37 +33,25 @@ class Grass extends Solid{
 		$this->hardness = 3;
 	}
 
-	public function getDrops(Item $item){
-		return [
-			[Item::DIRT, 0, 1],
-		];
+	public function getDrops(Item $item, PocketMine\Player $player){
+		return array(
+			array(DIRT, 0, 1),
+		);
 	}
 
-	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_RANDOM){
-			//TODO: light levels
-			$x = mt_rand($this->x - 1, $this->x + 1);
-			$y = mt_rand($this->y - 2, $this->y + 2);
-			$z = mt_rand($this->z - 1, $this->z + 1);
-			$block = $this->getLevel()->getBlockIdAt($x, $y, $z);
-			if($block === Block::DIRT){
-				$block = $this->getLevel()->getBlock(new Vector3($x, $y, $z));
-				if($block->getSide(1) instanceof Transparent){
-					$this->getLevel()->setBlock($block, new Grass());
-				}
+	public function onActivate(Item $item, PocketMine\Player $player){
+		if($item->getID() === Item::DYE and $item->getMetadata() === 0x0F){
+			if(($player->gamemode & 0x01) === 0){
+				$item->count--;
 			}
-		}
-	}
-
-	public function onActivate(Item $item, Player $player = null){
-		if($item->getID() === Item::DYE and $item->getDamage() === 0x0F){
-			$item->count--;
-			TallGrass::growGrass($this->getLevel(), $this, new Random(mt_rand()), 8, 2);
+			TallGrass::growGrass($this->level, $this, new Random(), 8, 2);
 
 			return true;
-		}elseif($item->isHoe()){
-			$item->useOn($this);
-			$this->getLevel()->setBlock($this, new Farmland());
+		} elseif($item->isHoe()){
+			if(($player->gamemode & 0x01) === 0){
+				$item->useOn($this);
+			}
+			$this->level->setBlock($this, new Farmland());
 
 			return true;
 		}

@@ -19,13 +19,12 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\network\protocol\LevelEventPacket;
-use pocketmine\Player;
-use pocketmine\Server;
+use PocketMine\Item\Item as Item;
+use PocketMine\Network\Protocol\LevelEventPacket as LevelEventPacket;
+use PocketMine\Player as Player;
+use PocketMine;
 
 
 abstract class Door extends Transparent{
@@ -35,28 +34,28 @@ abstract class Door extends Transparent{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			if($this->getSide(0)->getID() === self::AIR){ //Replace with common break method
-				$this->getLevel()->setBlock($this, new Air(), false);
+				$this->level->setBlock($this, new Air(), false);
 				if($this->getSide(1) instanceof Door){
-					$this->getLevel()->setBlock($this->getSide(1), new Air(), false);
+					$this->level->setBlock($this->getSide(1), new Air(), false);
 				}
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
 		}
 
 		return false;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		if($face === 1){
 			$blockUp = $this->getSide(1);
 			$blockDown = $this->getSide(0);
 			if($blockUp->isReplaceable === false or $blockDown->isTransparent === true){
 				return false;
 			}
-			$direction = $player instanceof Player ? $player->getDirection() : 0;
+			$direction = $player->getDirection();
 			$face = array(
 				0 => 3,
 				1 => 4,
@@ -69,69 +68,65 @@ abstract class Door extends Transparent{
 			if($next->getID() === $this->id or ($next2->isTransparent === false and $next->isTransparent === true)){ //Door hinge
 				$metaUp |= 0x01;
 			}
-			$this->getLevel()->setBlock($blockUp, Block::get($this->id, $metaUp), true, false, true); //Top
+			$this->level->setBlock($blockUp, Block::get($this->id, $metaUp), true, false, true); //Top
 
-			$this->meta = $player->getDirection() & 0x03;
-			$this->getLevel()->setBlock($block, $this, true, false, true); //Bottom
+			$this->meta = $direction & 0x03;
+			$this->level->setBlock($block, $this, true, false, true); //Bottom
 			return true;
 		}
 
 		return false;
 	}
 
-	public function onBreak(Item $item){
+	public function onBreak(Item $item, PocketMine\Player $player){
 		if(($this->meta & 0x08) === 0x08){
 			$down = $this->getSide(0);
 			if($down->getID() === $this->id){
-				$this->getLevel()->setBlock($down, new Air(), true, false, true);
+				$this->level->setBlock($down, new Air(), true, false, true);
 			}
-		}else{
+		} else{
 			$up = $this->getSide(1);
 			if($up->getID() === $this->id){
-				$this->getLevel()->setBlock($up, new Air(), true, false, true);
+				$this->level->setBlock($up, new Air(), true, false, true);
 			}
 		}
-		$this->getLevel()->setBlock($this, new Air(), true, false, true);
+		$this->level->setBlock($this, new Air(), true, false, true);
 
 		return true;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
+	public function onActivate(Item $item, PocketMine\Player $player){
 		if(($this->meta & 0x08) === 0x08){ //Top
 			$down = $this->getSide(0);
 			if($down->getID() === $this->id){
-				$meta = $down->getDamage() ^ 0x04;
-				$this->getLevel()->setBlock($down, Block::get($this->id, $meta), true, false, true);
-				$players = $this->getLevel()->getUsingChunk($this->x >> 4, $this->z >> 4);
-				if($player instanceof Player){
-					unset($players[$player->getID()]);
-				}
+				$meta = $down->getMetadata() ^ 0x04;
+				$this->level->setBlock($down, Block::get($this->id, $meta), true, false, true);
+				$players = $this->level->getUsingChunk($this->x >> 4, $this->z >> 4);
+				unset($players[$player->CID]);
 				$pk = new LevelEventPacket;
 				$pk->x = $this->x;
 				$pk->y = $this->y;
 				$pk->z = $this->z;
 				$pk->evid = 1003;
 				$pk->data = 0;
-				Server::broadcastPacket($players, $pk);
+				Player::broadcastPacket($players, $pk);
 
 				return true;
 			}
 
 			return false;
-		}else{
+		} else{
 			$this->meta ^= 0x04;
-			$this->getLevel()->setBlock($this, $this, true, false, true);
-			$players = $this->getLevel()->getUsingChunk($this->x >> 4, $this->z >> 4);
-			if($player instanceof Player){
-				unset($players[$player->getID()]);
-			}
+			$this->level->setBlock($this, $this, true, false, true);
+			$players = $this->level->getUsingChunk($this->x >> 4, $this->z >> 4);
+			unset($players[$player->CID]);
 			$pk = new LevelEventPacket;
 			$pk->x = $this->x;
 			$pk->y = $this->y;
 			$pk->z = $this->z;
 			$pk->evid = 1003;
 			$pk->data = 0;
-			Server::broadcastPacket($players, $pk);
+			Player::broadcastPacket($players, $pk);
 		}
 
 		return true;

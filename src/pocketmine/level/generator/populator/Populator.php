@@ -22,11 +22,12 @@
 /**
  * All the Object populator classes
  */
-namespace pocketmine\level\generator\populator;
+namespace PocketMine\Level\Generator\Populator;
 
-use pocketmine\level\ChunkManager;
-use pocketmine\utils\Random;
+use PocketMine\Level\Level as Level;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 abstract class Populator{
-	public abstract function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random);
+	public abstract function populate(Level $level, $chunkX, $chunkZ, Random $random);
 }

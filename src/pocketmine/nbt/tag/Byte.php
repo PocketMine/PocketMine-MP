@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\nbt\tag;
+namespace PocketMine\NBT\Tag;
 
-use pocketmine\nbt\NBT;
+use PocketMine;
+use PocketMine\NBT\NBT as NBT;
 
 class Byte extends NamedTag{
 
@@ -30,7 +31,7 @@ class Byte extends NamedTag{
 	}
 
 	public function read(NBT $nbt){
-		$this->value = $nbt->getByte(true);
+		$this->value = $nbt->getByte();
 	}
 
 	public function write(NBT $nbt){

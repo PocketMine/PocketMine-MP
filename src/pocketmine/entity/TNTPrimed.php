@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace PocketMine\Entity;
 
+use PocketMine;
 
 class TNTPrimed extends Entity implements Explosive{
 

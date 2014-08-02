@@ -19,15 +19,15 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
-use pocketmine\block\Air;
-use pocketmine\block\Block;
-use pocketmine\block\Lava;
-use pocketmine\block\Liquid;
-use pocketmine\block\Water;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine\Block\Air as Air;
+use PocketMine\Block\Block as Block;
+use PocketMine\Block\Lava as Lava;
+use PocketMine\Block\Liquid as Liquid;
+use PocketMine\Block\Water as Water;
+use PocketMine\Level\Level as Level;
+use PocketMine;
 
 class Bucket extends Item{
 	public function __construct($meta = 0, $count = 1){
@@ -37,28 +37,28 @@ class Bucket extends Item{
 	}
 
 	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
-		if($this->meta === Item::AIR){
+		if($this->meta === AIR){
 			if($target instanceof Liquid){
 				$level->setBlock($target, new Air(), true, false, true);
 				if(($player->gamemode & 0x01) === 0){
-					$this->meta = ($target instanceof Water) ? Item::WATER : Item::LAVA;
+					$this->meta = ($target instanceof Water) ? WATER : LAVA;
 				}
 
 				return true;
 			}
-		}elseif($this->meta === Item::WATER){
+		} elseif($this->meta === WATER){
 			//Support Make Non-Support Water to Support Water
-			if($block->getID() === self::AIR || ($block instanceof Water && ($block->getDamage() & 0x07) != 0x00)){
+			if($block->getID() === self::AIR || ($block instanceof Water && ($block->getMetadata() & 0x07) != 0x00)){
 				$water = new Water();
 				$level->setBlock($block, $water, true, false, true);
-				$water->place(clone $this, $block, $target, $face, $fx, $fy, $fz, $player);
+				$water->place(clone $this, $player, $block, $target, $face, $fx, $fy, $fz);
 				if(($player->gamemode & 0x01) === 0){
 					$this->meta = 0;
 				}
 
 				return true;
 			}
-		}elseif($this->meta === Item::LAVA){
+		} elseif($this->meta === LAVA){
 			if($block->getID() === self::AIR){
 				$level->setBlock($block, new Lava(), true, false, true);
 				if(($player->gamemode & 0x01) === 0){

@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
+ *  ____            _        _   __  __ _                  __  __ ____  
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,20 +15,17 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- *
+ * 
  *
 */
 
-namespace pocketmine\math;
+namespace PocketMine\Math;
 
-/**
- * WARNING: This class is available on the PocketMine-MP Zephir project.
- * If this class is modified, remember to modify the PHP C extension.
- */
+use PocketMine;
+use PocketMine\Math\Vector3 as MathVector3;
+
 class Vector3{
-	public $x;
-	public $y;
-	public $z;
+	public $x, $y, $z;
 
 	public function __construct($x = 0, $y = 0, $z = 0){
 		$this->x = $x;
@@ -61,110 +58,104 @@ class Vector3{
 	}
 
 	public function getRight(){
-		return $this->x;
+		return $this->getX();
 	}
 
 	public function getUp(){
-		return $this->y;
+		return $this->getY();
 	}
 
 	public function getForward(){
-		return $this->z;
+		return $this->getZ();
 	}
 
 	public function getSouth(){
-		return $this->x;
+		return $this->getX();
 	}
 
 	public function getWest(){
-		return $this->z;
+		return $this->getZ();
 	}
 
-	/**
-	 * @param Vector3|int $x
-	 * @param int $y
-	 * @param int $z
-	 * @return Vector3
-	 */
-	public function add($x, $y = 0, $z = 0){
-		if($x instanceof Vector3){
+	public function add($x = 0, $y = 0, $z = 0){
+		if(($x instanceof MathVector3) === true){
 			return $this->add($x->x, $x->y, $x->z);
-		}else{
-			return new Vector3($this->x + $x, $this->y + $y, $this->z + $z);
+		} else{
+			return new MathVector3($this->x + $x, $this->y + $y, $this->z + $z);
 		}
 	}
 
-	/**
-	 * @param Vector3|int $x
-	 * @param int $y
-	 * @param int $z
-	 * @return Vector3
-	 */
 	public function subtract($x = 0, $y = 0, $z = 0){
-		if($x instanceof Vector3){
+		if(($x instanceof MathVector3) === true){
 			return $this->add(-$x->x, -$x->y, -$x->z);
-		}else{
+		} else{
 			return $this->add(-$x, -$y, -$z);
 		}
 	}
 
 	public function multiply($number){
-		return new Vector3($this->x * $number, $this->y * $number, $this->z * $number);
+		return new MathVector3($this->x * $number, $this->y * $number, $this->z * $number);
 	}
 
 	public function divide($number){
-		return new Vector3($this->x / $number, $this->y / $number, $this->z / $number);
+		return new MathVector3($this->x / $number, $this->y / $number, $this->z / $number);
 	}
 
 	public function ceil(){
-		return new Vector3((int) ($this->x + 1), (int) ($this->y + 1), (int) ($this->z + 1));
+		return new MathVector3((int) ($this->x + 1), (int) ($this->y + 1), (int) ($this->z + 1));
 	}
 
 	public function floor(){
-		return new Vector3((int) $this->x, (int) $this->y, (int) $this->z);
+		return new MathVector3((int) $this->x, (int) $this->y, (int) $this->z);
 	}
 
 	public function round(){
-		return new Vector3(round($this->x), round($this->y), round($this->z));
+		return new MathVector3(round($this->x), round($this->y), round($this->z));
 	}
 
 	public function abs(){
-		return new Vector3(abs($this->x), abs($this->y), abs($this->z));
+		return new MathVector3(abs($this->x), abs($this->y), abs($this->z));
 	}
 
-	public function getSide($side, $step = 1){
+	public function getSide($side){
 		switch((int) $side){
 			case 0:
-				return new Vector3($this->x, $this->y - $step, $this->z);
+				return new MathVector3($this->x, $this->y - 1, $this->z);
 			case 1:
-				return new Vector3($this->x, $this->y + $step, $this->z);
+				return new MathVector3($this->x, $this->y + 1, $this->z);
 			case 2:
-				return new Vector3($this->x, $this->y, $this->z - $step);
+				return new MathVector3($this->x, $this->y, $this->z - 1);
 			case 3:
-				return new Vector3($this->x, $this->y, $this->z + $step);
+				return new MathVector3($this->x, $this->y, $this->z + 1);
 			case 4:
-				return new Vector3($this->x - $step, $this->y, $this->z);
+				return new MathVector3($this->x - 1, $this->y, $this->z);
 			case 5:
-				return new Vector3($this->x + $step, $this->y, $this->z);
+				return new MathVector3($this->x + 1, $this->y, $this->z);
 			default:
 				return $this;
 		}
 	}
 
-	public function distance(Vector3 $pos){
-		return sqrt($this->distanceSquared($pos));
+	public function distance($x = 0, $y = 0, $z = 0){
+		if(($x instanceof MathVector3) === true){
+			return sqrt($this->distanceSquared($x->x, $x->y, $x->z));
+		} else{
+			return sqrt($this->distanceSquared($x, $y, $z));
+		}
 	}
 
-	public function distanceSquared(Vector3 $pos){
-		return pow($this->x - $pos->x, 2) + pow($this->y - $pos->y, 2) + pow($this->z - $pos->z, 2);
+	public function distanceSquared($x = 0, $y = 0, $z = 0){
+		if(($x instanceof MathVector3) === true){
+			return $this->distanceSquared($x->x, $x->y, $x->z);
+		} else{
+			return pow($this->x - $x, 2) + pow($this->y - $y, 2) + pow($this->z - $z, 2);
+		}
 	}
 
 	public function maxPlainDistance($x = 0, $z = 0){
-		if($x instanceof Vector3){
+		if(($x instanceof MathVector3) === true){
 			return $this->maxPlainDistance($x->x, $x->z);
-		}elseif($x instanceof Vector2){
-			return $this->maxPlainDistance($x->x, $x->y);
-		}else{
+		} else{
 			return max(abs($this->x - $x), abs($this->z - $z));
 		}
 	}
@@ -183,15 +174,15 @@ class Vector3{
 			return $this->divide($len);
 		}
 
-		return new Vector3(0, 0, 0);
+		return new MathVector3(0, 0, 0);
 	}
 
-	public function dot(Vector3 $v){
+	public function dot(MathVector3 $v){
 		return $this->x * $v->x + $this->y * $v->y + $this->z * $v->z;
 	}
 
-	public function cross(Vector3 $v){
-		return new Vector3(
+	public function cross(MathVector3 $v){
+		return new MathVector3(
 			$this->y * $v->z - $this->z * $v->y,
 			$this->z * $v->x - $this->x * $v->z,
 			$this->x * $v->y - $this->y * $v->x

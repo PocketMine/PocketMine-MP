@@ -15,31 +15,26 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-__PocketMine-MP is a free, open-source software that creates Minecraft: Pocket Edition servers and allows extending its functionalities__
+__PocketMine-MP is a Minecraft: PE server software.__
+
+The entire server is written in PHP, and has been tested, profiled and optimized to run smoothly.
 
 ### [Homepage](http://www.pocketmine.net/)
 
 ### [Forums](http://forums.pocketmine.net/)
 
-### [Documentation](http://pocketmine-mp.readthedocs.org/)
+### [Wiki](https://github.com/PocketMine/PocketMine-MP/wiki/)
 
-### [Plugin Repository](http://plugins.pocketmine.net/)
-
-<!--## [FAQ: Frequently Asked Questions](https://github.com/PocketMine/PocketMine-MP/wiki/Frequently-Asked-Questions)-->
-
-### [Official Jenkins server](http://jenkins.pocketmine.net/)
+### [FAQ: Frequently Asked Questions](https://github.com/PocketMine/PocketMine-MP/wiki/Frequently-Asked-Questions)
 
 ### API Documentation
- * [Official Doxygen-generated documentation](http://docs.pocketmine.net/)
- * [Latest Doxygen generated from development](http://jenkins.pocketmine.net/job/PocketMine-MP-doc/doxygen/)
+ * [Doxygen generated](http://docs.pocketmine.net/)
+ * [PHPDoc generated](http://docs.pocketmine.net/phpdoc/)
 
 ### [Twitter @PocketMine](https://twitter.com/PocketMine)
 
-### IRC Chat #pocketmine (or #mcpedevs) @ irc.freenode.net
+## IRC Chat #pocketmine (or #mcpedevs) @ irc.freenode.net
 [#pocketmine + #mcpedevs channel WebIRC](http://webchat.freenode.net/?channels=pocketmine,mcpedevs)
-
-### Want to contribute?
-* Check the [Contributing Guidelines](CONTRIBUTING.md)
 
 
 ## Third-party Libraries/Protocols Used
@@ -49,6 +44,7 @@ __PocketMine-MP is a free, open-source software that creates Minecraft: Pocket E
 * __[PHP pthreads](http://pthreads.org/)__ by _[krakjoe](https://github.com/krakjoe)_: Threading for PHP - Share Nothing, Do Everything.
 * __[PHP YAML](https://code.google.com/p/php-yaml/)__ by _Bryan Davis_: The Yaml PHP Extension provides a wrapper to the LibYAML library.
 * __[LibYAML](http://pyyaml.org/wiki/LibYAML)__ by _Kirill Simonov_: A YAML 1.1 parser and emitter written in C.
+* __[mintty](https://code.google.com/p/mintty/)__ : xterm Terminal Emulator
 * __[cURL](http://curl.haxx.se/)__: cURL is a command line tool for transferring data with URL syntax
 * __[Zlib](http://www.zlib.net/)__: A Massively Spiffy Yet Delicately Unobtrusive Compression Library
 * __[Source RCON Protocol](https://developer.valvesoftware.com/wiki/Source_RCON_Protocol)__

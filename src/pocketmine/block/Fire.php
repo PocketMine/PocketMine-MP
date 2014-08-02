@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Fire extends Flowable{
 	public function __construct($meta = 0){
@@ -33,26 +33,26 @@ class Fire extends Flowable{
 		$this->hardness = 0;
 	}
 
-	public function getDrops(Item $item){
-		return [];
+	public function getDrops(Item $item, PocketMine\Player $player){
+		return array();
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			for($s = 0; $s <= 5; ++$s){
 				$side = $this->getSide($s);
 				if($side->getID() !== self::AIR and !($side instanceof Liquid)){
 					return false;
 				}
 			}
-			$this->getLevel()->setBlock($this, new Air(), true, false, true);
+			$this->level->setBlock($this, new Air(), true, false, true);
 
-			return Level::BLOCK_UPDATE_NORMAL;
-		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
+			return BLOCK_UPDATE_NORMAL;
+		} elseif($type === BLOCK_UPDATE_RANDOM){
 			if($this->getSide(0)->getID() !== self::NETHERRACK){
-				$this->getLevel()->setBlock($this, new Air(), true, false, true);
+				$this->level->setBlock($this, new Air(), true, false, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
 		}
 

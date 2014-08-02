@@ -19,17 +19,20 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class WoodStairs extends Stair{
 	public function __construct($meta = 0){
 		parent::__construct(self::WOOD_STAIRS, $meta, "Wood Stairs");
 	}
 
-	public function getBreakTime(Item $item){
-
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.20;
+		}
 		switch($item->isAxe()){
 			case 5:
 				return 0.4;
@@ -46,7 +49,7 @@ class WoodStairs extends Stair{
 		}
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);

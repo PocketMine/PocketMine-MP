@@ -19,14 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\math\AxisAlignedBB;
+use PocketMine;
 
-
-/**
- * Air block
- */
 class Air extends Transparent{
 	public function __construct(){
 		parent::__construct(self::AIR, 0, "Air");
@@ -41,10 +37,6 @@ class Air extends Transparent{
 		$this->isFullBlock = true;
 		$this->hardness = 0;
 
-	}
-
-	public function getBoundingBox(){
-		return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 	}
 
 }

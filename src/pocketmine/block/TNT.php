@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class TNT extends Solid{
 	public function __construct(){
@@ -31,7 +31,7 @@ class TNT extends Solid{
 		$this->isActivable = true;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
+	public function onActivate(Item $item, PocketMine\Player $player){
 		if($item->getID() === Item::FLINT_STEEL){
 			if(($player->gamemode & 0x01) === 0){
 				$item->useOn($this);
@@ -43,9 +43,9 @@ class TNT extends Solid{
 				"power" => 4,
 				"fuse" => 20 * 4, //4 seconds
 			);
-			$this->getLevel()->setBlock($this, new Air(), false, false, true);
+			$this->level->setBlock($this, new Air(), false, false, true);
 			//TODO
-			//$e = Server::getInstance()->api->entity->add($this->level, ENTITY_OBJECT, OBJECT_PRIMEDTNT, $data);
+			//$e = ServerAPI::request()->api->entity->add($this->level, ENTITY_OBJECT, OBJECT_PRIMEDTNT, $data);
 			//$e->spawnToAll();
 
 			return true;

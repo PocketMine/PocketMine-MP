@@ -19,12 +19,11 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
-use pocketmine\block\Block;
-use pocketmine\Entity;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine\Block\Block as Block;
+use PocketMine\Level\Level as Level;
+use PocketMine;
 
 class SpawnEgg extends Item{
 	public function __construct($meta = 0, $count = 1){
@@ -35,18 +34,17 @@ class SpawnEgg extends Item{
 
 	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		switch($this->meta){
-			//TODO: use entity constants
-			case 10:
-			case 11:
-			case 12:
-			case 13:
+			case Entity\CHICKEN:
+			case Entity\SHEEP:
+			case Entity\COW:
+			case Entity\PIG:
 				$data = array(
 					"x" => $block->x + 0.5,
 					"y" => $block->y,
 					"z" => $block->z + 0.5,
 				);
-				//$e = Server::getInstance()->api->entity->add($block->level, ENTITY_MOB, $this->meta, $data);
-				//Server::getInstance()->api->entity->spawnToAll($e);
+				//$e = ServerAPI::request()->api->entity->add($block->level, ENTITY_MOB, $this->meta, $data);
+				//ServerAPI::request()->api->entity->spawnToAll($e);
 				if(($player->gamemode & 0x01) === 0){
 					--$this->count;
 				}

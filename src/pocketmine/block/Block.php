@@ -22,19 +22,14 @@
 /**
  * All Block classes are in here
  */
-namespace pocketmine\block;
+namespace PocketMine\Block;
+use PocketMine;
+use PocketMine\Player as Player;
+use PocketMine\Item\Item as Item;
+use PocketMine\Level\Position as Position;
+use PocketMine\Level\Level as Level;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
-use pocketmine\math\AxisAlignedBB;
-use pocketmine\metadata\Metadatable;
-use pocketmine\metadata\MetadataValue;
-use pocketmine\Player;
-use pocketmine\plugin\Plugin;
-
-
-abstract class Block extends Position implements Metadatable{
+abstract class Block extends Position{
 	const AIR = 0;
 	const STONE = 1;
 	const GRASS = 2;
@@ -79,7 +74,7 @@ abstract class Block extends Position implements Metadatable{
 	const WOOL = 35;
 	const DANDELION = 37;
 	const ROSE = 38;
-	const POPPY = 38;
+	const CYAN_FLOWER = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
 	const GOLD_BLOCK = 41;
@@ -173,9 +168,7 @@ abstract class Block extends Position implements Metadatable{
 	const NETHER_BRICKS_STAIRS = 114;
 
 	const SANDSTONE_STAIRS = 128;
-	const EMERALD_ORE = 129;
 
-	const EMERALD_BLOCK = 133;
 	const SPRUCE_WOOD_STAIRS = 134;
 	const SPRUCE_WOODEN_STAIRS = 134;
 	const BIRCH_WOOD_STAIRS = 135;
@@ -200,22 +193,10 @@ abstract class Block extends Position implements Metadatable{
 	const WOODEN_SLAB = 158;
 	const WOOD_SLABS = 158;
 	const WOODEN_SLABS = 158;
-	const STAINED_CLAY = 159;
-	const STAINED_HARDENED_CLAY = 159;
-
-	const LEAVES2 = 161;
-	const LEAVE2 = 161;
-	const WOOD2 = 162;
-	const TRUNK2 = 162;
-	const LOG2 = 162;
-	const ACACIA_WOOD_STAIRS = 163;
-	const ACACIA_WOODEN_STAIRS = 163;
-	const DARK_OAK_WOOD_STAIRS = 164;
-	const DARK_OAK_WOODEN_STAIRS = 164;
 
 	const HAY_BALE = 170;
 	const CARPET = 171;
-	const HARDENED_CLAY = 172;
+
 	const COAL_BLOCK = 173;
 
 	const BEETROOT_BLOCK = 244;
@@ -223,277 +204,8 @@ abstract class Block extends Position implements Metadatable{
 	const GLOWING_OBSIDIAN = 246;
 	const NETHER_REACTOR = 247;
 
-	public static $creative = array(
-		//Building
-		[Item::COBBLESTONE, 0],
-		[Item::STONE_BRICKS, 0],
-		[Item::STONE_BRICKS, 1],
-		[Item::STONE_BRICKS, 2],
-		[Item::MOSS_STONE, 0],
-		[Item::WOODEN_PLANKS, 0],
-		[Item::WOODEN_PLANKS, 1],
-		[Item::WOODEN_PLANKS, 2],
-		[Item::WOODEN_PLANKS, 3],
-		[Item::WOODEN_PLANKS, 4],
-		[Item::WOODEN_PLANKS, 5],
-		[Item::BRICKS, 0],
 
-		[Item::STONE, 0],
-		[Item::STONE, 1],
-		[Item::STONE, 2],
-		[Item::STONE, 3],
-		[Item::STONE, 4],
-		[Item::STONE, 5],
-		[Item::STONE, 6],
-		[Item::DIRT, 0],
-		//TODO: PODZOL
-		[Item::GRASS, 0],
-		//TODO: MYCELIUM
-		[Item::CLAY_BLOCK, 0],
-		[Item::HARDENED_CLAY, 0],
-		[Item::STAINED_CLAY, 0],
-		[Item::STAINED_CLAY, 7],
-		[Item::STAINED_CLAY, 6],
-		[Item::STAINED_CLAY, 5],
-		[Item::STAINED_CLAY, 4],
-		[Item::STAINED_CLAY, 3],
-		[Item::STAINED_CLAY, 2],
-		[Item::STAINED_CLAY, 1],
-		[Item::STAINED_CLAY, 15],
-		[Item::STAINED_CLAY, 14],
-		[Item::STAINED_CLAY, 13],
-		[Item::STAINED_CLAY, 12],
-		[Item::STAINED_CLAY, 11],
-		[Item::STAINED_CLAY, 10],
-		[Item::STAINED_CLAY, 9],
-		[Item::STAINED_CLAY, 8],
-		[Item::SANDSTONE, 0],
-		[Item::SANDSTONE, 1],
-		[Item::SANDSTONE, 2],
-		[Item::SAND, 0],
-		[Item::GRAVEL, 0],
-		[Item::TRUNK, 0],
-		[Item::TRUNK, 1],
-		[Item::TRUNK, 2],
-		[Item::TRUNK, 3],
-		[Item::TRUNK2, 0],
-		[Item::TRUNK2, 1],
-		[Item::NETHER_BRICKS, 0],
-		[Item::NETHERRACK, 0],
-		[Item::BEDROCK, 0],
-		[Item::COBBLESTONE_STAIRS, 0],
-		[Item::OAK_WOODEN_STAIRS, 0],
-		[Item::SPRUCE_WOODEN_STAIRS, 0],
-		[Item::BIRCH_WOODEN_STAIRS, 0],
-		[Item::JUNGLE_WOODEN_STAIRS, 0],
-		[Item::ACACIA_WOODEN_STAIRS, 0],
-		[Item::DARK_OAK_WOODEN_STAIRS, 0],
-		[Item::BRICK_STAIRS, 0],
-		[Item::SANDSTONE_STAIRS, 0],
-		[Item::STONE_BRICK_STAIRS, 0],
-		[Item::NETHER_BRICKS_STAIRS, 0],
-		[Item::QUARTZ_STAIRS, 0],
-		[Item::SLAB, 0],
-		[Item::SLAB, 1],
-		[Item::WOODEN_SLAB, 0],
-		[Item::WOODEN_SLAB, 1],
-		[Item::WOODEN_SLAB, 2],
-		[Item::WOODEN_SLAB, 3],
-		[Item::WOODEN_SLAB, 4],
-		[Item::WOODEN_SLAB, 5],
-		[Item::SLAB, 3],
-		[Item::SLAB, 4],
-		[Item::SLAB, 5],
-		[Item::SLAB, 6],
-		[Item::QUARTZ_BLOCK, 0],
-		[Item::QUARTZ_BLOCK, 1],
-		[Item::QUARTZ_BLOCK, 2],
-		[Item::COAL_ORE, 0],
-		[Item::IRON_ORE, 0],
-		[Item::GOLD_ORE, 0],
-		[Item::DIAMOND_ORE, 0],
-		[Item::LAPIS_ORE, 0],
-		[Item::REDSTONE_ORE, 0],
-		[Item::EMERALD_ORE, 0],
-		[Item::OBSIDIAN, 0],
-		[Item::ICE, 0],
-		[Item::SNOW_BLOCK, 0],
-		//TODO: ENDSTONE
-
-		//Decoration
-		[Item::COBBLESTONE_WALL, 0],
-		[Item::COBBLESTONE_WALL, 1],
-		//TODO: Lilly Pad
-		[Item::GOLD_BLOCK, 0],
-		[Item::IRON_BLOCK, 0],
-		[Item::DIAMOND_BLOCK, 0],
-		[Item::LAPIS_BLOCK, 0],
-		[Item::COAL_BLOCK, 0],
-		[Item::EMERALD_BLOCK, 0],
-		[Item::SNOW_LAYER, 0],
-		[Item::GLASS, 0],
-		[Item::GLOWSTONE_BLOCK, 0],
-		//TODO: Vines
-		[Item::NETHER_REACTOR, 0],
-		[Item::LADDER, 0],
-		[Item::SPONGE, 0],
-		[Item::GLASS_PANE, 0],
-		[Item::WOODEN_DOOR, 0],
-		[Item::TRAPDOOR, 0],
-		[Item::FENCE, 0],
-		[Item::FENCE_GATE, 0],
-		[Item::IRON_BARS, 0],
-		[Item::BED, 0],
-		[Item::BOOKSHELF, 0],
-		[Item::PAINTING, 0],
-		[Item::WORKBENCH, 0],
-		[Item::STONECUTTER, 0],
-		[Item::CHEST, 0],
-		[Item::FURNACE, 0],
-		//TODO: End Portal
-		[Item::DANDELION, 0],
-		[Item::POPPY, 0],
-		//TODO: blue orchid
-		//TODO: Allium
-		//TODO: Azure Bluet
-		//TODO: Red Tulip
-		//TODO: Orange Tulip
-		//TODO: White Tulip
-		//TODO: Pink Tulip
-		//TODO: Oxeye Daisy
-		//TODO: Lilac
-		//TODO: Double Tallgrass
-		//TODO: Large Fern
-		//TODO: Rose Bush
-		//TODO: Peony
-		[Item::BROWN_MUSHROOM, 0],
-		[Item::RED_MUSHROOM, 0],
-		//TODO: Mushroom block (brown, cover)
-		//TODO: Mushroom block (red, cover)
-		//TODO: Mushroom block (brown, stem)
-		//TODO: Mushroom block (red, stem)
-		[Item::CACTUS, 0],
-		[Item::MELON_BLOCK, 0],
-		[Item::PUMPKIN, 0],
-		[Item::LIT_PUMPKIN, 0],
-		[Item::COBWEB, 0],
-		[Item::HAY_BALE, 0],
-		[Item::TALL_GRASS, 1],
-		[Item::TALL_GRASS, 2],
-		[Item::DEAD_BUSH, 0],
-		[Item::SAPLING, 0],
-		[Item::SAPLING, 1],
-		[Item::SAPLING, 2],
-		[Item::SAPLING, 3],
-		[Item::SAPLING, 4],
-		[Item::SAPLING, 5],
-		[Item::LEAVES, 0],
-		[Item::LEAVES, 1],
-		[Item::LEAVES, 2],
-		[Item::LEAVES, 3],
-		[Item::LEAVES, 3],
-		[Item::LEAVES2, 0],
-		[Item::LEAVES2, 1],
-		[Item::CAKE, 0],
-		[Item::SIGN, 0],
-		//TODO: Monster Spawner
-		[Item::WOOL, 0],
-		[Item::WOOL, 7],
-		[Item::WOOL, 6],
-		[Item::WOOL, 5],
-		[Item::WOOL, 4],
-		[Item::WOOL, 3],
-		[Item::WOOL, 2],
-		[Item::WOOL, 1],
-		[Item::WOOL, 15],
-		[Item::WOOL, 14],
-		[Item::WOOL, 13],
-		[Item::WOOL, 12],
-		[Item::WOOL, 11],
-		[Item::WOOL, 10],
-		[Item::WOOL, 9],
-		[Item::WOOL, 8],
-		[Item::CARPET, 0],
-		[Item::CARPET, 7],
-		[Item::CARPET, 6],
-		[Item::CARPET, 5],
-		[Item::CARPET, 4],
-		[Item::CARPET, 3],
-		[Item::CARPET, 2],
-		[Item::CARPET, 1],
-		[Item::CARPET, 15],
-		[Item::CARPET, 14],
-		[Item::CARPET, 13],
-		[Item::CARPET, 12],
-		[Item::CARPET, 11],
-		[Item::CARPET, 10],
-		[Item::CARPET, 9],
-		[Item::CARPET, 8],
-
-		//Tools
-		//TODO [Item::RAILS, 0],
-		//TODO [Item::POWERED_RAILS, 0],
-		[Item::TORCH, 0],
-		[Item::BUCKET, 0],
-		[Item::BUCKET, 8],
-		[Item::BUCKET, 10],
-		[Item::TNT, 0],
-		[Item::IRON_HOE, 0],
-		[Item::IRON_SWORD, 0],
-		[Item::BOW, 0],
-		[Item::SHEARS, 0],
-		[Item::FLINT_AND_STEEL, 0],
-		[Item::CLOCK, 0],
-		[Item::COMPASS, 0],
-		[Item::MINECART, 0],
-		//TODO: Villager
-		[Item::SPAWN_EGG, 10], //Chicken
-		[Item::SPAWN_EGG, 11], //Cow
-		[Item::SPAWN_EGG, 12], //Pig
-		[Item::SPAWN_EGG, 13], //Sheep
-		//TODO: Wolf
-		//TODO: Mooshroom
-		//TODO: Creeper
-		//TODO: Enderman
-		//TODO: Silverfish
-		//TODO: Skeleton
-		//TODO: Slime
-		//TODO: Zombie
-		//TODO: PigZombie
-		//TODO: Replace with Entity constants
-
-
-		//Seeds
-		[Item::SUGARCANE, 0],
-		[Item::WHEAT, 0],
-		[Item::SEEDS, 0],
-		[Item::MELON_SEEDS, 0],
-		[Item::PUMPKIN_SEEDS, 0],
-		[Item::CARROT, 0],
-		[Item::POTATO, 0],
-		[Item::BEETROOT_SEEDS, 0],
-		[Item::EGG, 0],
-		[Item::DYE, 0],
-		[Item::DYE, 7],
-		[Item::DYE, 6],
-		[Item::DYE, 5],
-		[Item::DYE, 4],
-		[Item::DYE, 3],
-		[Item::DYE, 2],
-		[Item::DYE, 1],
-		[Item::DYE, 15],
-		[Item::DYE, 14],
-		[Item::DYE, 13],
-		[Item::DYE, 12],
-		[Item::DYE, 11],
-		[Item::DYE, 10],
-		[Item::DYE, 9],
-		[Item::DYE, 8],
-
-	);
-
-	/** @var Block[] */
-	public static $list = [];
+	public static $list = array();
 	protected $id;
 	protected $meta;
 	protected $name;
@@ -506,13 +218,13 @@ abstract class Block extends Position implements Metadatable{
 	public $isTransparent = false;
 	public $isReplaceable = false;
 	public $isPlaceable = true;
+	public $level = false;
 	public $hasPhysics = false;
 	public $isLiquid = false;
 	public $isFullBlock = true;
 	public $x = 0;
 	public $y = 0;
 	public $z = 0;
-	public $frictionFactor = 0.6;
 
 	public static function init(){
 		if(count(self::$list) === 0){
@@ -547,9 +259,9 @@ abstract class Block extends Position implements Metadatable{
 				self::DEAD_BUSH => new DeadBush(),
 				self::WOOL => new Wool(),
 				self::DANDELION => new Dandelion(),
-				self::POPPY => new CyanFlower(),
+				self::CYAN_FLOWER => new CyanFlower(),
 				self::BROWN_MUSHROOM => new BrownMushroom(),
-				self::RED_MUSHROOM => new RedMushroom(),
+				self::RED_MUSHROOM => new RedMushRoom(),
 				self::GOLD_BLOCK => new Gold(),
 				self::IRON_BLOCK => new Iron(),
 				self::DOUBLE_SLAB => new DoubleSlab(),
@@ -618,9 +330,7 @@ abstract class Block extends Position implements Metadatable{
 				self::NETHER_BRICKS_STAIRS => new NetherBrickStairs(),
 
 				self::SANDSTONE_STAIRS => new SandstoneStairs(),
-				self::EMERALD_ORE => new EmeraldOre(),
 
-				self::EMERALD_BLOCK => new Emerald(),
 				self::SPRUCE_WOOD_STAIRS => new SpruceWoodStairs(),
 				self::BIRCH_WOOD_STAIRS => new BirchWoodStairs(),
 				self::JUNGLE_WOOD_STAIRS => new JungleWoodStairs(),
@@ -633,22 +343,15 @@ abstract class Block extends Position implements Metadatable{
 				self::QUARTZ_STAIRS => new QuartzStairs(),
 				self::DOUBLE_WOOD_SLAB => new DoubleWoodSlab(),
 				self::WOOD_SLAB => new WoodSlab(),
-				self::STAINED_CLAY => new StainedClay(),
-
-				self::LEAVES2 => new Leaves2(),
-				self::WOOD2 => new Wood2(),
-				self::ACACIA_WOOD_STAIRS => new AcaciaWoodStairs(),
-				self::DARK_OAK_WOOD_STAIRS => new DarkOakWoodStairs(),
 
 				self::HAY_BALE => new HayBale(),
 				self::CARPET => new Carpet(),
-				self::HARDENED_CLAY => new HardenedClay(),
+
 				self::COAL_BLOCK => new Coal(),
 
 				self::BEETROOT_BLOCK => new Beetroot(),
 				self::STONECUTTER => new Stonecutter(),
 				self::GLOWING_OBSIDIAN => new GlowingObsidian(),
-				self::NETHER_REACTOR => new NetherReactor(),
 			);
 		}
 	}
@@ -663,8 +366,8 @@ abstract class Block extends Position implements Metadatable{
 	public static function get($id, $meta = 0, Position $pos = null){
 		if(isset(self::$list[$id])){
 			$block = clone self::$list[$id];
-			$block->setDamage($meta);
-		}else{
+			$block->setMetadata($meta);
+		} else{
 			$block = new Generic($id, $meta);
 		}
 		if($pos instanceof Position){
@@ -674,11 +377,6 @@ abstract class Block extends Position implements Metadatable{
 		return $block;
 	}
 
-	/**
-	 * @param int    $id
-	 * @param int    $meta
-	 * @param string $name
-	 */
 	public function __construct($id, $meta = 0, $name = "Unknown"){
 		$this->id = (int) $id;
 		$this->meta = (int) $meta;
@@ -711,14 +409,14 @@ abstract class Block extends Position implements Metadatable{
 	/**
 	 * @return int
 	 */
-	final public function getDamage(){
+	final public function getMetadata(){
 		return $this->meta;
 	}
 
 	/**
 	 * @param int $meta
 	 */
-	final public function setDamage($meta){
+	final public function setMetadata($meta){
 		$this->meta = $meta & 0x0F;
 	}
 
@@ -728,26 +426,27 @@ abstract class Block extends Position implements Metadatable{
 	 * @param Position $v
 	 */
 	final public function position(Position $v){
+		$this->level = $v->level;
 		$this->x = (int) $v->x;
 		$this->y = (int) $v->y;
 		$this->z = (int) $v->z;
-		$this->level = $v->level;
 	}
 
 	/**
 	 * Returns an array of Item objects to be dropped
 	 *
 	 * @param Item $item
+	 * @param Player   $player
 	 *
 	 * @return array
 	 */
-	public function getDrops(Item $item){
-		if(!isset(self::$list[$this->id])){ //Unknown blocks
-			return [];
-		}else{
-			return [
+	public function getDrops(Item $item, PocketMine\Player $player){
+		if(!isset(self::$class[$this->id])){ //Unknown blocks
+			return array();
+		} else{
+			return array(
 				array($this->id, $this->meta, 1),
-			];
+			);
 		}
 	}
 
@@ -755,10 +454,16 @@ abstract class Block extends Position implements Metadatable{
 	 * Returns the seconds that this block takes to be broken using an specific Item
 	 *
 	 * @param Item $item
+	 * @param Player   $player
 	 *
 	 * @return float
 	 */
-	public function getBreakTime(Item $item){
+
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.15;
+		}
+
 		return $this->breakTime;
 	}
 
@@ -766,22 +471,18 @@ abstract class Block extends Position implements Metadatable{
 	 * Returns the Block on the side $side, works like Vector3::side()
 	 *
 	 * @param int $side
-	 * @param int $step
 	 *
 	 * @return Block
 	 */
-	public function getSide($side, $step = 1){
-		$v = parent::getSide($side, $step);
-		if($this->isValid()){
-			return $this->getLevel()->getBlock($v);
+	public function getSide($side){
+		$v = parent::getSide($side);
+		if($this->level instanceof Level){
+			return $this->level->getBlock($v);
 		}
 
-		return Block::get(Item::AIR, 0, $v);
+		return $v;
 	}
 
-	/**
-	 * @return string
-	 */
 	final public function __toString(){
 		return "Block " . $this->name . " (" . $this->id . ":" . $this->meta . ")";
 	}
@@ -790,72 +491,47 @@ abstract class Block extends Position implements Metadatable{
 	 * Returns if the item can be broken with an specific Item
 	 *
 	 * @param Item $item
+	 * @param Player   $player
 	 *
 	 * @return bool
 	 */
-	abstract function isBreakable(Item $item);
+	abstract function isBreakable(Item $item, PocketMine\Player $player);
 
 	/**
 	 * Do the actions needed so the block is broken with the Item
 	 *
 	 * @param Item $item
+	 * @param Player   $player
 	 *
 	 * @return mixed
 	 */
-	abstract function onBreak(Item $item);
-
-	/**
-	 * Checks for collision against an AxisAlignedBB
-	 *
-	 * @param AxisAlignedBB $bb
-	 * @param Block[]       $list
-	 */
-	public function collidesWithBB(AxisAlignedBB $bb, &$list = array()){
-		$bb2 = $this->getBoundingBox();
-		if($bb2->intersectsWith($bb)){
-			$list[] = $bb2;
-		}
-	}
-
-	/**
-	 * @return AxisAlignedBB
-	 */
-	public function getBoundingBox(){
-		return new AxisAlignedBB(
-			$this->x,
-			$this->y,
-			$this->z,
-			$this->x + 1,
-			$this->y + 1,
-			$this->z + 1
-		);
-	}
+	abstract function onBreak(Item $item, PocketMine\Player $player);
 
 	/**
 	 * Places the Block, using block space and block target, and side. Returns if the block has been placed.
 	 *
-	 * @param Item   $item
-	 * @param Block  $block
-	 * @param Block  $target
-	 * @param int    $face
-	 * @param float  $fx
-	 * @param float  $fy
-	 * @param float  $fz
-	 * @param Player $player = null
+	 * @param Item $item
+	 * @param Player   $player
+	 * @param Block    $block
+	 * @param Block    $target
+	 * @param int      $face
+	 * @param float    $fx
+	 * @param float    $fy
+	 * @param float    $fz
 	 *
 	 * @return bool
 	 */
-	abstract function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null);
+	abstract function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz);
 
 	/**
 	 * Do actions when activated by Item. Returns if it has done anything
 	 *
-	 * @param Item   $item
-	 * @param Player $player
+	 * @param Item $item
+	 * @param Player   $player
 	 *
 	 * @return bool
 	 */
-	abstract function onActivate(Item $item, Player $player = null);
+	abstract function onActivate(Item $item, PocketMine\Player $player);
 
 	/**
 	 * Fires a block update on the Block
@@ -865,28 +541,4 @@ abstract class Block extends Position implements Metadatable{
 	 * @return void
 	 */
 	abstract function onUpdate($type);
-
-	public function setMetadata($metadataKey, MetadataValue $metadataValue){
-		if($this->getLevel() instanceof Level){
-			$this->getLevel()->getBlockMetadata()->setMetadata($this, $metadataKey, $metadataValue);
-		}
-	}
-
-	public function getMetadata($metadataKey){
-		if($this->getLevel() instanceof Level){
-			$this->getLevel()->getBlockMetadata()->getMetadata($this, $metadataKey);
-		}
-	}
-
-	public function hasMetadata($metadataKey){
-		if($this->getLevel() instanceof Level){
-			$this->getLevel()->getBlockMetadata()->hasMetadata($this, $metadataKey);
-		}
-	}
-
-	public function removeMetadata($metadataKey, Plugin $plugin){
-		if($this->getLevel() instanceof Level){
-			$this->getLevel()->getBlockMetadata()->removeMetadata($this, $metadataKey, $plugin);
-		}
-	}
 }

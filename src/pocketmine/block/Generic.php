@@ -19,12 +19,12 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
-use pocketmine\Server;
+use PocketMine\Player as Player;
+use PocketMine\Item\Item as Item;
+use PocketMine\ServerAPI as ServerAPI;
+use PocketMine;
 
 class Generic extends Block{
 
@@ -37,20 +37,20 @@ class Generic extends Block{
 		parent::__construct($id, $meta, $name);
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		return $this->getLevel()->setBlock($this, $this, true, false, true);
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
+		return $this->level->setBlock($this, $this, true, false, true);
 	}
 
-	public function isBreakable(Item $item){
+	public function isBreakable(Item $item, PocketMine\Player $player){
 		return $this->breakable;
 	}
 
-	public function onBreak(Item $item){
-		return $this->getLevel()->setBlock($this, new Air(), true, false, true);
+	public function onBreak(Item $item, PocketMine\Player $player){
+		return $this->level->setBlock($this, new Air(), true, false, true);
 	}
 
 	public function onUpdate($type){
-		if($this->hasPhysics === true and $type === Level::BLOCK_UPDATE_NORMAL){
+		if($this->hasPhysics === true and $type === BLOCK_UPDATE_NORMAL){
 			$down = $this->getSide(0);
 			if($down->getID() === self::AIR or ($down instanceof Liquid)){
 				$data = array(
@@ -59,11 +59,12 @@ class Generic extends Block{
 					"z" => $this->z + 0.5,
 					"Tile" => $this->id,
 				);
-				/*$this->getLevel()->setBlock($this, new Air(), false, false, true);
+				$server = ServerAPI::request();
+				$this->level->setBlock($this, new Air(), false, false, true);
 				//TODO
-				//$e = $server->api->entity->add($this->getLevel(), ENTITY_FALLING, FALLING_SAND, $data);
+				//$e = $server->api->entity->add($this->level, ENTITY_FALLING, FALLING_SAND, $data);
 				//$e->spawnToAll();
-				$server->api->block->blockUpdateAround(clone $this, Level::BLOCK_UPDATE_NORMAL, 1);*/
+				$server->api->block->blockUpdateAround(clone $this, BLOCK_UPDATE_NORMAL, 1);
 			}
 
 			return false;
@@ -72,7 +73,7 @@ class Generic extends Block{
 		return false;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
+	public function onActivate(Item $item, PocketMine\Player $player){
 		return $this->isActivable;
 	}
 }

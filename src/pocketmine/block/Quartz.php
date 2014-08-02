@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Quartz extends Solid{
 	public function __construct($meta = 0){
@@ -35,8 +36,10 @@ class Quartz extends Solid{
 		$this->name = $names[$this->meta & 0x03];
 	}
 
-	public function getBreakTime(Item $item){
-
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.20;
+		}
 		switch($item->isPickaxe()){
 			case 5:
 				return 0.15;
@@ -53,13 +56,13 @@ class Quartz extends Solid{
 		}
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		if($item->isPickaxe() >= 1){
 			return array(
-				array(Item::QUARTZ_BLOCK, $this->meta & 0x03, 1),
+				array(QUARTZ_BLOCK, $this->meta & 0x03, 1),
 			);
-		}else{
-			return [];
+		} else{
+			return array();
 		}
 	}
 }

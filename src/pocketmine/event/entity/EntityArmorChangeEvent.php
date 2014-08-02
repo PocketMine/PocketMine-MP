@@ -19,15 +19,16 @@
  *
  */
 
-namespace pocketmine\event\entity;
+namespace PocketMine\Event\Entity;
 
-use pocketmine\entity\Entity;
-use pocketmine\event\Cancellable;
-use pocketmine\Event;
-use pocketmine\item\Item;
+use PocketMine\Entity\Entity as Entity;
+use PocketMine\Event;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
-class EntityArmorChangeEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityArmorChangeEvent extends EntityEvent implements CancellableEvent{
+	public static $handlers;
+	public static $handlerPriority;
 
 	private $oldItem;
 	private $newItem;

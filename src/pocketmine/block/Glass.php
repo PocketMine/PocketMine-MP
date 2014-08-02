@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Glass extends Transparent{
 	public function __construct(){
@@ -29,7 +30,7 @@ class Glass extends Transparent{
 		$this->hardness = 1.5;
 	}
 
-	public function getDrops(Item $item){
-		return [];
+	public function getDrops(Item $item, PocketMine\Player $player){
+		return array();
 	}
 }

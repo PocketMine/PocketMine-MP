@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class WoodSlab extends Transparent{
 	public function __construct($meta = 0){
@@ -32,69 +32,69 @@ class WoodSlab extends Transparent{
 			1 => "Spruce",
 			2 => "Birch",
 			3 => "Jungle",
-			4 => "Acacia",
-			5 => "Dark Oak",
 		);
 		$this->name = (($this->meta & 0x08) === 0x08 ? "Upper " : "") . $names[$this->meta & 0x07] . " Wooden Slab";
 		if(($this->meta & 0x08) === 0x08){
 			$this->isFullBlock = true;
-		}else{
+		} else{
 			$this->isFullBlock = false;
 		}
 		$this->hardness = 15;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$this->meta &= 0x07;
 		if($face === 0){
-			if($target->getID() === self::WOOD_SLAB and ($target->getDamage() & 0x08) === 0x08 and ($target->getDamage() & 0x07) === ($this->meta & 0x07)){
-				$this->getLevel()->setBlock($target, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
+			if($target->getID() === self::WOOD_SLAB and ($target->getMetadata() & 0x08) === 0x08 and ($target->getMetadata() & 0x07) === ($this->meta & 0x07)){
+				$this->level->setBlock($target, Block::get(DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
 
 				return true;
-			}elseif($block->getID() === self::WOOD_SLAB and ($block->getDamage() & 0x07) === ($this->meta & 0x07)){
-				$this->getLevel()->setBlock($block, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
+			} elseif($block->getID() === self::WOOD_SLAB and ($block->getMetadata() & 0x07) === ($this->meta & 0x07)){
+				$this->level->setBlock($block, Block::get(DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
 
 				return true;
-			}else{
+			} else{
 				$this->meta |= 0x08;
 			}
-		}elseif($face === 1){
-			if($target->getID() === self::WOOD_SLAB and ($target->getDamage() & 0x08) === 0 and ($target->getDamage() & 0x07) === ($this->meta & 0x07)){
-				$this->getLevel()->setBlock($target, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
+		} elseif($face === 1){
+			if($target->getID() === self::WOOD_SLAB and ($target->getMetadata() & 0x08) === 0 and ($target->getMetadata() & 0x07) === ($this->meta & 0x07)){
+				$this->level->setBlock($target, Block::get(DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
 
 				return true;
-			}elseif($block->getID() === self::WOOD_SLAB and ($block->getDamage() & 0x07) === ($this->meta & 0x07)){
-				$this->getLevel()->setBlock($block, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
+			} elseif($block->getID() === self::WOOD_SLAB and ($block->getMetadata() & 0x07) === ($this->meta & 0x07)){
+				$this->level->setBlock($block, Block::get(DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
 
 				return true;
 			}
-		}elseif(!($player instanceof Player)){ //TODO: collision
+		} elseif(!$player->inBlock($block)){
 			if($block->getID() === self::WOOD_SLAB){
-				if(($block->getDamage() & 0x07) === ($this->meta & 0x07)){
-					$this->getLevel()->setBlock($block, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
+				if(($block->getMetadata() & 0x07) === ($this->meta & 0x07)){
+					$this->level->setBlock($block, Block::get(DOUBLE_WOOD_SLAB, $this->meta), true, false, true);
 
 					return true;
 				}
 
 				return false;
-			}else{
+			} else{
 				if($fy > 0.5){
 					$this->meta |= 0x08;
 				}
 			}
-		}else{
+		} else{
 			return false;
 		}
-		if($block->getID() === self::WOOD_SLAB and ($target->getDamage() & 0x07) !== ($this->meta & 0x07)){
+		if($block->getID() === self::WOOD_SLAB and ($target->getMetadata() & 0x07) !== ($this->meta & 0x07)){
 			return false;
 		}
-		$this->getLevel()->setBlock($block, $this, true, false, true);
+		$this->level->setBlock($block, $this, true, false, true);
 
 		return true;
 	}
 
-	public function getBreakTime(Item $item){
-
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.20;
+		}
 		switch($item->isAxe()){
 			case 5:
 				return 0.4;
@@ -111,7 +111,7 @@ class WoodSlab extends Transparent{
 		}
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, $this->meta & 0x07, 1),
 		);

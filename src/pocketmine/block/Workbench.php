@@ -19,12 +19,11 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
-//TODO: check orientation
 class Workbench extends Solid{
 	public function __construct($meta = 0){
 		parent::__construct(self::WORKBENCH, $meta, "Crafting Table");
@@ -32,15 +31,13 @@ class Workbench extends Solid{
 		$this->hardness = 15;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
-		if($player instanceof Player){
-			$player->craftingType = 1;
-		}
+	public function onActivate(Item $item, PocketMine\Player $player){
+		$player->toCraft[-1] = 1;
 
 		return true;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);

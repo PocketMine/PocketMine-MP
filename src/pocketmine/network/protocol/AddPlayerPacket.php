@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
-use pocketmine\utils\Binary;
+use PocketMine;
+use PocketMine\Utils\Utils as Utils;
 
 class AddPlayerPacket extends DataPacket{
 	public $clientID;
@@ -52,11 +53,11 @@ class AddPlayerPacket extends DataPacket{
 		$this->putFloat($this->x);
 		$this->putFloat($this->y);
 		$this->putFloat($this->z);
-		$this->putByte((int) ($this->yaw * (256 / 360)));
-		$this->putByte((int) ($this->pitch * (256 / 360)));
+		$this->putByte($this->yaw);
+		$this->putByte($this->pitch);
 		$this->putShort($this->unknown1);
 		$this->putShort($this->unknown2);
-		$this->put(Binary::writeMetadata($this->metadata));
+		$this->put(Utils::writeMetadata($this->metadata));
 	}
 
 }

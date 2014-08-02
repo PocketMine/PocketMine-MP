@@ -19,12 +19,9 @@
  *
 */
 
-namespace pocketmine\math;
+namespace PocketMine\Math;
+use PocketMine;
 
-/**
- * WARNING: This class is available on the PocketMine-MP Zephir project.
- * If this class is modified, remember to modify the PHP C extension.
- */
 class AxisAlignedBB{
 	public $minX;
 	public $minY;
@@ -54,25 +51,26 @@ class AxisAlignedBB{
 	}
 
 	public function addCoord($x, $y, $z){
+		$vec = clone $this;
 		if($x < 0){
-			$this->minX += $x;
-		}elseif($x > 0){
-			$this->maxX += $x;
+			$vec->minX += $x;
+		} elseif($x > 0){
+			$vec->maxX += $x;
 		}
 
 		if($y < 0){
-			$this->minY += $y;
-		}elseif($y > 0){
-			$this->maxY += $y;
+			$vec->minY += $y;
+		} elseif($y > 0){
+			$vec->maxY += $y;
 		}
 
 		if($z < 0){
-			$this->minZ += $z;
-		}elseif($z > 0){
-			$this->maxZ += $z;
+			$vec->minZ += $z;
+		} elseif($z > 0){
+			$vec->maxZ += $z;
 		}
 
-		return $this;
+		return $vec;
 	}
 
 	public function expand($x, $y, $z){
@@ -196,13 +194,14 @@ class AxisAlignedBB{
 	}
 
 	public function intersectsWith(AxisAlignedBB $bb){
-		if($bb->maxX > $this->minX and $bb->minX < $this->maxX){
-			if($bb->maxY > $this->minY and $bb->minY < $this->maxY){
-				return $bb->maxZ > $this->minZ and $bb->minZ < $this->maxZ;
-			}
+		if($bb->maxX <= $this->minX or $bb->minX >= $this->maxX){
+			return false;
+		}
+		if($bb->maxY <= $this->minY or $bb->minY >= $this->maxY){
+			return false;
 		}
 
-		return false;
+		return $bb->maxZ > $this->minZ and $bb->minZ < $this->maxZ;
 	}
 
 	public function isVectorInside(Vector3 $vector){

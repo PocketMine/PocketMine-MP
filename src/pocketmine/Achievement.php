@@ -19,21 +19,13 @@
  *
 */
 
-namespace pocketmine;
+namespace PocketMine;
 
-use pocketmine\utils\TextFormat;
-
-/**
- * Handles the achievement list and a bit more
- */
 abstract class Achievement{
-	/**
-	 * @var array[]
-	 */
 	public static $list = array(
 		/*"openInventory" => array(
 			"name" => "Taking Inventory",
-			"requires" => [],
+			"requires" => array(),
 		),*/
 		"mineWood" => array(
 			"name" => "Getting Wood",
@@ -106,10 +98,13 @@ abstract class Achievement{
 
 	public static function broadcast(Player $player, $achievementId){
 		if(isset(Achievement::$list[$achievementId])){
-			if(Server::getInstance()->getConfigString("announce-player-achievements", true) === true){
-				Server::getInstance()->broadcastMessage($player->getDisplayName() . " has just earned the achievement " . TextFormat::GREEN . Achievement::$list[$achievementId]["name"]);
-			}else{
-				$player->sendMessage("You have just earned the achievement " . TextFormat::GREEN . Achievement::$list[$achievementId]["name"]);
+			$result = ServerAPI::request()->api->dhandle("achievement.broadcast", array("player" => $player, "achievementId" => $achievementId));
+			if($result !== false and $result !== true){
+				if(ServerAPI::request()->api->getProperty("announce-player-achievements") == true){
+					ServerAPI::request()->api->chat->broadcast($player->getUsername() . " has just earned the achievement " . Achievement::$list[$achievementId]["name"]);
+				} else{
+					$player->sendChat("You have just earned the achievement " . Achievement::$list[$achievementId]["name"]);
+				}
 			}
 
 			return true;
@@ -118,7 +113,7 @@ abstract class Achievement{
 		return false;
 	}
 
-	public static function add($achievementId, $achievementName, array $requires = []){
+	public static function add($achievementId, $achievementName, array $requires = array()){
 		if(!isset(Achievement::$list[$achievementId])){
 			Achievement::$list[$achievementId] = array(
 				"name" => $achievementName,

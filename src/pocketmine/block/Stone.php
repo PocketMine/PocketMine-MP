@@ -19,36 +19,21 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Stone extends Solid{
-	const NORMAL = 0;
-	const GRANITE = 1;
-	const POLISHED_GRANITE = 2;
-	const DIORITE = 3;
-	const POLISHED_DIORITE = 4;
-	const ANDESITE = 5;
-	const POLISHED_ANDESITE = 6;
-
-	public function __construct($meta = 0){
-		parent::__construct(self::STONE, $meta, "Stone");
-		$names = [
-			self::NORMAL => "Stone",
-			self::GRANITE => "Granite",
-			self::POLISHED_GRANITE => "Polished Granite",
-			self::DIORITE => "Diorite",
-			self::POLISHED_DIORITE => "Polished Diorite",
-			self::ANDESITE => "Andesite",
-			self::POLISHED_ANDESITE => "Polished Andesite",
-		];
-		$this->name = $names[$this->meta & 0x07];
+	public function __construct(){
+		parent::__construct(self::STONE, 0, "Stone");
 		$this->hardness = 30;
 	}
 
-	public function getBreakTime(Item $item){
-
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.20;
+		}
 		switch($item->isPickaxe()){
 			case 5:
 				return 0.4;
@@ -65,13 +50,13 @@ class Stone extends Solid{
 		}
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		if($item->isPickaxe() >= 1){
 			return array(
-				array(Item::COBBLESTONE, 0, 1),
+				array(COBBLESTONE, 0, 1),
 			);
-		}else{
-			return [];
+		} else{
+			return array();
 		}
 	}
 

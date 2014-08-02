@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class FenceGate extends Transparent{
 	public function __construct($meta = 0){
@@ -30,45 +30,45 @@ class FenceGate extends Transparent{
 		$this->isActivable = true;
 		if(($this->meta & 0x04) === 0x04){
 			$this->isFullBlock = true;
-		}else{
+		} else{
 			$this->isFullBlock = false;
 		}
 		$this->hardness = 15;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$faces = array(
 			0 => 3,
 			1 => 0,
 			2 => 1,
 			3 => 2,
 		);
-		$this->meta = $faces[$player instanceof Player ? $player->getDirection() : 0] & 0x03;
-		$this->getLevel()->setBlock($block, $this, true, false, true);
+		$this->meta = $faces[$player->getDirection()] & 0x03;
+		$this->level->setBlock($block, $this, true, false, true);
 
 		return true;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);
 	}
 
-	public function onActivate(Item $item, Player $player = null){
+	public function onActivate(Item $item, PocketMine\Player $player){
 		$faces = array(
 			0 => 3,
 			1 => 0,
 			2 => 1,
 			3 => 2,
 		);
-		$this->meta = ($faces[$player instanceof Player ? $player->getDirection() : 0] & 0x03) | ((~$this->meta) & 0x04);
+		$this->meta = ($faces[$player->getDirection()] & 0x03) | ((~$this->meta) & 0x04);
 		if(($this->meta & 0x04) === 0x04){
 			$this->isFullBlock = true;
-		}else{
+		} else{
 			$this->isFullBlock = false;
 		}
-		$this->getLevel()->setBlock($this, $this, true, false, true);
+		$this->level->setBlock($this, $this, true, false, true);
 
 		return true;
 	}

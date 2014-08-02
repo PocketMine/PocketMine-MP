@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class InteractPacket extends DataPacket{
 	public $action;

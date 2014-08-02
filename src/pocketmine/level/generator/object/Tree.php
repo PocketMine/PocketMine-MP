@@ -19,11 +19,14 @@
  *
 */
 
-namespace pocketmine\level\generator\object;
+namespace PocketMine\Level\Generator\Object;
 
-use pocketmine\block\Sapling;
-use pocketmine\level\ChunkManager;
-use pocketmine\utils\Random;
+use PocketMine\Block\Sapling as Sapling;
+use PocketMine\Level\Level as Level;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\Block\Block as Block;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 class Tree{
 	public $overridable = array(
@@ -35,12 +38,12 @@ class Tree{
 		18 => true,
 	);
 
-	public static function growTree(ChunkManager $level, $x, $y, $z, Random $random, $type = 0){
+	public static function growTree(Level $level, Vector3 $pos, Random $random, $type = 0){
 		switch($type & 0x03){
 			case Sapling::SPRUCE:
 				if($random->nextRange(0, 1) === 1){
 					$tree = new SpruceTree();
-				}else{
+				} else{
 					$tree = new PineTree();
 				}
 				break;
@@ -61,8 +64,8 @@ class Tree{
 				//}
 				break;
 		}
-		if($tree->canPlaceObject($level, $x, $y, $z, $random)){
-			$tree->placeObject($level, $x, $y, $z, $random);
+		if($tree->canPlaceObject($level, $pos, $random)){
+			$tree->placeObject($level, $pos, $random);
 		}
 	}
 }

@@ -19,13 +19,12 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\generator\object\Tree;
-use pocketmine\level\Level;
-use pocketmine\Player;
-use pocketmine\utils\Random;
+use PocketMine\Item\Item as Item;
+use PocketMine\Level\Generator\Object\Tree as Tree;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 class Sapling extends Flowable{
 	const OAK = 0;
@@ -42,17 +41,15 @@ class Sapling extends Flowable{
 			1 => "Spruce Sapling",
 			2 => "Birch Sapling",
 			3 => "Jungle Sapling",
-			4 => "Acacia Sapling",
-			5 => "Dark Oak Sapling",
 		);
-		$this->name = $names[$this->meta & 0x07];
+		$this->name = $names[$this->meta & 0x03];
 		$this->hardness = 0;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$down = $this->getSide(0);
 		if($down->getID() === self::GRASS or $down->getID() === self::DIRT or $down->getID() === self::FARMLAND){
-			$this->getLevel()->setBlock($block, $this, true, false, true);
+			$this->level->setBlock($block, $this, true, false, true);
 
 			return true;
 		}
@@ -60,10 +57,9 @@ class Sapling extends Flowable{
 		return false;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
-		if($item->getID() === Item::DYE and $item->getDamage() === 0x0F){ //Bonemeal
-			//TODO: change log type
-			Tree::growTree($this->getLevel(), $this->x, $this->y, $this->z, new Random(mt_rand()), $this->meta & 0x07);
+	public function onActivate(Item $item, PocketMine\Player $player){
+		if($item->getID() === Item::DYE and $item->getMetadata() === 0x0F){ //Bonemeal
+			Tree::growTree($this->level, $this, new Random(), $this->meta & 0x03);
 			if(($player->gamemode & 0x01) === 0){
 				$item->count--;
 			}
@@ -75,35 +71,35 @@ class Sapling extends Flowable{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			if($this->getSide(0)->isTransparent === true){ //Replace with common break method
 				//TODO
-				//Server::getInstance()->api->entity->drop($this, Item::get($this->id));
-				$this->getLevel()->setBlock($this, new Air(), false, false, true);
+				//ServerAPI::request()->api->entity->drop($this, Item::get($this->id));
+				$this->level->setBlock($this, new Air(), false, false, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
-		}elseif($type === Level::BLOCK_UPDATE_RANDOM){ //Growth
+		} elseif($type === BLOCK_UPDATE_RANDOM){ //Growth
 			if(mt_rand(1, 7) === 1){
 				if(($this->meta & 0x08) === 0x08){
-					Tree::growTree($this->getLevel(), $this->x, $this->y, $this->z, new Random(mt_rand()), $this->meta & 0x07);
-				}else{
+					Tree::growTree($this->level, $this, new Random(), $this->meta & 0x03);
+				} else{
 					$this->meta |= 0x08;
-					$this->getLevel()->setBlock($this, $this, true, false, true);
+					$this->level->setBlock($this, $this, true, false, true);
 
-					return Level::BLOCK_UPDATE_RANDOM;
+					return BLOCK_UPDATE_RANDOM;
 				}
-			}else{
-				return Level::BLOCK_UPDATE_RANDOM;
+			} else{
+				return BLOCK_UPDATE_RANDOM;
 			}
 		}
 
 		return false;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
-			array($this->id, $this->meta & 0x07, 1),
+			array($this->id, $this->meta & 0x03, 1),
 		);
 	}
 }

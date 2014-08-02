@@ -19,9 +19,9 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\level\Level;
+use PocketMine;
 
 class DeadBush extends Flowable{
 	public function __construct(){
@@ -31,11 +31,11 @@ class DeadBush extends Flowable{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			if($this->getSide(0)->isTransparent === true){ //Replace with common break method
-				$this->getLevel()->setBlock($this, new Air(), false, false, true);
+				$this->level->setBlock($this, new Air(), false, false, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
 		}
 

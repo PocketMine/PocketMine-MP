@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
+use PocketMine;
 
 class Transparent extends Generic{
 

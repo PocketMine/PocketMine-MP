@@ -19,11 +19,10 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace PocketMine\Entity;
 
+use PocketMine;
 
-use pocketmine\inventory\InventoryHolder;
-
-class Enderman extends Monster implements InventoryHolder{
+class Enderman extends Monster implements InventorySource{
 
 }

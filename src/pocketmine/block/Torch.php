@@ -19,11 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Torch extends Flowable{
 	public function __construct($meta = 0){
@@ -32,8 +31,8 @@ class Torch extends Flowable{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
-			$side = $this->getDamage();
+		if($type === BLOCK_UPDATE_NORMAL){
+			$side = $this->getMetadata();
 			$faces = array(
 				1 => 4,
 				2 => 5,
@@ -46,17 +45,17 @@ class Torch extends Flowable{
 
 			if($this->getSide($faces[$side])->isTransparent === true and !($side === 0 and $this->getSide(0)->getID() === self::FENCE)){ //Replace with common break method
 				//TODO
-				//Server::getInstance()->api->entity->drop($this, Item::get($this->id, 0, 1));
-				$this->getLevel()->setBlock($this, new Air(), true, false, true);
+				//ServerAPI::request()->api->entity->drop($this, Item::get($this->id, 0, 1));
+				$this->level->setBlock($this, new Air(), true, false, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
 		}
 
 		return false;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		if($target->isTransparent === false and $face !== 0){
 			$faces = array(
 				1 => 5,
@@ -66,12 +65,12 @@ class Torch extends Flowable{
 				5 => 1,
 			);
 			$this->meta = $faces[$face];
-			$this->getLevel()->setBlock($block, $this, true, false, true);
+			$this->level->setBlock($block, $this, true, false, true);
 
 			return true;
-		}elseif($this->getSide(0)->isTransparent === false or $this->getSide(0)->getID() === self::FENCE){
+		} elseif($this->getSide(0)->isTransparent === false or $this->getSide(0)->getID() === self::FENCE){
 			$this->meta = 0;
-			$this->getLevel()->setBlock($block, $this, true, false, true);
+			$this->level->setBlock($block, $this, true, false, true);
 
 			return true;
 		}
@@ -79,7 +78,7 @@ class Torch extends Flowable{
 		return false;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);

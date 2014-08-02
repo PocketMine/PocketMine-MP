@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class ContainerOpenPacket extends DataPacket{
 	public $windowid;
@@ -42,7 +43,7 @@ class ContainerOpenPacket extends DataPacket{
 		$this->reset();
 		$this->putByte($this->windowid);
 		$this->putByte($this->type);
-		$this->putShort($this->slots);
+		$this->putByte($this->slots);
 		$this->putInt($this->x);
 		$this->putInt($this->y);
 		$this->putInt($this->z);

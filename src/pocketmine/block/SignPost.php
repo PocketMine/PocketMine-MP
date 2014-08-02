@@ -19,11 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class SignPost extends Transparent{
 	public function __construct($meta = 0){
@@ -33,7 +32,7 @@ class SignPost extends Transparent{
 		$this->hardness = 5;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		if($face !== 0){
 			$faces = array(
 				2 => 2,
@@ -43,12 +42,12 @@ class SignPost extends Transparent{
 			);
 			if(!isset($faces[$face])){
 				$this->meta = floor((($player->yaw + 180) * 16 / 360) + 0.5) & 0x0F;
-				$this->getLevel()->setBlock($block, Block::get(Item::SIGN_POST, $this->meta), true, false, true);
+				$this->level->setBlock($block, Block::get(SIGN_POST, $this->meta), true, false, true);
 
 				return true;
-			}else{
+			} else{
 				$this->meta = $faces[$face];
-				$this->getLevel()->setBlock($block, Block::get(Item::WALL_SIGN, $this->meta), true, false, true);
+				$this->level->setBlock($block, Block::get(WALL_SIGN, $this->meta), true, false, true);
 
 				return true;
 			}
@@ -58,26 +57,26 @@ class SignPost extends Transparent{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			if($this->getSide(0)->getID() === self::AIR){ //Replace with common break method
 				//TODO
-				//Server::getInstance()->api->entity->drop($this, Item::get(SIGN, 0, 1));
-				$this->getLevel()->setBlock($this, new Air(), true, true, true);
+				//ServerAPI::request()->api->entity->drop($this, Item::get(SIGN, 0, 1));
+				$this->level->setBlock($this, new Air(), true, true, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
 		}
 
 		return false;
 	}
 
-	public function onBreak(Item $item){
-		$this->getLevel()->setBlock($this, new Air(), true, true, true);
+	public function onBreak(Item $item, PocketMine\Player $player){
+		$this->level->setBlock($this, new Air(), true, true, true);
 
 		return true;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array(Item::SIGN, 0, 1),
 		);

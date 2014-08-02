@@ -19,23 +19,24 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
-use pocketmine\block\Block;
-use pocketmine\block\Fire;
-use pocketmine\block\Solid;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine\Block\Block as Block;
+use PocketMine\Block\Fire as Fire;
+use PocketMine\Block\Solid as Solid;
+use PocketMine\Level\Level as Level;
+use PocketMine;
 
-class FlintSteel extends Tool{
+class FlintSteel extends Item{
 	public function __construct($meta = 0, $count = 1){
 		parent::__construct(self::FLINT_STEEL, $meta, $count, "Flint and Steel");
 		$this->isActivable = true;
+		$this->maxStackSize = 1;
 	}
 
 	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
-		if(($player->gamemode & 0x01) === 0 and $this->useOn($block) and $this->getDamage() >= $this->getMaxDurability()){
-			$player->getInventory()->setItemInHand(new Item(Item::AIR, 0, 0));
+		if(($player->gamemode & 0x01) === 0 and $this->useOn($block) and $this->getMetadata() >= $this->getMaxDurability()){
+			$player->setSlot($player->slot, new Item(AIR, 0, 0));
 		}
 
 		if($block->getID() === self::AIR and ($target instanceof Solid)){

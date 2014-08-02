@@ -22,20 +22,36 @@
 /**
  * Minecraft: PE multiplayer protocol implementation
  */
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
+
+use PocketMine;
 
 
-interface Info{
+abstract class Info{
 
 	/**
 	 * Actual Minecraft: PE protocol version
 	 */
-	const CURRENT_PROTOCOL = 18;
+	const CURRENT_PROTOCOL = 14;
+
+
+	const PING_PACKET = 0x00;
+
+	const PONG_PACKET = 0x03;
+
+	const CLIENT_CONNECT_PACKET = 0x09;
+	const SERVER_HANDSHAKE_PACKET = 0x10;
+
+	const CLIENT_HANDSHAKE_PACKET = 0x13;
+	//const SERVER_FULL_PACKET = 0x14;
+	const DISCONNECT_PACKET = 0x15;
+
+	//const BANNED_PACKET = 0x17;
 
 
 	const LOGIN_PACKET = 0x82;
 	const LOGIN_STATUS_PACKET = 0x83;
-
+	const READY_PACKET = 0x84;
 	const MESSAGE_PACKET = 0x85;
 	const SET_TIME_PACKET = 0x86;
 	const START_GAME_PACKET = 0x87;
@@ -49,6 +65,7 @@ interface Info{
 	const TAKE_ITEM_ENTITY_PACKET = 0x8f;
 	const MOVE_ENTITY_PACKET = 0x90;
 
+	const MOVE_ENTITY_PACKET_POSROT = 0x93;
 	const ROTATE_HEAD_PACKET = 0x94;
 	const MOVE_PLAYER_PACKET = 0x95;
 	//const PLACE_BLOCK_PACKET = 0x96;
@@ -59,7 +76,8 @@ interface Info{
 	const LEVEL_EVENT_PACKET = 0x9b;
 	const TILE_EVENT_PACKET = 0x9c;
 	const ENTITY_EVENT_PACKET = 0x9d;
-
+	const REQUEST_CHUNK_PACKET = 0x9e;
+	const CHUNK_DATA_PACKET = 0x9f;
 	const PLAYER_EQUIPMENT_PACKET = 0xa0;
 	const PLAYER_ARMOR_EQUIPMENT_PACKET = 0xa1;
 	const INTERACT_PACKET = 0xa2;
@@ -86,7 +104,5 @@ interface Info{
 	const ADVENTURE_SETTINGS_PACKET = 0xb7;
 	const ENTITY_DATA_PACKET = 0xb8;
 	//const PLAYER_INPUT_PACKET = 0xb9;
-	const FULL_CHUNK_DATA_PACKET = 0xba;
-	const UNLOAD_CHUNK_PACKET = 0xbb;
 
 }

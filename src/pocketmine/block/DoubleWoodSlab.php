@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class DoubleWoodSlab extends Solid{
 	public function __construct($meta = 0){
@@ -31,14 +32,15 @@ class DoubleWoodSlab extends Solid{
 			1 => "Spruce",
 			2 => "Birch",
 			3 => "Jungle",
-			4 => "Acacia",
-			5 => "Dark Oak",
 		);
 		$this->name = "Double " . $names[$this->meta & 0x07] . " Wooden Slab";
 		$this->hardness = 15;
 	}
 
-	public function getBreakTime(Item $item){
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.20;
+		}
 		switch($item->isAxe()){
 			case 5:
 				return 0.4;
@@ -55,9 +57,9 @@ class DoubleWoodSlab extends Solid{
 		}
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
-			array(Item::WOOD_SLAB, $this->meta & 0x07, 2),
+			array(WOOD_SLAB, $this->meta & 0x07, 2),
 		);
 	}
 

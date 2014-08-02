@@ -19,33 +19,30 @@
  *
 */
 
-namespace pocketmine\level\generator;
+namespace PocketMine\Level\Generator;
 
-use pocketmine\block\CoalOre;
-use pocketmine\block\DiamondOre;
-use pocketmine\block\Dirt;
-use pocketmine\block\GoldOre;
-use pocketmine\block\Gravel;
-use pocketmine\block\IronOre;
-use pocketmine\block\LapisOre;
-use pocketmine\block\RedstoneOre;
-use pocketmine\item\Block;
-use pocketmine\level\generator\noise\Simplex;
-use pocketmine\level\generator\object\OreType;
-use pocketmine\level\generator\populator\Ore;
-use pocketmine\level\generator\populator\Populator;
-use pocketmine\level\generator\populator\TallGrass;
-use pocketmine\level\generator\populator\Tree;
-use pocketmine\math\Vector3 as Vector3;
-use pocketmine\utils\Random;
+use PocketMine\Block\CoalOre as CoalOre;
+use PocketMine\Block\DiamondOre as DiamondOre;
+use PocketMine\Block\Dirt as Dirt;
+use PocketMine\Block\GoldOre as GoldOre;
+use PocketMine\Block\Gravel as Gravel;
+use PocketMine\Block\IronOre as IronOre;
+use PocketMine\Block\LapisOre as LapisOre;
+use PocketMine\Block\RedstoneOre as RedstoneOre;
+use PocketMine\Level\Generator\Noise\Simplex as Simplex;
+use PocketMine\Level\Generator\Object\OreType as OreType;
+use PocketMine\Level\Generator\Populator\Ore as Ore;
+use PocketMine\Level\Generator\Populator\TallGrass as TallGrass;
+use PocketMine\Level\Generator\Populator\Tree as Tree;
+use PocketMine\Level\Level as Level;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 class Normal extends Generator{
 
-	/** @var Populator[] */
-	private $populators = [];
-	/** @var GenerationChunkManager */
+	private $populators = array();
 	private $level;
-	/** @var Random */
 	private $random;
 	private $worldHeight = 65;
 	private $waterHeight = 63;
@@ -54,7 +51,7 @@ class Normal extends Generator{
 	private $noisePatchesSmall;
 	private $noiseBase;
 
-	public function __construct(array $options = []){
+	public function __construct(array $options = array()){
 
 	}
 
@@ -63,17 +60,17 @@ class Normal extends Generator{
 	}
 
 	public function getSettings(){
-		return [];
+		return array();
 	}
 
-	public function init(GenerationChunkManager $level, Random $random){
+	public function init(Level $level, Random $random){
 		$this->level = $level;
 		$this->random = $random;
 		$this->random->setSeed($this->level->getSeed());
-		$this->noiseHills = new Simplex($this->random, 3, 0.11, 12);
-		$this->noisePatches = new Simplex($this->random, 2, 0.03, 16);
-		$this->noisePatchesSmall = new Simplex($this->random, 2, 0.5, 4);
-		$this->noiseBase = new Simplex($this->random, 16, 0.7, 16);
+		$this->noiseHills = new Simplex($this->random, 3);
+		$this->noisePatches = new Simplex($this->random, 2);
+		$this->noisePatchesSmall = new Simplex($this->random, 2);
+		$this->noiseBase = new Simplex($this->random, 16);
 
 
 		$ores = new Ore();
@@ -102,17 +99,17 @@ class Normal extends Generator{
 
 	public function generateChunk($chunkX, $chunkZ){
 		$this->random->setSeed(0xdeadbeef ^ ($chunkX << 8) ^ $chunkZ ^ $this->level->getSeed());
-		$hills = [];
-		$patches = [];
-		$patchesSmall = [];
-		$base = [];
+		$hills = array();
+		$patches = array();
+		$patchesSmall = array();
+		$base = array();
 		for($z = 0; $z < 16; ++$z){
 			for($x = 0; $x < 16; ++$x){
 				$i = ($z << 4) + $x;
-				$hills[$i] = $this->noiseHills->noise2D($x + ($chunkX << 4), $z + ($chunkZ << 4), true);
-				$patches[$i] = $this->noisePatches->noise2D($x + ($chunkX << 4), $z + ($chunkZ << 4), true);
-				$patchesSmall[$i] = $this->noisePatchesSmall->noise2D($x + ($chunkX << 4), $z + ($chunkZ << 4), true);
-				$base[$i] = $this->noiseBase->noise2D($x + ($chunkX << 4), $z + ($chunkZ << 4), true);
+				$hills[$i] = $this->noiseHills->noise2D($x + ($chunkX << 4), $z + ($chunkZ << 4), 0.11, 12, true);
+				$patches[$i] = $this->noisePatches->noise2D($x + ($chunkX << 4), $z + ($chunkZ << 4), 0.03, 16, true);
+				$patchesSmall[$i] = $this->noisePatchesSmall->noise2D($x + ($chunkX << 4), $z + ($chunkZ << 4), 0.5, 4, true);
+				$base[$i] = $this->noiseBase->noise2D($x + ($chunkX << 4), $z + ($chunkZ << 4), 0.7, 16, true);
 
 				if($base[$i] < 0){
 					$base[$i] *= 0.5;
@@ -120,9 +117,8 @@ class Normal extends Generator{
 			}
 		}
 
-		$chunk = $this->level->getChunk($chunkX, $chunkZ);
-
 		for($chunkY = 0; $chunkY < 8; ++$chunkY){
+			$chunk = "";
 			$startY = $chunkY << 4;
 			$endY = $startY + 16;
 			for($z = 0; $z < 16; ++$z){
@@ -134,44 +130,47 @@ class Normal extends Generator{
 					for($y = $startY; $y < $endY; ++$y){
 						$diff = $height - $y;
 						if($y <= 4 and ($y === 0 or $this->random->nextFloat() < 0.75)){
-							$chunk->setBlockId($x, $y, $z, Block::BEDROCK);
-						}elseif($diff > 2){
-							$chunk->setBlockId($x, $y, $z, Block::STONE);
-						}elseif($diff > 0){
+							$chunk .= "\x07"; //bedrock
+						} elseif($diff > 2){
+							$chunk .= "\x01"; //stone
+						} elseif($diff > 0){
 							if($patches[$i] > 0.7){
-								$chunk->setBlockId($x, $y, $z, Block::STONE);
-							}elseif($patches[$i] < -0.8){
-								$chunk->setBlockId($x, $y, $z, Block::GRAVEL);
-							}else{
-								$chunk->setBlockId($x, $y, $z, Block::DIRT);
+								$chunk .= "\x01"; //stone
+							} elseif($patches[$i] < -0.8){
+								$chunk .= "\x0d"; //gravel
+							} else{
+								$chunk .= "\x03"; //dirt
 							}
-						}elseif($y <= $this->waterHeight){
+						} elseif($y <= $this->waterHeight){
 							if(($this->waterHeight - $y) <= 1 and $diff === 0){
-								$chunk->setBlockId($x, $y, $z, Block::SAND);
-							}elseif($diff === 0){
+								$chunk .= "\x0c"; //sand
+							} elseif($diff === 0){
 								if($patchesSmall[$i] > 0.3){
-									$chunk->setBlockId($x, $y, $z, Block::GRAVEL);
-								}elseif($patchesSmall[$i] < -0.45){
-									$chunk->setBlockId($x, $y, $z, Block::SAND);
-								}else{
-									$chunk->setBlockId($x, $y, $z, Block::DIRT);
+									$chunk .= "\x0d"; //gravel
+								} elseif($patchesSmall[$i] < -0.45){
+									$chunk .= "\x0c"; //sand
+								} else{
+									$chunk .= "\x03"; //dirt
 								}
-							}else{
-								$chunk->setBlockId($x, $y, $z, Block::STILL_WATER);
+							} else{
+								$chunk .= "\x09"; //still_water
 							}
-						}elseif($diff === 0){
+						} elseif($diff === 0){
 							if($patches[$i] > 0.7){
-								$chunk->setBlockId($x, $y, $z, Block::STONE);
-							}elseif($patches[$i] < -0.8){
-								$chunk->setBlockId($x, $y, $z, Block::GRAVEL);
-							}else{
-								$chunk->setBlockId($x, $y, $z, Block::GRASS);
+								$chunk .= "\x01"; //stone
+							} elseif($patches[$i] < -0.8){
+								$chunk .= "\x0d"; //gravel
+							} else{
+								$chunk .= "\x02"; //grass
 							}
+						} else{
+							$chunk .= "\x00";
 						}
 					}
-
+					$chunk .= "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
 				}
 			}
+			$this->level->setMiniChunk($chunkX, $chunkZ, $chunkY, $chunk);
 		}
 
 	}
@@ -189,3 +188,6 @@ class Normal extends Generator{
 	}
 
 }
+
+Generator::addGenerator(__NAMESPACE__ . "\\Normal", "normal");
+Generator::addGenerator(__NAMESPACE__ . "\\Normal", "default");

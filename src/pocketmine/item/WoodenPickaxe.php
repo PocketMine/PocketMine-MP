@@ -19,12 +19,13 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
+use PocketMine;
 
-class WoodenPickaxe extends Tool{
+class WoodenPickaxe extends Item{
 	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::WOODEN_PICKAXE, $meta, $count, "Wooden Pickaxe");
+		parent::__construct(self::WOODEN_PICKAXE, 0, $count, "Wooden Pickaxe");
 	}
 
 }

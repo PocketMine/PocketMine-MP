@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace PocketMine\Entity;
 
+use PocketMine;
 
 class Villager extends Creature implements NPC, Ageable{
 	const FARMER = 0;

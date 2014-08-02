@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class IronDoor extends Door{
 	public function __construct($meta = 0){
@@ -30,7 +31,10 @@ class IronDoor extends Door{
 		$this->hardness = 25;
 	}
 
-	public function getBreakTime(Item $item){
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.20;
+		}
 		switch($item->isPickaxe()){
 			case 5:
 				return 0.95;
@@ -47,13 +51,13 @@ class IronDoor extends Door{
 		}
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		if($item->isPickaxe() >= 1){
 			return array(
 				array(Item::IRON_DOOR, 0, 1),
 			);
-		}else{
-			return [];
+		} else{
+			return array();
 		}
 	}
 }

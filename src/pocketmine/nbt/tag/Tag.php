@@ -22,11 +22,11 @@
 /**
  * All the NBT Tags
  */
-namespace pocketmine\nbt\tag;
+namespace PocketMine\NBT\Tag;
+use PocketMine\NBT\NBT as NBT;
+use PocketMine;
 
-use pocketmine\nbt\NBT;
-
-abstract class Tag extends \stdClass{
+abstract class Tag{
 
 	protected $value;
 

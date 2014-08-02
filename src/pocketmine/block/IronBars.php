@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
+use PocketMine;
 
 class IronBars extends Transparent{
 	public function __construct(){

@@ -19,13 +19,14 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class ContainerSetContentPacket extends DataPacket{
 	public $windowid;
-	public $slots = [];
-	public $hotbar = [];
+	public $slots = array();
+	public $hotbar = array();
 
 	public function pid(){
 		return Info::CONTAINER_SET_CONTENT_PACKET;
@@ -57,8 +58,6 @@ class ContainerSetContentPacket extends DataPacket{
 			foreach($this->hotbar as $slot){
 				$this->putInt($slot);
 			}
-		}else{
-			$this->putShort(0);
 		}
 	}
 

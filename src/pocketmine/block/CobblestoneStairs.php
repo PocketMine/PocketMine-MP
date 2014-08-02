@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
+use PocketMine;
 
 class CobblestoneStairs extends Stair{
 	public function __construct($meta = 0){

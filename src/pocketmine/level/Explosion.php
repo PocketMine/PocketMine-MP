@@ -19,45 +19,45 @@
  *
 */
 
-namespace pocketmine\level;
+namespace PocketMine\Level;
 
-use pocketmine\block\Block;
-use pocketmine\block\TNT;
-use pocketmine\entity\Entity;
-use pocketmine\event\entity\EntityExplodeEvent;
-use pocketmine\item\Item;
-use pocketmine\math\Vector3 as Vector3;
-use pocketmine\network\protocol\ExplodePacket;
-use pocketmine\Server;
+use PocketMine\Block\Block as Block;
+use PocketMine\Block\TNT as TNT;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\Network\Protocol\ExplodePacket as ExplodePacket;
+use PocketMine\Player as Player;
+use PocketMine\ServerAPI as ServerAPI;
+use PocketMine;
 
 class Explosion{
 	public static $specialDrops = array(
-		Item::GRASS => Item::DIRT,
-		Item::STONE => Item::COBBLESTONE,
-		Item::COAL_ORE => Item::COAL,
-		Item::DIAMOND_ORE => Item::DIAMOND,
-		Item::REDSTONE_ORE => Item::REDSTONE,
+		GRASS => DIRT,
+		STONE => COBBLESTONE,
+		COAL_ORE => COAL,
+		DIAMOND_ORE => DIAMOND,
+		REDSTONE_ORE => REDSTONE,
 	);
 	private $rays = 16; //Rays
 	public $level;
 	public $source;
 	public $size;
-	/**
-	 * @var Block[]
-	 */
-	public $affectedBlocks = [];
+	public $affectedBlocks = array();
 	public $stepLen = 0.3;
-	private $what;
 
-	public function __construct(Position $center, $size, $what = null){
-		$this->level = $center->getLevel();
+	public function __construct(Position $center, $size){
+		$this->level = $center->level;
 		$this->source = $center;
 		$this->size = max($size, 0);
-		$this->what = $what;
 	}
 
 	public function explode(){
-		if($this->size < 0.1){
+		$server = ServerAPI::request();
+		if($this->size < 0.1 or $server->api->dhandle("entity.explosion", array(
+				"level" => $this->level,
+				"source" => $this->source,
+				"size" => $this->size
+			)) === false
+		){
 			return false;
 		}
 
@@ -72,7 +72,7 @@ class Explosion{
 
 						for($blastForce = $this->size * (mt_rand(700, 1300) / 1000); $blastForce > 0; $blastForce -= $this->stepLen * 0.75){
 							$vBlock = $pointer->floor();
-							$blockID = $this->level->getBlockIdAt($vBlock->x, $vBlock->y, $vBlock->z);
+							$blockID = $this->level->level->getBlockID($vBlock->x, $vBlock->y, $vBlock->z);
 
 							if($blockID > 0){
 								$block = Block::get($blockID, 0);
@@ -94,30 +94,18 @@ class Explosion{
 			}
 		}
 
-		$send = [];
+		$send = array();
 		$source = $this->source->floor();
 		$radius = 2 * $this->size;
-		$yield = (1 / $this->size) * 100;
-
-		if($this->what instanceof Entity){
-			Server::getInstance()->getPluginManager()->callEvent($ev = new EntityExplodeEvent($this->what, $this->source, $this->affectedBlocks, $yield));
-			if($ev->isCancelled()){
-				return false;
-			}else{
-				$yield = $ev->getYield();
-				$this->affectedBlocks = $ev->getBlockList();
-			}
-		}
-
 		//TODO
-		/*foreach($server->api->entity->getRadius($this->source, $radius) as $entity){
+		foreach($server->api->entity->getRadius($this->source, $radius) as $entity){
 			$impact = (1 - $this->source->distance($entity) / $radius) * 0.5; //placeholder, 0.7 should be exposure
 			$damage = (int) (($impact * $impact + $impact) * 8 * $this->size + 1);
 			$entity->harm($damage, "explosion");
-		}*/
-
+		}
 
 		foreach($this->affectedBlocks as $block){
+
 			if($block instanceof TNT){
 				$data = array(
 					"x" => $block->x + 0.5,
@@ -129,16 +117,16 @@ class Explosion{
 				//TODO
 				//$e = $server->api->entity->add($this->level, ENTITY_OBJECT, OBJECT_PRIMEDTNT, $data);
 				//$e->spawnToAll();
-			}elseif(mt_rand(0, 100) < $yield){
+			} elseif(mt_rand(0, 10000) < ((1 / $this->size) * 10000)){
 				if(isset(self::$specialDrops[$block->getID()])){
 					//TODO
 					//$server->api->entity->drop(new Position($block->x + 0.5, $block->y, $block->z + 0.5, $this->level), Item::get(self::$specialDrops[$block->getID()], 0));
-				}else{
+				} else{
 					//TODO
 					//$server->api->entity->drop(new Position($block->x + 0.5, $block->y, $block->z + 0.5, $this->level), Item::get($block->getID(), $this->level->level->getBlockDamage($block->x, $block->y, $block->z)));
 				}
 			}
-			$this->level->setBlockIdAt($block->x, $block->y, $block->z, 0);
+			$this->level->level->setBlockID($block->x, $block->y, $block->z, 0);
 			$send[] = new Vector3($block->x - $source->x, $block->y - $source->y, $block->z - $source->z);
 		}
 		$pk = new ExplodePacket;
@@ -147,7 +135,7 @@ class Explosion{
 		$pk->z = $this->source->z;
 		$pk->radius = $this->size;
 		$pk->records = $send;
-		Server::broadcastPacket($this->level->getPlayers(), $pk);
+		Player::broadcastPacket($this->level->getPlayers(), $pk);
 
 	}
 }

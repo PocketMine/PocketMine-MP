@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace PocketMine\Entity;
 
+use PocketMine;
 
-interface Tameable{
+interface TameableEntity{
 
 }

@@ -19,64 +19,104 @@
  *
 */
 
-namespace pocketmine\nbt\tag;
+namespace PocketMine\NBT\Tag;
 
-use pocketmine\nbt\NBT;
+use PocketMine;
+use PocketMine\NBT\NBT as NBT;
 
-class Compound extends NamedTag implements \ArrayAccess{
+class Compound extends NamedTag implements \ArrayAccess, \Iterator{
 
-	public function __construct($name = "", $value = []){
+	public function __construct($name = "", $value = array()){
 		$this->name = $name;
-		foreach($value as $tag){
-			$this->{$tag->getName()} = $tag;
-		}
-	}
-
-	public function offsetExists($offset){
-		return isset($this->{$offset});
-	}
-
-	public function offsetGet($offset){
-		if($this->{$offset} instanceof Tag){
-			if($this->{$offset} instanceof \ArrayAccess){
-				return $this->{$offset};
-			}else{
-				return $this->{$offset}->getValue();
-			}
-		}
-
-		return null;
-	}
-
-	public function offsetSet($offset, $value){
-		if($value instanceof Tag){
-			$this->{$offset} = $value;
-		}elseif(isset($this->{$offset}) and $this->{$offset} instanceof Tag){
-			$this->{$offset}->setValue($value);
-		}
-	}
-
-	public function offsetUnset($offset){
-		unset($this->{$offset});
+		$this->value = $value;
 	}
 
 	public function getType(){
 		return NBT::TAG_Compound;
 	}
 
+	public function rewind(){
+		reset($this->value);
+	}
+
+	public function current(){
+		return current($this->value);
+	}
+
+	public function key(){
+		return key($this->value);
+	}
+
+	public function next(){
+		return next($this->value);
+	}
+
+	public function valid(){
+		$key = key($this->value);
+
+		return $key !== null and $key !== false;
+	}
+
+	public function offsetExists($name){
+		return $this->__isset($name);
+	}
+
+	public function &offsetGet($name){
+		return $this->__get($name);
+	}
+
+	public function offsetSet($name, $value){
+		$this->__set($name, $value);
+	}
+
+	public function offsetUnset($name){
+		$this->__unset($name);
+	}
+
+	public function &__get($name){
+		$ret = isset($this->value[$name]) ? $this->value[$name] : false;
+		if(!is_object($ret) or $ret instanceof \ArrayAccess){
+			return $ret;
+		} else{
+			return $ret->getValue();
+		}
+	}
+
+	public function __set($name, $value){
+		if($value instanceof Tag){
+			$this->value[$name] = $value;
+		} elseif(isset($this->value[$name])){
+			if($value instanceof NamedTag and $value->getName() !== "" and $value->getName() !== false){
+				$this->value[$value->getName()]->setValue($value);
+			} else{
+				$this->value[$name]->setValue($value);
+			}
+		}
+	}
+
+	public function __isset($name){
+		return isset($this->value[$name]);
+	}
+
+	public function __unset($name){
+		unset($this->value[$name]);
+	}
+
 	public function read(NBT $nbt){
-		$this->value = [];
+		$this->value = array();
 		do{
 			$tag = $nbt->readTag();
 			if($tag instanceof NamedTag and $tag->getName() !== ""){
-				$this->{$tag->getName()} = $tag;
+				$this->value[$tag->getName()] = $tag;
+			} elseif(!($tag instanceof End)){
+				$this->value[] = $tag;
 			}
-		}while(!($tag instanceof End) and !$nbt->feof());
+		} while(!($tag instanceof End) and !$nbt->feof());
 	}
 
 	public function write(NBT $nbt){
-		foreach($this as $tag){
-			if($tag instanceof Tag and !($tag instanceof End)){
+		foreach($this->value as $tag){
+			if(!($tag instanceof End)){
 				$nbt->writeTag($tag);
 			}
 		}

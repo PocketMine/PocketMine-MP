@@ -19,16 +19,18 @@
  *
 */
 
-namespace pocketmine\level\generator\populator;
+namespace PocketMine\Level\Generator\Populator;
 
-use pocketmine\level\ChunkManager;
-use pocketmine\level\generator\object\Ore as ObjectOre;
-use pocketmine\utils\Random;
+use PocketMine\Level\Generator\Object\Ore as ObjectOre;
+use PocketMine\Level\Level as Level;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 class Ore extends Populator{
-	private $oreTypes = [];
+	private $oreTypes = array();
 
-	public function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random){
+	public function populate(Level $level, $chunkX, $chunkZ, Random $random){
 		foreach($this->oreTypes as $type){
 			$ore = new ObjectOre($random, $type);
 			for($i = 0; $i < $ore->type->clusterCount; ++$i){
@@ -36,7 +38,7 @@ class Ore extends Populator{
 				$y = $random->nextRange($ore->type->minHeight, $ore->type->maxHeight);
 				$z = $random->nextRange($chunkZ << 4, ($chunkZ << 4) + 15);
 				if($ore->canPlaceObject($level, $x, $y, $z)){
-					$ore->placeObject($level, $x, $y, $z);
+					$ore->placeObject($level, new Vector3($x, $y, $z));
 				}
 			}
 		}

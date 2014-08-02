@@ -19,15 +19,13 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
+use PocketMine;
 
 class Sand extends Fallable{
-	public function __construct($meta = 0){
-		parent::__construct(self::SAND, $meta & 0x01, "Sand");
-		if($this->meta === 0x01){
-			$this->name = "Red sand";
-		}
+	public function __construct(){
+		parent::__construct(self::SAND, 0, "Sand");
 		$this->hardness = 2.5;
 	}
 

@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
-use pocketmine\block\Block;
+use PocketMine;
+use PocketMine\Block\Block as Block;
 
 class Potato extends Item{
 	public function __construct($meta = 0, $count = 1){

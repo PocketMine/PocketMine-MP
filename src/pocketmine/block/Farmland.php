@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Farmland extends Solid{
 	public function __construct($meta = 0){
@@ -29,9 +30,9 @@ class Farmland extends Solid{
 		$this->hardness = 3;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
-			array(Item::DIRT, 0, 1),
+			array(DIRT, 0, 1),
 		);
 	}
 }

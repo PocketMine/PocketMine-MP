@@ -19,11 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Beetroot extends Flowable{
 	public function __construct($meta = 0){
@@ -32,10 +31,10 @@ class Beetroot extends Flowable{
 		$this->hardness = 0;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$down = $this->getSide(0);
 		if($down->getID() === self::FARMLAND){
-			$this->getLevel()->setBlock($block, $this, true, false, true);
+			$this->level->setBlock($block, $this, true, false, true);
 
 			return true;
 		}
@@ -43,11 +42,13 @@ class Beetroot extends Flowable{
 		return false;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
-		if($item->getID() === Item::DYE and $item->getDamage() === 0x0F){ //Bonemeal
+	public function onActivate(Item $item, PocketMine\Player $player){
+		if($item->getID() === Item::DYE and $item->getMetadata() === 0x0F){ //Bonemeal
 			$this->meta = 0x07;
-			$this->getLevel()->setBlock($this, $this, true, false, true);
-			$item->count--;
+			$this->level->setBlock($this, $this, true, false, true);
+			if(($player->gamemode & 0x01) === 0){
+				$item->count--;
+			}
 
 			return true;
 		}
@@ -56,35 +57,36 @@ class Beetroot extends Flowable{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->isTransparent === true){ //TODO: Replace with common break method
-				$this->getLevel()->dropItem($this, Item::get(Item::BEETROOT_SEEDS, 0, 1));
-				$this->getLevel()->setBlock($this, new Air(), false, false, true);
+		if($type === BLOCK_UPDATE_NORMAL){
+			if($this->getSide(0)->isTransparent === true){ //Replace with common break method
+				//TODO
+				//ServerAPI::request()->api->entity->drop($this, Item::get(BEETROOT_SEEDS, 0, 1));
+				$this->level->setBlock($this, new Air(), false, false, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
-		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
+		} elseif($type === BLOCK_UPDATE_RANDOM){
 			if(mt_rand(0, 2) == 1){
 				if($this->meta < 0x07){
 					++$this->meta;
-					$this->getLevel()->setBlock($this, $this, true, false, true);
+					$this->level->setBlock($this, $this, true, false, true);
 
-					return Level::BLOCK_UPDATE_RANDOM;
+					return BLOCK_UPDATE_RANDOM;
 				}
-			}else{
-				return Level::BLOCK_UPDATE_RANDOM;
+			} else{
+				return BLOCK_UPDATE_RANDOM;
 			}
 		}
 
 		return false;
 	}
 
-	public function getDrops(Item $item){
-		$drops = [];
+	public function getDrops(Item $item, PocketMine\Player $player){
+		$drops = array();
 		if($this->meta >= 0x07){
 			$drops[] = array(Item::BEETROOT, 0, 1);
 			$drops[] = array(Item::BEETROOT_SEEDS, 0, mt_rand(0, 3));
-		}else{
+		} else{
 			$drops[] = array(Item::BEETROOT_SEEDS, 0, 1);
 		}
 

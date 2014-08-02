@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class LitPumpkin extends Solid{
 	public function __construct(){
@@ -30,7 +30,7 @@ class LitPumpkin extends Solid{
 		$this->hardness = 5;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$faces = array(
 			0 => 4,
 			1 => 2,
@@ -38,7 +38,7 @@ class LitPumpkin extends Solid{
 			3 => 3,
 		);
 		$this->meta = $faces[$player->getDirection()];
-		$this->getLevel()->setBlock($block, $this, true, false, true);
+		$this->level->setBlock($block, $this, true, false, true);
 
 		return true;
 	}

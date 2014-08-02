@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class HurtArmorPacket extends DataPacket{
 	public $health;

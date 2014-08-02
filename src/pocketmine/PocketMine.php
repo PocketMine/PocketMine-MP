@@ -14,98 +14,52 @@
  * (at your option) any later version.
  *
  * @author PocketMine Team
- * @link http://www.pocketmine.net/
+
  * 
  *
 */
 
-namespace {
-	function safe_var_dump(){
-		static $cnt = 0;
-		foreach(func_get_args() as $var){
-			switch(true){
-				case is_array($var):
-					echo str_repeat("  ", $cnt) . "array(" . count($var) . ") {" . PHP_EOL;
-					foreach($var as $key => $value){
-						echo str_repeat("  ", $cnt + 1) . "[" . (is_integer($key) ? $key : '"' . $key . '"') . "]=>" . PHP_EOL;
-						++$cnt;
-						safe_var_dump($value);
-						--$cnt;
-					}
-					echo str_repeat("  ", $cnt) . "}" . PHP_EOL;
-					break;
-				case is_integer($var):
-					echo str_repeat("  ", $cnt) . "int(" . $var . ")" . PHP_EOL;
-					break;
-				case is_float($var):
-					echo str_repeat("  ", $cnt) . "float(" . $var . ")" . PHP_EOL;
-					break;
-				case is_bool($var):
-					echo str_repeat("  ", $cnt) . "bool(" . ($var === true ? "true" : "false") . ")" . PHP_EOL;
-					break;
-				case is_string($var):
-					echo str_repeat("  ", $cnt) . "string(" . strlen($var) . ") \"$var\"" . PHP_EOL;
-					break;
-				case is_resource($var):
-					echo str_repeat("  ", $cnt) . "resource() of type (" . get_resource_type($var) . ")" . PHP_EOL;
-					break;
-				case is_object($var):
-					echo str_repeat("  ", $cnt) . "object(" . get_class($var) . ")" . PHP_EOL;
-					break;
-				case is_null($var):
-					echo str_repeat("  ", $cnt) . "NULL" . PHP_EOL;
-					break;
-			}
-		}
-	}
-
-	function dummy(){
-
+namespace{
+	function console($message, $EOL = true, $log = true, $level = 1){
+		return PocketMine\console($message, $EOL, $log, $level);
 	}
 }
 
-namespace pocketmine {
-	use LogLevel;
-	use pocketmine\utils\Binary;
-	use pocketmine\utils\MainLogger;
-	use pocketmine\utils\TextFormat;
-	use pocketmine\utils\Utils;
-	use pocketmine\wizard\Installer;
-	use raklib\RakLib;
-
+namespace PocketMine{
 	const VERSION = "Alpha_1.4dev";
-	const API_VERSION = "1.2.0";
+	const API_VERSION = "1.0.0";
 	const CODENAME = "絶好(Zekkou)ケーキ(Cake)";
-	const MINECRAFT_VERSION = "v0.9.5 alpha";
+	const MINECRAFT_VERSION = "v0.8.1 alpha";
 	const PHP_VERSION = "5.5";
 
-	if(\Phar::running(true) !== ""){
-		@define("pocketmine\\PATH", \Phar::running(true) . "/");
-	}else{
-		@define("pocketmine\\PATH", \getcwd() . DIRECTORY_SEPARATOR);
-	}
+	\spl_autoload_register(function ($load){
+		$path = explode('\\', trim($load, '\\'));
+		if(($parent = array_shift($path)) === "PocketMine"){ //part of the PocketMine-MP code
+			$className = array_pop($path);
+			if(count($path) > 0){
+				$path = implode(DIRECTORY_SEPARATOR, array_map("strtolower", $path)) . DIRECTORY_SEPARATOR;
+			}else{
+				$path = "";
+			}
+			$fPath = \PocketMine\PATH . "src" . DIRECTORY_SEPARATOR . "PocketMine" . DIRECTORY_SEPARATOR . $path . $className . ".php";
+			if(file_exists($fPath)){
+				require_once($fPath);
+			}
+		}else{ //Try plugin
+			$className = array_pop($path);
+			if(count($path) > 0){
+				$path = implode(DIRECTORY_SEPARATOR, array_map("strtolower", $path)) . DIRECTORY_SEPARATOR;
+			}else{
+				$path = "";
+			}
+			$fPath = \PocketMine\PATH . "plugins". DIRECTORY_SEPARATOR . $parent . DIRECTORY_SEPARATOR . "src" . DIRECTORY_SEPARATOR . $path . $className . ".php";
+			if(file_exists($fPath)){
+				require_once($fPath);
+			}
+		}
+	});
 
-	if(!extension_loaded("pthreads")){
-		echo "[CRITICAL] Unable to find the pthreads extension." . PHP_EOL;
-		echo "[CRITICAL] Please use the installer provided on the homepage.". PHP_EOL;
-		exit(1);
-	}
-
-	if(!class_exists("SplClassLoader", false)){
-		require_once(\pocketmine\PATH . "src/spl/SplClassLoader.php");
-	}
-
-	$autoloader = new \SplClassLoader();
-	$autoloader->setMode(\SplAutoloader::MODE_DEBUG);
-	$autoloader->add("pocketmine", [
-		\pocketmine\PATH . "src"
-	]);
-
-	$autoloader->register(true);
-	if(!class_exists("raklib\\RakLib", false)){
-		require(\pocketmine\PATH . "src/raklib/raklib/RakLib.php");
-	}
-	RakLib::bootstrap($autoloader);
+	define("PocketMine\PATH", \getcwd() . DIRECTORY_SEPARATOR);
 
 	//Startup code. Do not look at it, it can harm you. Most of them are hacks to fix date-related bugs, or basic functions used after this
 
@@ -113,7 +67,7 @@ namespace pocketmine {
 
 	if(ini_get("date.timezone") == ""){ //No Timezone set
 		date_default_timezone_set("GMT");
-		if(strpos(" " . strtoupper(php_uname("s")), " WIN") !== false){
+		if(strpos(" ".strtoupper(php_uname("s")), " WIN") !== false){
 			$time = time();
 			$time -= $time % 60;
 			//TODO: Parse different time & date formats by region. ¬¬ world
@@ -142,72 +96,153 @@ namespace pocketmine {
 	}
 
 	gc_enable();
-	error_reporting(-1);
+	error_reporting(E_ALL | E_STRICT);
 	ini_set("allow_url_fopen", 1);
 	ini_set("display_errors", 1);
 	ini_set("display_startup_errors", 1);
 	ini_set("default_charset", "utf-8");
 
-	ini_set("memory_limit", "256M"); //Default
-	define("pocketmine\\START_TIME", microtime(true));
+	ini_set("memory_limit", "128M"); //Default
+	define("PocketMine\START_TIME", microtime(true));
 
-	$opts = getopt("", array("enable-ansi", "disable-ansi", "data:", "plugins:", "no-wizard"));
+	$opts = getopt("", array("enable-ansi", "disable-ansi", "data-path:", "no-wizard"));
+	define("PocketMine\DATA", isset($opts["data-path"]) ? realpath($opts["data-path"]) . DIRECTORY_SEPARATOR : PATH);
 
-	define("pocketmine\\DATA", isset($opts["data"]) ? realpath($opts["data"]) . DIRECTORY_SEPARATOR : \getcwd() . DIRECTORY_SEPARATOR);
-	define("pocketmine\\PLUGIN_PATH", isset($opts["plugins"]) ? realpath($opts["plugins"]) . DIRECTORY_SEPARATOR : \getcwd() . DIRECTORY_SEPARATOR . "plugins" . DIRECTORY_SEPARATOR);
+	if((strpos(strtoupper(php_uname("s")), "WIN") or isset($opts["enable-ansi"])) and !isset($opts["disable-ansi"])){
+		define("PocketMine\ANSI", true);
+	}else{
+		define("PocketMine\ANSI", false);
+	}
 
-	define("pocketmine\\ANSI", ((strpos(strtoupper(php_uname("s")), "WIN") === false or isset($opts["enable-ansi"])) and !isset($opts["disable-ansi"])));
+	function dummy(){
 
-	$logger = new MainLogger(\pocketmine\DATA . "server.log", \pocketmine\ANSI);
+	}
+
+	function safe_var_dump($var, $cnt = 0){
+		switch(true){
+			case is_array($var):
+				echo str_repeat("  ", $cnt)."array(".count($var).") {".PHP_EOL;
+				foreach($var as $key => $value){
+					echo str_repeat("  ", $cnt + 1)."[".(is_integer($key) ? $key:'"'.$key.'"')."]=>".PHP_EOL;
+					safe_var_dump($value, $cnt + 1);
+				}
+				echo str_repeat("  ", $cnt)."}".PHP_EOL;
+				break;
+			case is_integer($var):
+				echo str_repeat("  ", $cnt)."int(".$var.")".PHP_EOL;
+				break;
+			case is_float($var):
+				echo str_repeat("  ", $cnt)."float(".$var.")".PHP_EOL;
+				break;
+			case is_bool($var):
+				echo str_repeat("  ", $cnt)."bool(".($var === true ? "true":"false").")".PHP_EOL;
+				break;
+			case is_string($var):
+				echo str_repeat("  ", $cnt)."string(".strlen($var).") \"$var\"".PHP_EOL;
+				break;
+			case is_resource($var):
+				echo str_repeat("  ", $cnt)."resource() of type (".get_resource_type($var).")".PHP_EOL;
+				break;
+			case is_object($var):
+				echo str_repeat("  ", $cnt)."object(".get_class($var).")".PHP_EOL;
+				break;
+			case is_null($var):
+				echo str_repeat("  ", $cnt)."NULL".PHP_EOL;
+				break;
+		}
+	}
 
 	function kill($pid){
-		switch(Utils::getOS()){
+		switch(Utils\Utils::getOS()){
 			case "win":
-				exec("taskkill.exe /F /PID " . ((int) $pid) . " > NUL");
+				exec("taskkill.exe /F /PID ".((int) $pid)." > NUL");
 				break;
 			case "mac":
 			case "linux":
 			default:
-				exec("kill -9 " . ((int) $pid) . " > /dev/null 2>&1");
+				exec("kill -9 ".((int) $pid)." > /dev/null 2>&1");
 		}
 	}
 
-	function getTrace($start = 1, $trace = null){
-		if($trace === null){
-			if(function_exists("xdebug_get_function_stack")){
-				$trace = array_reverse(xdebug_get_function_stack());
-			}else{
-				$e = new \Exception();
-				$trace = $e->getTrace();
+	function hard_unset(&$var){
+		if(is_object($var)){
+			$unset = new \ReflectionClass($var);
+			foreach($unset->getProperties() as $prop){
+				$prop->setAccessible(true);
+				@hard_unset($prop->getValue($var));
+				$prop->setValue($var, null);
 			}
+			$var = null;
+			unset($var);
+		}elseif(is_array($var)){
+			foreach($var as $i => $v){
+				hard_unset($var[$i]);
+			}
+			$var = null;
+			unset($var);
+		}else{
+			$var = null;
+			unset($var);
 		}
+	}
 
-		$messages = [];
+	function console($message, $EOL = true, $log = true, $level = 1){
+		if(!defined("DEBUG") or DEBUG >= $level){
+			$message .= $EOL === true ? PHP_EOL:"";
+			$time = (ANSI === true ? Utils\TextFormat::AQUA . date("H:i:s") . Utils\TextFormat::RESET:date("H:i:s")) . " ";
+			$replaced = Utils\TextFormat::clean(preg_replace('/\x1b\[[0-9;]*m/', "", $time . $message));
+			if($log === true and (!defined("LOG") or LOG === true)){
+				log(date("Y-m-d")." ".$replaced, "console", false, $level);
+			}
+			if(ANSI === true){
+				$add = "";
+				if(preg_match("/\[([a-zA-Z0-9]*)\]/", $message, $matches) > 0){
+					switch($matches[1]){
+						case "ERROR":
+						case "SEVERE":
+							$add .= Utils\TextFormat::RED;
+							break;
+						case "INTERNAL":
+						case "DEBUG":
+							$add .= Utils\TextFormat::GRAY;
+							break;
+						case "WARNING":
+							$add .= Utils\TextFormat::YELLOW;
+							break;
+						case "NOTICE":
+							$add .= Utils\TextFormat::AQUA;
+							break;
+						default:
+							$add = "";
+							break;
+					}
+				}
+				$message = Utils\TextFormat::toANSI($time . $add . $message . Utils\TextFormat::RESET);
+			}else{
+				$message = $replaced;
+			}
+			echo $message;
+		}
+	}
+
+	function getTrace($start = 1){
+		$e = new \Exception();
+		$trace = $e->getTrace();
+		$messages = array();
 		$j = 0;
 		for($i = (int) $start; isset($trace[$i]); ++$i, ++$j){
 			$params = "";
-			if(isset($trace[$i]["args"]) or isset($trace[$i]["params"])){
-				if(isset($trace[$i]["args"])){
-					$args = $trace[$i]["args"];
-				}else{
-					$args = $trace[$i]["params"];
-				}
-				foreach($args as $name => $value){
-					$params .= (is_object($value) ? get_class($value) . " " . (method_exists($value, "__toString") ? $value->__toString() : "object") : gettype($value) . " " . @strval($value)) . ", ";
+			if(isset($trace[$i]["args"])){
+				foreach($trace[$i]["args"] as $name => $value){
+					$params .= (is_object($value) ? get_class($value)." ".(method_exists($value, "__toString") ? $value->__toString() : "object"):gettype($value)." ".@strval($value)).", ";
 				}
 			}
-			$messages[] = "#$j " . (isset($trace[$i]["file"]) ? cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . substr($params, 0, -2) . ")";
+			$messages[] = "#$j ".(isset($trace[$i]["file"]) ? $trace[$i]["file"]:"")."(".(isset($trace[$i]["line"]) ? $trace[$i]["line"]:"")."): ".(isset($trace[$i]["class"]) ? $trace[$i]["class"].$trace[$i]["type"]:"").$trace[$i]["function"]."(".substr($params, 0, -2).")";
 		}
-
 		return $messages;
 	}
 
-	function cleanPath($path){
-		return rtrim(str_replace(["\\", ".php", "phar://", rtrim(str_replace(["\\", "phar://"], ["/", ""], \pocketmine\PATH), "/"), rtrim(str_replace(["\\", "phar://"], ["/", ""], \pocketmine\PLUGIN_PATH), "/")], ["/", "", "", "", ""], $path), "/");
-	}
-
-	function error_handler($errno, $errstr, $errfile, $errline, $trace = null){
-		global $lastError;
+	function error_handler($errno, $errstr, $errfile, $errline){
 		if(error_reporting() === 0){ //@ error-control
 			return false;
 		}
@@ -228,129 +263,110 @@ namespace pocketmine {
 			E_DEPRECATED => "E_DEPRECATED",
 			E_USER_DEPRECATED => "E_USER_DEPRECATED",
 		);
-		$type = ($errno === E_ERROR or $errno === E_WARNING or $errno === E_USER_ERROR or $errno === E_USER_WARNING) ? LogLevel::ERROR : LogLevel::NOTICE;
-		$errno = isset($errorConversion[$errno]) ? $errorConversion[$errno] : $errno;
-		if(($pos = strpos($errstr, "\n")) !== false){
-			$errstr = substr($errstr, 0, $pos);
+		$errno = isset($errorConversion[$errno]) ? $errorConversion[$errno]:$errno;
+		console("[ERROR] A ".$errno." error happened: \"$errstr\" in \"$errfile\" at line $errline", true, true, 0);
+		foreach(getTrace() as $i => $line){
+			console("[TRACE] $line");
 		}
-		$logger = MainLogger::getLogger();
-		$oldFile = $errfile;
-		$errfile = cleanPath($errfile);
-		$logger->log($type, "An $errno error happened: \"$errstr\" in \"$errfile\" at line $errline");
-
-		foreach(($trace = getTrace($trace === null ? 3 : 0, $trace)) as $i => $line){
-			$logger->debug($line);
-		}
-		$lastError = [
-			"type" => $type,
-			"message" => $errstr,
-			"fullFile" => $oldFile,
-			"file" => $errfile,
-			"line" => $errline,
-			"trace" => $trace
-		];
-
 		return true;
 	}
 
-	set_error_handler("\\pocketmine\\error_handler", E_ALL);
+	function log($message, $name, $EOL = true, $level = 2, $close = false){
+		global $fpointers;
+		if((!defined("DEBUG") or DEBUG >= $level) and (!defined("LOG") or LOG === true)){
+			$message .= $EOL === true ? PHP_EOL:"";
+			if(!isset($fpointers)){
+				$fpointers = array();
+			}
+			if(!isset($fpointers[$name]) or $fpointers[$name] === false){
+				$fpointers[$name] = @fopen(\PocketMine\DATA."/".$name.".log", "ab");
+			}
+			@fwrite($fpointers[$name], $message);
+			if($close === true){
+				fclose($fpointers[$name]);
+				unset($fpointers[$name]);
+			}
+		}
+	}
+
+
+	set_error_handler("\PocketMine\\error_handler", E_ALL);
 
 	$errors = 0;
 
 	if(version_compare("5.4.0", PHP_VERSION) > 0){
-		$logger->critical("Use PHP >= 5.4.0");
+		console("[ERROR] Use PHP >= 5.4.0", true, true, 0);
 		++$errors;
 	}
 
 	if(php_sapi_name() !== "cli"){
-		$logger->critical("You must run PocketMine-MP using the CLI.");
+		console("[ERROR] You must run PocketMine-MP using the CLI.", true, true, 0);
 		++$errors;
 	}
 
-	if(!extension_loaded("sockets")){
-		$logger->critical("Unable to find the Socket extension.");
+	if(!extension_loaded("sockets") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "sockets." . PHP_SHLIB_SUFFIX) === false){
+		console("[ERROR] Unable to find the Socket extension.", true, true, 0);
 		++$errors;
 	}
 
-	$pthreads_version = phpversion("pthreads");
-	if(substr_count($pthreads_version, ".") < 2){
-		$pthreads_version = "0.$pthreads_version";
-	}
-	if(version_compare($pthreads_version, "2.0.4") < 0){
-		$logger->critical("pthreads >= 2.0.4 is required, while you have $pthreads_version.");
+	if(!extension_loaded("pthreads") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "pthreads." . PHP_SHLIB_SUFFIX) === false){
+		console("[ERROR] Unable to find the pthreads extension.", true, true, 0);
 		++$errors;
-	}
-
-	if(!extension_loaded("uopz")){
-		//$logger->notice("Couldn't find the uopz extension. Some functions may be limited");
-	}
-
-	if(extension_loaded("pocketmine")){
-		if(version_compare(phpversion("pocketmine"), "0.0.1") < 0){
-			$logger->critical("You have the native PocketMine extension, but your version is lower than 0.0.1.");
-			++$errors;
-		}elseif(version_compare(phpversion("pocketmine"), "0.0.4") > 0){
-			$logger->critical("You have the native PocketMine extension, but your version is higher than 0.0.4.");
+	}else{
+		$pthreads_version = phpversion("pthreads");
+		if(substr_count($pthreads_version, ".") < 2){
+			$pthreads_version = "0.$pthreads_version";
+		}
+		if(version_compare($pthreads_version, "0.1.0") < 0){
+			console("[ERROR] pthreads >= 0.1.0 is required, while you have $pthreads_version.", true, true, 0);
 			++$errors;
 		}
 	}
 
-	if(!extension_loaded("Weakref") and !extension_loaded("weakref")){
-		$logger->critical("Unable to find the Weakref extension.");
+	if(!extension_loaded("curl") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "curl." . PHP_SHLIB_SUFFIX) === false){
+		console("[ERROR] Unable to find the cURL extension.", true, true, 0);
 		++$errors;
 	}
 
-	if(!extension_loaded("curl")){
-		$logger->critical("Unable to find the cURL extension.");
+	if(!extension_loaded("sqlite3") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "sqlite3." . PHP_SHLIB_SUFFIX) === false){
+		console("[ERROR] Unable to find the SQLite3 extension.", true, true, 0);
 		++$errors;
 	}
 
-	if(!extension_loaded("sqlite3")){
-		$logger->critical("Unable to find the SQLite3 extension.");
+	if(!extension_loaded("yaml") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "yaml." . PHP_SHLIB_SUFFIX) === false){
+		console("[ERROR] Unable to find the YAML extension.", true, true, 0);
 		++$errors;
 	}
 
-	if(!extension_loaded("yaml")){
-		$logger->critical("Unable to find the YAML extension.");
-		++$errors;
-	}
-
-	if(!extension_loaded("zlib")){
-		$logger->critical("Unable to find the Zlib extension.");
+	if(!extension_loaded("zlib") and @dl((PHP_SHLIB_SUFFIX === "dll" ? "php_":"") . "zlib." . PHP_SHLIB_SUFFIX) === false){
+		console("[ERROR] Unable to find the Zlib extension.", true, true, 0);
 		++$errors;
 	}
 
 	if($errors > 0){
-		$logger->critical("Please use the installer provided on the homepage, or recompile PHP again.");
-		$logger->shutdown();
-		$logger->join();
+		console("[ERROR] Please use the installer provided on the homepage, or recompile PHP again.", true, true, 0);
 		exit(1); //Exit with error
 	}
 
-	if(file_exists(\pocketmine\PATH . ".git/refs/heads/master")){ //Found Git information!
-		define("pocketmine\\GIT_COMMIT", strtolower(trim(file_get_contents(\pocketmine\PATH . ".git/refs/heads/master"))));
+	$gitsha1 = false;
+	if(file_exists(\PocketMine\PATH . ".git/refs/heads/master")){ //Found Git information!
+		define("PocketMine\GIT_COMMIT", strtolower(trim(file_get_contents(\PocketMine\PATH .".git/refs/heads/master"))));
 	}else{ //Unknown :(
-		define("pocketmine\\GIT_COMMIT", str_repeat("00", 20));
+		define("PocketMine\GIT_COMMIT", str_repeat("00", 20));
 	}
 
-	@define("ENDIANNESS", (pack("d", 1) === "\77\360\0\0\0\0\0\0" ? Binary::BIG_ENDIAN : Binary::LITTLE_ENDIAN));
-	@define("INT32_MASK", is_int(0xffffffff) ? 0xffffffff : -1);
-	@ini_set("opcache.mmap_base", bin2hex(Utils::getRandomBytes(8, false))); //Fix OPCache address errors
+	ini_set("opcache.mmap_base", bin2hex(Utils\Utils::getRandomBytes(8, false))); //Fix OPCache address errors
 
-	if(!file_exists(\pocketmine\DATA . "server.properties") and !isset($opts["no-wizard"])){
-		new Installer();
+	require_once(\PocketMine\PATH . "src/pthreads.php");
+
+	if(!file_exists(\PocketMine\DATA . "server.properties") and !isset($opts["no-wizard"])){
+		$installer = new Wizard\Installer();
 	}
 
-	if(substr(__FILE__, 0, 7) !== "phar://"){
-		$logger->warning("Non-packaged PocketMine-MP installation detected, do not use on production.");
-	}
-
-	$server = new Server($autoloader, $logger, \pocketmine\PATH, \pocketmine\DATA, \pocketmine\PLUGIN_PATH);
+	$server = new ServerAPI();
 	$server->start();
-	$logger->shutdown();
-	$logger->join();
 
-	kill(getmypid());
+	kill(getmypid()); //Fix for ConsoleAPI being blocked
 	exit(0);
 
 }

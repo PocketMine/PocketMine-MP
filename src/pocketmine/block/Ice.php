@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Ice extends Transparent{
 	public function __construct(){
@@ -29,13 +30,20 @@ class Ice extends Transparent{
 		$this->hardness = 2.5;
 	}
 
-	public function onBreak(Item $item){
-		$this->getLevel()->setBlock($this, new Water(), true, false, true);
+	public function onBreak(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0){
+			$this->level->setBlock($this, new Water(), true, false, true);
+		} else{
+			$this->level->setBlock($this, new Air(), true, false, true);
+		}
 
 		return true;
 	}
 
-	public function getBreakTime(Item $item){
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.20;
+		}
 		switch($item->isPickaxe()){
 			case 5:
 				return 0.1;
@@ -52,7 +60,7 @@ class Ice extends Transparent{
 		}
 	}
 
-	public function getDrops(Item $item){
-		return [];
+	public function getDrops(Item $item, PocketMine\Player $player){
+		return array();
 	}
 }

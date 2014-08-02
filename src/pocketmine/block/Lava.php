@@ -19,13 +19,12 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
-use pocketmine\Player;
-use pocketmine\Server;
+use PocketMine\Item\Item as Item;
+use PocketMine\Level\Position as Position;
+use PocketMine\ServerAPI as ServerAPI;
+use PocketMine;
 
 class Lava extends Liquid{
 	public function __construct($meta = 0){
@@ -33,9 +32,9 @@ class Lava extends Liquid{
 		$this->hardness = 0;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$ret = $this->getLevel()->setBlock($this, $this, true, false, true);
-		$this->getLevel()->scheduleUpdate(clone $this, 40);
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
+		$ret = $this->level->setBlock($this, $this, true, false, true);
+		ServerAPI::request()->api->block->scheduleBlockUpdate(clone $this, 40, BLOCK_UPDATE_NORMAL);
 
 		return $ret;
 	}
@@ -61,9 +60,9 @@ class Lava extends Liquid{
 			if($b instanceof Water){
 				$level = $this->meta & 0x07;
 				if($level == 0x00){
-					$this->getLevel()->setBlock($this, new Obsidian(), false, false, true);
-				}else{
-					$this->getLevel()->setBlock($this, new Cobblestone(), false, false, true);
+					$this->level->setBlock($this, new Obsidian(), false, false, true);
+				} else{
+					$this->level->setBlock($this, new Cobblestone(), false, false, true);
 				}
 			}
 		}
@@ -85,10 +84,10 @@ class Lava extends Liquid{
 	}
 
 	public function onUpdate($type){
-		return false;
+		//return false;
 		$newId = $this->id;
 		$level = $this->meta & 0x07;
-		if($type !== Level::BLOCK_UPDATE_NORMAL){
+		if($type !== BLOCK_UPDATE_NORMAL){
 			return false;
 		}
 
@@ -103,21 +102,21 @@ class Lava extends Liquid{
 		if($from !== null || $level == 0x00){
 			if($level !== 0x07){
 				if($down instanceof Air || $down instanceof Lava){
-					$this->getLevel()->setBlock($down, new Lava(0x01), false, false, true);
-					Server::getInstance()->api->block->scheduleBlockUpdate(new Position($down, 0, 0, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
-				}else{
+					$this->level->setBlock($down, new Lava(0x01), false, false, true);
+					ServerAPI::request()->api->block->scheduleBlockUpdate(new Position($down, 0, 0, $this->level), 40, BLOCK_UPDATE_NORMAL);
+				} else{
 					for($side = 2; $side <= 5; ++$side){
 						$b = $this->getSide($side);
 						if($b instanceof Lava){
 
-						}elseif($b->isFlowable === true){
-							$this->getLevel()->setBlock($b, new Lava(min($level + 2, 7)), false, false, true);
-							Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
+						} elseif($b->isFlowable === true){
+							$this->level->setBlock($b, new Lava(min($level + 2, 7)), false, false, true);
+							ServerAPI::request()->api->block->scheduleBlockUpdate(new Position($b, 0, 0, $this->level), 40, BLOCK_UPDATE_NORMAL);
 						}
 					}
 				}
 			}
-		}else{
+		} else{
 			//Extend Remove for Left Lavas
 			for($side = 2; $side <= 5; ++$side){
 				$sb = $this->getSide($side);
@@ -126,9 +125,9 @@ class Lava extends Liquid{
 					if($tlevel != 0x00){
 						for($s = 0; $s <= 5; $s++){
 							$ssb = $sb->getSide($s);
-							Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
+							ServerAPI::request()->api->block->scheduleBlockUpdate(new Position($ssb, 0, 0, $this->level), 40, BLOCK_UPDATE_NORMAL);
 						}
-						$this->getLevel()->setBlock($sb, new Air(), false, false, true);
+						$this->level->setBlock($sb, new Air(), false, false, true);
 					}
 				}
 				$b = $this->getSide(0)->getSide($side);
@@ -137,15 +136,15 @@ class Lava extends Liquid{
 					if($tlevel != 0x00){
 						for($s = 0; $s <= 5; $s++){
 							$ssb = $sb->getSide($s);
-							Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
+							ServerAPI::request()->api->block->scheduleBlockUpdate(new Position($ssb, 0, 0, $this->level), 40, BLOCK_UPDATE_NORMAL);
 						}
-						$this->getLevel()->setBlock($b, new Air(), false, false, true);
+						$this->level->setBlock($b, new Air(), false, false, true);
 					}
 				}
-				//Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
+				//ServerAPI::request()->api->block->scheduleBlockUpdate(new Position($b, 0, 0, $this->level), 10, BLOCK_UPDATE_NORMAL);
 			}
 
-			$this->getLevel()->setBlock($this, new Air(), false, false, true);
+			$this->level->setBlock($this, new Air(), false, false, true);
 		}
 
 		return false;

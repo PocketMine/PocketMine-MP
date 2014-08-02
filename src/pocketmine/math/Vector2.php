@@ -19,15 +19,12 @@
  *
 */
 
-namespace pocketmine\math;
+namespace PocketMine\Math;
 
-/**
- * WARNING: This class is available on the PocketMine-MP Zephir project.
- * If this class is modified, remember to modify the PHP C extension.
- */
+use PocketMine;
+
 class Vector2{
-	public $x;
-	public $y;
+	public $x, $y;
 
 	public function __construct($x = 0, $y = 0){
 		$this->x = $x;
@@ -50,18 +47,21 @@ class Vector2{
 		return (int) $this->y;
 	}
 
-	public function add($x, $y = 0){
-		if($x instanceof Vector2){
+	public function add($x = 0, $y = 0){
+		if(($x instanceof Vector2) === true){
 			return $this->add($x->x, $x->y);
-		}else{
-			return new Vector2($this->x + $x, $this->y + $y);
+		} else{
+			$this->x += $x;
+			$this->y += $y;
+
+			return new Vector3($this->x + $x, $this->y + $y);
 		}
 	}
 
-	public function subtract($x, $y = 0){
-		if($x instanceof Vector2){
+	public function subtract($x = 0, $y = 0){
+		if(($x instanceof Vector2) === true){
 			return $this->add(-$x->x, -$x->y);
-		}else{
+		} else{
 			return $this->add(-$x, -$y);
 		}
 	}
@@ -90,18 +90,18 @@ class Vector2{
 		return new Vector2($this->x / $number, $this->y / $number);
 	}
 
-	public function distance($x, $y = 0){
-		if($x instanceof Vector2){
+	public function distance($x = 0, $y = 0){
+		if(($x instanceof Vector2) === true){
 			return sqrt($this->distanceSquared($x->x, $x->y));
-		}else{
+		} else{
 			return sqrt($this->distanceSquared($x, $y));
 		}
 	}
 
-	public function distanceSquared($x, $y = 0){
-		if($x instanceof Vector2){
+	public function distanceSquared($x = 0, $y = 0){
+		if(($x instanceof Vector2) === true){
 			return $this->distanceSquared($x->x, $x->y);
-		}else{
+		} else{
 			return pow($this->x - $x, 2) + pow($this->y - $y, 2);
 		}
 	}

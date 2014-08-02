@@ -22,9 +22,10 @@
 /**
  * Events related to the server core, like networking, stop, level loading
  */
-namespace pocketmine\event\server;
+namespace PocketMine\Event\Server;
 
-use pocketmine\event\Event;
+use PocketMine;
+use PocketMine\Event;
 
 abstract class ServerEvent extends Event{
 

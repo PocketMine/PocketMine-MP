@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Gravel extends Fallable{
 	public function __construct(){
@@ -29,7 +30,7 @@ class Gravel extends Fallable{
 		$this->hardness = 3;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		if(mt_rand(1, 10) === 1){
 			return array(
 				array(Item::FLINT, 0, 1),
@@ -37,7 +38,7 @@ class Gravel extends Fallable{
 		}
 
 		return array(
-			array(Item::GRAVEL, 0, 1),
+			array(GRAVEL, 0, 1),
 		);
 	}
 

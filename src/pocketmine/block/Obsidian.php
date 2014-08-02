@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Obsidian extends Solid{
 	public function __construct(){
@@ -29,22 +30,24 @@ class Obsidian extends Solid{
 		$this->hardness = 6000;
 	}
 
-	public function getBreakTime(Item $item){
-
+	public function getBreakTime(Item $item, PocketMine\Player $player){
+		if(($player->gamemode & 0x01) === 0x01){
+			return 0.20;
+		}
 		if($item->isPickaxe() >= 5){
 			return 9.4;
-		}else{
+		} else{
 			return 250;
 		}
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		if($item->isPickaxe() >= 5){
 			return array(
-				array(Item::OBSIDIAN, 0, 1),
+				array(OBSIDIAN, 0, 1),
 			);
-		}else{
-			return [];
+		} else{
+			return array();
 		}
 	}
 }

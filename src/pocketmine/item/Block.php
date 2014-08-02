@@ -19,22 +19,26 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
-use pocketmine\block\Block as BlockBlock;
+use PocketMine;
+use PocketMine\Block\Block as BlockBlock;
 
 /**
  * Class used for Items that can be Blocks
+ *
+ * Class Block
+ * @package PocketMine\Item
  */
 class Block extends Item{
 	public function __construct(BlockBlock $block, $meta = 0, $count = 1){
 		$this->block = clone $block;
-		parent::__construct($block->getID(), $block->getDamage(), $count, $block->getName());
+		parent::__construct($block->getID(), $block->getMetadata(), $count, $block->getName());
 	}
 
-	public function setDamage($meta){
-		$this->meta = $meta !== null ? $meta & 0xf : null;
-		$this->block->setDamage($this->meta);
+	public function setMetadata($meta){
+		$this->meta = $meta & 0x0F;
+		$this->block->setMetadata($this->meta);
 	}
 
 	public function getBlock(){

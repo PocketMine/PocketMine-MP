@@ -19,9 +19,10 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
-use pocketmine\utils\Binary;
+use PocketMine;
+use PocketMine\Utils\Utils as Utils;
 
 class AddMobPacket extends DataPacket{
 	public $eid;
@@ -48,9 +49,9 @@ class AddMobPacket extends DataPacket{
 		$this->putFloat($this->x);
 		$this->putFloat($this->y);
 		$this->putFloat($this->z);
-		$this->putByte(floor($this->yaw * (256 / 360)));
-		$this->putByte(floor($this->pitch * (256 / 360)));
-		$this->put(Binary::writeMetadata($this->metadata));
+		$this->putByte($this->yaw);
+		$this->putByte($this->pitch);
+		$this->put(Utils::writeMetadata($this->metadata));
 	}
 
 }

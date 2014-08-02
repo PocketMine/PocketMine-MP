@@ -19,15 +19,16 @@
  *
  */
 
-namespace pocketmine\event\entity;
+namespace PocketMine\Event\Entity;
 
-use pocketmine\entity\Entity;
-use pocketmine\event\Cancellable;
-use pocketmine\Event;
-use pocketmine\level\Level;
+use PocketMine\Entity\Entity as Entity;
+use PocketMine\Event;
+use PocketMine;
+use PocketMine\Level\Level as Level;
 
-class EntityLevelChangeEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityLevelChangeEvent extends EntityEvent implements CancellableEvent{
+	public static $handlers;
+	public static $handlerPriority;
 
 	private $originLevel;
 	private $targetLevel;

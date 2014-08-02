@@ -19,12 +19,12 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
-use pocketmine\block\Block;
-use pocketmine\level\Level;
-use pocketmine\Player;
-
+use PocketMine\Block\Block as Block;
+use PocketMine\Level\Level as Level;
+use PocketMine\ServerAPI as ServerAPI;
+use PocketMine;
 
 class Painting extends Item{
 	public function __construct($meta = 0, $count = 1){
@@ -34,6 +34,7 @@ class Painting extends Item{
 
 	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		if($target->isTransparent === false and $face > 1 and $block->isSolid === false){
+			$server = ServerAPI::request();
 			$faces = array(
 				2 => 1,
 				3 => 3,
@@ -82,7 +83,7 @@ class Painting extends Item{
 			//$e = $server->api->entity->add($level, ENTITY_OBJECT, OBJECT_PAINTING, $data);
 			//$e->spawnToAll();
 			if(($player->gamemode & 0x01) === 0x00){
-				$player->removeItem(Item::get($this->getID(), $this->getDamage(), 1));
+				$player->removeItem(Item::get($this->getID(), $this->getMetadata(), 1));
 			}
 
 			return true;

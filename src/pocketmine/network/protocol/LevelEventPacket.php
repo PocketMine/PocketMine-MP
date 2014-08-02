@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class LevelEventPacket extends DataPacket{
 	public $evid;
@@ -40,9 +41,9 @@ class LevelEventPacket extends DataPacket{
 	public function encode(){
 		$this->reset();
 		$this->putShort($this->evid);
-		$this->putInt($this->x);
+		$this->putShort($this->x);
 		$this->putShort($this->y);
-		$this->putInt($this->z);
+		$this->putShort($this->z);
 		$this->putInt($this->data);
 	}
 

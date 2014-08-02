@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Dirt extends Solid{
 	public function __construct(){
@@ -31,10 +31,12 @@ class Dirt extends Solid{
 		$this->hardness = 2.5;
 	}
 
-	public function onActivate(Item $item, Player $player = null){
+	public function onActivate(Item $item, PocketMine\Player $player){
 		if($item->isHoe()){
-			$item->useOn($this);
-			$this->getLevel()->setBlock($this, Block::get(Item::FARMLAND, 0), true, false, true);
+			if(($player->gamemode & 0x01) === 0){
+				$item->useOn($this);
+			}
+			$this->level->setBlock($this, Block::get(FARMLAND, 0), true, false, true);
 
 			return true;
 		}

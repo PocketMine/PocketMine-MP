@@ -22,12 +22,12 @@
 /**
  * Player-only related events
  */
-namespace pocketmine\event\player;
+namespace PocketMine\Event\Player;
 
-use pocketmine\event\Event;
+use PocketMine;
+use PocketMine\Event;
 
 abstract class PlayerEvent extends Event{
-	/** @var \pocketmine\Player */
 	protected $player;
 
 	public function getPlayer(){

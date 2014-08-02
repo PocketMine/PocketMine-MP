@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
+use PocketMine;
 
 class Diamond extends Item{
 	public function __construct($meta = 0, $count = 1){

@@ -19,15 +19,16 @@
  *
  */
 
-namespace pocketmine\event\entity;
+namespace PocketMine\Event\Entity;
 
-use pocketmine\entity\Entity;
-use pocketmine\event\Cancellable;
-use pocketmine\Event;
-use pocketmine\math\Vector3 as Vector3;
+use PocketMine\Entity\Entity as Entity;
+use PocketMine\Event;
+use PocketMine;
+use PocketMine\Math\Vector3 as Vector3;
 
-class EntityMotionEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+class EntityMotionEvent extends EntityEvent implements CancellableEvent{
+	public static $handlers;
+	public static $handlerPriority;
 
 	private $mot;
 

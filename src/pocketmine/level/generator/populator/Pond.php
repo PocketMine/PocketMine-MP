@@ -19,25 +19,29 @@
  *
 */
 
-namespace pocketmine\level\generator\populator;
+namespace PocketMine\Level\Generator\Populator;
 
-use pocketmine\block\Water;
-use pocketmine\level\ChunkManager;
-use pocketmine\utils\Random;
+use PocketMine\Block\Water as Water;
+use PocketMine\Level\Level as Level;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\Utils\Random as Random;
+use PocketMine;
 
 class Pond extends Populator{
 	private $waterOdd = 4;
 	private $lavaOdd = 4;
 	private $lavaSurfaceOdd = 4;
 
-	public function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random){
+	public function populate(Level $level, $chunkX, $chunkZ, Random $random){
 		if($random->nextRange(0, $this->waterOdd) === 0){
-			$x = $random->nextRange($chunkX << 4, ($chunkX << 4) + 16);
-			$y = $random->nextRange(0, 128);
-			$z = $random->nextRange($chunkZ << 4, ($chunkZ << 4) + 16);
-			$pond = new \pocketmine\level\generator\object\Pond($random, new Water());
-			if($pond->canPlaceObject($level, $x, $y, $z)){
-				$pond->placeObject($level, $x, $y, $z);
+			$v = new Vector3(
+				$random->nextRange($chunkX << 4, ($chunkX << 4) + 16),
+				$random->nextRange(0, 128),
+				$random->nextRange($chunkZ << 4, ($chunkZ << 4) + 16)
+			);
+			$pond = new Level\Genenerator\Object\Pond($random, new Water());
+			if($pond->canPlaceObject($level, $v)){
+				$pond->placeObject($level, $v);
 			}
 		}
 	}

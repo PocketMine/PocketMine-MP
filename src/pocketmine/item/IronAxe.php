@@ -19,12 +19,13 @@
  *
 */
 
-namespace pocketmine\item;
+namespace PocketMine\Item;
 
+use PocketMine;
 
-class IronAxe extends Tool{
+class IronAxe extends Item{
 	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::IRON_AXE, $meta, $count, "Iron Axe");
+		parent::__construct(self::IRON_AXE, 0, $count, "Iron Axe");
 	}
 
 }

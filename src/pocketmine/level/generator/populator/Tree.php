@@ -19,16 +19,17 @@
  *
 */
 
-namespace pocketmine\level\generator\populator;
+namespace PocketMine\Level\Generator\Populator;
 
-use pocketmine\block\Block;
-use pocketmine\block\Sapling;
-use pocketmine\level\ChunkManager;
-use pocketmine\level\generator\object\Tree as ObjectTree;
-use pocketmine\utils\Random;
+use PocketMine\Level\Level as Level;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\Utils\Random as Random;
+use PocketMine\Block\Block as Block;
+use PocketMine\Block\Sapling as Sapling;
+use PocketMine\Level\Generator\Object\Tree as ObjectTree;
+use PocketMine;
 
 class Tree extends Populator{
-	/** @var ChunkManager */
 	private $level;
 	private $randomAmount;
 	private $baseAmount;
@@ -41,7 +42,7 @@ class Tree extends Populator{
 		$this->baseAmount = $amount;
 	}
 
-	public function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random){
+	public function populate(Level $level, $chunkX, $chunkZ, Random $random){
 		$this->level = $level;
 		$amount = $random->nextRange(0, $this->randomAmount + 1) + $this->baseAmount;
 		for($i = 0; $i < $amount; ++$i){
@@ -53,21 +54,21 @@ class Tree extends Populator{
 			}
 			if($random->nextFloat() > 0.75){
 				$meta = Sapling::BIRCH;
-			}else{
+			} else{
 				$meta = Sapling::OAK;
 			}
-			ObjectTree::growTree($this->level, $x, $y, $z, $random, $meta);
+			ObjectTree::growTree($this->level, new Vector3($x, $y, $z), $random, $meta);
 		}
 	}
 
 	private function getHighestWorkableBlock($x, $z){
 		for($y = 128; $y > 0; --$y){
-			$b = $this->level->getBlockIdAt($x, $y, $z);
-			if($b !== Block::DIRT and $b !== Block::GRASS){
+			$b = $this->level->getBlockRaw(new Vector3($x, $y, $z));
+			if($b->getID() !== Block::DIRT and $b->getID() !== Block::GRASS){
 				if(--$y <= 0){
 					return -1;
 				}
-			}else{
+			} else{
 				break;
 			}
 		}

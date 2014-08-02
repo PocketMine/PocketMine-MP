@@ -19,14 +19,16 @@
  *
 */
 
-namespace pocketmine\level\generator\populator;
+namespace PocketMine\Level\Generator\Populator;
 
-use pocketmine\block\Block;
-use pocketmine\level\ChunkManager;
-use pocketmine\utils\Random;
+use PocketMine\Block\TallGrass as BlockTallGrass;
+use PocketMine\Math\Vector3 as Vector3;
+use PocketMine\Level\Level as Level;
+use PocketMine\Utils\Random as Random;
+use PocketMine\Block\Block as Block;
+use PocketMine;
 
 class TallGrass extends Populator{
-	/** @var ChunkManager */
 	private $level;
 	private $randomAmount;
 	private $baseAmount;
@@ -39,7 +41,7 @@ class TallGrass extends Populator{
 		$this->baseAmount = $amount;
 	}
 
-	public function populate(ChunkManager $level, $chunkX, $chunkZ, Random $random){
+	public function populate(Level $level, $chunkX, $chunkZ, Random $random){
 		$this->level = $level;
 		$amount = $random->nextRange(0, $this->randomAmount + 1) + $this->baseAmount;
 		for($i = 0; $i < $amount; ++$i){
@@ -49,27 +51,26 @@ class TallGrass extends Populator{
 				$xx = $x - 7 + $random->nextRange(0, 15);
 				$zz = $z - 7 + $random->nextRange(0, 15);
 				$yy = $this->getHighestWorkableBlock($xx, $zz);
-
-				if($yy !== -1 and $this->canTallGrassStay($xx, $yy, $zz)){
-					$this->level->setBlockIdAt($xx, $yy, $zz, Block::TALL_GRASS);
-					$this->level->setBlockDataAt($xx, $yy, $zz, 1);
+				$vector = new Vector3($xx, $yy, $zz);
+				if($yy !== -1 and $this->canTallGrassStay($this->level->getBlockRaw($vector))){
+					$this->level->setBlockRaw($vector, new BlockTallGrass(1));
 				}
 			}
 		}
 	}
 
-	private function canTallGrassStay($x, $y, $z){
-		return $this->level->getBlockIdAt($x, $y, $z) === Block::AIR and $this->level->getBlockIdAt($x, $y - 1, $z) === Block::GRASS;
+	private function canTallGrassStay(Block $block){
+		return $block->getID() === Block::AIR and $block->getSide(0)->getID() === Block::GRASS;
 	}
 
 	private function getHighestWorkableBlock($x, $z){
 		for($y = 128; $y > 0; --$y){
-			$b = $this->level->getBlockIdAt($x, $y, $z);
-			if($b === Block::AIR or $b === Block::LEAVES){
+			$b = $this->level->getBlockRaw(new Vector3($x, $y, $z));
+			if($b->getID() === Block::AIR or $b->getID() === Block::LEAVES){
 				if(--$y <= 0){
 					return -1;
 				}
-			}else{
+			} else{
 				break;
 			}
 		}

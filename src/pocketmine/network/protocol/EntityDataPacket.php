@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace PocketMine\Network\Protocol;
 
+use PocketMine;
 
 class EntityDataPacket extends DataPacket{
 	public $x;
@@ -33,17 +34,17 @@ class EntityDataPacket extends DataPacket{
 	}
 
 	public function decode(){
-		$this->x = $this->getInt();
+		$this->x = $this->getShort();
 		$this->y = $this->getByte();
-		$this->z = $this->getInt();
+		$this->z = $this->getShort();
 		$this->namedtag = $this->get(true);
 	}
 
 	public function encode(){
 		$this->reset();
-		$this->putInt($this->x);
+		$this->putShort($this->x);
 		$this->putByte($this->y);
-		$this->putInt($this->z);
+		$this->putShort($this->z);
 		$this->put($this->namedtag);
 	}
 

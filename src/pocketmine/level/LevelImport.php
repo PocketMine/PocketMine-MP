@@ -19,13 +19,11 @@
  *
 */
 
-namespace pocketmine\level;
+namespace PocketMine\Level;
 
-use pocketmine\level\format\pmf\LevelFormat;
-use pocketmine\level\format\PocketChunkParser;
-use pocketmine\nbt\NBT;
-use pocketmine\utils\Config;
-use pocketmine\utils\MainLogger;
+use PocketMine\PMF\LevelFormat as LevelFormat;
+use PocketMine\Utils\Config as Config;
+use PocketMine;
 
 class LevelImport{
 	private $path;
@@ -37,24 +35,24 @@ class LevelImport{
 	public function import(){
 		if(file_exists($this->path . "tileEntities.dat")){ //OldPM
 			$level = unserialize(file_get_contents($this->path . "level.dat"));
-			MainLogger::getLogger()->info("Importing OldPM level \"" . $level["LevelName"] . "\" to PMF format");
+			console("[INFO] Importing OldPM level \"" . $level["LevelName"] . "\" to PMF format");
 			$entities = new Config($this->path . "entities.yml", Config::YAML, unserialize(file_get_contents($this->path . "entities.dat")));
 			$entities->save();
 			$tiles = new Config($this->path . "tiles.yml", Config::YAML, unserialize(file_get_contents($this->path . "tileEntities.dat")));
 			$tiles->save();
-		}elseif(file_exists($this->path . "chunks.dat") and file_exists($this->path . "level.dat")){ //Pocket
+		} elseif(file_exists($this->path . "chunks.dat") and file_exists($this->path . "level.dat")){ //Pocket
 			$nbt = new NBT(NBT::LITTLE_ENDIAN);
 			$nbt->read(substr(file_get_contents($this->path . "level.dat"), 8));
 			$level = $nbt->getData();
-			if($level["LevelName"] == ""){
-				$level["LevelName"] = "world" . time();
+			if($level->LevelName == ""){
+				$level->LevelName = "world" . time();
 			}
-			MainLogger::getLogger()->info("Importing Pocket level \"" . $level->LevelName . "\" to PMF format");
+			console("[INFO] Importing Pocket level \"" . $level->LevelName . "\" to PMF format");
 			unset($level->Player);
 			$nbt->read(substr(file_get_contents($this->path . "entities.dat"), 12));
 			$entities = $nbt->getData();
 			if(!isset($entities->TileEntities)){
-				$entities->TileEntities = [];
+				$entities->TileEntities = array();
 			}
 			$tiles = $entities->TileEntities;
 			$entities = $entities->Entities;
@@ -62,7 +60,7 @@ class LevelImport{
 			$entities->save();
 			$tiles = new Config($this->path . "tiles.yml", Config::YAML, $tiles);
 			$tiles->save();
-		}else{
+		} else{
 			return false;
 		}
 
@@ -112,7 +110,7 @@ class LevelImport{
 				$pmf->setPopulated($X, $Z);
 				$pmf->saveChunk($X, $Z);
 			}
-			MainLogger::getLogger()->notice("Importing level " . ceil(($Z + 1) / 0.16) . "%");
+			console("[NOTICE] Importing level " . ceil(($Z + 1) / 0.16) . "%");
 		}
 		$chunks->map = null;
 		$chunks = null;

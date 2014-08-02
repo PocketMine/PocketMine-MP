@@ -19,11 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class Ladder extends Transparent{
 	public function __construct($meta = 0){
@@ -33,7 +32,7 @@ class Ladder extends Transparent{
 		$this->hardness = 2;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		if($target->isTransparent === false){
 			$faces = array(
 				2 => 2,
@@ -43,7 +42,7 @@ class Ladder extends Transparent{
 			);
 			if(isset($faces[$face])){
 				$this->meta = $faces[$face];
-				$this->getLevel()->setBlock($block, $this, true, false, true);
+				$this->level->setBlock($block, $this, true, false, true);
 
 				return true;
 			}
@@ -53,18 +52,18 @@ class Ladder extends Transparent{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			/*if($this->getSide(0)->getID() === self::AIR){ //Replace with common break method
-				Server::getInstance()->api->entity->drop($this, Item::get(LADDER, 0, 1));
-				$this->getLevel()->setBlock($this, new Air(), true, true, true);
-				return Level::BLOCK_UPDATE_NORMAL;
+				ServerAPI::request()->api->entity->drop($this, Item::get(LADDER, 0, 1));
+				$this->level->setBlock($this, new Air(), true, true, true);
+				return BLOCK_UPDATE_NORMAL;
 			}*/
 		}
 
 		return false;
 	}
 
-	public function getDrops(Item $item){
+	public function getDrops(Item $item, PocketMine\Player $player){
 		return array(
 			array($this->id, 0, 1),
 		);

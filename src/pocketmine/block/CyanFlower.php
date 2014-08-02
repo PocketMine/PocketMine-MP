@@ -19,22 +19,21 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine;
+use PocketMine\Item\Item as Item;
 
 class CyanFlower extends Flowable{
 	public function __construct(){
-		parent::__construct(self::POPPY, 0, "Cyan Flower");
+		parent::__construct(self::CYAN_FLOWER, 0, "Cyan Flower");
 		$this->hardness = 0;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$down = $this->getSide(0);
 		if($down->getID() === 2 or $down->getID() === 3 or $down->getID() === 60){
-			$this->getLevel()->setBlock($block, $this, true, false, true);
+			$this->level->setBlock($block, $this, true, false, true);
 
 			return true;
 		}
@@ -43,12 +42,13 @@ class CyanFlower extends Flowable{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->isTransparent === true){ //TODO: Replace with common break method
-				$this->getLevel()->dropItem($this, Item::get($this->id, 0, 1));
-				$this->getLevel()->setBlock($this, new Air(), false, false, true);
+		if($type === BLOCK_UPDATE_NORMAL){
+			if($this->getSide(0)->isTransparent === true){ //Replace with common break method
+				//TODO
+				//ServerAPI::request()->api->entity->drop($this, Item::get($this->id));
+				$this->level->setBlock($this, new Air(), false, false, true);
 
-				return Level::BLOCK_UPDATE_NORMAL;
+				return BLOCK_UPDATE_NORMAL;
 			}
 		}
 

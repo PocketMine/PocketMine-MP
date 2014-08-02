@@ -19,19 +19,17 @@
  *
 */
 
-namespace pocketmine\block;
+namespace PocketMine\Block;
 
-use pocketmine\item\Item;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use PocketMine\Item\Item as Item;
+use PocketMine\ServerAPI as ServerAPI;
+use PocketMine;
 
 class Leaves extends Transparent{
 	const OAK = 0;
 	const SPRUCE = 1;
 	const BIRCH = 2;
 	const JUNGLE = 3;
-	const ACACIA = 0;
-	const DARK_OAK = 1;
 
 	public function __construct($meta = 0){
 		parent::__construct(self::LEAVES, $meta, "Leaves");
@@ -53,10 +51,10 @@ class Leaves extends Transparent{
 		}
 		if($pos->getID() === self::WOOD){
 			return true;
-		}elseif($pos->getID() === self::LEAVES and $distance < 3){
+		} elseif($pos->getID() === self::LEAVES and $distance < 3){
 			$visited[$index] = true;
 			$down = $pos->getSide(0)->getID();
-			if($down === Item::WOOD){
+			if($down === WOOD){
 				return true;
 			}
 			if($fromSide === null){
@@ -65,41 +63,41 @@ class Leaves extends Transparent{
 						return true;
 					}
 				}
-			}else{ //No more loops
+			} else{ //No more loops
 				switch($fromSide){
 					case 2:
 						if($this->findLog($pos->getSide(2), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
-						}elseif($this->findLog($pos->getSide(4), $visited, $distance + 1, $check, $fromSide) === true){
+						} elseif($this->findLog($pos->getSide(4), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
-						}elseif($this->findLog($pos->getSide(5), $visited, $distance + 1, $check, $fromSide) === true){
+						} elseif($this->findLog($pos->getSide(5), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
 						}
 						break;
 					case 3:
 						if($this->findLog($pos->getSide(3), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
-						}elseif($this->findLog($pos->getSide(4), $visited, $distance + 1, $check, $fromSide) === true){
+						} elseif($this->findLog($pos->getSide(4), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
-						}elseif($this->findLog($pos->getSide(5), $visited, $distance + 1, $check, $fromSide) === true){
+						} elseif($this->findLog($pos->getSide(5), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
 						}
 						break;
 					case 4:
 						if($this->findLog($pos->getSide(2), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
-						}elseif($this->findLog($pos->getSide(3), $visited, $distance + 1, $check, $fromSide) === true){
+						} elseif($this->findLog($pos->getSide(3), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
-						}elseif($this->findLog($pos->getSide(4), $visited, $distance + 1, $check, $fromSide) === true){
+						} elseif($this->findLog($pos->getSide(4), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
 						}
 						break;
 					case 5:
 						if($this->findLog($pos->getSide(2), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
-						}elseif($this->findLog($pos->getSide(3), $visited, $distance + 1, $check, $fromSide) === true){
+						} elseif($this->findLog($pos->getSide(3), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
-						}elseif($this->findLog($pos->getSide(5), $visited, $distance + 1, $check, $fromSide) === true){
+						} elseif($this->findLog($pos->getSide(5), $visited, $distance + 1, $check, $fromSide) === true){
 							return true;
 						}
 						break;
@@ -111,28 +109,30 @@ class Leaves extends Transparent{
 	}
 
 	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === BLOCK_UPDATE_NORMAL){
 			if(($this->meta & 0b00001100) === 0){
 				$this->meta |= 0x08;
-				$this->getLevel()->setBlock($this, $this, false, false, true);
+				$this->level->setBlock($this, $this, false, false, true);
 			}
-		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
+		} elseif($type === BLOCK_UPDATE_RANDOM){
 			if(($this->meta & 0b00001100) === 0x08){
 				$this->meta &= 0x03;
-				$visited = [];
+				$visited = array();
 				$check = 0;
 				if($this->findLog($this, $visited, 0, $check) === true){
-					$this->getLevel()->setBlock($this, $this, false, false, true);
-				}else{
-					$this->getLevel()->setBlock($this, new Air(), false, false, true);
+					$this->level->setBlock($this, $this, false, false, true);
+				} else{
+					$this->level->setBlock($this, new Air(), false, false, true);
 					if(mt_rand(1, 20) === 1){ //Saplings
-						$this->getLevel()->dropItem($this, Item::get($this->id, $this->meta & 0x03, 1));
+						//TODO
+						ServerAPI::request()->api->entity->drop($this, Item::get(SAPLING, $this->meta & 0x03, 1));
 					}
 					if(($this->meta & 0x03) === self::OAK and mt_rand(1, 200) === 1){ //Apples
-						$this->getLevel()->dropItem($this, Item::get(Item::APPLE, 0, 1));
+						//TODO
+						ServerAPI::request()->api->entity->drop($this, Item::get(APPLE, 0, 1));
 					}
 
-					return Level::BLOCK_UPDATE_NORMAL;
+					return BLOCK_UPDATE_NORMAL;
 				}
 			}
 		}
@@ -140,21 +140,21 @@ class Leaves extends Transparent{
 		return false;
 	}
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+	public function place(Item $item, PocketMine\Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
 		$this->meta |= 0x04;
-		$this->getLevel()->setBlock($this, $this, true, false, true);
+		$this->level->setBlock($this, $this, true, false, true);
 	}
 
-	public function getDrops(Item $item){
-		$drops = [];
+	public function getDrops(Item $item, PocketMine\Player $player){
+		$drops = array();
 		if($item->isShears()){
-			$drops[] = array(Item::LEAVES, $this->meta & 0x03, 1);
-		}else{
+			$drops[] = array(LEAVES, $this->meta & 0x03, 1);
+		} else{
 			if(mt_rand(1, 20) === 1){ //Saplings
 				$drops[] = array(Item::SAPLING, $this->meta & 0x03, 1);
 			}
 			if(($this->meta & 0x03) === self::OAK and mt_rand(1, 200) === 1){ //Apples
-				$drops[] = array(Item::APPLE, 0, 1);
+				$drops[] = array(APPLE, 0, 1);
 			}
 		}
 
