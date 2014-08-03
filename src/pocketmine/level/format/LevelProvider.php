@@ -26,11 +26,41 @@ use pocketmine\math\Vector3;
 
 interface LevelProvider{
 
+	const ORDER_YZX = 0;
+	const ORDER_ZXY = 1;
+
 	/**
 	 * @param Level  $level
 	 * @param string $path
 	 */
 	public function __construct(Level $level, $path);
+
+	/**
+	 * Returns the full provider name, like "anvil" or "mcregion", will be used to find the correct format.
+	 *
+	 * @return string
+	 */
+	public static function getProviderName();
+
+	/**
+	 * @return int
+	 */
+	public static function getProviderOrder();
+
+	/**
+	 * @return bool
+	 */
+	public static function usesChunkSection();
+
+	/**
+	 * Requests a MC: PE network chunk to be sent
+	 *
+	 * @param int $x
+	 * @param int $z
+	 *
+	 * @return \pocketmine\scheduler\AsyncTask
+	 */
+	public function requestChunkTask($x, $z);
 
 	/** @return string */
 	public function getPath();
@@ -79,6 +109,13 @@ interface LevelProvider{
 	 * @return Chunk
 	 */
 	public function getChunk($X, $Z, $create = false);
+
+	/**
+	 * @param $Y 0-7
+	 *
+	 * @return ChunkSection
+	 */
+	public static function createChunkSection($Y);
 
 	public function saveChunks();
 
@@ -133,13 +170,13 @@ interface LevelProvider{
 	public function isChunkLoaded($X, $Z);
 
 	/**
-	 * @param int         $chunkX
-	 * @param int         $chunkZ
-	 * @param SimpleChunk $chunk
+	 * @param int       $chunkX
+	 * @param int       $chunkZ
+	 * @param FullChunk $chunk
 	 *
 	 * @return mixed
 	 */
-	public function setChunk($chunkX, $chunkZ, SimpleChunk $chunk);
+	public function setChunk($chunkX, $chunkZ, FullChunk $chunk);
 
 	/**
 	 * @return string

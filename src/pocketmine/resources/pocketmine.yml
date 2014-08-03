@@ -4,12 +4,17 @@
 
 settings:
  shutdown-message: "Server closed"
+ #Allow listing plugins via Query
  query-plugins: true
+ #Show a console message when a plugin uses deprecated API methods
  deprecated-verbose: true
+ #Enable plugin and core profiling by default
  enable-profiling: false
  advanced-cache: false
  upnp-forwarding: false
+ #Sends anonymous statistics to create usage reports
  send-usage: true
+ #Number of AsyncTask workers
  async-workers: 4
 
 debug:
@@ -18,12 +23,22 @@ debug:
  #Enables /status
  commands: false
 
+level-settings:
+ #The default format that levels will use when created
+ default-format: mcregion
+ #If true, converts from a format that is not the default to the default format on load
+ convert-format: false
+
 chunk-sending:
+ #Amount of chunks sent to players per tick
  per-tick: 4
- compression-level: 9
+ #Compression level used when sending chunks. Higher = more CPU, less bandwidth usage
+ compression-level: 7
 
 chunk-ticking:
+ #Max amount of chunks processed each tick
  per-tick: 80
+ #Radius of chunks around a player to tick
  tick-radius: 2
  light-updates: false
  clear-tick-list: false
@@ -43,6 +58,14 @@ spawn-limits:
   water-animals: 5
   ambient: 15
 
+auto-report:
+ #Send crash reports for processing
+ enabled: true
+ send-code: true
+ send-settings: true
+ send-phpinfo: true
+ host: crash.pocketmine.net
+
 auto-updater:
  enabled: true
  on-update:
@@ -55,6 +78,13 @@ auto-updater:
  host: www.pocketmine.net
 
 aliases:
- #Examples
+ #Examples:
  #showtheversion: version
  #savestop: [save-all, stop]
+
+worlds:
+ #These settings will override the generator set in server.properties and allows loading multiple levels
+ #Example:
+ #world:
+ # seed: 404
+ # generator: FLAT:2;7,59x1,3x3,2;1;decoration(treecount=80 grasscount=45)

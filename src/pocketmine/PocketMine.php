@@ -74,9 +74,9 @@ namespace pocketmine {
 	use raklib\RakLib;
 
 	const VERSION = "Alpha_1.4dev";
-	const API_VERSION = "1.1.0";
+	const API_VERSION = "1.2.0";
 	const CODENAME = "絶好(Zekkou)ケーキ(Cake)";
-	const MINECRAFT_VERSION = "v0.9.4 alpha";
+	const MINECRAFT_VERSION = "v0.9.5 alpha";
 	const PHP_VERSION = "5.5";
 
 	if(\Phar::running(true) !== ""){
@@ -141,14 +141,14 @@ namespace pocketmine {
 		}
 	}
 
-	gc_disable();
-	error_reporting(E_ALL | E_STRICT);
+	gc_enable();
+	error_reporting(-1);
 	ini_set("allow_url_fopen", 1);
 	ini_set("display_errors", 1);
 	ini_set("display_startup_errors", 1);
 	ini_set("default_charset", "utf-8");
 
-	ini_set("memory_limit", "128M"); //Default
+	ini_set("memory_limit", "256M"); //Default
 	define("pocketmine\\START_TIME", microtime(true));
 
 	$opts = getopt("", array("enable-ansi", "disable-ansi", "data:", "plugins:", "no-wizard"));
@@ -172,25 +172,42 @@ namespace pocketmine {
 		}
 	}
 
-	function getTrace($start = 1){
-		$e = new \Exception();
-		$trace = $e->getTrace();
+	function getTrace($start = 1, $trace = null){
+		if($trace === null){
+			if(function_exists("xdebug_get_function_stack")){
+				$trace = array_reverse(xdebug_get_function_stack());
+			}else{
+				$e = new \Exception();
+				$trace = $e->getTrace();
+			}
+		}
+
 		$messages = [];
 		$j = 0;
 		for($i = (int) $start; isset($trace[$i]); ++$i, ++$j){
 			$params = "";
-			if(isset($trace[$i]["args"])){
-				foreach($trace[$i]["args"] as $name => $value){
+			if(isset($trace[$i]["args"]) or isset($trace[$i]["params"])){
+				if(isset($trace[$i]["args"])){
+					$args = $trace[$i]["args"];
+				}else{
+					$args = $trace[$i]["params"];
+				}
+				foreach($args as $name => $value){
 					$params .= (is_object($value) ? get_class($value) . " " . (method_exists($value, "__toString") ? $value->__toString() : "object") : gettype($value) . " " . @strval($value)) . ", ";
 				}
 			}
-			$messages[] = "#$j " . (isset($trace[$i]["file"]) ? $trace[$i]["file"] : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . $trace[$i]["type"] : "") . $trace[$i]["function"] . "(" . substr($params, 0, -2) . ")";
+			$messages[] = "#$j " . (isset($trace[$i]["file"]) ? cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . substr($params, 0, -2) . ")";
 		}
 
 		return $messages;
 	}
 
-	function error_handler($errno, $errstr, $errfile, $errline){
+	function cleanPath($path){
+		return rtrim(str_replace(["\\", ".php", "phar://", rtrim(str_replace(["\\", "phar://"], ["/", ""], \pocketmine\PATH), "/"), rtrim(str_replace(["\\", "phar://"], ["/", ""], \pocketmine\PLUGIN_PATH), "/")], ["/", "", "", "", ""], $path), "/");
+	}
+
+	function error_handler($errno, $errstr, $errfile, $errline, $trace = null){
+		global $lastError;
 		if(error_reporting() === 0){ //@ error-control
 			return false;
 		}
@@ -213,11 +230,25 @@ namespace pocketmine {
 		);
 		$type = ($errno === E_ERROR or $errno === E_WARNING or $errno === E_USER_ERROR or $errno === E_USER_WARNING) ? LogLevel::ERROR : LogLevel::NOTICE;
 		$errno = isset($errorConversion[$errno]) ? $errorConversion[$errno] : $errno;
+		if(($pos = strpos($errstr, "\n")) !== false){
+			$errstr = substr($errstr, 0, $pos);
+		}
 		$logger = MainLogger::getLogger();
-		$logger->log($type, "A $errno error happened: \"$errstr\" in \"$errfile\" at line $errline");
-		foreach(getTrace() as $i => $line){
+		$oldFile = $errfile;
+		$errfile = cleanPath($errfile);
+		$logger->log($type, "An $errno error happened: \"$errstr\" in \"$errfile\" at line $errline");
+
+		foreach(($trace = getTrace($trace === null ? 3 : 0, $trace)) as $i => $line){
 			$logger->debug($line);
 		}
+		$lastError = [
+			"type" => $type,
+			"message" => $errstr,
+			"fullFile" => $oldFile,
+			"file" => $errfile,
+			"line" => $errline,
+			"trace" => $trace
+		];
 
 		return true;
 	}
