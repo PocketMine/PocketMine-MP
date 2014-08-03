@@ -2214,7 +2214,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 		}
 
-		$this->server->getPluginManager()->callEvent($ev = new PlayerDeathEvent($this, $this->getDrops(), $message));
+		$this->server->getPluginManager()->callEvent($ev = new PlayerDeathEvent($this, $this->getDrops(), $message, $cause));
 
 		$this->server->broadcast($ev->getDeathMessage(), Server::BROADCAST_CHANNEL_USERS);
 

@@ -24,20 +24,24 @@ namespace pocketmine\event\player;
 use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\event\entity\EntityDeathEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 
 class PlayerDeathEvent extends EntityDeathEvent{
 	public static $handlerList = null;
 
 	private $deathMessage;
+    private $cause;
 
 	/**
 	 * @param Player $entity
 	 * @param Item[] $drops
 	 * @param string $deathMessage
+     * @param EntityDamageEvent $cause
 	 */
-	public function __construct(Player $entity, array $drops, $deathMessage){
+	public function __construct(Player $entity, array $drops, $deathMessage, $cause){
 		parent::__construct($entity, $drops);
 		$this->deathMessage = $deathMessage;
+        $this->cause = $cause;
 	}
 
 	/**
@@ -46,6 +50,13 @@ class PlayerDeathEvent extends EntityDeathEvent{
 	public function getEntity(){
 		return $this->entity;
 	}
+
+    /**
+     * @return EntityDamageEvent
+     */
+    public function getCause(){
+        return $this->cause;
+    }
 
 	public function getDeathMessage(){
 		return $this->deathMessage;
