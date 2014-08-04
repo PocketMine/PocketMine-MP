@@ -68,8 +68,8 @@ ini_set("memory_limit", "128M"); //Default
 define("LOG", true);
 define("START_TIME", microtime(true));
 define("MAJOR_VERSION", "Alpha_1.3.12");
-define("CODENAME", "甘い(Amai)ビートルート(Beetroot)");
-define("CURRENT_MINECRAFT_VERSION", "v0.8.1 alpha");
+define("CODENAME", "Breadfence");
+define("CURRENT_MINECRAFT_VERSION", "v0.9.5 alpha");
 define("CURRENT_API_VERSION", 12);
 define("CURRENT_PHP_VERSION", "5.5");
 $gitsha1 = false;
