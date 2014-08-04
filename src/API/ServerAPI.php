@@ -159,50 +159,7 @@ class ServerAPI{
 		$this->server = new PocketMinecraftServer($this->getProperty("server-name"), $this->getProperty("gamemode"), ($seed = $this->getProperty("level-seed")) != "" ? (int) $seed:false, $this->getProperty("server-port"), ($ip = $this->getProperty("server-ip")) != "" ? $ip:"0.0.0.0");
 		$this->server->api = $this;
 		self::$serverRequest = $this->server;
-		console("[INFO] This server is running PocketMine-MP version ".($version->isDev() ? FORMAT_YELLOW:"").MAJOR_VERSION.FORMAT_RESET." \"".CODENAME."\" (MCPE: ".CURRENT_MINECRAFT_VERSION.") (API ".CURRENT_API_VERSION.")", true, true, 0);
-		console("[INFO] PocketMine-MP is distributed under the LGPL License", true, true, 0);
-
-		if($this->getProperty("last-update") === false or ($this->getProperty("last-update") + 3600) < time()){
-			console("[INFO] Checking for new server version");
-			console("[INFO] Last check: ".FORMAT_AQUA.date("Y-m-d H:i:s", $this->getProperty("last-update"))."\x1b[0m");
-			if($this->server->version->isDev()){
-				$info = json_decode(Utils::curl_get("https://api.github.com/repos/PocketMine/PocketMine-MP/commits"), true);
-				if($info === false or !isset($info[0])){
-					console("[ERROR] Github API error");
-				}else{
-					$last = new DateTime($info[0]["commit"]["committer"]["date"]);
-					$last = $last->getTimestamp();
-					if($last >= $this->getProperty("last-update") and $this->getProperty("last-update") !== false and GIT_COMMIT != $info[0]["sha"]){
-						console("[NOTICE] ".FORMAT_YELLOW."A new DEVELOPMENT version of PocketMine-MP has been released!");
-						console("[NOTICE] ".FORMAT_YELLOW."Commit \"".$info[0]["commit"]["message"]."\" [".substr($info[0]["sha"], 0, 10)."] by ".$info[0]["commit"]["committer"]["name"]);
-						console("[NOTICE] ".FORMAT_YELLOW."Get it at PocketMine.net or at https://github.com/PocketMine/PocketMine-MP/archive/".$info[0]["sha"].".zip");
-						console("[NOTICE] This message will dissapear after issuing the command \"/update-done\"");
-					}else{
-						$this->setProperty("last-update", time());
-						console("[INFO] ".FORMAT_AQUA."This is the latest DEVELOPMENT version");
-					}
-				}
-			}else{
-				$info = json_decode(Utils::curl_get("https://api.github.com/repos/PocketMine/PocketMine-MP/tags"), true);
-				if($info === false or !isset($info[0])){
-					console("[ERROR] Github API error");
-				}else{
-					$newest = new VersionString(MAJOR_VERSION);
-					$newestN = $newest->getNumber();
-					$update = new VersionString($info[0]["name"]);
-					$updateN = $update->getNumber();
-					if($updateN > $newestN){
-						console("[NOTICE] ".FORMAT_GREEN."A new STABLE version of PocketMine-MP has been released!");
-						console("[NOTICE] ".FORMAT_GREEN."Version \"".$info[0]["name"]."\" #".$updateN);
-						console("[NOTICE] Get it at PocketMine.net or at ".$info[0]["zipball_url"]);
-						console("[NOTICE] This message will dissapear as soon as you update");
-					}else{
-						$this->setProperty("last-update", time());
-						console("[INFO] ".FORMAT_AQUA."This is the latest STABLE version");
-					}
-				}
-			}
-		}
+		console("[INFO] This server is running Steadfast version ".($version->isDev() ? FORMAT_YELLOW:"").MAJOR_VERSION.FORMAT_RESET." \"".CODENAME."\" (MCPE: ".CURRENT_MINECRAFT_VERSION.") (API ".CURRENT_API_VERSION.")", true, true, 0);
 
 		$this->loadProperties();
 		
