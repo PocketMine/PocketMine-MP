@@ -181,6 +181,7 @@ class Player{
 		}
 		
 		if(is_array($this->lastChunk)){
+		/*
 			$tiles = $this->server->query("SELECT ID FROM tiles WHERE spawnable = 1 AND level = '".$this->level->getName()."' AND x >= ".($this->lastChunk[0] - 1)." AND x < ".($this->lastChunk[0] + 17)." AND z >= ".($this->lastChunk[1] - 1)." AND z < ".($this->lastChunk[1] + 17).";");
 			$this->lastChunk = false;
 			if($tiles !== false and $tiles !== true){
@@ -190,7 +191,8 @@ class Player{
 						$tile->spawn($this);
 					}
 				}
-			}			
+			}
+		*/
 		}
 
 		$c = key($this->chunksOrder);
@@ -217,10 +219,13 @@ class Player{
 				$Yndex |= 1 << $iY;
 			}
 		}
-		$pk = new ChunkDataPacket;
+		if ($Yndex != 0xff) {
+			echo("WTF not 0xff!\n");
+		}
+		$pk = new FullChunkDataPacket;
 		$pk->chunkX = $X;
 		$pk->chunkZ = $Z;
-		$pk->data = $this->level->getOrderedChunk($X, $Z, $Yndex);
+		$pk->data = $this->level->getOrderedFullChunk($X, $Z);
 		$cnt = $this->dataPacket($pk);
 		if($cnt === false){
 			return false;
@@ -921,7 +926,7 @@ class Player{
 							$pk->z = -256;
 							$pk->yaw = 0;
 							$pk->pitch = 0;
-							$e->player->dataPacket($pk);
+							//$e->player->dataPacket($pk);
 							
 							$pk = new MoveEntityPacket_PosRot;
 							$pk->eid = $e->eid;
@@ -930,11 +935,11 @@ class Player{
 							$pk->z = -256;
 							$pk->yaw = 0;
 							$pk->pitch = 0;
-							$this->dataPacket($pk);
+							//$this->dataPacket($pk);
 						}else{
 							$pk = new RemoveEntityPacket;
 							$pk->eid = $e->eid;
-							$this->dataPacket($pk);
+							//$this->dataPacket($pk);
 						}
 					}
 				}
@@ -960,7 +965,7 @@ class Player{
 						$pk->z = $player->entity->z;
 						$pk->yaw = $player->entity->yaw;
 						$pk->pitch = $player->entity->pitch;
-						$this->dataPacket($pk);
+						//$this->dataPacket($pk);
 						
 						$pk = new PlayerEquipmentPacket;
 						$pk->eid = $this->eid;
@@ -1151,8 +1156,6 @@ class Player{
 								}
 								switch($p->pid()){
 									case 0x01:
-									case ProtocolInfo::PING_PACKET:
-									case ProtocolInfo::PONG_PACKET:
 									case ProtocolInfo::MOVE_PLAYER_PACKET:
 									case ProtocolInfo::REQUEST_CHUNK_PACKET:
 									case ProtocolInfo::ANIMATE_PACKET:
@@ -1260,14 +1263,6 @@ class Player{
 		
 		switch($packet->pid()){
 			case 0x01:
-				break;
-			case ProtocolInfo::PONG_PACKET:
-				break;
-			case ProtocolInfo::PING_PACKET:
-				$pk = new PongPacket;
-				$pk->ptime = $packet->time;
-				$pk->time = abs(microtime(true) * 1000);
-				$this->directDataPacket($pk);
 				break;
 			case ProtocolInfo::DISCONNECT_PACKET:
 				$this->close("client disconnect");
@@ -1395,9 +1390,12 @@ class Player{
 				$pk->x = $this->data->get("position")["x"];
 				$pk->y = $this->data->get("position")["y"];
 				$pk->z = $this->data->get("position")["z"];
-				$pk->generator = 0;
+				$pk->generator = 1;
 				$pk->gamemode = $this->gamemode & 0x01;
 				$pk->eid = 0;
+				$pk->spawnX = $this->data->get("position")["x"];
+				$pk->spawnY = $this->data->get("position")["y"];
+				$pk->spawnZ = $this->data->get("position")["z"];
 				$this->dataPacket($pk);
 	
 				if(($this->gamemode & 0x01) === 0x01){

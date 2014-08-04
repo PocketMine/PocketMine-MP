@@ -426,6 +426,37 @@ class Level{
 		return $ordered;
 	}
 
+	public function getOrderedFullChunk($X, $Z){
+		if(!isset($this->level)){
+			return false;
+		}
+		if(ADVANCED_CACHE == true){
+			$identifier = "world:{$this->name}:$X:$Z";
+			if(($cache = Cache::get($identifier)) !== false){
+				return $cache;
+			}
+		}
+
+		echo("Sending chunk" . $X . ":" . $Z . "\n");
+
+		$orderedIds = str_repeat("\x2e", 16*16*128);
+		$orderedData = str_repeat("\x00", 16*16*64);
+		$orderedSkyLight = $orderedData;
+		$orderedLight = $orderedData;
+		$orderedBiomeIds = str_repeat("\x00", 16*16);
+		$orderedBiomeColors = Utils::writeInt(0);
+		$tileEntities = "";
+		$orderedUncompressed = Utils::writeLInt($X) . Utils::writeLInt($Z) .
+			$orderedIds . $orderedData . $orderedSkyLight . $orderedLight .
+			$orderedBiomeIds . $orderedBiomeColors . $tileEntities;
+		$ordered = zlib_encode($orderedUncompressed, ZLIB_ENCODING_DEFLATE, 1);
+		if(ADVANCED_CACHE == true){
+			Cache::add($identifier, $ordered, 60);
+		}
+		return $ordered;
+	}
+
+
 	public function getOrderedMiniChunk($X, $Z, $Y){
 		if(!isset($this->level)){
 			return false;
