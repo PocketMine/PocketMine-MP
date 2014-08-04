@@ -22,7 +22,7 @@
 
 class ProtocolInfo{
 
-	const CURRENT_PROTOCOL = 14;
+	const CURRENT_PROTOCOL = 18;
 	
 	
 

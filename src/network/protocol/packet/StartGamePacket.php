@@ -24,6 +24,9 @@ class StartGamePacket extends RakNetDataPacket{
 	public $generator;
 	public $gamemode;
 	public $eid;
+	public $spawnX;
+	public $spawnY;
+	public $spawnZ;
 	public $x;
 	public $y;
 	public $z;
