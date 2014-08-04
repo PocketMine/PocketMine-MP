@@ -13,3 +13,4 @@ __Features:__
 * Load plugin on server start from an FTP server
 * Disable server logs to save CPU resources
 * Disable player death messages
+* Automatic server restart & log file cleanup
