@@ -55,6 +55,7 @@ use pocketmine\command\defaults\TimingsCommand;
 use pocketmine\command\defaults\VanillaCommand;
 use pocketmine\command\defaults\VersionCommand;
 use pocketmine\command\defaults\WhitelistCommand;
+use pocketmine\Player;
 use pocketmine\Server;
 
 class SimpleCommandMap implements CommandMap{
@@ -164,6 +165,51 @@ class SimpleCommandMap implements CommandMap{
 	}
 
 	public function dispatch(CommandSender $sender, $commandLine){
+		$commandLine = preg_replace_callback('# @(([a-z]+)(\[([^\]]*)\])?)([ $])#', function($match) use($sender){
+			switch($match[2]){
+				case "u":
+				case "username":
+					$result = $sender->getName();
+					break;
+				case "w":
+				case "world":
+					if($sender instanceof Player){
+						$result = $sender->getLevel()->getName();
+					}else{
+						$result = $sender->getServer()->getDefaultLevel()->getName();
+					}
+					break;
+				case "r":
+				case "random":
+					$names = [];
+					foreach($sender->getServer()->getOnlinePlayers() as $player){
+						// if(!$player->isOnline()){
+						// continue;
+						// }
+						$names[] = $player->getName();
+					}
+					$result = array_rand($names);
+					break;
+				case "p":
+				case "player":
+					if($sender instanceof Player){
+						$nearest = $sender->getNearestPlayers(); // TODO check the selector parameters ($match[4])
+						if(count($nearest) > 0){
+							/** @var Player $player */
+							$player = array_rand($nearest);
+							$result = $player->getName();
+							break;
+						}
+					}
+					$result = "@$match[1]";
+					break;
+				default:
+					$result = "@$match[1]";
+					break;
+			}
+			return " ".$result.$match[5];
+		}, $commandLine);
+
 		$args = explode(" ", $commandLine);
 
 		if(count($args) === 0){
@@ -175,6 +221,22 @@ class SimpleCommandMap implements CommandMap{
 
 		if($target === null){
 			return false;
+		}
+
+		$offset = array_search("@a", $args);
+		if($offset !== false){
+			if(!$sender->hasPermission("pocketmine.command.loopall")){
+				$sender->sendMessage("You don't have permission to use the '@a' selector.");
+				return true;
+			}
+			foreach($this->server->getOnlinePlayers() as $player){
+				// if(!$player->isOnline()){
+				// continue;
+				// }
+				$args[$offset] = $player->getName();
+				$this->dispatch($sender, $sentCommandLabel . implode(" ", $args));
+			}
+			return true;
 		}
 
 		$target->timings->startTiming();

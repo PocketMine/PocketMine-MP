@@ -535,6 +535,26 @@ abstract class Entity extends Position implements Metadatable{
 		return new Vector3($x, $y, $z);
 	}
 
+	/**
+	 * @return Player[]
+	 */
+	public function getNearestPlayers(){ // this function will get useful when entity AI is implemented anyways
+		$currentDistance = PHP_INT_MAX;
+		$nearest = [];
+		foreach($this->getLevel()->getPlayers() as $player){
+			if($player->getID() === $this->getID()){
+				continue;
+			}
+			if($this->distance($player) === $currentDistance){
+				$nearest[] = $player;
+			}
+			elseif($this->distance($player) < $currentDistance){
+				$nearest = [$player];
+			}
+		}
+		return $nearest;
+	}
+
 	public function onUpdate(){
 		if($this->closed !== false){
 			return false;
