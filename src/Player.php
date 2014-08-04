@@ -1441,52 +1441,9 @@ class Player{
 				$this->lastMeasure = microtime(true);
 				$this->server->schedule(50, array($this, "measureLag"), array(), true);
 				console("[INFO] ".FORMAT_AQUA.$this->username.FORMAT_RESET."[/".$this->ip.":".$this->port."] logged in with entity id ".$this->eid." at (".$this->entity->level->getName().", ".round($this->entity->x, 2).", ".round($this->entity->y, 2).", ".round($this->entity->z, 2).")");
+				$this->sendSpawnPlayerPacket();
 				break;
-			case ProtocolInfo::READY_PACKET:
-				if($this->loggedIn === false){
-					break;
-				}
-				switch($packet->status){
-					case 1: //Spawn!!
-						if($this->spawned !== false){
-							break;
-						}
-						$this->entity->setHealth($this->data->get("health"), "spawn", true);
-						$this->spawned = true;	
-						$this->server->api->player->spawnAllPlayers($this);
-						$this->server->api->player->spawnToAllPlayers($this);
-						$this->server->api->entity->spawnAll($this);
-						$this->server->api->entity->spawnToAll($this->entity);
-						
-						$this->server->schedule(5, array($this->entity, "update"), array(), true);
-						$this->server->schedule(2, array($this->entity, "updateMovement"), array(), true);
-						$this->sendArmor();
-						$this->sendChat($this->server->motd."\n");
-						
-						if($this->iusername === "steve" or $this->iusername === "stevie"){
-							$this->sendChat("You're using the default username. Please change it on the Minecraft PE settings.\n");
-						}
-						$this->sendInventory();
-						$this->sendSettings();
-						$this->server->schedule(50, array($this, "orderChunks"), array(), true);
-						$this->blocked = false;
-						
-						$pk = new SetTimePacket;
-						$pk->time = $this->level->getTime();
-						$this->dataPacket($pk);
-						
-						$pos = new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level);
-						$pos = $this->level->getSafeSpawn($pos);
-						$this->teleport($pos);
-						$this->server->schedule(10, array($this, "teleport"), $pos);
-						$this->server->schedule(20, array($this, "teleport"), $pos);
-						$this->server->schedule(30, array($this, "teleport"), $pos);
-						$this->server->handle("player.spawn", $this);
-						break;
-					case 2://Chunk loaded?
-						break;
-				}
-				break;
+
 			case ProtocolInfo::ROTATE_HEAD_PACKET:
 				if($this->spawned === false){
 					break;
@@ -2407,6 +2364,45 @@ class Player{
 		$this->bufferLen += 6 + $len;
 		return array();
 	}
+
+	function sendSpawnPlayerPacket() { 
+		if($this->spawned !== false){
+			return;
+		}
+		$this->entity->setHealth($this->data->get("health"), "spawn", true);
+		$this->spawned = true;	
+		$this->server->api->player->spawnAllPlayers($this);
+		$this->server->api->player->spawnToAllPlayers($this);
+		$this->server->api->entity->spawnAll($this);
+		$this->server->api->entity->spawnToAll($this->entity);
+		
+		$this->server->schedule(5, array($this->entity, "update"), array(), true);
+		$this->server->schedule(2, array($this->entity, "updateMovement"), array(), true);
+		$this->sendArmor();
+		$this->sendChat($this->server->motd."\n");
+		
+		if($this->iusername === "steve" or $this->iusername === "stevie"){
+			$this->sendChat("You're using the default username. Please change it on the Minecraft PE settings.\n");
+		}
+		$this->sendInventory();
+		$this->sendSettings();
+		$this->server->schedule(50, array($this, "orderChunks"), array(), true);
+		$this->blocked = false;
+		
+		$pk = new SetTimePacket;
+		$pk->time = $this->level->getTime();
+		$this->dataPacket($pk);
+		
+		$pos = new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level);
+		$pos = $this->level->getSafeSpawn($pos);
+//		$this->teleport($pos);
+		$this->server->schedule(10, array($this, "teleport"), $pos);
+		$this->server->schedule(20, array($this, "teleport"), $pos);
+		$this->server->schedule(30, array($this, "teleport"), $pos);
+		$this->server->handle("player.spawn", $this);
+	}
+
+
 
     /**
      * @return string
