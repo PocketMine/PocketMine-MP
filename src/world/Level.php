@@ -1,5 +1,5 @@
 <?php
-require_once(FILE_PATH."custom_options.php");
+
 /**
  *
  *  ____            _        _   __  __ _                  __  __ ____  
