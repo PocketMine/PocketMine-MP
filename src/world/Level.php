@@ -476,7 +476,7 @@ class Level{
         // TODO: Make conversion asynchronous. When it is async, make it return empty strings to the player in the meantime so they can't move
         // TODO: Recalculate in the background periodically on level save if blocks were broken and save is enabled, asynchronously & on server shutdown
         if(isset($this->ochunkCache[$X.",".$Z])) {
-        } elseif(file_exists(FILE_PATH."ochunks/".$this->name.":".$X."-".$Z)) {
+        } elseif(file_exists(FILE_PATH."/ochunks/".$this->name.":".$X."-".$Z)) {
             if($gen_only) return;
             $this->level->loadChunk($X,$Z);
             if(!LOAD_OCHUNKS_IN_RAM or MAX_OCHUNKS_PER_LEVEL > count($this->ochunkCache)) {
