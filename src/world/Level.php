@@ -448,12 +448,8 @@ class Level{
             for($send_z = 0; $send_z <= $max_z; $send_z++) {
                 for($send_y = 0; $send_y <= 127; $send_y++) {
                     $block = $this->level->getBlock($send_x,$send_y,$send_z);
-                    if(!($block->has_method("getID"))) {
-                        echo $send_x.",".$send_y.",".$send_z."\n";
-                    } else {
-                        $orderedIds .= chr($block->getID());
-                        $orderedData .= chr($block->getMetadata());
-                    }
+                    $orderedIds .= chr($block[0]);
+                    $orderedData .= chr($block[1]);
                 }
             }
         }
