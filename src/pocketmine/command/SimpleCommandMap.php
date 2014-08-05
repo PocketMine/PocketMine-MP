@@ -55,7 +55,9 @@ use pocketmine\command\defaults\TimingsCommand;
 use pocketmine\command\defaults\VanillaCommand;
 use pocketmine\command\defaults\VersionCommand;
 use pocketmine\command\defaults\WhitelistCommand;
-use pocketmine\Player;
+use pocketmine\command\selector\Selector;
+use pocketmine\command\selector\UsernameSelector;
+use pocketmine\command\selector\WorldSelector;
 use pocketmine\Server;
 
 class SimpleCommandMap implements CommandMap{
@@ -68,9 +70,13 @@ class SimpleCommandMap implements CommandMap{
 	/** @var Server */
 	private $server;
 
+	/** @var Selector[] */
+	private $selectors = [];
+
 	public function __construct(Server $server){
 		$this->server = $server;
 		$this->setDefaultCommands();
+		$this->setDefaultSelectors();
 	}
 
 	private function setDefaultCommands(){
@@ -112,6 +118,10 @@ class SimpleCommandMap implements CommandMap{
 		}
 	}
 
+	private function setDefaultSelectors(){
+		$this->registerSelector(new UsernameSelector());
+		$this->registerSelector(new WorldSelector());
+	}
 
 	public function registerAll($fallbackPrefix, array $commands){
 		foreach($commands as $command){
@@ -165,49 +175,31 @@ class SimpleCommandMap implements CommandMap{
 	}
 
 	public function dispatch(CommandSender $sender, $commandLine){
-		$commandLine = preg_replace_callback('# @(([a-z]+)(\[([^\]]*)\])?)([ $])#', function($match) use($sender){
-			switch($match[2]){
-				case "u":
-				case "username":
-					$result = $sender->getName();
-					break;
-				case "w":
-				case "world":
-					if($sender instanceof Player){
-						$result = $sender->getLevel()->getName();
-					}else{
-						$result = $sender->getServer()->getDefaultLevel()->getName();
+		$commandLine = preg_replace_callback('# @([a-z]+)(\[(.*)\])?[ $]#', function($match) use($sender){
+			$name = $match[1];
+			$rawArgs = isset($match[3]) ? $match[3]:"";
+			$args = [];
+			$defaults = ["x", "y", "z", "r"];
+			foreach(explode(",", $rawArgs) as $opt){
+				$tokens = explode("=", $opt);
+				if(!isset($tokens[0])){
+					continue;
+				}
+				if(!isset($tokens[1])){
+					if(!isset($defaults[0])){
+						continue;
 					}
-					break;
-				case "r":
-				case "random":
-					$names = [];
-					foreach($sender->getServer()->getOnlinePlayers() as $player){
-						// if(!$player->isOnline()){
-						// continue;
-						// }
-						$names[] = $player->getName();
-					}
-					$result = array_rand($names);
-					break;
-				case "p":
-				case "player":
-					if($sender instanceof Player){
-						$nearest = $sender->getNearestPlayers(); // TODO check the selector parameters ($match[4])
-						if(count($nearest) > 0){
-							/** @var Player $player */
-							$player = array_rand($nearest);
-							$result = $player->getName();
-							break;
-						}
-					}
-					$result = "@$match[1]";
-					break;
-				default:
-					$result = "@$match[1]";
-					break;
+					array_unshift($tokens, array_shift($defaults));
+				}
+				$args[strtolower($tokens[0])] = $tokens[1];
 			}
-			return " ".$result.$match[5];
+			foreach($this->selectors as $selector){
+				if(in_array($name, $selector->getNames())){
+					$result = $selector->onRun($sender, $args);
+					return is_string($result) ? $result:$match[0];
+				}
+			}
+			return $match[0];
 		}, $commandLine);
 
 		$args = explode(" ", $commandLine);
@@ -244,6 +236,10 @@ class SimpleCommandMap implements CommandMap{
 		$target->timings->stopTiming();
 
 		return true;
+	}
+
+	public function registerSelector(Selector $selector){
+		$this->selectors[] = $selector;
 	}
 
 	public function clearCommands(){

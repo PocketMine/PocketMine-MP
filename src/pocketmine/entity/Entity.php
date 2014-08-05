@@ -26,7 +26,6 @@ namespace pocketmine\entity;
 
 use pocketmine\block\Block;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\entity\EntityDespawnEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityMotionEvent;
@@ -52,7 +51,6 @@ use pocketmine\network\protocol\MovePlayerPacket;
 use pocketmine\network\protocol\RemoveEntityPacket;
 use pocketmine\network\protocol\SetEntityMotionPacket;
 use pocketmine\network\protocol\SetTimePacket;
-use pocketmine\network\protocol\UnloadChunkPacket;
 use pocketmine\Network;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
@@ -532,26 +530,6 @@ abstract class Entity extends Position implements Metadatable{
 		$z = $xz * cos(deg2rad($this->yaw));
 
 		return new Vector3($x, $y, $z);
-	}
-
-	/**
-	 * @return Player[]
-	 */
-	public function getNearestPlayers(){ // this function will get useful when entity AI is implemented anyways
-		$currentDistance = PHP_INT_MAX;
-		$nearest = [];
-		foreach($this->getLevel()->getPlayers() as $player){
-			if($player->getID() === $this->getID()){
-				continue;
-			}
-			if($this->distance($player) === $currentDistance){
-				$nearest[] = $player;
-			}
-			elseif($this->distance($player) < $currentDistance){
-				$nearest = [$player];
-			}
-		}
-		return $nearest;
 	}
 
 	public function onUpdate(){
