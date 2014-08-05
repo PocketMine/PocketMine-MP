@@ -488,7 +488,7 @@ class Level{
         } else {
             $orderedIds = "";
             $orderedData = "";
-
+	
             $num_air = 0;
             $this->level->loadChunk($X,$Z);
             $max_x = ($X * 16) + 16;
@@ -503,7 +503,7 @@ class Level{
                     }
                 }
             }
-            if($num_air > 32768) {
+            if($num_air >= 32768) {
                 echo "Chunk $X:$Z is air, ignoring";
                 $orderedData = "air";
                 $orderedIds = "air";
