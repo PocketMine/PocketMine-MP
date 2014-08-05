@@ -444,7 +444,7 @@ class Level{
         $this->level->loadChunk($X,$Z);
         for($send_x = 0; $send_x <= ($X + 16); $send_x++) {
             for($send_z = 0; $send_z <= ($Z + 16); $send_z++) {
-                for($send_y = 0; $send_y <= 127; $send_y++) {4
+                for($send_y = 0; $send_y <= 127; $send_y++) {
                     echo $send_x.",".$send_y.",".$send_z;
                     //$orderedIds .= "\x" . $this->level->getBlock($send_x,$send_y,$send_z)->getID();
                     //$orderedData .= "\x" . $this->level->getBlock($send_x,$send_y,$send_z)->getMetadata();
