@@ -502,7 +502,6 @@ class Level{
                 mkdir(FILE_PATH."/ochunks", 777, true);
             }
             echo FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z;
-            echo json_encode(array($orderedIds,$orderedData));
             file_put_contents(FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z,json_encode(array($orderedIds,$orderedData)));
 
             $this->ochunkCache[$X.",".$Z] = array($orderedIds,$orderedData);
