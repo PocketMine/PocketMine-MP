@@ -33,5 +33,3 @@ define('MAX_OCHUNKS_PER_LEVEL',128);
 
 // Force chunk cache to generate if does not exist on level load.
 define('FORCE_OCHUNK_GEN_ON_LEVEL_LOAD',true);
-
-echo "foo";
