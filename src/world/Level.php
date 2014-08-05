@@ -476,10 +476,10 @@ class Level{
             if($gen_only) return;
             $this->level->loadChunk($X,$Z);
             if(!LOAD_OCHUNKS_IN_RAM or MAX_OCHUNKS_PER_LEVEL > count($this->ochunkCache)) {
-                $res = json_decode(file_get_contents(FILE_PATH."ochunks/".$this->name."-".$X."-".$Z));
+                $res = json_decode(file_get_contents(FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z));
                 return $res;
             } else {
-                $this->ochunkCache[$X.",".$Z] = json_decode(file_get_contents(FILE_PATH."ochunks/".$this->name."-".$X."-".$Z));
+                $this->ochunkCache[$X.",".$Z] = json_decode(file_get_contents(FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z));
             }
         } else {
             if(!$supress) echo "Optimizing region: ".$this->name.":".$X.",".$Z."\n";
@@ -501,7 +501,6 @@ class Level{
             if (!file_exists(FILE_PATH."/ochunks")) {
                 mkdir(FILE_PATH."/ochunks", 777, true);
             }
-            echo FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z;
             file_put_contents(FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z,json_encode(array($orderedIds,$orderedData)));
 
             $this->ochunkCache[$X.",".$Z] = array($orderedIds,$orderedData);
