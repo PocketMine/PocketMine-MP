@@ -444,6 +444,7 @@ class Level{
         for($i=0;$i<=7;$i++) {
             $orderedIds .= $this->level->getMiniChunk($X,$Z,$i);
         }
+        echo $orderedIds;
 		//$orderedIds = str_repeat("\x2e", 16*16*128);
 		$orderedData = str_repeat("\x00", 16*16*64);
 		$orderedSkyLight = $orderedData;
