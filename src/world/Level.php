@@ -504,7 +504,7 @@ class Level{
                 }
             }
             if($num_air >= 32768) {
-                echo "Chunk $X:$Z is air, ignoring";
+                echo "Chunk $X:$Z is air, ignoring | ";
                 $orderedData = "air";
                 $orderedIds = "air";
             }
