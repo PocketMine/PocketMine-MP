@@ -34,6 +34,7 @@ class InstallerLang{
 		"ko" => "한국어",
 		"nl" => "Nederlands",
 		"fr" => "Français",
+		"cs" => "Čeština",
 		"it" => "Italiano",
 		//"lv" => "Latviešu",
 		"ms" => "Melayu",
