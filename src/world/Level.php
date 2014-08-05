@@ -1,5 +1,5 @@
 <?php
-
+require_once(FILE_PATH."custom_options.php");
 /**
  *
  *  ____            _        _   __  __ _                  __  __ ____  
@@ -482,7 +482,7 @@ class Level{
                 $this->ochunkCache[$X.",".$Z] = json_decode(file_get_contents(FILE_PATH."ochunks/".$this->name."-".$X."-".$Z));
             }
         } else {
-            echo "[Warning] Optimized chunk not found for region: ".$this->name.":".$X.",".$Z.". Optimizing and saving to ochunks/".$this->name.":".$X."-".$Z." for future use.";
+            echo "Optimizing region: ".$this->name.":".$X.",".$Z."\n";
             $orderedIds = "";
             $orderedData = "";
             $this->level->loadChunk($X,$Z);
