@@ -476,9 +476,7 @@ class Level{
         // TODO: Make conversion asynchronous. When it is async, make it return empty strings to the player in the meantime so they can't move
         // TODO: Recalculate in the background periodically on level save if blocks were broken and save is enabled, asynchronously & on server shutdown
         if(isset($this->ochunkCache[$X.",".$Z])) {
-            echo "Saved in RAM\n";
         } elseif(file_exists(FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z)) {
-            echo "Found already optimized dat, returning\n";
             if($gen_only) return;
             $this->level->loadChunk($X,$Z);
             if(!LOAD_OCHUNKS_IN_RAM or MAX_OCHUNKS_PER_LEVEL > count($this->ochunkCache)) {
@@ -488,7 +486,6 @@ class Level{
                 $this->ochunkCache[$X.",".$Z] = json_decode(file_get_contents(FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z));
             }
         } else {
-            echo "Optimizing region: ".$this->name.":".$X.",".$Z."\n";
             $orderedIds = "";
             $orderedData = "";
             $this->level->loadChunk($X,$Z);
