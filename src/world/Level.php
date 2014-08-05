@@ -440,13 +440,20 @@ class Level{
 		echo("Sending chunk" . $X . ":" . $Z . "\n");
 
         $orderedIds = "";
+        $orderedData = "";
         $this->level->loadChunk($X,$Z);
-        for($i=0;$i<=7;$i++) {
-            $orderedIds .= $this->level->getMiniChunk($X,$Z,$i);
+        for($send_x = 0; $send_x <= ($X + 16); $send_x++) {
+            for($send_z = 0; $send_z <= ($Z + 16); $send_z++) {
+                for($send_y = 0; $send_y <= 127; $send_y++) {
+                    $orderedIds .= "\x" . $this->level->getBlock($send_x,$send_y,$send_z)->getID();
+                    $orderedData .= "\x" . $this->level->getBlock($send_x,$send_y,$send_z)->getMetadata();
+                }
+            }
         }
+        //Debug:
         echo $orderedIds;
 		//$orderedIds = str_repeat("\x2e", 16*16*128);
-		$orderedData = str_repeat("\x00", 16*16*64);
+		//$orderedData = str_repeat("\x00", 16*16*64);
 		$orderedSkyLight = $orderedData;
 		$orderedLight = $orderedData;
 		$orderedBiomeIds = str_repeat("\x00", 16*16);
