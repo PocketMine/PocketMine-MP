@@ -488,6 +488,8 @@ class Level{
         } else {
             $orderedIds = "";
             $orderedData = "";
+
+            $num_air = 0;
             $this->level->loadChunk($X,$Z);
             $max_x = ($X * 16) + 16;
             $max_z = ($Z * 16) + 16;
@@ -497,10 +499,15 @@ class Level{
                         $block = $this->level->getBlock($send_x,$send_y,$send_z);
                         $orderedIds .= chr($block[0]);
                         $orderedData .= chr($block[1]);
+                        if($block[0] === 0) $num_air++;
                     }
                 }
             }
-
+            if($num_air > 32768) {
+                echo "Chunk $X:$Z is air, ignoring";
+                $orderedData = "air";
+                $orderedIds = "air";
+            }
             if (!file_exists(FILE_PATH."/ochunks")) {
                 mkdir(FILE_PATH."/ochunks", 777, true);
             }
@@ -509,6 +516,9 @@ class Level{
             $this->ochunkCache[$X.",".$Z] = array($orderedIds,$orderedData);
         }
 
+        if($this->ochunkCache[$X.",".$Z] === array("air","air")) {
+            return array(str_repeat(chr(0),32768));
+        }
         return $this->ochunkCache[$X.",".$Z];
     }
 
