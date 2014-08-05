@@ -469,7 +469,7 @@ class Level{
 		return $ordered;
 	}
 
-    public function getOptimizedChunk($X,$Z,$gen_only = false,$supress = false) {
+    public function getOptimizedChunk($X, $Z, $gen_only = false, $suppress = false) {
         if($X > 15 or $Z > 15) {
             return array("",""); // return empty string = client can't walk there
         }
@@ -499,7 +499,7 @@ class Level{
                         $block = $this->level->getBlock($send_x,$send_y,$send_z);
                         $orderedIds .= chr($block[0]);
                         $orderedData .= chr($block[1]);
-                        echo "Scanning block, block ID: " . $block[0] . " | "
+                        echo "Scanning block, block ID: " . $block[0] . " | ";
                         if($block[0] === 0){
                         	$num_air++;
                         }
