@@ -44,7 +44,7 @@ class Level{
         if(FORCE_OCHUNK_GEN_ON_LEVEL_LOAD) {
             for($x=0;$x<=15;$x++) {
                 for($z=0;$z<=15;$z++) {
-                    $this->getOptimizedChunk($x,$z);
+                    $this->getOptimizedChunk($x,$z,true,true);
                 }
             }
         }
@@ -465,7 +465,7 @@ class Level{
 		return $ordered;
 	}
 
-    public function getOptimizedChunk($X,$Z,$gen_only = false) {
+    public function getOptimizedChunk($X,$Z,$gen_only = false,$supress = false) {
         if($X > 15 or $Z > 15) {
             return array("",""); // return empty string = client can't walk there
         }
@@ -482,7 +482,7 @@ class Level{
                 $this->ochunkCache[$X.",".$Z] = json_decode(file_get_contents(FILE_PATH."ochunks/".$this->name."-".$X."-".$Z));
             }
         } else {
-            echo "Optimizing region: ".$this->name.":".$X.",".$Z."\n";
+            if(!$supress) echo "Optimizing region: ".$this->name.":".$X.",".$Z."\n";
             $orderedIds = "";
             $orderedData = "";
             $this->level->loadChunk($X,$Z);
