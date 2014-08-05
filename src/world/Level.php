@@ -21,7 +21,7 @@
 
 class Level{
 	public $entities, $tiles, $blockUpdates, $nextSave, $players = array(), $level;
-	private $time, $startCheck, $startTime, $server, $name, $usedChunks, $changedBlocks, $changedCount, $stopTime;
+	private $time, $startCheck, $startTime, $server, $name, $usedChunks, $changedBlocks, $changedCount, $stopTime,$ochunkCache;
 	
 	public function __construct(PMFLevel $level, Config $entities, Config $tiles, Config $blockUpdates, $name){
 		$this->server = ServerAPI::request();
@@ -40,6 +40,14 @@ class Level{
 		$this->usedChunks = array();
 		$this->changedBlocks = array();
 		$this->changedCount = array();
+
+        if(FORCE_OCHUNK_GEN_ON_LEVEL_LOAD) {
+            for($x=0;$x<=15;$x++) {
+                for($z=0;$z<=15;$z++) {
+                    $this->getOptimizedChunk($x,$z);
+                }
+            }
+        }
 	}
 	
 	public function close(){
@@ -427,6 +435,7 @@ class Level{
 	}
 
 	public function getOrderedFullChunk($X, $Z){
+        //todo: make asynchronous
 		if(!isset($this->level)){
 			return false;
 		}
@@ -438,25 +447,9 @@ class Level{
 		}
 
 		echo("Sending chunk" . $X . ":" . $Z . "\n");
-
-        $orderedIds = "";
-        $orderedData = "";
-        $this->level->loadChunk($X,$Z);
-        $max_x = ($X * 16) + 16;
-        $max_z = ($Z * 16) + 16;
-        for($send_x = 0; $send_x <= $max_x; $send_x++) {
-            for($send_z = 0; $send_z <= $max_z; $send_z++) {
-                for($send_y = 0; $send_y <= 127; $send_y++) {
-                    $block = $this->level->getBlock($send_x,$send_y,$send_z);
-                    $orderedIds .= chr($block[0]);
-                    $orderedData .= chr($block[1]);
-                }
-            }
-        }
-        //Debug:
-        //echo $orderedIds;
-		//$orderedIds = str_repeat("\x2e", 16*16*128);
-		//$orderedData = str_repeat("\x00", 16*16*64);
+        $data = $this->getOptimizedChunk($X,$Z);
+        $orderedIds = $data[0];
+        $orderedData = $data[1];
 		$orderedSkyLight = $orderedData;
 		$orderedLight = $orderedData;
 		$orderedBiomeIds = str_repeat("\x00", 16*16);
@@ -472,6 +465,49 @@ class Level{
 		return $ordered;
 	}
 
+    public function getOptimizedChunk($X,$Z,$gen_only = false) {
+        if($X > 15 or $Y > 15) {
+            return array("",""); // return empty string = client can't walk there
+        }
+        // TODO: Make conversion asynchronous. When it is async, make it return empty strings to the player in the meantime so they can't move
+        // TODO: Recalculate in the background periodically on level save if blocks were broken and save is enabled, asynchronously & on server shutdown
+        if(isset($this->ochunkCache[$X.",".$Z])) {
+        } elseif(file_exists(FILE_PATH."ochunks/".$this->name.":".$X."-".$Z)) {
+            if($gen_only) return;
+            $this->level->loadChunk($X,$Z);
+            if(!LOAD_OCHUNKS_IN_RAM or MAX_OCHUNKS_PER_LEVEL > count($this->ochunkCache)) {
+                $res = json_decode(file_get_contents(FILE_PATH."ochunks/".$this->name."-".$X."-".$Z));
+                return $res;
+            } else {
+                $this->ochunkCache[$X.",".$Z] = json_decode(file_get_contents(FILE_PATH."ochunks/".$this->name."-".$X."-".$Z));
+            }
+        } else {
+            echo "[Warning] Optimized chunk not found for region: ".$this->name.":".$X.",".$Z.". Optimizing and saving to ochunks/".$this->name.":".$X."-".$Z." for future use.";
+            $orderedIds = "";
+            $orderedData = "";
+            $this->level->loadChunk($X,$Z);
+            $max_x = ($X * 16) + 16;
+            $max_z = ($Z * 16) + 16;
+            for($send_x = 0; $send_x <= $max_x; $send_x++) {
+                for($send_z = 0; $send_z <= $max_z; $send_z++) {
+                    for($send_y = 0; $send_y <= 127; $send_y++) {
+                        $block = $this->level->getBlock($send_x,$send_y,$send_z);
+                        $orderedIds .= chr($block[0]);
+                        $orderedData .= chr($block[1]);
+                    }
+                }
+            }
+
+            if (!file_exists(FILE_PATH."ochunks")) {
+                mkdir(FILE_PATH."ochunks", 0755, true);
+            }
+            file_put_contents(FILE_PATH."ochunks/".$this->name."-".$X."-".$Z,json_encode(array($orderedIds,$orderedData)));
+
+            $this->ochunkCache[$X.",".$Z] = array($orderedIds,$orderedData);
+        }
+
+        return $this->ochunkCache[$X.",".$Z];
+    }
 
 	public function getOrderedMiniChunk($X, $Z, $Y){
 		if(!isset($this->level)){
