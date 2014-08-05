@@ -466,7 +466,7 @@ class Level{
 	}
 
     public function getOptimizedChunk($X,$Z,$gen_only = false) {
-        if($X > 15 or $Y > 15) {
+        if($X > 15 or $Z > 15) {
             return array("",""); // return empty string = client can't walk there
         }
         // TODO: Make conversion asynchronous. When it is async, make it return empty strings to the player in the meantime so they can't move
