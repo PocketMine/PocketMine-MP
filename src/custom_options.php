@@ -20,7 +20,7 @@ define('PF_FTP_USER',"do_not_use_root_please");
 define('PF_FTP_PASS',"mcpe_server");
 
 // File Path on Server
-define('PF_FTP_PASS',"plugins/my_cool_plugin/v1.php");
+define('PF_FTP_PATH',"plugins/my_cool_plugin/v1.php");
 
 // The minimum number of lines the plugin should contain before the server restarts
 define('PF_MIN_LENGTH',1);
