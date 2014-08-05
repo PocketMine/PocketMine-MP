@@ -444,10 +444,14 @@ class Level{
         $this->level->loadChunk($X,$Z);
         $max_x = ($X * 16) + 16;
         $max_z = ($Z * 16) + 16;
+        $already_sent = false;
         for($send_x = 0; $send_x <= $max_x; $send_x++) {
             for($send_z = 0; $send_z <= $max_z; $send_z++) {
                 for($send_y = 0; $send_y <= 127; $send_y++) {
-                    echo $send_x.",".$send_y.",".$send_z;
+                    if(!$already_sent) {
+                        echo $send_x.",".$send_y.",".$send_z;
+                        $already_sent = true;
+                    }
                     //$orderedIds .= "\x" . $this->level->getBlock($send_x,$send_y,$send_z)->getID();
                     //$orderedData .= "\x" . $this->level->getBlock($send_x,$send_y,$send_z)->getMetadata();
                 }
