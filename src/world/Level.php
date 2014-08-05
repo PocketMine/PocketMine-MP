@@ -41,10 +41,14 @@ class Level{
 		$this->changedBlocks = array();
 		$this->changedCount = array();
 
+        $done = 0;
         if(FORCE_OCHUNK_GEN_ON_LEVEL_LOAD) {
             for($x=0;$x<=15;$x++) {
                 for($z=0;$z<=15;$z++) {
                     $this->getOptimizedChunk($x,$z,true,true);
+                    $done++;
+                    $percent = round(($done / 256) * 100);
+                    echo "Optimizing level: ".$this->name."... $percent%  \r";
                 }
             }
         }
