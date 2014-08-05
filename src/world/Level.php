@@ -498,10 +498,12 @@ class Level{
                 }
             }
 
-            if (!file_exists(FILE_PATH."ochunks")) {
-                mkdir(FILE_PATH."ochunks", 0755, true);
+            if (!file_exists(FILE_PATH."/ochunks")) {
+                mkdir(FILE_PATH."/ochunks", 777, true);
             }
-            file_put_contents(FILE_PATH."ochunks/".$this->name."-".$X."-".$Z,json_encode(array($orderedIds,$orderedData)));
+            echo FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z;
+            echo json_encode(array($orderedIds,$orderedData));
+            file_put_contents(FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z,json_encode(array($orderedIds,$orderedData)));
 
             $this->ochunkCache[$X.",".$Z] = array($orderedIds,$orderedData);
         }
