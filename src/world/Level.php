@@ -451,9 +451,9 @@ class Level{
 		}
 
 		echo("Sending chunk" . $X . ":" . $Z . "\n");
-        $data = $this->getOptimizedChunk($X,$Z);
-        $orderedIds = $data[0];
-        $orderedData = $data[1];
+        	$data = $this->getOptimizedChunk($X,$Z);
+        	$orderedIds = $data[0];
+        	$orderedData = $data[1];
 		$orderedSkyLight = $orderedData;
 		$orderedLight = $orderedData;
 		$orderedBiomeIds = str_repeat("\x00", 16*16);
@@ -499,7 +499,10 @@ class Level{
                         $block = $this->level->getBlock($send_x,$send_y,$send_z);
                         $orderedIds .= chr($block[0]);
                         $orderedData .= chr($block[1]);
-                        if($block[0] === 0) $num_air++;
+                        echo "Scanning block, block ID: " . $block[0] . " | "
+                        if($block[0] === 0){
+                        	$num_air++;
+                        }
                     }
                 }
             }
