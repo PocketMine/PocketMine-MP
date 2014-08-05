@@ -477,7 +477,7 @@ class Level{
         // TODO: Recalculate in the background periodically on level save if blocks were broken and save is enabled, asynchronously & on server shutdown
         if(isset($this->ochunkCache[$X.",".$Z])) {
             echo "Saved in RAM\n";
-        } elseif(file_exists(FILE_PATH."/ochunks/".$this->name.":".$X."-".$Z)) {
+        } elseif(file_exists(FILE_PATH."/ochunks/".$this->name."-".$X."-".$Z)) {
             echo "Found already optimized dat, returning\n";
             if($gen_only) return;
             $this->level->loadChunk($X,$Z);
