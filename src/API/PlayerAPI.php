@@ -402,13 +402,10 @@ class PlayerAPI{
             if($p !== $player and ($p->entity instanceof Entity)){
                 $p->entity->spawn($player);
                 if($p->level !== $player->level){
-					$pk = new MoveEntityPacket_PosRot;
-					$pk->eid = $p->entity->eid;
-					$pk->x = -256;
-					$pk->y = 128;
-					$pk->z = -256;
-					$pk->yaw = 0;
-					$pk->pitch = 0;
+                    $pk = new MoveEntityPacket;
+                    $pk->entities = [
+                        [$p->entity->eid, -256, 128, -256, 0, 0]
+                    ];
                     $player->dataPacket($pk);
                 }
             }
@@ -420,13 +417,10 @@ class PlayerAPI{
             if($p !== $player and ($p->entity instanceof Entity) and ($player->entity instanceof Entity)){
                 $player->entity->spawn($p);
                 if($p->level !== $player->level){
-					$pk = new MoveEntityPacket_PosRot;
-					$pk->eid = $player->entity->eid;
-					$pk->x = -256;
-					$pk->y = 128;
-					$pk->z = -256;
-					$pk->yaw = 0;
-					$pk->pitch = 0;
+                    $pk = new MoveEntityPacket;
+                    $pk->entities = [
+                        [$player->entity->eid, -256, 128, -256, 0, 0]
+                    ];
                     $p->dataPacket($pk);
                 }
             }

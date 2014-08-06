@@ -582,13 +582,10 @@ class Entity extends Position{
 						$pk->bodyYaw = $this->yaw;
 						$this->server->api->player->broadcastPacket($players, $pk);
 					}else{
-						$pk = new MoveEntityPacket_PosRot;
-						$pk->eid = $this->eid;
-						$pk->x = $this->x;
-						$pk->y = $this->y;
-						$pk->z = $this->z;
-						$pk->yaw = $this->yaw;
-						$pk->pitch = $this->pitch;
+						$pk = new MoveEntityPacket;
+						$pk->entities = [
+							[$this->eid, $this->x, $this->y, $this->z, $this->yaw, $this->pitch]
+						];
 						$this->server->api->player->broadcastPacket($players, $pk);
 					}
 				}
@@ -677,10 +674,9 @@ class Entity extends Position{
 				$player->dataPacket($pk);
 				
 				$pk = new SetEntityMotionPacket;
-				$pk->eid = $this->eid;
-				$pk->speedX = $this->speedX;
-				$pk->speedY = $this->speedY;
-				$pk->speedZ = $this->speedZ;
+				$pk->entities = [
+					[$this->eid, $this->speedX, $this->speedY, $this->speedZ]
+				];
 				$player->dataPacket($pk);
 				
 				$pk = new PlayerEquipmentPacket;
@@ -705,10 +701,9 @@ class Entity extends Position{
 				$player->dataPacket($pk);
 				
 				$pk = new SetEntityMotionPacket;
-				$pk->eid = $this->eid;
-				$pk->speedX = $this->speedX;
-				$pk->speedY = $this->speedY;
-				$pk->speedZ = $this->speedZ;
+				$pk->entities = [
+					[$this->eid, $this->speedX, $this->speedY, $this->speedZ]
+				];
 				$player->dataPacket($pk);
 				break;
 			case ENTITY_MOB:
@@ -724,10 +719,9 @@ class Entity extends Position{
 				$player->dataPacket($pk);
 				
 				$pk = new SetEntityMotionPacket;
-				$pk->eid = $this->eid;
-				$pk->speedX = $this->speedX;
-				$pk->speedY = $this->speedY;
-				$pk->speedZ = $this->speedZ;
+				$pk->entities = [
+					[$this->eid, $this->speedX, $this->speedY, $this->speedZ]
+				];
 				$player->dataPacket($pk);
 				break;
 			case ENTITY_OBJECT:
@@ -751,10 +745,9 @@ class Entity extends Position{
 					$player->dataPacket($pk);
 					
 					$pk = new SetEntityMotionPacket;
-					$pk->eid = $this->eid;
-					$pk->speedX = $this->speedX;
-					$pk->speedY = $this->speedY;
-					$pk->speedZ = $this->speedZ;
+					$pk->entities = [
+						[$this->eid, $this->speedX, $this->speedY, $this->speedZ]
+					];
 					$player->dataPacket($pk);
 				}elseif($this->type === OBJECT_ARROW){
 					$pk = new AddEntityPacket;
@@ -767,10 +760,9 @@ class Entity extends Position{
 					$player->dataPacket($pk);
 					
 					$pk = new SetEntityMotionPacket;
-					$pk->eid = $this->eid;
-					$pk->speedX = $this->speedX;
-					$pk->speedY = $this->speedY;
-					$pk->speedZ = $this->speedZ;
+					$pk->entities = [
+						[$this->eid, $this->speedX, $this->speedY, $this->speedZ]
+					];
 					$player->dataPacket($pk);
 				}
 				break;
@@ -785,10 +777,9 @@ class Entity extends Position{
 				$player->dataPacket($pk);
 				
 				$pk = new SetEntityMotionPacket;
-				$pk->eid = $this->eid;
-				$pk->speedX = $this->speedX;
-				$pk->speedY = $this->speedY;
-				$pk->speedZ = $this->speedZ;
+				$pk->entities = [
+					[$this->eid, $this->speedX, $this->speedY, $this->speedZ]
+				];
 				$player->dataPacket($pk);
 				break;
 		}
@@ -1014,13 +1005,10 @@ class Entity extends Position{
 				$this->updateMetadata();
 				$this->dead = true;
 				if($this->player instanceof Player){
-					$pk = new MoveEntityPacket_PosRot;
-					$pk->eid = $this->eid;
-					$pk->x = -256;
-					$pk->y = 128;
-					$pk->z = -256;
-					$pk->yaw = 0;
-					$pk->pitch = 0;
+					$pk = new MoveEntityPacket;
+					$pk->entities = [
+						[$this->eid, -256, 128, -256, 0, 0]
+					];
 					$this->server->api->player->broadcastPacket($this->level->players, $pk);
 				}else{
 					$this->server->api->dhandle("entity.event", array("entity" => $this, "event" => 3)); //Entity dead

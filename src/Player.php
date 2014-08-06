@@ -641,10 +641,9 @@ class Player{
 					break;
 				}
 				$pk = new SetEntityMotionPacket;
-				$pk->eid = $data->eid;
-				$pk->speedX = $data->speedX;
-				$pk->speedY = $data->speedY;
-				$pk->speedZ = $data->speedZ;
+				$pk->entities = [
+					[$data->eid, $data->speedX, $data->speedY, $data->speedZ]
+				];
 				$this->dataPacket($pk);
 				break;
 			case "entity.animate":
@@ -919,27 +918,23 @@ class Player{
 				foreach($this->server->api->entity->getAll($this->level) as $e){
 					if($e !== $this->entity){
 						if($e->player instanceof Player){
-							$pk = new MoveEntityPacket_PosRot;
-							$pk->eid = $this->entity->eid;
-							$pk->x = -256;
-							$pk->y = 128;
-							$pk->z = -256;
-							$pk->yaw = 0;
-							$pk->pitch = 0;
-							//$e->player->dataPacket($pk);
+							// TODO: maybe not the best way to hide players when cross-world teleporting
+							// maybe use the new RemovePlayer packet instead
+							$pk = new MoveEntityPacket;
+							$pk->entities = [
+								[$this->entity->eid, -256, 128, -256, 0, 0]
+							];
+							$e->player->dataPacket($pk);
 							
-							$pk = new MoveEntityPacket_PosRot;
-							$pk->eid = $e->eid;
-							$pk->x = -256;
-							$pk->y = 128;
-							$pk->z = -256;
-							$pk->yaw = 0;
-							$pk->pitch = 0;
-							//$this->dataPacket($pk);
+							$pk = new MoveEntityPacket;
+							$pk->entities = [
+								[$e->eid, -256, 128, -256, 0, 0]
+							];
+							$this->dataPacket($pk);
 						}else{
 							$pk = new RemoveEntityPacket;
 							$pk->eid = $e->eid;
-							//$this->dataPacket($pk);
+							$this->dataPacket($pk);
 						}
 					}
 				}
@@ -958,14 +953,12 @@ class Player{
 				
 				foreach($this->server->api->player->getAll($this->level) as $player){
 					if($player !== $this and $player->entity instanceof Entity){
-						$pk = new MoveEntityPacket_PosRot;
-						$pk->eid = $player->entity->eid;
-						$pk->x = $player->entity->x;
-						$pk->y = $player->entity->y;
-						$pk->z = $player->entity->z;
-						$pk->yaw = $player->entity->yaw;
-						$pk->pitch = $player->entity->pitch;
-						//$this->dataPacket($pk);
+						$pk = new MoveEntityPacket;
+						$pk->entities = [
+							[$player->entity->eid, $player->entity->x, $player->entity->y, $player->entity->z,
+								$player->entity->yaw, $player->entity->pitch]
+						];
+						$this->dataPacket($pk);
 						
 						$pk = new PlayerEquipmentPacket;
 						$pk->eid = $this->eid;
