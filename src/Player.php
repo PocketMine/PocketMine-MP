@@ -1387,6 +1387,11 @@ class Player{
 				
 				$pk = new StartGamePacket;
 				$pk->seed = $this->level->getSeed();
+				// reset spawn to 128/64/128 otherwise MCPE waits for extra chunks
+				// TODO: use world limit chunk provider instead
+				$this->data->get("position")["x"] = 128;
+				$this->data->get("position")["y"] = 64;
+				$this->data->get("position")["z"] = 128;
 				$pk->x = $this->data->get("position")["x"];
 				$pk->y = $this->data->get("position")["y"];
 				$pk->z = $this->data->get("position")["z"];

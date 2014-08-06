@@ -451,14 +451,27 @@ class Level{
 		}
 
 		echo("Sending chunk" . $X . ":" . $Z . "\n");
-        	$data = $this->getOptimizedChunk($X,$Z);
-        	$orderedIds = $data[0];
-        	$orderedData = $data[1];
+		$orderedIds = "";
+		$orderedData = str_repeat("\x00", 16*16*64);
 		$orderedSkyLight = $orderedData;
 		$orderedLight = $orderedData;
-		$orderedBiomeIds = str_repeat("\x00", 16*16);
-		$orderedBiomeColors = Utils::writeInt(0);
+		$orderedBiomeIds = str_repeat("\x01", 16*16); //all plains, according to PocketMine 1.4 source
+		$orderedBiomeColors = str_repeat("\x00\x85\xb2\x4a", 256); // also PM 1.4
 		$tileEntities = "";
+		$this->level->loadChunk($X, $Z);
+		for ($aX = 0; $aX < 16; $aX++) {
+			for ($aZ = 0; $aZ < 16; $aZ++) {
+				for ($y = 0; $y < 8; $y++) {
+					$miniChunk = $this->level->getMiniChunk($X, $Z, $y);
+					$miniChunkIndex = ($aX << 5) + ($aZ << 9);
+					$orderedIds .= substr($miniChunk, $miniChunkIndex, 16);
+					//$miniChunkIndex = 4096 + ((($aX << 5) + ($aZ << 9)) >> 1);
+					//$orderedData .= substr($miniChunk, $miniChunkIndex, 8);
+					//$miniChunkIndex += 2048;
+					//$orderedLight .= substr($miniChunk, $miniChunkIndex, 8);
+				}
+			}
+		}
 		$orderedUncompressed = Utils::writeLInt($X) . Utils::writeLInt($Z) .
 			$orderedIds . $orderedData . $orderedSkyLight . $orderedLight .
 			$orderedBiomeIds . $orderedBiomeColors . $tileEntities;
