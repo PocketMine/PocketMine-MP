@@ -450,7 +450,6 @@ class Level{
 			}
 		}
 
-		echo("Sending chunk" . $X . ":" . $Z . "\n");
 		$orderedIds = "";
 		$orderedData = str_repeat("\x00", 16*16*64);
 		$orderedSkyLight = $orderedData;
