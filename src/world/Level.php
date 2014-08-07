@@ -464,7 +464,7 @@ class Level{
 					$miniChunk = $this->level->getMiniChunk($X, $Z, $y);
 					$miniChunkIndex = ($aX << 5) + ($aZ << 9);
 					$orderedIds .= substr($miniChunk, $miniChunkIndex, 16);
-					$miniChunkIndex = 4096 + ((($aX << 5) + ($aZ << 9)) >> 1);
+					$miniChunkIndex = 16 + ((($aX << 5) + ($aZ << 9)));
 					$orderedData .= substr($miniChunk, $miniChunkIndex, 8);
 					//$miniChunkIndex += 2048;
 					//$orderedLight .= substr($miniChunk, $miniChunkIndex, 8);
