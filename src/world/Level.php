@@ -458,22 +458,21 @@ class Level{
 		$orderedBiomeColors = str_repeat("\x00\x85\xb2\x4a", 256); // also PM 1.4
 		$tileEntities = "";
 		$this->level->loadChunk($X, $Z);
-		for ($aX = 0; $aX < 16; $aX++) {
-			for ($aZ = 0; $aZ < 16; $aZ++) {
-				for ($y = 0; $y < 8; $y++) {
-					$miniChunk = $this->level->getMiniChunk($X, $Z, $y);
-					$miniChunkIndex = ($aX << 5) + ($aZ << 9);
-					$orderedIds .= substr($miniChunk, $miniChunkIndex, 16);
-					$miniChunkIndex += ($y >> 1) + 16; // "4096 + 2048 + 2048, Block Data, Meta, Light" - @shoghicp :D
-					$orderedData .= substr($miniChunk, $miniChunkIndex, 8);
-					//$miniChunkIndex += 2048;
-					//$orderedLight .= substr($miniChunk, $miniChunkIndex, 8);
-				}
-			}
+		
+		$miniChunks = [];
+		
+		for($y = 0; $y < 8; ++$y){
+			$miniChunks[$y] = $this->level->getMiniChunk($X, $Z, $y);
 		}
+		
+		for($j = 0; $j < 256; ++$j){
+			$orderedIds .= substr($miniChunks[$y], $bIndex = ($j << 5), 16);
+			$orderedData .= substr($miniChunks[$y], $bIndex + 16, 8);
+		}
+		
 		$orderedUncompressed = Utils::writeLInt($X) . Utils::writeLInt($Z) .
-			$orderedIds . $orderedData . $orderedSkyLight . $orderedLight .
-			$orderedBiomeIds . $orderedBiomeColors . $tileEntities;
+		$orderedIds . $orderedData . $orderedSkyLight . $orderedLight .
+		$orderedBiomeIds . $orderedBiomeColors . $tileEntities;
 		$ordered = zlib_encode($orderedUncompressed, ZLIB_ENCODING_DEFLATE, 1);
 		if(ADVANCED_CACHE == true){
 			Cache::add($identifier, $ordered, 60);
