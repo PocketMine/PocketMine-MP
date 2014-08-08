@@ -466,8 +466,10 @@ class Level{
 		}
 		
 		for($j = 0; $j < 256; ++$j){
-			$orderedIds .= substr($miniChunks[$y], $bIndex = ($j << 5), 16);
-			$orderedData .= substr($miniChunks[$y], $bIndex + 16, 8);
+			foreach($miniChunks as $chunk){
+				$orderedIds .= substr($chunk, $bIndex = ($j << 5), 16);
+				$orderedData .= substr($chunk, $bIndex + 16, 8);
+			}
 		}
 		
 		$orderedUncompressed = Utils::writeLInt($X) . Utils::writeLInt($Z) .
