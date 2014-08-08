@@ -465,10 +465,13 @@ class Level{
 			$miniChunks[$y] = $this->level->getMiniChunk($X, $Z, $y);
 		}
 		
-		for($j = 255; $j >= 0; --$j){
-			foreach($miniChunks as $chunk){
-				$orderedIds .= substr($chunk, $bIndex = ($j << 5), 16);
-				$orderedData .= substr($chunk, $bIndex + 16, 8);
+		for ($i = 0; $i < 16; $i++){
+			for ($j = 0; $j < 16; $j++){
+				$bIndex = ($i << 5) + ($j << 9);
+				foreach($miniChunks as $chunk){
+					$orderedIds .= substr($chunk, $bIndex, 16);
+					$orderedData .= substr($chunk, $bIndex + 16, 8);
+				}
 			}
 		}
 		
