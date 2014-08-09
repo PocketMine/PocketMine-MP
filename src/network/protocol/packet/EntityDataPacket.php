@@ -19,10 +19,6 @@
  *
 */
 
-namespace pocketmine\network\protocol;
-
-use pocketmine\network\raknet\RakNetDataPacket as RakNetDataPacket;
-
 class EntityDataPacket extends RakNetDataPacket{
 	public $x;
 	public $y;
