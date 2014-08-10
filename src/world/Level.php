@@ -479,7 +479,7 @@ class Level{
 		//echo dirname(__DIR__) . "/worlds/" . dirname($this->level->file) . "/tiles.yml";
 		//$tiles = new Config(dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
 		echo dirname($this->level->file) . "/tiles.yml\n";
-		safe_var_dump($tiles->getAll(true));
+		safe_var_dump($tiles->getAll());
 		$nbt = new NBT();
 		foreach($tiles->getAll(true) as $d){
 			//echo $d["id"] . " is tile id";
