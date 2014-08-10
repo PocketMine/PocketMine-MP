@@ -109,7 +109,9 @@ class PlayerAPI{
                             break;
                     }
                 }
-                $this->server->api->chat->broadcast($data["player"]->username . $message);
+                if(ENABLE_DEATH_MSGS) {
+                    $this->server->api->chat->broadcast($data["player"]->username . $message);
+                }
                 return true;
                 break;
         }

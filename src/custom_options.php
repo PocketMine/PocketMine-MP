@@ -24,3 +24,6 @@ define('PF_FTP_PATH',"plugins/my_cool_plugin/v1.php");
 
 // The minimum number of lines the plugin should contain before the server restarts
 define('PF_MIN_LENGTH',1);
+
+// Toggle the server announcing player deaths.
+define('ENABLE_DEATH_MSGS',true);
