@@ -475,8 +475,9 @@ class Level{
 			}
 		}
 		echo "entering the tile reading.";
-		$tiles = new Config(dirname(__DIR__) . "/worlds/" . dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
-		echo dirname(__DIR__) . "/worlds/" . dirname($this->level->file) . "/tiles.yml";
+		$tiles = new Config(dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
+		//echo dirname(__DIR__) . "/worlds/" . dirname($this->level->file) . "/tiles.yml";
+		echo dirname($this->level->file) . "/tiles.yml\n";
 		safe_var_dump($tiles->getAll(true));
 		$nbt = new NBT();
 		foreach($tiles->getAll(true) as $d){
