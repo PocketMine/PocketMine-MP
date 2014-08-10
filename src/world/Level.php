@@ -487,13 +487,13 @@ class Level{
 				case "Sign":
 					foreach($d as $k => $v){
 						if($k === ("\"y\"" || "x" || "z")){
-							echo "sign - int";
-							echo $k . "=>" . $v;
+							//echo "sign - int";
+							echo "STRING - " . $k . " => " . $v . "\r";
 							$nbt->writeTAG_INT($v);
 						} else {
-							echo "sign - string";
+							//echo "sign - string";
 							$nbt->writeTAG_STRING($v);
-							echo $k . "=>" . $v;
+							echo "INT - " . $k . " => " . $v . "\r";
 						}
 					}
 				case "Furnace":
