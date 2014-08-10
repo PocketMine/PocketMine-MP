@@ -18,7 +18,7 @@
  * 
  *
 */
-require_once("./Tag.php");
+require_once(FILE_PATH . "/Tag.php");
 
 abstract class NamedTag extends Tag{
 
