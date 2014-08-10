@@ -24,12 +24,3 @@ define('PF_FTP_PATH',"plugins/my_cool_plugin/v1.php");
 
 // The minimum number of lines the plugin should contain before the server restarts
 define('PF_MIN_LENGTH',1);
-
-// Whether or not to load hexadecimal versions of world files in server RAM to make terrain sending faster.
-define('LOAD_OCHUNKS_IN_RAM',true);
-
-// The maximum number of chunks to cache per world. 256 chunks / world. Larger cache = more ram, faster chunk sending
-define('MAX_OCHUNKS_PER_LEVEL',128);
-
-// Force chunk cache to generate if does not exist on level load.
-define('FORCE_OCHUNK_GEN_ON_LEVEL_LOAD',true);
