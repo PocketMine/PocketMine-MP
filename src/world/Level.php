@@ -474,14 +474,15 @@ class Level{
 				}
 			}
 		}
-		echo "entering the tile reading.";
+		//echo "entering the tile reading.";
 		$tiles = new Config(dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
 		//echo dirname(__DIR__) . "/worlds/" . dirname($this->level->file) . "/tiles.yml";
+		//$tiles = new Config(dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
 		echo dirname($this->level->file) . "/tiles.yml\n";
 		safe_var_dump($tiles->getAll(true));
 		$nbt = new NBT();
 		foreach($tiles->getAll(true) as $d){
-			echo $d["id"] . " is tile id";
+			//echo $d["id"] . " is tile id";
 			switch($d["id"]){
 				case "Sign":
 					foreach($d as $k => $v){
