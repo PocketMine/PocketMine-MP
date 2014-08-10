@@ -475,10 +475,35 @@ class Level{
 			}
 		}
 		
+		$tiles = new Config(dirname($this->level->file) . "tiles.yml", CONFIG_YAML);
+		$nbt = new NBT();
+		foreach($tiles->getAll(true) as $d){
+			switch($d["id"]){
+				case "Sign":
+					foreach($d as $k => $v){
+						if($k === ("\"y\"" || "x" || "z")){
+							writeTAG_INT($v);
+						} else {
+							writeTAG_STRING($v);
+						}
+					}
+				case "Furnace":
+					//nutting
+					break;
+				case "Chest":
+					//nutting again
+					break;
+				case default:
+					//you guessed it again - nutting.
+					break;
+					
+			}
+		}
+		$tileEntities = $nbt->binary;
 		$orderedUncompressed = Utils::writeLInt($X) . Utils::writeLInt($Z) .
 		$orderedIds . $orderedData . $orderedSkyLight . $orderedLight .
 		$orderedBiomeIds . $orderedBiomeColors . $tileEntities;
-		$ordered = zlib_encode($orderedUncompressed, ZLIB_ENCODING_DEFLATE, 1);
+		$ordered = zlib_encode($orderedUncompressed, ZLIB_ENCODING_DEFLATE, 7);
 		if(ADVANCED_CACHE == true){
 			Cache::add($identifier, $ordered, 60);
 		}
