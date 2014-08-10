@@ -493,7 +493,7 @@ class Level{
 				case "Chest":
 					//nutting again
 					break;
-				case default:
+				default:
 					//you guessed it again - nutting.
 					break;
 					
