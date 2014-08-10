@@ -95,6 +95,8 @@ $sha1sum = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 require_once(FILE_PATH."/src/math/Vector3.php");
 require_once(FILE_PATH."/src/world/Position.php");
 require_once(FILE_PATH."/src/pmf/PMF.php");
+require_once(FILE_PATH."/src/nbt/tag/NamedTag.php");
+require_once(FILE_PATH."/src/nbt/tag/Tag.php");
 
 require_all(FILE_PATH . "src/");
 
