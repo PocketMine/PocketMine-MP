@@ -481,7 +481,7 @@ class Level{
 		echo dirname($this->level->file) . "/tiles.yml\n";
 		safe_var_dump($tiles->getAll());
 		$nbt = new NBT();
-		foreach($tiles->getAll(true) as $d){
+		foreach($tiles->getAll() as $d){
 			//echo $d["id"] . " is tile id";
 			switch($d["id"]){
 				case "Sign":
