@@ -478,8 +478,8 @@ class Level{
 		$tiles = new Config(dirname($this->level->file) . "tiles.yml", CONFIG_YAML);
 		$nbt = new NBT();
 		foreach($tiles->getAll(true) as $d){
+			echo $d["id"] . " is tile id";
 			switch($d["id"]){
-				echo $d["id"] . " is tile id";
 				case "Sign":
 					foreach($d as $k => $v){
 						if($k === ("\"y\"" || "x" || "z")){
