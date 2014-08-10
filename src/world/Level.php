@@ -530,7 +530,7 @@ class Level{
 		$orderedUncompressed = Utils::writeLInt($X) . Utils::writeLInt($Z) .
 		$orderedIds . $orderedData . $orderedSkyLight . $orderedLight .
 		$orderedBiomeIds . $orderedBiomeColors . $tileEntities;
-		$ordered = zlib_encode($orderedUncompressed, ZLIB_ENCODING_DEFLATE, 10);
+		$ordered = zlib_encode($orderedUncompressed, ZLIB_ENCODING_DEFLATE, 9);
 		if(ADVANCED_CACHE == true){
 			Cache::add($identifier, $ordered, 60);
 		}
