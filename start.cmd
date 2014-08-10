@@ -1,5 +1,5 @@
 @echo off
-TITLE Steadfast - Modified PocketMine-MP for 0.9.x clients!
+TITLE Steadfast - PocketMine-MP for Production Servers!
 cd /d %~dp0
 if exist bin\php\php.exe (
 	if exist bin\mintty.exe (
