@@ -19,10 +19,6 @@
  *
 */
 
-namespace pocketmine\nbt\tag;
-
-use pocketmine\nbt\NBT;
-
 class ByteArray extends NamedTag{
 
 	public function getType(){
