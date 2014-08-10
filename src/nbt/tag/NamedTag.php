@@ -18,7 +18,7 @@
  * 
  *
 */
-require_once(FILE_PATH . "/Tag.php");
+require_once(FILE_PATH . "src/nbt/Tag.php");
 
 abstract class NamedTag extends Tag{
 
