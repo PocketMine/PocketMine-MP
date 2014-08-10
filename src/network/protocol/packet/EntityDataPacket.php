@@ -26,7 +26,7 @@ class EntityDataPacket extends RakNetDataPacket{
 	public $namedtag;
 
 	public function pid(){
-		return Info::ENTITY_DATA_PACKET;
+		return ProtocolInfo::ENTITY_DATA_PACKET;
 	}
 
 	public function decode(){
