@@ -482,11 +482,11 @@ class Level{
 				case "Sign":
 					foreach($d as $k => $v){
 						if($k === ("\"y\"" || "x" || "z")){
-							echo "sign - int"
+							echo "sign - int";
 							echo $k . "=>" . $v;
 							writeTAG_INT($v);
 						} else {
-							echo "sign - string"
+							echo "sign - string";
 							writeTAG_STRING($v);
 							echo $k . "=>" . $v;
 						}
