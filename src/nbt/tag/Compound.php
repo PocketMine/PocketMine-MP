@@ -57,25 +57,25 @@ class Compound extends NamedTag implements \ArrayAccess{
 	}
 
 	public function getType(){
-		return NBT::TAG_Compound;
+		return NBT_new::TAG_Compound;
 	}
 
-	public function read(NBT $nbt){
+	public function read(NBT_new $NBT_new){
 		$this->value = [];
 		do{
-			$tag = $nbt->readTag();
+			$tag = $NBT_new->readTag();
 			if($tag instanceof NamedTag and $tag->getName() !== ""){
 				$this->{$tag->getName()} = $tag;
 			}
-		}while(!($tag instanceof End) and !$nbt->feof());
+		}while(!($tag instanceof End) and !$NBT_new->feof());
 	}
 
-	public function write(NBT $nbt){
+	public function write(NBT_new $NBT_new){
 		foreach($this as $tag){
 			if($tag instanceof Tag and !($tag instanceof End)){
-				$nbt->writeTag($tag);
+				$NBT_new->writeTag($tag);
 			}
 		}
-		$nbt->writeTag(new End);
+		$NBT_new->writeTag(new End);
 	}
 }
