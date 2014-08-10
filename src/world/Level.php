@@ -524,6 +524,7 @@ class Level{
 							new Int("y", (int) $data["y"]), //fix for strange y-reading \"y\"
 							new Int("z", (int) $data["z"])
 						)));
+						$tileEntities .= $nbt->write();
 					break;
 				case "Furnace":
 						//nutting, not spawnable :D
@@ -533,7 +534,6 @@ class Level{
 					break;
 			}
 		}
-		$tileEntities .= $nbt->write();
 		$orderedUncompressed = Utils::writeLInt($X) . Utils::writeLInt($Z) .
 		$orderedIds . $orderedData . $orderedSkyLight . $orderedLight .
 		$orderedBiomeIds . $orderedBiomeColors . $tileEntities;
