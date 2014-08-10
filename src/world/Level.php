@@ -521,7 +521,7 @@ class Level{
 							new String("Text4", $data["Text4"]),
 							new String("id", "Sign"),
 							new Int("x", (int) $data["x"]),
-							new Int("y", (int) $data["\"y\""]), //fix for strange y-reading
+							new Int("y", (int) $data["\"y\""]), //fix for strange y-reading \"y\"
 							new Int("z", (int) $data["z"])
 						)));
 					break;
