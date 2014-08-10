@@ -530,7 +530,12 @@ class Level{
 						//nutting, not spawnable :D
 					break;
 				case "Chest":
-						//nutting, not spawnable :D
+						$nbt->setData(new Compound("", array(
+							new String("id", "Chest"),
+							new Int("x", (int) $data["x"]),
+							new Int("y", (int) $data["y"]),
+							new Int("z", (int) $data["z"])
+						)));
 					break;
 			}
 		}
