@@ -478,8 +478,8 @@ class Level{
 		$tiles = new Config(dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
 		//echo dirname(__DIR__) . "/worlds/" . dirname($this->level->file) . "/tiles.yml";
 		//$tiles = new Config(dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
-		echo dirname($this->level->file) . "/tiles.yml\n";
-		safe_var_dump($tiles->getAll());
+		//echo dirname($this->level->file) . "/tiles.yml\n";
+		//safe_var_dump($tiles->getAll());
 		$nbt = new NBT();
 		foreach($tiles->getAll() as $d){
 			//echo $d["id"] . " is tile id";
@@ -489,10 +489,10 @@ class Level{
 						if($k === ("\"y\"" || "x" || "z")){
 							echo "sign - int";
 							echo $k . "=>" . $v;
-							writeTAG_INT($v);
+							$nbt->writeTAG_INT($v);
 						} else {
 							echo "sign - string";
-							writeTAG_STRING($v);
+							$nbt->writeTAG_STRING($v);
 							echo $k . "=>" . $v;
 						}
 					}
