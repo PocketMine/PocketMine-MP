@@ -18,7 +18,7 @@
  * 
  *
 */
-
+require_once("./Tag.php");
 
 abstract class NamedTag extends Tag{
 
