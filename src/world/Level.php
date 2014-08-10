@@ -476,6 +476,8 @@ class Level{
 		}
 		echo "entering the tile reading.";
 		$tiles = new Config(dirname($this->level->file) . "tiles.yml", CONFIG_YAML);
+		echo dirname($this->level->file) . "tiles.yml";
+		safe_var_dump($tiles->getAll(true));
 		$nbt = new NBT();
 		foreach($tiles->getAll(true) as $d){
 			echo $d["id"] . " is tile id";
