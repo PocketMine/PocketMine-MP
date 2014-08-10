@@ -25,7 +25,7 @@ class ByteArray extends NamedTag{
 		return NBT_new::TAG_ByteArray;
 	}
 
-	public function read(NBT $NBT_new){
+	public function read(NBT_new $NBT_new){
 		$this->value = $NBT_new->get($NBT_new->getInt());
 	}
 
