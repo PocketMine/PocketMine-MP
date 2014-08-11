@@ -524,6 +524,7 @@ class Level{
 							new Int("y", (int) $data["y"]),
 							new Int("z", (int) $data["z"])
 						)));
+						$tileEntities .= $nbt->write();
 					break;
 			}
 		}
