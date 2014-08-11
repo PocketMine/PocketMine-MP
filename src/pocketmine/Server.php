@@ -749,7 +749,7 @@ class Server{
 		$name = strtolower($name);
 		$delta = PHP_INT_MAX;
 		foreach($this->getOnlinePlayers() as $player){
-			if(stripos($player->getName(), $name) === 0){
+			if(stripos($player->getName(), $name) === 0 || stripos($player->getDisplayName(), $name) === 0){
 				$curDelta = strlen($player->getName()) - strlen($name);
 				if($curDelta < $delta){
 					$found = $player;
@@ -772,7 +772,7 @@ class Server{
 	public function getPlayerExact($name){
 		$name = strtolower($name);
 		foreach($this->getOnlinePlayers() as $player){
-			if(strtolower($player->getName()) === $name){
+			if(strtolower($player->getName()) === $name || strtolower($player->getDisplayName()) === $name){
 				return $player;
 			}
 		}
@@ -789,7 +789,7 @@ class Server{
 		$partialName = strtolower($partialName);
 		$matchedPlayers = [];
 		foreach($this->getOnlinePlayers() as $player){
-			if(strtolower($player->getName()) === $partialName){
+			if(strtolower($player->getName()) === $partialName || strtolower($player->getDisplayName()) === $partialName){
 				$matchedPlayers = array($player);
 				break;
 			}elseif(stripos($player->getName(), $partialName) !== false){
