@@ -292,9 +292,9 @@ class Binary{
 		return pack("v", $value);
 	}
 
-	public static function readInt($str){
+	public static function readInt($str, $signed = true){
 		$unpacked = @unpack("N", $str)[1];
-		if($unpacked > 2147483647){
+		if($unpacked > 2147483647 and $signed){
 			$unpacked -= 4294967296;
 		}
 
@@ -305,9 +305,9 @@ class Binary{
 		return pack("N", $value);
 	}
 
-	public static function readLInt($str){
+	public static function readLInt($str, $signed = true){
 		$unpacked = @unpack("V", $str)[1];
-		if($unpacked >= 2147483648){
+		if($unpacked >= 2147483648 and $signed){
 			$unpacked -= 4294967296;
 		}
 
