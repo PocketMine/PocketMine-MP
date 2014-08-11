@@ -21,8 +21,8 @@
 
 class ContainerSetContentPacket extends RakNetDataPacket{
 	public $windowid;
-	public $slots = array();
-	public $hotbar = array();
+	public $slots = [];
+	public $hotbar = [];
 	
 	public function pid(){
 		return ProtocolInfo::CONTAINER_SET_CONTENT_PACKET;
@@ -54,6 +54,8 @@ class ContainerSetContentPacket extends RakNetDataPacket{
 			foreach($this->hotbar as $slot){
 				$this->putInt($slot);
 			}
+		} else {
+			$this->putShort(0);
 		}
 	}
 
