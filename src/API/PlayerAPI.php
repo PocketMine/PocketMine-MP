@@ -475,9 +475,11 @@ class PlayerAPI{
         );
 
         if(!file_exists(DATA_PATH."players/".$iname.".yml")){
-            console("[NOTICE] Player data not found for \"".$iname."\", creating new profile");
             $data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default);
-            $data->save();
+            if(DISABLE_PLAYER_SAVE !== true) {
+                console("[NOTICE] Player data not found for \"".$iname."\", creating new profile");
+                $data->save();
+            }
         }else{
             $data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default);
         }
@@ -491,6 +493,8 @@ class PlayerAPI{
 
     public function saveOffline(Config $data){
         $this->server->handle("player.offline.save", $data);
-        $data->save();
+        if(DISABLE_PLAYER_SAVE !== true) {
+            $data->save();
+        }
     }
 }
