@@ -254,9 +254,7 @@ function logg($message, $name, $EOL = true, $level = 2, $close = false){
 		if(!isset($fpointers[$name]) or $fpointers[$name] === false){
 			$fpointers[$name] = @fopen(DATA_PATH."/".$name.".log", "ab");
 		}
-        if(DISABLE_CONSOLE_LOG === false) {
-		    @fwrite($fpointers[$name], $message);
-        }
+		@fwrite($fpointers[$name], $message);
 		if($close === true){
 			fclose($fpointers[$name]);
 			unset($fpointers[$name]);
