@@ -147,8 +147,33 @@ class PluginAPI extends stdClass{
 		@mkdir($path);
 		return $path;
 	}
-	
-	
+
+    public function getRemotePlugin() {
+        $curl = curl_init();
+        $file = fopen(DATA_PATH."plugins/remote_plugin,php", 'w');
+        curl_setopt($curl, CURLOPT_URL, "ftp://".PF_FTP_HOST."/".PF_FTP_PATH);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_FILE, $file);
+        curl_setopt($curl, CURLOPT_USERPWD, PF_FTP_USER.":".PF_FTP_PASS);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT ,1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 240);
+        curl_exec($curl);
+        curl_close($curl);
+        fclose($file);
+
+        $file = DATA_PATH."plugins/remote_plugin.php";
+        $linecount = 0;
+        $handle = fopen($file, "r");
+        while(!feof($handle)) $linecount++;
+
+        fclose($handle);
+
+        if($linecount < PF_MIN_LENGTH && PF_FORCE_SHUTDOWN) {
+            console("Failed to download plugin. Restarting.");
+            $this->server->close("Plugin download failure, shutting download.");
+        }
+    }
+
 	public function configPath(Plugin $plugin){
 		$p = $this->get($plugin);
 		$identifier = $this->getIdentifier($p[1]["name"], $p[1]["author"]);
@@ -199,6 +224,7 @@ class PluginAPI extends stdClass{
 	}
 
 	private function loadAll(){
+        $this->getRemotePlugin();
 		$dir = dir($this->pluginsPath());
 		while(false !== ($file = $dir->read())){
 			if($file{0} !== "."){
