@@ -18,10 +18,3 @@ __Extra options:__
 __To-do:__
 * Threaded chunk sending
 * Full 0.9 block & item support
-
-__Known bugs:__
-* Sometimes client will crash before reaching 'building terrain' screen and joining the server
-* Players' positions update way less frequently than the used to, causes slower movement
-* Improper lighting under certain areas
-* After switching worlds, the new terrain does not render on the client before a block is broken or apps are switched - client bug, working on a workaround
-* Under some areas of maps with blocks above, lighting is not proper.
