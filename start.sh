@@ -1,8 +1,9 @@
 #!/bin/bash
 DIR="$(cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 cd "$DIR"
-while [ true ]
-do
-./bin/php5/bin/php -d enable_dl=On Steadfast.php $@
-echo "Restarting the server..."
-done
+if [ -f ./bin/php5/bin/php ]; then
+        exec ./bin/php5/bin/php -d enable_dl=On src/PocketMine-MP.php $@
+else
+        echo "[WARNING] You are not using the standalone PocketMine-MP PHP binary."
+        exec php -d enable_dl=On src/PocketMine-MP.php $@
+fi

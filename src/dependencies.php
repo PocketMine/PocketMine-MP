@@ -20,11 +20,10 @@
 */
 
 /***REM_START***/
-require_once(dirname(__FILE__)."/config.php");
 require_once(FILE_PATH."/src/utils/TextFormat.php");
 require_once(FILE_PATH."/src/functions.php");
 /***REM_END***/
-define("DATA_PATH", realpath(arg("data-path", FILE_PATH))."/");
+define("DATA_PATH", realpath(arg("data-path", getcwd() . DIRECTORY_SEPARATOR))."/");
 
 if(arg("enable-ansi", strpos(strtoupper(php_uname("s")), "WIN") === 0 ? false:true) === true and arg("disable-ansi", false) !== true){
 	define("ENABLE_ANSI", true);
