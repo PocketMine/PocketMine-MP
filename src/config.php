@@ -57,12 +57,10 @@ ini_set("allow_url_fopen", 1);
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);
 ini_set("default_charset", "utf-8");
-if(defined("POCKETMINE_COMPILE") and POCKETMINE_COMPILE === true){
-	define("FILE_PATH", realpath(dirname(__FILE__))."/");
-}else{
-	define("FILE_PATH", realpath(dirname(__FILE__)."/../")."/");
-}
-set_include_path(get_include_path() . PATH_SEPARATOR . FILE_PATH);
+
+define("FILE_PATH", Phar::running(true) . "/");
+
+set_include_path(FILE_PATH);
 
 ini_set("memory_limit", "128M"); //Default
 define("LOG", true);
