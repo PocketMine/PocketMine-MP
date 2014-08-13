@@ -23,6 +23,10 @@
 abstract class ProtocolInfo{
 
 	const CURRENT_PROTOCOL = 18;
+	
+	const PING_PACKET = 0x00;
+	
+	const PONG_PACKET = 0x03;
 
 	const CLIENT_CONNECT_PACKET = 0x09;
 	const SERVER_HANDSHAKE_PACKET = 0x10;
