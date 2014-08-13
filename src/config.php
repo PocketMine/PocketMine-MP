@@ -52,7 +52,7 @@ if(ini_get("date.timezone") == ""){ //No Timezone set
 }
 
 gc_enable();
-error_reporting(E_ALL | E_STRICT);
+error_reporting(-1);
 ini_set("allow_url_fopen", 1);
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);
@@ -62,13 +62,13 @@ define("FILE_PATH", Phar::running(true) . "/");
 
 set_include_path(FILE_PATH);
 
-ini_set("memory_limit", "128M"); //Default
+ini_set("memory_limit", "256M"); //Default
 define("LOG", true);
 define("START_TIME", microtime(true));
-define("MAJOR_VERSION", "Alpha_1.3.12");
-define("CODENAME", "Breadfence");
+define("MAJOR_VERSION", "Alpha_1.3.13");
+define("CODENAME", "BreadFence");
 define("CURRENT_MINECRAFT_VERSION", "v0.9.5 alpha");
-define("CURRENT_API_VERSION", 12);
+define("CURRENT_API_VERSION", 13);
 define("CURRENT_PHP_VERSION", "5.5");
 $gitsha1 = false;
 if(file_exists(FILE_PATH.".git/refs/heads/master")){ //Found Git information!
