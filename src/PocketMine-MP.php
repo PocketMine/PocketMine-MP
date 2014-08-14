@@ -21,7 +21,11 @@
 
 
 /***REM_START***/
-require_once(Phar::running(true)."/config.php");
+if(Phar::running(true) !== "/") {
+    require_once(Phar::running(true)."/config.php");
+} else {
+    require_once(FILE_PATH."/config.php");
+}
 
 require_once(FILE_PATH."/functions.php");
 require_once(FILE_PATH."/dependencies.php");
