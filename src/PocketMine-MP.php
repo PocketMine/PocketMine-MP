@@ -21,7 +21,7 @@
 
 
 /***REM_START***/
-if(Phar::running(true) !== "/") {
+if(Phar::running(true) !== "") {
     require_once(Phar::running(true)."/config.php");
 } else {
     require_once(FILE_PATH."/config.php");
