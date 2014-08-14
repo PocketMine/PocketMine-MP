@@ -22,13 +22,13 @@
 
 /***REM_START***/
 if(Phar::running(true) !== "") {
-    require_once(Phar::running(true)."/config.php");
+    require_once(Phar::running(true)."/src/config.php");
 } else {
     require_once(dirname(__FILE__)."/config.php");
 }
 
-require_once(FILE_PATH."/functions.php");
-require_once(FILE_PATH."/dependencies.php");
+require_once(FILE_PATH."/src/functions.php");
+require_once(FILE_PATH."/src/dependencies.php");
 /***REM_END***/
 
 $server = new ServerAPI();
