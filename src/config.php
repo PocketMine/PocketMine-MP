@@ -58,7 +58,11 @@ ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);
 ini_set("default_charset", "utf-8");
 
-define("FILE_PATH", Phar::running(true) . "/");
+if(Phar::running(true) !== "") {
+	define("FILE_PATH", Phar::running(true) . "/");
+} else {
+	define("FILE_PATH", dirname(__FILE__) . "/../");
+}
 
 set_include_path(FILE_PATH);
 
