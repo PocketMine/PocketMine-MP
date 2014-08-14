@@ -937,7 +937,9 @@ class Player{
 					}
 				}
 				
-
+                if($pos->level->getName() !== $this->level->getName()) { // we're switching levels.
+                    $rf = new ClientRenderFix($this);
+                }
 				$this->level->freeAllChunks($this);
 				$this->level = $pos->level;
 				$this->chunksLoaded = array();
