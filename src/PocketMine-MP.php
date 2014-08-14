@@ -24,7 +24,7 @@
 if(Phar::running(true) !== "") {
     require_once(Phar::running(true)."/config.php");
 } else {
-    require_once(FILE_PATH."/config.php");
+    require_once(dirname(__FILE__)."/config.php");
 }
 
 require_once(FILE_PATH."/functions.php");
