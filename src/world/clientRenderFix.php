@@ -54,7 +54,7 @@ class clientRenderFix {
 
         //1:
         $this->mkPacket($this->startingFromX + $this->done,$this->startingFromZ + $this->done);
-        if($done === 0) return true; // no need to update the same block 4 times
+        if($this->done === 0) return true; // no need to update the same block 4 times
 
         //2:
         $this->mkPacket($this->startingFromX + $this->done,$this->startingFromZ - $this->done);
