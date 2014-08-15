@@ -1153,7 +1153,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 				$this->server->getPluginManager()->callEvent($ev = new PlayerPreLoginEvent($this, "Plugin reason"));
 				if($ev->isCancelled()){
-					$this->close("", $ev->getKickMessage());
+					$this->close($ev->getKickMessage(), "generic reason");
 
 					return;
 				}
