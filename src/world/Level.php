@@ -462,55 +462,33 @@ class Level{
 				}
 			}
 		}
-		//echo "entering the tile reading.";
-		$tiles = new Config(dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
-		//echo dirname(__DIR__) . "/worlds/" . dirname($this->level->file) . "/tiles.yml";
-		//$tiles = new Config(dirname($this->level->file) . "/tiles.yml", CONFIG_YAML);
-		//echo dirname($this->level->file) . "/tiles.yml\n";
-		//safe_var_dump($tiles->getAll());
-		/*
-		foreach($tiles->getAll() as $d){
-			//echo $d["id"] . " is tile id";
-			switch($d["id"]){
-				case "Sign":
-					foreach($d as $k => $v){
-						if($k === ("\"y\"" || "x" || "z")){
-							//echo "sign - int";
-							echo "STRING - " . $k . " => " . $v . "\r";
-							$nbt->writeTAG_INT($v);
-						} else {
-							//echo "sign - string";
-							$nbt->writeTAG_STRING($v);
-							echo "INT - " . $k . " => " . $v . "\r";
-						}
-					}
-				case "Furnace":
-					//nutting
-					break;
-				case "Chest":
-					//nutting again
-					break;
-				default:
-					//you guessed it again - nutting.
-					break;
-					
+		
+		$chunkTiles = [];
+		
+		$tiles = $this->server->query("SELECT ID FROM tiles WHERE spawnable = 1 AND level = '".$this->getName()."' AND x >= ".($X * 16 - 1)." AND x < ".($X * 16 + 17)." AND z >= ".($Z * 16 - 1)." AND z < ".($Z * 16 + 17).";");
+		if($tiles !== false and $tiles !== true){
+			while(($tile = $tiles->fetchArray(SQLITE3_ASSOC)) !== false){
+				$tile = $this->server->api->tile->getByID($tile["ID"]);
+				if($tile instanceof Tile){
+					$chunkTiles[] = $tile;
+				}
 			}
 		}
-		$tileEntities = $nbt->binary;
-		*/
+
 		$nbt = new NBT_new(NBT_new::LITTLE_ENDIAN);
-		foreach($tiles->getAll() as $data){
-			switch($data["id"]){
+		foreach($tiles->getAll() as $tile){
+			switch($tile->id){
 				case "Sign":
+					$text = $tile->getText();
 						$nbt->setData(new Compound("", array(
-							new String("Text1", $data["Text1"]),
-							new String("Text2", $data["Text2"]),
-							new String("Text3", $data["Text3"]),
-							new String("Text4", $data["Text4"]),
+							new String("Text1", $text[0]),
+							new String("Text2", $text[1]),
+							new String("Text3", $text[2]),
+							new String("Text4", $text[3]),
 							new String("id", "Sign"),
-							new Int("x", (int) $data["x"]),
-							new Int("y", (int) $data["y"]), //fix for strange y-reading \"y\"
-							new Int("z", (int) $data["z"])
+							new Int("x", (int) $tile->x),
+							new Int("y", (int) $tile->y),
+							new Int("z", (int) $tile->z)
 						)));
 						$tileEntities .= $nbt->write();
 					break;
@@ -520,9 +498,9 @@ class Level{
 				case "Chest":
 						$nbt->setData(new Compound("", array(
 							new String("id", "Chest"),
-							new Int("x", (int) $data["x"]),
-							new Int("y", (int) $data["y"]),
-							new Int("z", (int) $data["z"])
+							new Int("x", (int) $tile->x),
+							new Int("y", (int) $tile->y),
+							new Int("z", (int) $tile->z)
 						)));
 						$tileEntities .= $nbt->write();
 					break;
