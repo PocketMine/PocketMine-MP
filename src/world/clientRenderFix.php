@@ -31,7 +31,7 @@ class clientRenderFix {
         $this->startingFromZ = round($player->entity->z,0);
         $this->startChunkZ = $this->block2Chunk( $this->startingFromZ);
         $this->lowerLeftChunkZ = $this->startChunkZ;
-        $this->server->schedule(3,array($this,"updateSpiral"),array(),true);
+        $this->server->schedule(8,array($this,"updateSpiral"),array(),true);
         // Doing  0 = bottom, 1 = left side, 2 = top, 3 = right side.
     }
 
@@ -137,7 +137,7 @@ class clientRenderFix {
         $pk->x = $x;
         $pk->z = $z;
         $pk->y = 127;
-        $pk->block = 0;
+        $pk->block = GLOWSTONE_BLOCK;
         $pk->meta = 0;
         $this->player->dataPacket($pk);
     }
