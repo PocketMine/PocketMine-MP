@@ -103,7 +103,7 @@ class Player{
 		$this->server = ServerAPI::request();
 		$this->lastBreak = microtime(true);
 		$this->clientID = $clientID;
-		$this->CID = PocketMinecraftServer::clientID($ip, $port);
+		$this->CID = MainServer::clientID($ip, $port);
 		$this->ip = $ip;
 		$this->port = $port;
 		$this->spawnPosition = $this->server->spawn;
@@ -181,6 +181,7 @@ class Player{
 		}
 		
 		if(is_array($this->lastChunk)){
+		/*
 			$tiles = $this->server->query("SELECT ID FROM tiles WHERE spawnable = 1 AND level = '".$this->level->getName()."' AND x >= ".($this->lastChunk[0] - 1)." AND x < ".($this->lastChunk[0] + 17)." AND z >= ".($this->lastChunk[1] - 1)." AND z < ".($this->lastChunk[1] + 17).";");
 			$this->lastChunk = false;
 			if($tiles !== false and $tiles !== true){
@@ -190,7 +191,8 @@ class Player{
 						$tile->spawn($this);
 					}
 				}
-			}			
+			}
+		*/
 		}
 
 		$c = key($this->chunksOrder);
@@ -207,7 +209,6 @@ class Player{
 		$Y = $id[1];
 		$x = $X << 4;
 		$z = $Z << 4;
-		$y = $Y << 4;
 		$this->level->useChunk($X, $Z, $this);
 		$Yndex = 1 << $Y;
 		for($iY = 0; $iY < 8; ++$iY){
@@ -217,10 +218,13 @@ class Player{
 				$Yndex |= 1 << $iY;
 			}
 		}
-		$pk = new ChunkDataPacket;
+		if ($Yndex != 0xff) {
+			echo("WTF not 0xff!\n");
+		}
+		$pk = new FullChunkDataPacket;
 		$pk->chunkX = $X;
 		$pk->chunkZ = $Z;
-		$pk->data = $this->level->getOrderedChunk($X, $Z, $Yndex);
+		$pk->data = $this->level->getOrderedFullChunk($X, $Z);
 		$cnt = $this->dataPacket($pk);
 		if($cnt === false){
 			return false;
@@ -294,7 +298,6 @@ class Player{
 			$this->directDataPacket(new DisconnectPacket);
 			$this->connected = false;
 			$this->level->freeAllChunks($this);
-			$this->spawned = false;
 			$this->loggedIn = false;
 			$this->buffer = null;
 			unset($this->buffer);
@@ -303,9 +306,10 @@ class Player{
 			$this->resendQueue = array();
 			$this->ackQueue = array();
 			$this->server->api->player->remove($this->CID);
-			if($msg === true and $this->username != "" and $this->spawned !== false){
+			if($msg === true and $this->username != "" and $this->spawned !== false and $this->server->sf_config->get("quit-msg")){
 				$this->server->api->chat->broadcast($this->username." left the game");
 			}
+			$this->spawned = false;
 			console("[INFO] ".FORMAT_AQUA.$this->username.FORMAT_RESET."[/".$this->ip.":".$this->port."] logged out due to ".$reason);
 			$this->windows = array();
 			$this->armor = array();
@@ -313,7 +317,7 @@ class Player{
 			$this->chunksLoaded = array();
 			$this->chunksOrder = array();
 			$this->chunkCount = array();
-			$this->cratingItems = array();
+			$this->craftingItems = array();
 			$this->received = array();
 		}
 	}
@@ -636,10 +640,9 @@ class Player{
 					break;
 				}
 				$pk = new SetEntityMotionPacket;
-				$pk->eid = $data->eid;
-				$pk->speedX = $data->speedX;
-				$pk->speedY = $data->speedY;
-				$pk->speedZ = $data->speedZ;
+				$pk->entities = [
+					[$data->eid, $data->speedX, $data->speedY, $data->speedZ]
+				];
 				$this->dataPacket($pk);
 				break;
 			case "entity.animate":
@@ -683,11 +686,10 @@ class Player{
 						return;
 					}else{
 						$message = $data->get();
-						$this->sendChat(preg_replace('/\x1b\[[0-9;]*m/', "", $message["message"]), $message["player"]); //Remove ANSI codes from chat
+						$this->sendChat($message["message"], $message["player"]);
 					}
 				}else{
-					$message = (string) $data;
-					$this->sendChat(preg_replace('/\x1b\[[0-9;]*m/', "", (string) $data)); //Remove ANSI codes from chat
+					$this->sendChat((string) $data);
 				}
 				break;
 		}
@@ -914,22 +916,18 @@ class Player{
 				foreach($this->server->api->entity->getAll($this->level) as $e){
 					if($e !== $this->entity){
 						if($e->player instanceof Player){
-							$pk = new MoveEntityPacket_PosRot;
-							$pk->eid = $this->entity->eid;
-							$pk->x = -256;
-							$pk->y = 128;
-							$pk->z = -256;
-							$pk->yaw = 0;
-							$pk->pitch = 0;
+							// TODO: maybe not the best way to hide players when cross-world teleporting
+							// maybe use the new RemovePlayer packet instead
+							$pk = new MoveEntityPacket;
+							$pk->entities = [
+								[$this->entity->eid, -256, 128, -256, 0, 0]
+							];
 							$e->player->dataPacket($pk);
 							
-							$pk = new MoveEntityPacket_PosRot;
-							$pk->eid = $e->eid;
-							$pk->x = -256;
-							$pk->y = 128;
-							$pk->z = -256;
-							$pk->yaw = 0;
-							$pk->pitch = 0;
+							$pk = new MoveEntityPacket;
+							$pk->entities = [
+								[$e->eid, -256, 128, -256, 0, 0]
+							];
 							$this->dataPacket($pk);
 						}else{
 							$pk = new RemoveEntityPacket;
@@ -939,7 +937,11 @@ class Player{
 					}
 				}
 				
-
+                if($pos->level->getName() !== $this->level->getName()) { // we're switching levels.
+                    if($this->server->sf_config->get("update-client-on-world-switch")) {
+                        $rf = new ClientRenderFix($this,$this->server->sf_config->get("update-frequency"));
+                    }
+                }
 				$this->level->freeAllChunks($this);
 				$this->level = $pos->level;
 				$this->chunksLoaded = array();
@@ -953,13 +955,11 @@ class Player{
 				
 				foreach($this->server->api->player->getAll($this->level) as $player){
 					if($player !== $this and $player->entity instanceof Entity){
-						$pk = new MoveEntityPacket_PosRot;
-						$pk->eid = $player->entity->eid;
-						$pk->x = $player->entity->x;
-						$pk->y = $player->entity->y;
-						$pk->z = $player->entity->z;
-						$pk->yaw = $player->entity->yaw;
-						$pk->pitch = $player->entity->pitch;
+						$pk = new MoveEntityPacket;
+						$pk->entities = [
+							[$player->entity->eid, $player->entity->x, $player->entity->y, $player->entity->z,
+								$player->entity->yaw, $player->entity->pitch]
+						];
 						$this->dataPacket($pk);
 						
 						$pk = new PlayerEquipmentPacket;
@@ -1001,7 +1001,7 @@ class Player{
 		$pk = new MovePlayerPacket;
 		$pk->eid = 0;
 		$pk->x = $pos->x;
-		$pk->y = $pos->y;
+		$pk->y = $pos->y + 1.62; //FIXME
 		$pk->z = $pos->z;
 		$pk->bodyYaw = $yaw;
 		$pk->pitch = $pitch;
@@ -1151,8 +1151,6 @@ class Player{
 								}
 								switch($p->pid()){
 									case 0x01:
-									case ProtocolInfo::PING_PACKET:
-									case ProtocolInfo::PONG_PACKET:
 									case ProtocolInfo::MOVE_PLAYER_PACKET:
 									case ProtocolInfo::REQUEST_CHUNK_PACKET:
 									case ProtocolInfo::ANIMATE_PACKET:
@@ -1261,14 +1259,6 @@ class Player{
 		switch($packet->pid()){
 			case 0x01:
 				break;
-			case ProtocolInfo::PONG_PACKET:
-				break;
-			case ProtocolInfo::PING_PACKET:
-				$pk = new PongPacket;
-				$pk->ptime = $packet->time;
-				$pk->time = abs(microtime(true) * 1000);
-				$this->directDataPacket($pk);
-				break;
 			case ProtocolInfo::DISCONNECT_PACKET:
 				$this->close("client disconnect");
 				break;
@@ -1311,7 +1301,7 @@ class Player{
 					$this->close("Incorrect protocol #".$packet->protocol1, false);
 					return;
 				}
-				if(preg_match('#[^a-zA-Z0-9_]#', $packet->username) > 0 or $packet->username === ""){
+				if(preg_match('#^[a-zA-Z0-9_]{3,16}$#', $this->username) == 0 or $this->username === "" or $this->iusername === "rcon" or $this->iusername === "console"){
 					$this->close("Bad username", false);
 					return;
 				}
@@ -1362,8 +1352,8 @@ class Player{
 								$inv[] = array($item[0], $item[1], 1);
 							}
 						}
+						$this->data->set("inventory", $inv);
 					}
-					$this->data->set("inventory", $inv);
 				}
 				$this->achievements = $this->data->get("achievements");
 				$this->data->set("caseusername", $this->username);
@@ -1392,12 +1382,23 @@ class Player{
 				
 				$pk = new StartGamePacket;
 				$pk->seed = $this->level->getSeed();
+				/*
+				// reset spawn to 128/64/128 otherwise MCPE waits for extra chunks
+				// TODO: use world limit chunk provider instead
+				$this->data->get("position")["x"] = 128;
+				$this->data->get("position")["y"] = 64;
+				$this->data->get("position")["z"] = 128;
+				*/
+				//stop throwing my people in the air :P
 				$pk->x = $this->data->get("position")["x"];
 				$pk->y = $this->data->get("position")["y"];
 				$pk->z = $this->data->get("position")["z"];
-				$pk->generator = 0;
+				$pk->generator = 1;
 				$pk->gamemode = $this->gamemode & 0x01;
 				$pk->eid = 0;
+				$pk->spawnX = $this->data->get("position")["x"];
+				$pk->spawnY = $this->data->get("position")["y"];
+				$pk->spawnZ = $this->data->get("position")["z"];
 				$this->dataPacket($pk);
 	
 				if(($this->gamemode & 0x01) === 0x01){
@@ -1441,52 +1442,9 @@ class Player{
 				$this->lastMeasure = microtime(true);
 				$this->server->schedule(50, array($this, "measureLag"), array(), true);
 				console("[INFO] ".FORMAT_AQUA.$this->username.FORMAT_RESET."[/".$this->ip.":".$this->port."] logged in with entity id ".$this->eid." at (".$this->entity->level->getName().", ".round($this->entity->x, 2).", ".round($this->entity->y, 2).", ".round($this->entity->z, 2).")");
+				$this->sendSpawnPlayerPacket();
 				break;
-			case ProtocolInfo::READY_PACKET:
-				if($this->loggedIn === false){
-					break;
-				}
-				switch($packet->status){
-					case 1: //Spawn!!
-						if($this->spawned !== false){
-							break;
-						}
-						$this->entity->setHealth($this->data->get("health"), "spawn", true);
-						$this->spawned = true;	
-						$this->server->api->player->spawnAllPlayers($this);
-						$this->server->api->player->spawnToAllPlayers($this);
-						$this->server->api->entity->spawnAll($this);
-						$this->server->api->entity->spawnToAll($this->entity);
-						
-						$this->server->schedule(5, array($this->entity, "update"), array(), true);
-						$this->server->schedule(2, array($this->entity, "updateMovement"), array(), true);
-						$this->sendArmor();
-						$this->sendChat($this->server->motd."\n");
-						
-						if($this->iusername === "steve" or $this->iusername === "stevie"){
-							$this->sendChat("You're using the default username. Please change it on the Minecraft PE settings.\n");
-						}
-						$this->sendInventory();
-						$this->sendSettings();
-						$this->server->schedule(50, array($this, "orderChunks"), array(), true);
-						$this->blocked = false;
-						
-						$pk = new SetTimePacket;
-						$pk->time = $this->level->getTime();
-						$this->dataPacket($pk);
-						
-						$pos = new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level);
-						$pos = $this->level->getSafeSpawn($pos);
-						$this->teleport($pos);
-						$this->server->schedule(10, array($this, "teleport"), $pos);
-						$this->server->schedule(20, array($this, "teleport"), $pos);
-						$this->server->schedule(30, array($this, "teleport"), $pos);
-						$this->server->handle("player.spawn", $this);
-						break;
-					case 2://Chunk loaded?
-						break;
-				}
-				break;
+
 			case ProtocolInfo::ROTATE_HEAD_PACKET:
 				if($this->spawned === false){
 					break;
@@ -1645,7 +1603,7 @@ class Player{
 						$this->entity->updateMetadata();
 					}
 					
-					if($this->blocked === true or ($this->entity->position instanceof Vector3 and $blockVector->distance($this->entity->position) > 10)){
+					if($this->blocked === true or ($this->entity instanceof Entity and $blockVector->distance($this->entity) > 10)){
 					
 					}elseif($this->getSlot($this->slot)->getID() !== $packet->item or ($this->getSlot($this->slot)->isTool() === false and $this->getSlot($this->slot)->getMetadata() !== $packet->meta)){
 						$this->sendInventorySlot($this->slot);
@@ -1992,6 +1950,7 @@ class Player{
 				$packet->item = $this->getSlot($this->slot);
 				$this->craftingItems = array();
 				$this->toCraft = array();
+				$data = array();
 				$data["eid"] = $packet->eid;
 				$data["unknown"] = $packet->unknown;
 				$data["item"] = $packet->item;
@@ -2011,6 +1970,7 @@ class Player{
 				}
 				$this->craftingItems = array();
 				$this->toCraft = array();
+				$packet->message = TextFormat::clean($packet->message);
 				if(trim($packet->message) != "" and strlen($packet->message) <= 255){
 					$message = $packet->message;
 					if($message{0} === "/"){ //Command
@@ -2155,6 +2115,7 @@ class Player{
 					if($item->getID() !== AIR and $slot->getID() == $item->getID()){
 						if($slot->count < $item->count){
 							if($this->removeItem($item->getID(), $item->getMetadata(), $item->count - $slot->count, false) === false){
+								$this->sendInventory();
 								break;
 							}
 						}elseif($slot->count > $item->count){
@@ -2162,6 +2123,7 @@ class Player{
 						}
 					}else{
 						if($this->removeItem($item->getID(), $item->getMetadata(), $item->count, false) === false){
+							$this->sendInventory();
 							break;
 						}
 						$this->addItem($slot->getID(), $slot->getMetadata(), $slot->count, false);
@@ -2201,6 +2163,7 @@ class Player{
 					if($item->getID() !== AIR and $slot->getID() == $item->getID()){
 						if($slot->count < $item->count){
 							if($this->removeItem($item->getID(), $item->getMetadata(), $item->count - $slot->count, false) === false){
+								$this->sendInventory();
 								break;
 							}
 						}elseif($slot->count > $item->count){
@@ -2208,6 +2171,7 @@ class Player{
 						}
 					}else{
 						if($this->removeItem($item->getID(), $item->getMetadata(), $item->count, false) === false){
+							$this->sendInventory();
 							break;
 						}
 						$this->addItem($slot->getID(), $slot->getMetadata(), $slot->count, false);
@@ -2353,7 +2317,7 @@ class Player{
 		return $cnts;
 	}
 	
-	public function directDataPacket(RakNetDataPacket $packet, $reliability = 0, $recover = true){
+	public function directDataPacket(RakNetDataPacket $packet, $recover = true){
 		if($this->connected === false){
 			return false;
 		}
@@ -2361,7 +2325,6 @@ class Player{
 		if(EventHandler::callEvent(new DataPacketSendEvent($this, $packet)) === BaseEvent::DENY){
 			return array();
 		}
-		
 		$packet->encode();
 		$pk = new RakNetPacket(RakNetInfo::DATA_PACKET_0);
 		$pk->data[] = $packet;
@@ -2407,6 +2370,49 @@ class Player{
 		$this->bufferLen += 6 + $len;
 		return array();
 	}
+
+	function sendSpawnPlayerPacket() { 
+		if($this->spawned !== false){
+			return;
+		}
+		$this->entity->setHealth($this->data->get("health"), "spawn", true);
+		$this->spawned = true;	
+		$this->server->api->player->spawnAllPlayers($this);
+		$this->server->api->player->spawnToAllPlayers($this);
+		$this->server->api->entity->spawnAll($this);
+		$this->server->api->entity->spawnToAll($this->entity);
+		
+		$this->server->schedule(5, array($this->entity, "update"), array(), true);
+		$this->server->schedule(2, array($this->entity, "updateMovement"), array(), true);
+		$this->sendArmor();
+		$this->sendChat($this->server->motd."\n");
+		
+		if($this->iusername === "steve" or $this->iusername === "stevie"){
+			$this->sendChat("You're using the default username. Please change it on the Minecraft PE settings.\n");
+		}
+		$this->sendInventory();
+		$this->sendSettings();
+		$this->server->schedule(50, array($this, "orderChunks"), array(), true);
+		$this->blocked = false;
+		
+		$pk = new SetTimePacket;
+		$pk->time = $this->level->getTime();
+		$this->dataPacket($pk);
+		
+		$pos = new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level);
+		$pos = $this->level->getSafeSpawn($pos);
+//		$this->teleport($pos);
+		$this->server->schedule(10, array($this, "teleport"), $pos);
+		$this->server->schedule(20, array($this, "teleport"), $pos);
+		$this->server->schedule(30, array($this, "teleport"), $pos);
+
+        if($this->server->sf_config->get("join-msg")) {
+            $this->server->api->chat->broadcast($this->username . " joined the game");
+        }
+		$this->server->handle("player.spawn", $this);
+	}
+
+
 
     /**
      * @return string

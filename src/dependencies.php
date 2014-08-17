@@ -20,11 +20,10 @@
 */
 
 /***REM_START***/
-require_once(dirname(__FILE__)."/config.php");
 require_once(FILE_PATH."/src/utils/TextFormat.php");
 require_once(FILE_PATH."/src/functions.php");
 /***REM_END***/
-define("DATA_PATH", realpath(arg("data-path", FILE_PATH))."/");
+define("DATA_PATH", realpath(arg("data-path", getcwd() . DIRECTORY_SEPARATOR))."/");
 
 if(arg("enable-ansi", strpos(strtoupper(php_uname("s")), "WIN") === 0 ? false:true) === true and arg("disable-ansi", false) !== true){
 	define("ENABLE_ANSI", true);
@@ -95,7 +94,9 @@ $sha1sum = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 require_once(FILE_PATH."/src/math/Vector3.php");
 require_once(FILE_PATH."/src/world/Position.php");
 require_once(FILE_PATH."/src/pmf/PMF.php");
-
+require_once(FILE_PATH . "/src/nbt/tag/NamedTag.php");
+require_once(FILE_PATH . "/src/nbt/tag/Tag.php");
+require_once(FILE_PATH."src/nbt/NBT_new.php");
 require_all(FILE_PATH . "src/");
 
 $inc = get_included_files();
@@ -108,6 +109,7 @@ foreach($inc as $s){
 	$sha1sum ^= sha1_file($s, true);
 }
 /***REM_END***/
+ini_set("opcache.mmap_base", bin2hex(Utils::getRandomBytes(8, false))); //Fix OPCache address errors
 define("SOURCE_SHA1SUM", bin2hex($sha1sum));
 
 /***REM_START***/

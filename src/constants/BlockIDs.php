@@ -191,3 +191,18 @@ define("BEETROOT_BLOCK", 244);
 define("STONECUTTER", 245);
 define("GLOWING_OBSIDIAN", 246);
 define("NETHER_REACTOR", 247);
+
+define("END_PORTAL_FRAME",120);
+define("PODZOL",243);
+define("MYCELIUM",110);
+define("HUGE_BROWN_MUSHROOM",99);
+define("HUGE_RED_MUSHROOM",100);
+define("COCOA",127);
+define("ACACIA_WOOD_STAIRS",163);
+define("MONSTER_SPAWNER",52);
+define("EMERALD_BLOCK",133);
+define("END_STONE",121);
+define("DARK_OAK_WOOD_STAIRS",164);
+define("LILY_PAD",111);
+define("STAINED_CLAY",159);
+define("EMERALD_ORE",129);

@@ -19,10 +19,10 @@
  *
 */
 
-class PocketMinecraftServer{
+class MainServer{
 	public $tCnt;
-	public $serverID, $interface, $database, $version, $invisible, $tickMeasure, $preparedSQL, $seed, $gamemode, $name, $maxClients, $clients, $eidCnt, $custom, $description, $motd, $port, $saveEnabled;
-	private $serverip, $evCnt, $handCnt, $events, $eventsID, $handlers, $serverType, $lastTick, $ticks, $memoryStats, $async = array(), $asyncID = 0;
+	public $sf_config,$serverID, $interface, $database, $version, $invisible, $tickMeasure, $preparedSQL, $spawn, $whitelist, $seed, $stop, $gamemode, $difficulty, $name, $maxClients, $clients, $eidCnt, $custom, $description, $motd, $port, $saveEnabled;
+	private $serverip, $evCnt, $handCnt, $events, $eventsID, $handlers, $serverType, $lastTick, $doTick, $ticks, $memoryStats, $schedule, $asyncThread, $async = array(), $asyncID = 0;
 
 	/**
 	 * @var ServerAPI
@@ -30,6 +30,7 @@ class PocketMinecraftServer{
 	public $api;
 	
 	private function load(){
+        global $dolog;
 		$this->version = new VersionString();
 		/*if(defined("DEBUG") and DEBUG >= 0){
 			@cli_set_process_title("PocketMine-MP ".MAJOR_VERSION);
@@ -45,10 +46,7 @@ class PocketMinecraftServer{
 		$this->eventsID = array();
 		$this->handlers = array();
 		$this->invisible = false;
-		$this->levelData = false;
 		$this->difficulty = 1;
-		$this->tiles = array();
-		$this->entities = array();
 		$this->custom = array();
 		$this->evCnt = 1;
 		$this->handCnt = 1;
@@ -57,11 +55,11 @@ class PocketMinecraftServer{
 		$this->schedule = array();
 		$this->scheduleCnt = 1;
 		$this->description = "";
-		$this->whitelist = false;
 		$this->memoryStats = array();
 		$this->clients = array();
 		$this->spawn = false;
 		$this->saveEnabled = true;
+		$this->whitelist = false;
 		$this->tickMeasure = array_fill(0, 40, 0);
 		$this->setType("normal");
 		$this->interface = new MinecraftInterface("255.255.255.255", $this->port, $this->serverip);
@@ -70,6 +68,25 @@ class PocketMinecraftServer{
 		if(!defined("NO_THREADS")){
 			$this->asyncThread = new AsyncMultipleQueue();
 		}
+        console("[Steadfast] Loading properties...");
+        $this->sf_config = new Config(DATA_PATH . "steadfast.properties", CONFIG_PROPERTIES, array(
+            "death-msg" => true,
+            "join-msg" => true,
+            "quit-msg" => true,
+            "enable-remote-plugin-fetch" => false,
+            "ftp-host" => "",
+            "ftp-user" => "",
+            "ftp-pass" => "",
+            "ftp-path" => "",
+            "ftp-min-lines" => 1,
+            "remote-plugin-shutdown-on-failure" => true,
+            "update-client-on-world-switch" => true,
+            "update-frequency" => 8,
+            "save-player-data" => true,
+            "save-console-data" => true
+        ));
+
+        $dolog = $this->sf_config->get("save-console-data");
 	}
 
 	function __construct($name, $gamemode = SURVIVAL, $seed = false, $port = 19132, $serverip = "0.0.0.0"){
@@ -129,7 +146,7 @@ class PocketMinecraftServer{
 	public function startDatabase(){
 		$this->preparedSQL = new stdClass();
 		$this->preparedSQL->entity = new stdClass();
-		$this->database = new SQLite3(":memory:");
+		$this->database = new SQLite3(":memory:", SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
 		$this->query("PRAGMA journal_mode = OFF;");
 		$this->query("PRAGMA encoding = \"UTF-8\";");
 		$this->query("PRAGMA secure_delete = OFF;");
@@ -231,6 +248,10 @@ class PocketMinecraftServer{
 					$d .= Utils::writeShort(strlen($key)).$key . Utils::writeInt(strlen($value)).$value;
 				}
 				break;
+			case ASYNC_FUNCTION:
+				$params = serialize($data["arguments"]);
+				$d .= Utils::writeShort(strlen($data["function"])).$data["function"] . Utils::writeInt(strlen($params)) . $params;
+				break;
 			default:
 				return false;
 		}
@@ -257,6 +278,12 @@ class PocketMinecraftServer{
 					$len = Utils::readInt(substr($this->asyncThread->output, $offset, 4));
 					$offset += 4;
 					$data["result"] = substr($this->asyncThread->output, $offset, $len);
+					$offset += $len;
+					break;
+				case ASYNC_FUNCTION:
+					$len = Utils::readInt(substr($this->asyncThread->output, $offset, 4));
+					$offset += 4;
+					$data["result"] = unserialize(substr($this->asyncThread->output, $offset, $len));
 					$offset += $len;
 					break;
 			}
@@ -316,7 +343,6 @@ class PocketMinecraftServer{
 			$handlers->finalize();
 			foreach($call as $hnid => $boolean){
 				if($result !== false and $result !== true){
-					$called[$hnid] = true;
 					$handler = $this->handlers[$hnid];
 					if(is_array($handler)){
 						$method = $handler[1];
@@ -388,6 +414,7 @@ class PocketMinecraftServer{
 		if($this->stop === true){
 			return;
 		}
+		ini_set("memory_limit", "-1"); //Fix error dump not dumped on memory problems
 		console("[SEVERE] An unrecovereable has ocurred and the server has crashed. Creating an error dump");
 		$dump = "```\r\n# PocketMine-MP Error Dump ".date("D M j H:i:s T Y")."\r\n";
 		$er = error_get_last();
@@ -451,6 +478,7 @@ class PocketMinecraftServer{
 		}
 		
 		$dump .= "Loaded Modules: ".var_export($extensions, true)."\r\n";
+		$this->checkMemory();
 		$dump .= "Memory Usage Tracking: \r\n".chunk_split(base64_encode(gzdeflate(implode(";", $this->memoryStats), 9)))."\r\n";
 		ob_start();
 		phpinfo();
@@ -468,8 +496,9 @@ class PocketMinecraftServer{
 			$this->tickMeasure[] = $this->lastTick = $time;
 			unset($this->tickMeasure[key($this->tickMeasure)]);
 			++$this->ticks;
-			$this->tickerFunction($time);
+			return $this->tickerFunction($time);
 		}
+		return 0;
 	}
 
 	public static function clientID($ip, $port){
@@ -479,7 +508,7 @@ class PocketMinecraftServer{
 
 	public function packetHandler(Packet $packet){
 		$data =& $packet;
-		$CID = PocketMinecraftServer::clientID($packet->ip, $packet->port);
+		$CID = MainServer::clientID($packet->ip, $packet->port);
 		if(isset($this->clients[$CID])){
 			$this->clients[$CID]->handlePacket($packet);
 		}else{
@@ -563,6 +592,8 @@ class PocketMinecraftServer{
 			if($packet instanceof Packet){
 				$this->packetHandler($packet);
 				$lastLoop = 0;
+			}elseif($this->tick() > 0){
+				$lastLoop = 0;
 			}else{
 				++$lastLoop;
 				if($lastLoop < 16){
@@ -618,6 +649,7 @@ class PocketMinecraftServer{
 		$this->preparedSQL->selectActions->bindValue(":time", $time, SQLITE3_FLOAT);
 		$actions = $this->preparedSQL->selectActions->execute();
 
+		$actionCount = 0;
 		if($actions instanceof SQLite3Result){
 			while(($action = $actions->fetchArray(SQLITE3_ASSOC)) !== false){
 				$cid = $action["ID"];
@@ -628,6 +660,7 @@ class PocketMinecraftServer{
 				if(!@is_callable($this->schedule[$cid][0])){
 					$return = false;
 				}else{
+					++$actionCount;
 					$return = call_user_func($this->schedule[$cid][0], $this->schedule[$cid][1], $this->schedule[$cid][2]);
 				}
 
@@ -639,6 +672,7 @@ class PocketMinecraftServer{
 			}
 			$actions->finalize();
 		}
+		return $actionCount;
 	}
 
 	public function event($event,callable $func){

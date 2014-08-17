@@ -21,7 +21,7 @@
 
 class Level{
 	public $entities, $tiles, $blockUpdates, $nextSave, $players = array(), $level;
-	private $time, $startCheck, $startTime, $server, $name, $usedChunks, $changedBlocks, $changedCount, $stopTime;
+	private $time, $startCheck, $startTime, $server, $name, $usedChunks, $changedBlocks, $changedCount, $stopTime,$ochunkCache;
 	
 	public function __construct(PMFLevel $level, Config $entities, Config $tiles, Config $blockUpdates, $name){
 		$this->server = ServerAPI::request();
@@ -34,7 +34,7 @@ class Level{
 		$this->nextSave = $this->startCheck = microtime(true);
 		$this->nextSave += 90;
 		$this->stopTime = false;
-		$this->server->schedule(15, array($this, "checkThings"), array(), true);
+		$this->server->schedule(2, array($this, "checkThings"), array(), true);
 		$this->server->schedule(20 * 13, array($this, "checkTime"), array(), true);
 		$this->name = $name;
 		$this->usedChunks = array();
@@ -423,6 +423,96 @@ class Level{
 		if(ADVANCED_CACHE == true and $Yndex == 0xff){
 			Cache::add($identifier, $ordered, 60);
 		}		
+		return $ordered;
+	}
+
+	public function getOrderedFullChunk($X, $Z){
+        //todo: make asynchronous
+		if(!isset($this->level)){
+			return false;
+		}
+		if(ADVANCED_CACHE == true){
+			$identifier = "world:{$this->name}:$X:$Z";
+			if(($cache = Cache::get($identifier)) !== false){
+				return $cache;
+			}
+		}
+
+		$orderedIds = "";
+		$orderedData = "";
+		$orderedSkyLight = str_repeat("\x00", 16*16*64);
+		$orderedLight = str_repeat("\x00", 16*16*64);
+		$orderedBiomeIds = str_repeat("\x01", 16*16); //all plains, according to PocketMine 1.4 source
+		$orderedBiomeColors = str_repeat("\x00\x85\xb2\x4a", 256); // also PM 1.4
+		$tileEntities = "";
+		$this->level->loadChunk($X, $Z);
+		
+		$miniChunks = [];
+		
+		for($y = 0; $y < 8; ++$y){
+			$miniChunks[$y] = $this->level->getMiniChunk($X, $Z, $y);
+		}
+		
+		for ($i = 0; $i < 16; $i++){
+			for ($j = 0; $j < 16; $j++){
+				$bIndex = ($i << 5) + ($j << 9);
+				foreach($miniChunks as $chunk){
+					$orderedIds .= substr($chunk, $bIndex, 16);
+					$orderedData .= substr($chunk, $bIndex + 16, 8);
+				}
+			}
+		}
+		
+		$chunkTiles = [];
+		
+		$tiles = $this->server->query("SELECT ID FROM tiles WHERE spawnable = 1 AND level = '".$this->getName()."' AND x >= ".($X * 16 - 1)." AND x < ".($X * 16 + 17)." AND z >= ".($Z * 16 - 1)." AND z < ".($Z * 16 + 17).";");
+		if($tiles !== false and $tiles !== true){
+			while(($tile = $tiles->fetchArray(SQLITE3_ASSOC)) !== false){
+				$tile = $this->server->api->tile->getByID($tile["ID"]);
+				if($tile instanceof Tile){
+					$chunkTiles[] = $tile;
+				}
+			}
+		}
+
+		$nbt = new NBT_new(NBT_new::LITTLE_ENDIAN);
+        foreach($chunkTiles as $tile){
+			switch($tile->class){
+				case "Sign":
+					$text = $tile->getText();
+						$nbt->setData(new Compound("", array(
+							new String("Text1", $text[0]),
+							new String("Text2", $text[1]),
+							new String("Text3", $text[2]),
+							new String("Text4", $text[3]),
+							new String("id", "Sign"),
+							new Int("x", (int) $tile->x),
+							new Int("y", (int) $tile->y),
+							new Int("z", (int) $tile->z)
+						)));
+						$tileEntities .= $nbt->write();
+					break;
+				case "Furnace":
+						//nutting, not spawnable :D
+					break;
+				case "Chest":
+						$nbt->setData(new Compound("", array(
+							new String("id", "Chest"),
+							new Int("x", (int) $tile->x),
+							new Int("y", (int) $tile->y),
+							new Int("z", (int) $tile->z)
+						)));
+						$tileEntities .= $nbt->write();
+					break;
+			}
+		}
+		$orderedUncompressed = Utils::writeLInt($X) . Utils::writeLInt($Z) .
+		$orderedIds . $orderedData . $orderedSkyLight . $orderedLight .
+		$orderedBiomeIds . $orderedBiomeColors . $tileEntities;
+		$ordered = zlib_encode($orderedUncompressed, ZLIB_ENCODING_DEFLATE, 6);
+		if(ADVANCED_CACHE == true){
+			Cache::add($identifier, $ordered, 60);
+		}
 		return $ordered;
 	}
 

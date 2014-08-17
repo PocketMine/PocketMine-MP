@@ -74,9 +74,8 @@ class Config{
      * @param array $default
      * @param null|boolean $correct
      */
-    public function __construct($file, $type = CONFIG_DETECT, $default = array(), &$correct = null){
-		$this->load($file, $type, $default);
-		$correct = $this->check();
+    public function __construct($file, $type = CONFIG_DETECT, $default = array(), &$correct = null,$save = true){
+		$this->load($file, $type, $default, $save);
 	}
 	
 	public function reload(){	
@@ -84,7 +83,6 @@ class Config{
 		unset($this->correct);
 		unset($this->type);
 		$this->load($this->file);
-		$correct = $this->check();
 	}
 	
 	public function fixYAMLIndexes($str){
@@ -98,7 +96,7 @@ class Config{
      *
      * @return boolean
      */
-    public function load($file, $type = CONFIG_DETECT, $default = array()){
+    public function load($file, $type = CONFIG_DETECT, $default = array(), $save = true){
 		$this->correct = true;
 		$this->type = (int) $type;
 		$this->file = $file;
@@ -107,7 +105,7 @@ class Config{
 		}
 		if(!file_exists($file)){
 			$this->config = $default;
-			$this->save();
+            if($save) $this->save();
 		}else{			
 			if($this->type === CONFIG_DETECT){
 				$extension = explode(".", basename($this->file));
@@ -141,7 +139,6 @@ class Config{
 					default:
 						$this->correct = false;
 						return false;
-						break;
 				}
 				if(!is_array($this->config)){
 					$this->config = $default;

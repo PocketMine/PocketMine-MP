@@ -19,30 +19,22 @@
  *
 */
 
-class MoveEntityPacket_PosRot extends RakNetDataPacket{
-	public $eid;
-	public $x;
-	public $y;
-	public $z;
-	public $yaw;
-	public $pitch;
+class UnloadChunkPacket extends RakNetDataPacket{
+	public $chunkX;
+	public $chunkZ;
 	
 	public function pid(){
-		return ProtocolInfo::MOVE_ENTITY_PACKET_POSROT;
+		return ProtocolInfo::UNLOAD_CHUNK_PACKET;
 	}
 	
 	public function decode(){
-		
+
 	}
 	
 	public function encode(){
 		$this->reset();
-		$this->putInt($this->eid);
-		$this->putFloat($this->x);
-		$this->putFloat($this->y);
-		$this->putFloat($this->z);
-		$this->putFloat($this->yaw);
-		$this->putFloat($this->pitch);
+		$this->putInt($this->chunkX);
+		$this->putInt($this->chunkZ);
 	}
 
 }

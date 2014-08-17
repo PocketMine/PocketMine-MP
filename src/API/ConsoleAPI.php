@@ -26,13 +26,12 @@ class ConsoleAPI{
 		$this->cmds = array();
 		$this->alias = array();
 		$this->server = ServerAPI::request();
-		$this->last = microtime(true);
 	}
 
 	public function init(){
 		$this->server->schedule(2, array($this, "handle"), array(), true);
 		if(!defined("NO_THREADS")){
-			$this->loop = new ConsoleLoop();
+			$this->loop = new CommandReader();
 		}
 		$this->register("help", "[page|command name]", array($this, "defaultCommands"));
 		$this->register("status", "", array($this, "defaultCommands"));
@@ -45,10 +44,6 @@ class ConsoleAPI{
 	function __destruct(){
 		$this->server->deleteEvent($this->event);
 		if(!defined("NO_THREADS")){
-			$this->loop->stop();
-			$this->loop->notify();
-			//@fclose($this->loop->fp);
-			usleep(50000);
 			$this->loop->kill();
 			//$this->loop->join();
 		}
@@ -250,7 +245,7 @@ class ConsoleAPI{
 			if(($d1 = $this->server->api->dhandle("console.command.".$cmd, array("cmd" => $cmd, "parameters" => $params, "issuer" => $issuer, "alias" => $alias))) === false
 			or ($d2 = $this->server->api->dhandle("console.command", array("cmd" => $cmd, "parameters" => $params, "issuer" => $issuer, "alias" => $alias))) === false){
 				$output = "You don't have permissions to use this command.\n";
-			}elseif($d1 !== true and $d2 !== true){
+			}elseif($d1 !== true and (!isset($d2) or $d2 !== true)){
 				if(isset($this->cmds[$cmd]) and is_callable($this->cmds[$cmd])){
 					$output = @call_user_func($this->cmds[$cmd], $cmd, $params, $issuer, $alias);
 				}elseif($this->server->api->dhandle("console.command.unknown", array("cmd" => $cmd, "params" => $params, "issuer" => $issuer, "alias" => $alias)) !== false){
@@ -269,9 +264,9 @@ class ConsoleAPI{
 		if(defined("NO_THREADS")){
 			return;
 		}
-		if($this->loop->line !== false){
-			$line = preg_replace("#\\x1b\\x5b([^\\x1b]*\\x7e|[\\x40-\\x50])#", "", trim($this->loop->line));
-			$this->loop->line = false;
+
+		if(($line = $this->loop->getLine()) !== null){
+			$line = preg_replace("#\\x1b\\x5b([^\\x1b]*\\x7e|[\\x40-\\x50])#", "", trim($line));
 			$output = $this->run($line, "console");
 			if($output != ""){
 				$mes = explode("\n", trim($output));
@@ -279,55 +274,78 @@ class ConsoleAPI{
 					console("[CMD] ".$m);	
 				}
 			}
-		}else{
-			$this->loop->notify();
 		}
 	}
 
 }
 
-class ConsoleLoop extends Thread{
-	public $line;
-	public $stop;
-	public $base;
-	public $ev;
-	public $fp;
-	public function __construct(){
-		$this->line = false;
-		$this->stop = false;
-		$this->start();
-	}
+class CommandReader extends \Thread{
 
-	public function stop(){
-		$this->stop = true;
+	private $stream;
+	/** @var resource */
+	private $fp;
+	private $readline;
+
+	/** @var \Threaded */
+	private $buffer;
+
+	/**
+	 * @param string $stream
+	 */
+	public function __construct($stream = "php://stdin"){
+		$this->stream = $stream;
+		$this->start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
 	}
 
 	private function readLine(){
-		if($this->fp){
+		if(!$this->readline){
 			$line = trim(fgets($this->fp));
 		}else{
-			$line = trim(readline(""));
+			$line = trim(readline("> "));
 			if($line != ""){
-				readline_add_history( $line );
+				readline_add_history($line);
 			}
 		}
+
 		return $line;
 	}
 
+	/**
+	 * Reads a line from console, if available. Returns null if not available
+	 *
+	 * @return string|null
+	 */
+	public function getLine(){
+		if($this->buffer->count() !== 0){
+			return $this->buffer->synchronized(function (){
+				return $this->buffer->shift();
+			});
+		}
+
+		return null;
+	}
+
 	public function run(){
-		if(!extension_loaded("readline")){
-			$this->fp = fopen("php://stdin", "r");
+		$this->buffer = new \Threaded;
+		if(extension_loaded("readline") and $this->stream === "php://stdin"){
+			$this->readline = true;
+		}else{
+			$this->readline = false;
+			$this->fp = fopen($this->stream, "r");
+			stream_set_blocking($this->fp, 1); //Non-blocking STDIN won't work on Windows
 		}
 
-		while($this->stop === false){
-			$this->line = $this->readLine();
-			$this->wait();
-			$this->line = false;
+		$lastLine = microtime(true);
+		while(true){
+			if(($line = $this->readLine()) !== ""){
+				$this->buffer->synchronized(function (\Threaded $buffer, $line){
+					$buffer[] = preg_replace("#\\x1b\\x5b([^\\x1b]*\\x7e|[\\x40-\\x50])#", "", $line);
+				}, $this->buffer, $line);
+				$lastLine = microtime(true);
+			}elseif((microtime(true) - $lastLine) <= 0.1){ //Non blocking! Sleep to save CPU
+				usleep(40000);
+			}
 		}
-
-		if(!extension_loaded("readline")){
-			@fclose($fp);
-		}
-		exit(0);
 	}
 }
+

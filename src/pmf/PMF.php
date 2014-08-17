@@ -23,7 +23,7 @@ define("PMF_CURRENT_VERSION", 0x01);
 
 class PMF{
 	protected $fp;
-	protected $file;
+	public $file;
 	private $version;
 	private $type;
 	

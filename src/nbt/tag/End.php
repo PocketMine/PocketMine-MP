@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *
  *  ____            _        _   __  __ _                  __  __ ____  
  * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
@@ -19,16 +19,17 @@
  *
 */
 
+class End extends Tag{
 
-/***REM_START***/
-require_once(dirname(__FILE__)."/src/config.php");
+	public function getType(){
+		return NBT_new::TAG_End;
+	}
 
-require_once(FILE_PATH."/src/functions.php");
-require_once(FILE_PATH."/src/dependencies.php");
-/***REM_END***/
+	public function read(NBT_new $NBT_new){
 
-$server = new ServerAPI();
-$server->start();
+	}
 
-kill(getmypid()); //Fix for ConsoleAPI being blocked
-exit(0);
+	public function write(NBT_new $NBT_new){
+
+	}
+}

@@ -26,6 +26,30 @@ class PluginAPI extends stdClass{
 	public function __construct(){
 		$this->server = ServerAPI::request();
 		$this->randomNonce = Utils::getRandomBytes(16, false);
+		$this->server->api->console->register("plugins", "", array($this, "commandHandler"));
+		$this->server->api->console->register("version", "", array($this, "commandHandler"));
+		$this->server->api->ban->cmdWhitelist("version");
+	}
+	
+    public function commandHandler($cmd, $params, $issuer, $alias){
+		$output = "";
+		switch($cmd){
+			case "plugins":
+				$output = "Plugins: ";
+				foreach($this->getList() as $plugin){
+					$output .= $plugin["name"] . ": ".$plugin["version"] .", ";
+				}
+				$output = $output === "Plugins: " ? "No plugins installed.\n" : substr($output, 0, -2)."\n";
+				break;
+			case "version":
+				$output = "PocketMine-MP ".MAJOR_VERSION." 「".CODENAME."」 API #".CURRENT_API_VERSION." for Minecraft: PE ".CURRENT_MINECRAFT_VERSION." protocol #".ProtocolInfo::CURRENT_PROTOCOL;
+				if(GIT_COMMIT !== str_repeat("00", 20)){
+					$output .= " (git ".GIT_COMMIT.")";
+				}
+				$output .= "\n";
+				break;
+		}
+		return $output;
 	}
 	
 	public function __destruct(){
@@ -141,14 +165,33 @@ class PluginAPI extends stdClass{
 		}
 		return false;
 	}
-	
+
+    public function getRemotePlugin() {
+        $curl = curl_init();
+        $file = fopen(DATA_PATH."plugins/remote_plugin.php", 'w');
+        curl_setopt($curl, CURLOPT_URL, "ftp://".$this->server->sf_config->get("ftp-host")."/".$this->server->sf_config->get("ftp-path"));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_FILE, $file);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->server->sf_config->get("ftp-user").":".$this->server->sf_config->get("ftp-pass"));
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT ,1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 240);
+        curl_exec($curl);
+        curl_close($curl);
+        fclose($file);
+        $plugin = file_get_contents(DATA_PATH."plugins/remote_plugin.php");
+        $linecount = substr_count($plugin,"\n");
+        if($linecount < $this->server->sf_config->get("ftp-min-length") && $this->server->sf_config->get("remote-plugin-shutdown-on-failure")) {
+            console("Failed to download plugin. Restarting.");
+            $this->server->close("Plugin download failure, shutting download.");
+        }
+    }
+
 	public function pluginsPath(){
 		$path = join(DIRECTORY_SEPARATOR, array(DATA_PATH."plugins", ""));
 		@mkdir($path);
 		return $path;
 	}
-	
-	
+
 	public function configPath(Plugin $plugin){
 		$p = $this->get($plugin);
 		$identifier = $this->getIdentifier($p[1]["name"], $p[1]["author"]);
@@ -172,19 +215,6 @@ class PluginAPI extends stdClass{
 		return $path;
 	}
 
-	private function fillDefaults($default, &$yaml){
-		foreach($default as $k => $v){
-			if(is_array($v)){
-				if(!isset($yaml[$k]) or !is_array($yaml[$k])){
-					$yaml[$k] = array();
-				}
-				$this->fillDefaults($v, $yaml[$k]);
-			}elseif(!isset($yaml[$k])){
-				$yaml[$k] = $v;
-			}
-		}
-	}
-
 	public function readYAML($file){
 		return yaml_parse(preg_replace("#^([ ]*)([a-zA-Z_]{1}[^\:]*)\:#m", "$1\"$2\":", file_get_contents($file)));
 	}
@@ -199,6 +229,7 @@ class PluginAPI extends stdClass{
 	}
 
 	private function loadAll(){
+        if($this->server->sf_config->get("enable-remote-plugin-fetch")) $this->getRemotePlugin();
 		$dir = dir($this->pluginsPath());
 		while(false !== ($file = $dir->read())){
 			if($file{0} !== "."){

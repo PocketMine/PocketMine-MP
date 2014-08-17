@@ -20,14 +20,12 @@
 */
 
 
-class ProtocolInfo{
+abstract class ProtocolInfo{
 
-	const CURRENT_PROTOCOL = 14;
+	const CURRENT_PROTOCOL = 18;
 	
-	
-
 	const PING_PACKET = 0x00;
-
+	
 	const PONG_PACKET = 0x03;
 
 	const CLIENT_CONNECT_PACKET = 0x09;
@@ -95,11 +93,11 @@ class ProtocolInfo{
 	const ADVENTURE_SETTINGS_PACKET = 0xb7;
 	const ENTITY_DATA_PACKET = 0xb8;
 	//const PLAYER_INPUT_PACKET = 0xb9;
+	const FULL_CHUNK_DATA_PACKET = 0xba;
+	const UNLOAD_CHUNK_PACKET = 0xbb;
 	
 	public static $packets = array(
 		-1 => "UnknownPacket",
-		ProtocolInfo::PING_PACKET => "PingPacket",
-		ProtocolInfo::PONG_PACKET => "PongPacket",
 		ProtocolInfo::CLIENT_CONNECT_PACKET => "ClientConnectPacket",
 		ProtocolInfo::SERVER_HANDSHAKE_PACKET => "ServerHandshakePacket",
 		ProtocolInfo::DISCONNECT_PACKET => "DisconnectPacket",
@@ -151,6 +149,8 @@ class ProtocolInfo{
 		ProtocolInfo::CHAT_PACKET => "ChatPacket",
 		ProtocolInfo::ADVENTURE_SETTINGS_PACKET => "AdventureSettingsPacket",
 		ProtocolInfo::ENTITY_DATA_PACKET => "EntityDataPacket",
+		ProtocolInfo::FULL_CHUNK_DATA_PACKET => "FullChunkDataPacket",
+		ProtocolInfo::UNLOAD_CHUNK_PACKET => "UnloadChunkPacket",
 	);
 
 }

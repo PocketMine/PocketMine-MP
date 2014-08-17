@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  *
  *  ____            _        _   __  __ _                  __  __ ____  
  * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
@@ -19,24 +19,24 @@
  *
 */
 
-class ChunkDataPacket extends RakNetDataPacket{
-	public $chunkX;
-	public $chunkZ;
-	public $data;
-	
-	public function pid(){
-		return ProtocolInfo::CHUNK_DATA_PACKET;
-	}
-	
-	public function decode(){
+class IntArray extends NamedTag{
 
-	}
-	
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->chunkX);
-		$this->putInt($this->chunkZ);
-		$this->put($this->data);
+	public function getType(){
+		return NBT_new::TAG_IntArray;
 	}
 
+	public function read(NBT_new $NBT_new){
+		$this->value = [];
+		$size = $NBT_new->getInt();
+		for($i = 0; $i < $size and !$NBT_new->feof(); ++$i){
+			$this->value[] = $NBT_new->getInt();
+		}
+	}
+
+	public function write(NBT_new $NBT_new){
+		$NBT_new->putInt(count($this->value));
+		foreach($this->value as $v){
+			$NBT_new->putInt($v);
+		}
+	}
 }

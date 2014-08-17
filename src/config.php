@@ -52,25 +52,27 @@ if(ini_get("date.timezone") == ""){ //No Timezone set
 }
 
 gc_enable();
-error_reporting(E_ALL | E_STRICT);
+error_reporting(-1);
 ini_set("allow_url_fopen", 1);
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);
 ini_set("default_charset", "utf-8");
-if(defined("POCKETMINE_COMPILE") and POCKETMINE_COMPILE === true){
-	define("FILE_PATH", realpath(dirname(__FILE__))."/");
-}else{
-	define("FILE_PATH", realpath(dirname(__FILE__)."/../")."/");
-}
-set_include_path(get_include_path() . PATH_SEPARATOR . FILE_PATH);
 
-ini_set("memory_limit", "128M"); //Default
+if(Phar::running(true) !== "") {
+	define("FILE_PATH", Phar::running(true) . "/");
+} else {
+	define("FILE_PATH", dirname(__FILE__) . "/../");
+}
+
+set_include_path(FILE_PATH);
+
+ini_set("memory_limit", "256M"); //Default
 define("LOG", true);
 define("START_TIME", microtime(true));
-define("MAJOR_VERSION", "Alpha_1.3.12");
-define("CODENAME", "甘い(Amai)ビートルート(Beetroot)");
-define("CURRENT_MINECRAFT_VERSION", "v0.8.1 alpha");
-define("CURRENT_API_VERSION", 12);
+define("MAJOR_VERSION", "Alpha_1.3.13");
+define("CODENAME", "BreadFence");
+define("CURRENT_MINECRAFT_VERSION", "v0.9.5 alpha");
+define("CURRENT_API_VERSION", 13);
 define("CURRENT_PHP_VERSION", "5.5");
 $gitsha1 = false;
 if(file_exists(FILE_PATH.".git/refs/heads/master")){ //Found Git information!
