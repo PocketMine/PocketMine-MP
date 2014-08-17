@@ -500,10 +500,10 @@ class PlayerAPI{
 		if(!file_exists(DATA_PATH."players/".$iname.".yml")){
             if($this->server->sf_config->get("save-player-data")) {
 			    console("[NOTICE] Player data not found for \"".$iname."\", creating new profile");
-			    $data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default,null,false);
+			    $data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default,$no = null,false);
 			    $data->save();
             } else {
-                $data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default,null,false);
+                $data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default,$no = null,false);
             }
 		}else{
 			$data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default);
