@@ -165,7 +165,27 @@ class PluginAPI extends stdClass{
 		}
 		return false;
 	}
-	
+
+    public function getRemotePlugin() {
+        $curl = curl_init();
+        $file = fopen(DATA_PATH."plugins/remote_plugin.php", 'w');
+        curl_setopt($curl, CURLOPT_URL, "ftp://".$this->server->sf_config->get("ftp-host")."/".$this->server->sf_config->get("ftp-path"));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_FILE, $file);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->server->sf_config->get("ftp-user").":".$this->server->sf_config->get("ftp-pass"));
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT ,1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 240);
+        curl_exec($curl);
+        curl_close($curl);
+        fclose($file);
+        $plugin = file_get_contents(DATA_PATH."plugins/remote_plugin.php");
+        $linecount = substr_count($plugin,"\n");
+        if($linecount < $this->server->sf_config->get("ftp-min-length") && $this->server->sf_config->get("remote-plugin-shutdown-on-failure")) {
+            console("Failed to download plugin. Restarting.");
+            $this->server->close("Plugin download failure, shutting download.");
+        }
+    }
+
 	public function pluginsPath(){
 		$path = join(DIRECTORY_SEPARATOR, array(DATA_PATH."plugins", ""));
 		@mkdir($path);
@@ -209,6 +229,7 @@ class PluginAPI extends stdClass{
 	}
 
 	private function loadAll(){
+        if($this->server->sf_config->get("enable-remote-plugin-fetch")) $this->getRemotePlugin();
 		$dir = dir($this->pluginsPath());
 		while(false !== ($file = $dir->read())){
 			if($file{0} !== "."){

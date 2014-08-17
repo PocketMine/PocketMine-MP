@@ -306,7 +306,7 @@ class Player{
 			$this->resendQueue = array();
 			$this->ackQueue = array();
 			$this->server->api->player->remove($this->CID);
-			if($msg === true and $this->username != "" and $this->spawned !== false){
+			if($msg === true and $this->username != "" and $this->spawned !== false and $this->server->sf_config->get("quit-msg")){
 				$this->server->api->chat->broadcast($this->username." left the game");
 			}
 			$this->spawned = false;
@@ -938,7 +938,9 @@ class Player{
 				}
 				
                 if($pos->level->getName() !== $this->level->getName()) { // we're switching levels.
-                    $rf = new ClientRenderFix($this);
+                    if($this->server->sf_config->get("update-client-on-world-switch")) {
+                        $rf = new ClientRenderFix($this,$this->server->sf_config->get("update-frequency"));
+                    }
                 }
 				$this->level->freeAllChunks($this);
 				$this->level = $pos->level;
@@ -2403,6 +2405,10 @@ class Player{
 		$this->server->schedule(10, array($this, "teleport"), $pos);
 		$this->server->schedule(20, array($this, "teleport"), $pos);
 		$this->server->schedule(30, array($this, "teleport"), $pos);
+
+        if($this->server->sf_config->get("join-msg")) {
+            $this->server->api->chat->broadcast($this->username . " joined the game");
+        }
 		$this->server->handle("player.spawn", $this);
 	}
 

@@ -245,7 +245,7 @@ function error_handler($errno, $errstr, $errfile, $errline){
 }
 
 function logg($message, $name, $EOL = true, $level = 2, $close = false){
-	global $fpointers;
+	global $fpointers,$dolog;
 	if((!defined("DEBUG") or DEBUG >= $level) and (!defined("LOG") or LOG === true)){
 		$message .= $EOL === true ? PHP_EOL:"";
 		if(!isset($fpointers)){
@@ -254,7 +254,9 @@ function logg($message, $name, $EOL = true, $level = 2, $close = false){
 		if(!isset($fpointers[$name]) or $fpointers[$name] === false){
 			$fpointers[$name] = @fopen(DATA_PATH."/".$name.".log", "ab");
 		}
-		@fwrite($fpointers[$name], $message);
+        if($dolog) {
+            @fwrite($fpointers[$name], $message);
+        }
 		if($close === true){
 			fclose($fpointers[$name]);
 			unset($fpointers[$name]);

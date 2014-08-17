@@ -21,6 +21,7 @@
 
 class PlayerAPI{
 	private $server;
+
 	function __construct(){
 		$this->server = ServerAPI::request();
 	}
@@ -109,7 +110,9 @@ class PlayerAPI{
 							break;
 					}
 				}
-				$this->server->api->chat->broadcast($data["player"]->username . $message);
+                if($this->server->sf_config->get("death-msg")) {
+                    $this->server->api->chat->broadcast($data["player"]->username . $message);
+                }
 				return true;
 		}
 	}
@@ -495,9 +498,13 @@ class PlayerAPI{
 		);
 
 		if(!file_exists(DATA_PATH."players/".$iname.".yml")){
-			console("[NOTICE] Player data not found for \"".$iname."\", creating new profile");
-			$data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default);
-			$data->save();
+            if($this->server->sf_config->get("save-player-data")) {
+			    console("[NOTICE] Player data not found for \"".$iname."\", creating new profile");
+			    $data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default);
+			    $data->save();
+            } else {
+                $data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default);
+            }
 		}else{
 			$data = new Config(DATA_PATH."players/".$iname.".yml", CONFIG_YAML, $default);
 		}
@@ -510,8 +517,10 @@ class PlayerAPI{
 	}
 
 	public function saveOffline(Config $data){
-		$this->server->handle("player.offline.save", $data);
-		$data->save();
+        if($this->server->sf_config->get("save-player-data")) {
+            $this->server->handle("player.offline.save", $data);
+            $data->save();
+        }
 	}
 }
 

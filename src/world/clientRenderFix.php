@@ -21,7 +21,7 @@ class clientRenderFix {
     public $player;
     private $server, $startingFromX, $startingFromZ, $sideLength = 1, $doing = 0, $nUpdated = 0,$sideIndex = 0, $spiralDone = false,$startChunkX, $startChunkZ;
 
-    public function __construct($player) {
+    public function __construct($player,$freq) {
         if(!$player instanceof Player) return;
         $this->server = ServerAPI::request();
         $this->player = $player;
@@ -31,7 +31,7 @@ class clientRenderFix {
         $this->startingFromZ = round($player->entity->z,0);
         $this->startChunkZ = $this->block2Chunk( $this->startingFromZ);
         $this->lowerLeftChunkZ = $this->startChunkZ;
-        $this->server->schedule(8,array($this,"updateSpiral"),array(),true);
+        $this->server->schedule($freq,array($this,"updateSpiral"),array(),true);
         // Doing  0 = bottom, 1 = left side, 2 = top, 3 = right side.
     }
 

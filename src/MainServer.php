@@ -21,7 +21,7 @@
 
 class MainServer{
 	public $tCnt;
-	public $serverID, $interface, $database, $version, $invisible, $tickMeasure, $preparedSQL, $spawn, $whitelist, $seed, $stop, $gamemode, $difficulty, $name, $maxClients, $clients, $eidCnt, $custom, $description, $motd, $port, $saveEnabled;
+	public $sf_config,$serverID, $interface, $database, $version, $invisible, $tickMeasure, $preparedSQL, $spawn, $whitelist, $seed, $stop, $gamemode, $difficulty, $name, $maxClients, $clients, $eidCnt, $custom, $description, $motd, $port, $saveEnabled;
 	private $serverip, $evCnt, $handCnt, $events, $eventsID, $handlers, $serverType, $lastTick, $doTick, $ticks, $memoryStats, $schedule, $asyncThread, $async = array(), $asyncID = 0;
 
 	/**
@@ -30,6 +30,7 @@ class MainServer{
 	public $api;
 	
 	private function load(){
+        global $dolog;
 		$this->version = new VersionString();
 		/*if(defined("DEBUG") and DEBUG >= 0){
 			@cli_set_process_title("PocketMine-MP ".MAJOR_VERSION);
@@ -67,6 +68,25 @@ class MainServer{
 		if(!defined("NO_THREADS")){
 			$this->asyncThread = new AsyncMultipleQueue();
 		}
+        console("[Steadfast] Loading properties...");
+        $this->sf_config = new Config(DATA_PATH . "steadfast.properties", CONFIG_PROPERTIES, array(
+            "death-msg" => true,
+            "join-msg" => true,
+            "quit-msg" => true,
+            "enable-remote-plugin-fetch" => false,
+            "ftp-host" => "",
+            "ftp-user" => "",
+            "ftp-pass" => "",
+            "ftp-path" => "",
+            "ftp-min-lines" => 1,
+            "remote-plugin-shutdown-on-failure" => true,
+            "update-client-on-world-switch" => true,
+            "update-frequency" => 8,
+            "save-player-data" => true,
+            "save-console-data" => true
+        ));
+
+        $dolog = $this->sf_config->get("save-console-data");
 	}
 
 	function __construct($name, $gamemode = SURVIVAL, $seed = false, $port = 19132, $serverip = "0.0.0.0"){
