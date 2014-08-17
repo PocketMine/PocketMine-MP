@@ -477,7 +477,7 @@ class Level{
 
 		$nbt = new NBT_new(NBT_new::LITTLE_ENDIAN);
         foreach($chunkTiles as $tile){
-			switch($tile->id){
+			switch($tile->class){
 				case "Sign":
 					$text = $tile->getText();
 						$nbt->setData(new Compound("", array(
