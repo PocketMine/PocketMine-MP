@@ -1391,10 +1391,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 						Block::$creative[$slot][1],
 						1
 					);
-//					$this->inventory->setItem($index,$item);
-//					$this->inventory->setHotbarSlotIndex($index,$index); //links $hotbar[$index] to $slots[$index]
 					$this->inventory->setHeldItemIndex($index);
-//					$this->inventory->setItemInHand($item);
 				}else{
 					$this->inventory->setHeldItemSlot($slot);
 				}
