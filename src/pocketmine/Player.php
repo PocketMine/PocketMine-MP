@@ -23,7 +23,6 @@ namespace pocketmine;
 
 use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
-use pocketmine\entity\Arrow;
 use pocketmine\entity\DroppedItem;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Human;
@@ -66,9 +65,6 @@ use pocketmine\metadata\MetadataValue;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\Byte;
 use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Double;
-use pocketmine\nbt\tag\Enum;
-use pocketmine\nbt\tag\Float;
 use pocketmine\nbt\tag\Int;
 use pocketmine\nbt\tag\String;
 use pocketmine\network\protocol\AdventureSettingsPacket;
@@ -285,9 +281,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			return;
 		}
 		unset($this->hiddenPlayers[$player->getName()]);
-		if($player->isOnline()){
-            		$player->spawnTo($this);
-        	}
+		$player->spawnTo($this);
 	}
 
 	/**
@@ -1363,23 +1357,46 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 				if(($this->gamemode & 0x01) === 1){ //Creative mode match
 					$item = Item::get($packet->item, $packet->meta, 1);
-					$packet->slot = $this->getCreativeBlock($item);
+					$slot = $this->getCreativeBlock($item);//
 				}else{
 					$item = $this->inventory->getItem($packet->slot);
+					$slot = $packet->slot;
 				}
-
-				if(!isset($item) or $packet->slot === -1 or $item->getID() !== $packet->item or $item->getDamage() !== $packet->meta){
+				
+				if($packet->slot === -1){ //Air
+					if(($this->gamemode & 0x01) === Player::CREATIVE){
+						$found = false;
+						for($i = 0; $i < $this->inventory->getHotbarSize(); ++$i){
+							if($this->inventory->getHotbarSlotIndex($i) === -1){
+								$this->inventory->setHeldItemIndex($i);
+								$found = true;
+								break;
+							}
+						}
+						
+						if(!$found){ //couldn't find a empty slot (error)
+							$this->inventory->sendContents($this);
+							break;
+						}
+					}
+					else{
+						$this->inventory->setHeldItemSlot($packet->slot); //set Air
+					}
+				}elseif(!isset($item) or $slot === -1 or $item->getID() !== $packet->item or $item->getDamage() !== $packet->meta){ // packet error or not implemented
 					$this->inventory->sendContents($this);
 					break;
 				}elseif(($this->gamemode & 0x01) === Player::CREATIVE){
 					$item = Item::get(
-						Block::$creative[$packet->slot][0],
-						Block::$creative[$packet->slot][1],
+						Block::$creative[$slot][0],
+						Block::$creative[$slot][1],
 						1
 					);
-					$this->inventory->setItemInHand($item);
+//					$this->inventory->setItem($index,$item);
+//					$this->inventory->setHotbarSlotIndex($index,$index); //links $hotbar[$index] to $slots[$index]
+					$this->inventory->setHeldItemIndex($index);
+//					$this->inventory->setItemInHand($item);
 				}else{
-					$this->inventory->setHeldItemSlot($packet->slot);
+					$this->inventory->setHeldItemSlot($slot);
 				}
 
 				$this->inventory->sendHeldItem($this->hasSpawned);
@@ -1477,34 +1494,70 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				$packet->eid = $this->id;
 
 				switch($packet->action){
-					case 5: //Shot arrow
-						//if($this->entity->inAction === true){
-							if($this->inventory->getItemInHand()->getID() === Item::BOW){
-								$f = 1 * 2 * 1.5;
-								$nbt = new Compound("", [
-									"Pos" => new Enum("Pos", [
-											new Double("", $this->x),
-											new Double("", $this->y + 1.62),
-											new Double("", $this->z)
-										]),
-									"Motion" => new Enum("Motion", [
-											new Double("", -sin($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI) * $f),
-											new Double("", -sin($this->pitch / 180 * M_PI) * $f),
-											new Double("", cos($this->yaw / 180 * M_PI) * cos($this->pitch / 180 * M_PI) * $f)
-										]),
-									"Rotation" => new Enum("Rotation", [
-											new Float("", $this->yaw),
-											new Float("", $this->pitch)
-										]),
-								]);
-								$arrow = new Arrow($this->chunk, $nbt);
-								$arrow->spawnToAll();
+					/*case 5: //Shot arrow
+						if($this->entity->inAction === true){
+							if($this->getSlot($this->getCurrentEquipment())->getID() === BOW){
+								if($this->startAction !== false){
+									$time = microtime(true) - $this->startAction;
+									$d = array(
+										"x" => $this->entity->x,
+										"y" => $this->entity->y + 1.6,
+										"z" => $this->entity->z,
+									);
+									$e = $this->server->api->entity->add($this->getLevel(), ENTITY_OBJECT, OBJECT_ARROW, $d);
+									$e->yaw = $this->entity->yaw;
+									$e->pitch = $this->entity->pitch;
+									$rotation = ($this->entity->yaw - 90) % 360;
+									if($rotation < 0){
+										$rotation = (360 + $rotation);
+									}
+									$rotation = ($rotation + 180);
+									if($rotation >= 360){
+										$rotation = ($rotation - 360);
+									}
+									$X = 1;
+									$Z = 1;
+									$overturn = false;
+									if(0 <= $rotation and $rotation < 90){
+
+									}elseif(90 <= $rotation and $rotation < 180){
+										$rotation -= 90;
+										$X = (-1);
+										$overturn = true;
+									}elseif(180 <= $rotation and $rotation < 270){
+										$rotation -= 180;
+										$X = (-1);
+										$Z = (-1);
+									}elseif(270 <= $rotation and $rotation < 360){
+										$rotation -= 270;
+										$Z = (-1);
+										$overturn = true;
+									}
+									$rad = deg2rad($rotation);
+									$pitch = (-($this->entity->pitch));
+									$speed = 80;
+									$speedY = (sin(deg2rad($pitch)) * $speed);
+									$speedXZ = (cos(deg2rad($pitch)) * $speed);
+									if($overturn){
+										$speedX = (sin($rad) * $speedXZ * $X);
+										$speedZ = (cos($rad) * $speedXZ * $Z);
+									}
+									else{
+										$speedX = (cos($rad) * $speedXZ * $X);
+										$speedZ = (sin($rad) * $speedXZ * $Z);
+									}
+									$e->speedX = $speedX;
+									$e->speedZ = $speedZ;
+									$e->speedY = $speedY;
+									$e->spawnToAll();
+								}
 							}
-						//}
+						}
 						$this->startAction = false;
-						//$this->entity->inAction = false;
-						//$this->entity->updateMetadata();
+						$this->entity->inAction = false;
+						$this->entity->updateMetadata();
 						break;
+					*/
 					case 6: //get out of the bed
 						$this->stopSleep();
 						break;
@@ -1872,7 +1925,15 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 					if($packet->slot > $this->inventory->getSize()){
 						break;
 					}
-					$this->inventory->setHeldItemSlot($packet->slot);
+					if(($this->gamemode & 0x01) === Player::CREATIVE){
+						if($this->getCreativeBlock($packet->item) !== -1){
+							$this->inventory->setItem($packet->slot,$packet->item);
+							$this->inventory->setHotbarSlotIndex($packet->slot,$packet->slot); //links $hotbar[$packet->slot] to $slots[$packet->slot]
+						}
+					}
+					else{
+						$this->inventory->setHeldItemSlot($packet->slot);						
+					}
 					$transaction = new BaseTransaction($this->inventory, $packet->slot, $this->inventory->getItem($packet->slot), $packet->item);
 				}elseif(isset($this->windowIndex[$packet->windowid])){
 					$this->craftingType = 0;
@@ -1975,7 +2036,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 
 				break;
-			case ProtocolInfo::SEND_INVENTORY_PACKET: //TODO, Mojang, enable this ´^_^`
+			case ProtocolInfo::SEND_INVENTORY_PACKET: //TODO, Mojang, enable this ﾂｴ^_^`
 				if($this->spawned === false){
 					break;
 				}
