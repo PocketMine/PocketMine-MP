@@ -59,6 +59,9 @@ use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 
 abstract class Entity extends Position implements Metadatable{
+
+	const NETWORK_ID = -1;
+
 	public static $entityCount = 1;
 
 	/**
@@ -155,7 +158,7 @@ abstract class Entity extends Position implements Metadatable{
 		$this->justCreated = true;
 		$this->namedtag = $nbt;
 		$this->chunk = $chunk;
-		$this->setLevel($chunk->getProvider()->getLevel(), true); //Create a hard reference
+		$this->setLevel($chunk->getProvider()->getLevel()); //Create a hard reference
 		$this->server = $chunk->getProvider()->getLevel()->getServer();
 
 		$this->boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
@@ -664,7 +667,7 @@ abstract class Entity extends Position implements Metadatable{
 				$this->getLevel()->freeAllChunks($this);
 			}
 		}
-		$this->setLevel($targetLevel, true); //Hard reference
+		$this->setLevel($targetLevel, $this instanceof Player ? true : false); //Hard reference
 		$this->getLevel()->addEntity($this);
 		if($this instanceof Player){
 			$this->usedChunks = [];

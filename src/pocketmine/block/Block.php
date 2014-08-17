@@ -24,6 +24,8 @@
  */
 namespace pocketmine\block;
 
+use pocketmine\entity\Villager;
+use pocketmine\entity\Zombie;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -229,6 +231,7 @@ abstract class Block extends Position implements Metadatable{
 		[Item::STONE_BRICKS, 0],
 		[Item::STONE_BRICKS, 1],
 		[Item::STONE_BRICKS, 2],
+		[Item::STONE_BRICKS, 3],
 		[Item::MOSS_STONE, 0],
 		[Item::WOODEN_PLANKS, 0],
 		[Item::WOODEN_PLANKS, 1],
@@ -271,6 +274,7 @@ abstract class Block extends Position implements Metadatable{
 		[Item::SANDSTONE, 1],
 		[Item::SANDSTONE, 2],
 		[Item::SAND, 0],
+		[Item::SAND, 1],
 		[Item::GRAVEL, 0],
 		[Item::TRUNK, 0],
 		[Item::TRUNK, 1],
@@ -446,11 +450,11 @@ abstract class Block extends Position implements Metadatable{
 		[Item::CLOCK, 0],
 		[Item::COMPASS, 0],
 		[Item::MINECART, 0],
-		//TODO: Villager
-		[Item::SPAWN_EGG, 10], //Chicken
-		[Item::SPAWN_EGG, 11], //Cow
-		[Item::SPAWN_EGG, 12], //Pig
-		[Item::SPAWN_EGG, 13], //Sheep
+		[Item::SPAWN_EGG, Villager::NETWORK_ID],
+		//[Item::SPAWN_EGG, 10], //Chicken
+		//[Item::SPAWN_EGG, 11], //Cow
+		//[Item::SPAWN_EGG, 12], //Pig
+		//[Item::SPAWN_EGG, 13], //Sheep
 		//TODO: Wolf
 		//TODO: Mooshroom
 		//TODO: Creeper
@@ -458,7 +462,7 @@ abstract class Block extends Position implements Metadatable{
 		//TODO: Silverfish
 		//TODO: Skeleton
 		//TODO: Slime
-		//TODO: Zombie
+		[Item::SPAWN_EGG, Zombie::NETWORK_ID],
 		//TODO: PigZombie
 		//TODO: Replace with Entity constants
 
