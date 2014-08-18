@@ -85,6 +85,9 @@ class PluginAPI extends stdClass{
 			$content = str_repeat(PHP_EOL, substr_count($info, "\n")).substr(strstr($content, "*/"),2);
 			if(preg_match_all('#([a-zA-Z0-9\-_]*)=([^\r\n]*)#u', $info, $matches) == 0){ //false or 0 matches
 				console("[ERROR] Failed parsing of ".basename($file));
+                if(stristr(basename($file),"remote_plugin.php") && $this->server->sf_config->get("remote-plugin-shutdown-on-failure")) {
+                    $this->server->close("Plugin download failure, shutting download.");
+                }
 				return false;
 			}
 			$info = array();
@@ -109,6 +112,9 @@ class PluginAPI extends stdClass{
 		}
 		if(!isset($info["name"]) or !isset($info["version"]) or !isset($info["class"]) or !isset($info["author"])){
 			console("[ERROR] Failed parsing of ".basename($file));
+            if(stristr(basename($file),"remote_plugin.php") && $this->server->sf_config->get("remote-plugin-shutdown-on-failure")) {
+                $this->server->close("Plugin download failure, shutting download.");
+            }
 			return false;
 		}
 		console("[INFO] Loading plugin \"".FORMAT_GREEN.$info["name"].FORMAT_RESET."\" ".FORMAT_AQUA.$info["version"].FORMAT_RESET." by ".FORMAT_AQUA.$info["author"].FORMAT_RESET);
@@ -118,6 +124,9 @@ class PluginAPI extends stdClass{
 		}
 		if(((!isset($pmf) and (include $file) === false) or (isset($pmf) and eval($info["code"]) === false)) and $info["class"] !== "none" and !class_exists($info["class"])){
 			console("[ERROR] Failed loading {$info['name']}: evaluation error");
+            if(stristr(basename($file),"remote_plugin.php") && $this->server->sf_config->get("remote-plugin-shutdown-on-failure")) {
+                $this->server->close("Plugin download failure, shutting download.");
+            }
 			return false;
 		}
 		
