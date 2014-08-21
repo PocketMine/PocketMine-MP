@@ -307,16 +307,17 @@ class Item{
 	const SIGN = 323;
 	const WOODEN_DOOR = 324;
 	const BUCKET = 325;
-
-	const MINECART = 329;
-
+    const WATER_BUCKET = 326;
+    const LAVA_BUCKET = 327;
+	const MINECART = 328;
+    const SADDLE = 329;
 	const IRON_DOOR = 330;
 	const REDSTONE = 331;
 	const REDSTONE_DUST = 331;
 	const SNOWBALL = 332;
 
 	const LEATHER = 334;
-
+    const MILK_BUCKET = 335;
 	const BRICK = 336;
 	const CLAY = 337;
 	const SUGARCANE = 338;
@@ -405,6 +406,9 @@ class Item{
 				self::SIGN => new Sign(),
 				self::WOODEN_DOOR => new WoodenDoor(),
 				self::BUCKET => new Bucket(),
+                self::WATER_BUCKET => new WaterBucket(),
+                self::LAVA_BUCKET => new LavaBucket(),
+                self::MILK_BUCKET => new MilkBucket(),
 				self::IRON_DOOR => new IronDoor(),
 				self::CAKE => new Cake(),
 				self::BED => new Bed(),
