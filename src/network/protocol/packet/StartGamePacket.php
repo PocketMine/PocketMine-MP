@@ -46,7 +46,7 @@ class StartGamePacket extends RakNetDataPacket{
 		$this->putInt($this->gamemode);
 		$this->putInt($this->eid);
 		$this->putFloat($this->x);
-		$this->putFloat($this->y);
+		$this->putFloat($this->y + 1.62);
 		$this->putFloat($this->z);
 	}
 
