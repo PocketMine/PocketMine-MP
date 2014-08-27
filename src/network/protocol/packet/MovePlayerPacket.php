@@ -51,8 +51,7 @@ class MovePlayerPacket extends RakNetDataPacket{
 		$this->putFloat($this->yaw);
 		$this->putFloat($this->pitch);
 		$this->putFloat($this->bodyYaw);
-        $n = null;
-        $this->putByte($n);
+	        $this->buffer .= "\x00";
 	}
 
 }
