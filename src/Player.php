@@ -2403,9 +2403,9 @@ class Player{
 		$pos = new Position($this->data->get("position")["x"], $this->data->get("position")["y"], $this->data->get("position")["z"], $this->level);
 		$pos = $this->level->getSafeSpawn($pos);
 //		$this->teleport($pos);
-		$this->server->schedule(10, array($this, "teleport"), $pos);
+		//$this->server->schedule(10, array($this, "teleport"), $pos);
 		$this->server->schedule(20, array($this, "teleport"), $pos);
-		$this->server->schedule(30, array($this, "teleport"), $pos);
+		//$this->server->schedule(30, array($this, "teleport"), $pos);
 
         if($this->server->sf_config->get("join-msg")) {
             $this->server->api->chat->broadcast($this->username . " joined the game");
