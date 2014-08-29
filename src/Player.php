@@ -1001,7 +1001,7 @@ class Player{
 		$pk = new MovePlayerPacket;
 		$pk->eid = 0;
 		$pk->x = $pos->x;
-		$pk->y = $pos->y; //FIXME
+		$pk->y = $pos->y + 1.62; //FIXME
 		$pk->z = $pos->z;
 		$pk->bodyYaw = $yaw;
 		$pk->pitch = $pitch;
