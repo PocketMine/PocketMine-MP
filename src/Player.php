@@ -1006,6 +1006,7 @@ class Player{
 		$pk->bodyYaw = $yaw;
 		$pk->pitch = $pitch;
 		$pk->yaw = $yaw;
+		$pk->teleport = true;
 		$this->dataPacket($pk);
 	}
 	
