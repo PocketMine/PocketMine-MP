@@ -27,6 +27,7 @@ class MovePlayerPacket extends RakNetDataPacket{
 	public $yaw;
 	public $pitch;
 	public $bodyYaw;
+	public $teleport = false;
 	
 	public function pid(){
 		return ProtocolInfo::MOVE_PLAYER_PACKET;
@@ -40,6 +41,8 @@ class MovePlayerPacket extends RakNetDataPacket{
 		$this->yaw = $this->getFloat();
 		$this->pitch = $this->getFloat();
 		$this->bodyYaw = $this->getFloat();
+		$flags = $this->getByte();
+		$this->teleport = (($flags & 0x80) > 0);
 	}
 	
 	public function encode(){
@@ -51,7 +54,7 @@ class MovePlayerPacket extends RakNetDataPacket{
 		$this->putFloat($this->yaw);
 		$this->putFloat($this->pitch);
 		$this->putFloat($this->bodyYaw);
-	        $this->buffer .= "\x00";
+	        $this->putByte($this->teleport == true ? 0x80 : 0x00);
 	}
 
 }
