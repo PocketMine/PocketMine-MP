@@ -583,7 +583,7 @@ class Entity extends Position{
 						$pk = new MovePlayerPacket;
 						$pk->eid = $this->eid;
 						$pk->x = $this->x;
-						$pk->y = $this->y + 1.62; //FIXME
+						$pk->y = $this->y;
 						$pk->z = $this->z;
 						$pk->yaw = $this->yaw;
 						$pk->pitch = $this->pitch;

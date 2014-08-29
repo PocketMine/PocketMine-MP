@@ -1003,9 +1003,9 @@ class Player{
 		$pk->x = $pos->x;
 		$pk->y = $pos->y + 1.62; //FIXME
 		$pk->z = $pos->z;
-		$pk->bodyYaw = $yaw;
-		$pk->pitch = $pitch;
-		$pk->yaw = $yaw;
+		$pk->bodyYaw = $this->entity->yaw;
+		$pk->pitch = $this->entity->pitch;
+		$pk->yaw = $this->entity->yaw;
 		$pk->teleport = true;
 		$this->dataPacket($pk);
 	}
