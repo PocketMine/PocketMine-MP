@@ -16,6 +16,7 @@ settings:
  send-usage: true
  #Number of AsyncTask workers
  async-workers: 4
+ session-port-checking: true
 
 debug:
  #If > 1, it will show debug messages in the console
