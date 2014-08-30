@@ -109,6 +109,7 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 		$server = new RakLibServer($this->server->getLogger(), $this->server->getLoader(), $this->server->getPort(), $this->server->getIp() === "" ? "0.0.0.0" : $this->server->getIp());
 		$this->interface = new ServerHandler($server, $this);
 		$this->setName($this->server->getMotd());
+		$this->setPortCheck($this->server->getProperty("settings.session-port-checking", true));
 		$this->tickTask = $this->server->getScheduler()->scheduleRepeatingTask(new CallbackTask([$this, "doTick"]), 1);
 	}
 
