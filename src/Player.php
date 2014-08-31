@@ -1195,7 +1195,16 @@ class Player{
 			}
 		}
 	}
-	
+
+    public function getNametag() {
+        $this->entity->getName();
+    }
+
+    public function setNameTag($name) {
+        $this->entity->setName($name);
+        $this->server->api->entity->spawnToAll($this->entity);
+    }
+
 	public function handlePacket(RakNetPacket $packet){
 		if($this->connected === true){
 			$this->timeout = microtime(true) + 20;
