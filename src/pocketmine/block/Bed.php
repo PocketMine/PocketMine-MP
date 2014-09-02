@@ -22,6 +22,8 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\level\Level;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\network\protocol\ChatPacket;
 use pocketmine\Player;
 
@@ -33,14 +35,30 @@ class Bed extends Transparent{
 		$this->hardness = 1;
 	}
 
+	public function getBoundingBox(){
+		return new AxisAlignedBB(
+			$this->x,
+			$this->y,
+			$this->z,
+			$this->x + 1,
+			$this->y + 0.5625,
+			$this->z + 1
+		);
+	}
+
 	public function onActivate(Item $item, Player $player = null){
-		/*if($player instanceof Player and Server::getInstance()->api->time->getPhase($this->getLevel()) !== "night"){
+
+		$time = $this->getLevel()->getTime() % Level::TIME_FULL;
+
+		$isNight = ($time >= Level::TIME_NIGHT and $time < Level::TIME_SUNRISE);
+
+		if($player instanceof Player and !$isNight){
 			$pk = new ChatPacket;
 			$pk->message = "You can only sleep at night";
 			$player->dataPacket($pk);
 
 			return true;
-		}*/
+		}
 
 		$blockNorth = $this->getSide(2); //Gets the blocks around them
 		$blockSouth = $this->getSide(3);
@@ -57,10 +75,12 @@ class Bed extends Transparent{
 				$b = $blockEast;
 			}elseif($blockWest->getID() === $this->id and ($blockWest->meta & 0x08) === 0x08){
 				$b = $blockWest;
-			}elseif($player instanceof Player){
-				$pk = new ChatPacket;
-				$pk->message = "This bed is incomplete";
-				$player->dataPacket($pk);
+			}else{
+				if($player instanceof Player){
+					$pk = new ChatPacket;
+					$pk->message = "This bed is incomplete";
+					$player->dataPacket($pk);
+				}
 
 				return true;
 			}
@@ -78,12 +98,12 @@ class Bed extends Transparent{
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$down = $this->getSide(0);
 		if($down->isTransparent === false){
-			$faces = array(
+			$faces = [
 				0 => 3,
 				1 => 4,
 				2 => 2,
 				3 => 5,
-			);
+			];
 			$d = $player instanceof Player ? $player->getDirection() : 0;
 			$next = $this->getSide($faces[(($d + 3) % 4)]);
 			$downNext = $this->getSide(0);
@@ -132,9 +152,9 @@ class Bed extends Transparent{
 	}
 
 	public function getDrops(Item $item){
-		return array(
-			array(Item::BED, 0, 1),
-		);
+		return [
+			[Item::BED, 0, 1],
+		];
 	}
 
 }

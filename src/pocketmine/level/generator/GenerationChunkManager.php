@@ -22,7 +22,7 @@
 namespace pocketmine\level\generator;
 
 use pocketmine\level\ChunkManager;
-use pocketmine\level\format\SimpleChunk;
+use pocketmine\level\format\FullChunk;
 use pocketmine\level\Level;
 use pocketmine\utils\Random;
 
@@ -30,11 +30,8 @@ class GenerationChunkManager implements ChunkManager{
 
 	protected $levelID;
 
-	/** @var SimpleChunk[] */
+	/** @var FullChunk[] */
 	protected $chunks = [];
-
-	/** @var \SplObjectStorage<SimpleChunk> */
-	protected $unloadQueue;
 
 	/** @var Generator */
 	protected $generator;
@@ -44,6 +41,8 @@ class GenerationChunkManager implements ChunkManager{
 
 	protected $seed;
 
+	protected $changes = [];
+
 	public function __construct(GenerationManager $manager, $levelID, $seed, $class, array $options){
 		if(!is_subclass_of($class, "pocketmine\\level\\generator\\Generator")){
 			throw new \Exception("Class is not a subclass of Generator");
@@ -52,8 +51,6 @@ class GenerationChunkManager implements ChunkManager{
 		$this->levelID = $levelID;
 		$this->seed = $seed;
 		$this->manager = $manager;
-
-		$this->unloadQueue = new \SplObjectStorage();
 
 		$this->generator = new $class($options);
 		$this->generator->init($this, new Random($seed));
@@ -77,49 +74,44 @@ class GenerationChunkManager implements ChunkManager{
 	 * @param $chunkX
 	 * @param $chunkZ
 	 *
-	 * @return SimpleChunk
+	 * @return FullChunk
 	 */
 	public function getChunk($chunkX, $chunkZ){
 		$index = Level::chunkHash($chunkX, $chunkZ);
 		$chunk = !isset($this->chunks[$index]) ? $this->requestChunk($chunkX, $chunkZ) : $this->chunks[$index];
-		$this->unloadQueue->detach($chunk);
+		$this->changes[$index] = $chunk;
+
 		return $chunk;
 	}
 
 	/**
-	 * @param bool $set
-	 *
-	 * @return SimpleChunk[]
+	 * @return FullChunk[]
 	 */
-	public function getChangedChunks($set = true){
-		$changed = [];
-		foreach($this->chunks as $chunk){
-			if($chunk->hasChanged($set)){
-				$changed[] = $chunk;
-			}
-		}
+	public function getChangedChunks(){
+		return $this->changes;
+	}
 
-		return $changed;
+	public function cleanChangedChunks(){
+		$this->changes = [];
+	}
+
+	public function cleanChangedChunk($index){
+		unset($this->changes[$index]);
 	}
 
 	public function doGarbageCollection(){
-		if($this->unloadQueue->count() > 0){
-			/** @var SimpleChunk $chunk */
-			foreach($this->unloadQueue as $chunk){
-				if(!$chunk->hasChanged(false)){
-					unset($this->chunks[Level::chunkHash($chunk->getX(), $chunk->getZ())]);
-				}
-				$this->unloadQueue->detach($chunk);
+		foreach($this->chunks as $index => $chunk){
+			if(!isset($this->changes[$index]) or $chunk->isPopulated()){
+				unset($this->chunks[$index]);
+				unset($this->changes[$index]);
 			}
 		}
 
-		foreach($this->chunks as $chunk){
-			$this->unloadQueue->attach($chunk);
-		}
+		gc_collect_cycles();
 	}
 
 	public function generateChunk($chunkX, $chunkZ){
-		$this->chunks[Level::chunkHash($chunkX, $chunkZ)] = new SimpleChunk($chunkX, $chunkZ, 0);
+		$this->getChunk($chunkX, $chunkZ);
 		$this->generator->generateChunk($chunkX, $chunkZ);
 		$this->setChunkGenerated($chunkX, $chunkZ);
 	}
@@ -150,27 +142,31 @@ class GenerationChunkManager implements ChunkManager{
 	}
 
 	public function setChunkGenerated($chunkX, $chunkZ){
-		$this->getChunk($chunkX, $chunkZ)->setGenerated(true);
+		$chunk = $this->getChunk($chunkX, $chunkZ);
+		$chunk->setGenerated(true);
 	}
 
 	public function setChunkPopulated($chunkX, $chunkZ){
-		$this->getChunk($chunkX, $chunkZ)->setPopulated(true);
+		$chunk = $this->getChunk($chunkX, $chunkZ);
+		$chunk->setPopulated(true);
 	}
 
 	protected function requestChunk($chunkX, $chunkZ){
 		$chunk = $this->manager->requestChunk($this->levelID, $chunkX, $chunkZ);
 		$this->chunks[$index = Level::chunkHash($chunkX, $chunkZ)] = $chunk;
-		return $this->chunks[$index];
+
+		return $chunk;
 	}
 
 	/**
-	 * @param int         $chunkX
-	 * @param int         $chunkZ
-	 * @param SimpleChunk $chunk
+	 * @param int       $chunkX
+	 * @param int       $chunkZ
+	 * @param FullChunk $chunk
 	 */
-	public function setChunk($chunkX, $chunkZ, SimpleChunk $chunk){
-		$this->chunks[Level::chunkHash($chunkX, $chunkZ)] = $chunk;
-		if($chunk->isGenerated() and $chunk->isPopulated()){
+	public function setChunk($chunkX, $chunkZ, FullChunk $chunk){
+		$this->chunks[$index = Level::chunkHash($chunkX, $chunkZ)] = $chunk;
+		$this->changes[$index] = $chunk;
+		if($chunk->isPopulated()){
 			//TODO: Queue to be sent
 		}
 	}

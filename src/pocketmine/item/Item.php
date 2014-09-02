@@ -27,7 +27,6 @@ namespace pocketmine\item;
 use pocketmine\block\Block;
 use pocketmine\entity\Entity;
 use pocketmine\inventory\Fuel;
-use pocketmine\item\Block as ItemBlock;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
@@ -95,7 +94,7 @@ class Item{
 	const OBSIDIAN = 49;
 	const TORCH = 50;
 	const FIRE = 51;
-
+	const MONSTER_SPAWNER = 52;
 	const WOOD_STAIRS = 53;
 	const WOODEN_STAIRS = 53;
 	const OAK_WOOD_STAIRS = 53;
@@ -164,11 +163,15 @@ class Item{
 	const FENCE_GATE = 107;
 	const BRICK_STAIRS = 108;
 	const STONE_BRICK_STAIRS = 109;
+	const MYCELIUM = 110;
 
 	const NETHER_BRICKS = 112;
 	const NETHER_BRICK_BLOCK = 112;
 
 	const NETHER_BRICKS_STAIRS = 114;
+
+	const END_PORTAL = 120;
+	const END_STONE = 121;
 
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
@@ -216,6 +219,7 @@ class Item{
 	const HARDENED_CLAY = 172;
 	const COAL_BLOCK = 173;
 
+	const PODZOL = 243;
 	const BEETROOT_BLOCK = 244;
 	const STONECUTTER = 245;
 	const GLOWING_OBSIDIAN = 246;
@@ -387,64 +391,64 @@ class Item{
 
 	public static function init(){
 		if(count(self::$list) === 0){
-			self::$list = array(
-				self::SUGARCANE => new Sugarcane(),
-				self::WHEAT_SEEDS => new WheatSeeds(),
-				self::PUMPKIN_SEEDS => new PumpkinSeeds(),
-				self::MELON_SEEDS => new MelonSeeds(),
-				self::MUSHROOM_STEW => new MushroomStew(),
-				self::BEETROOT_SOUP => new BeetrootSoup(),
-				self::CARROT => new Carrot(),
-				self::POTATO => new Potato(),
-				self::BEETROOT_SEEDS => new BeetrootSeeds(),
-				self::SIGN => new Sign(),
-				self::WOODEN_DOOR => new WoodenDoor(),
-				self::BUCKET => new Bucket(),
-				self::IRON_DOOR => new IronDoor(),
-				self::CAKE => new Cake(),
-				self::BED => new Bed(),
-				self::PAINTING => new Painting(),
-				self::COAL => new Coal(),
-				self::APPLE => new Apple(),
-				self::SPAWN_EGG => new SpawnEgg(),
-				self::DIAMOND => new Diamond(),
-				self::STICK => new Stick(),
-				self::BOWL => new Bowl(),
-				self::FEATHER => new Feather(),
-				self::BRICK => new Brick(),
-				self::IRON_SWORD => new IronSword(),
-				self::IRON_INGOT => new IronIngot(),
-				self::GOLD_INGOT => new GoldIngot(),
-				self::IRON_SHOVEL => new IronShovel(),
-				self::IRON_PICKAXE => new IronPickaxe(),
-				self::IRON_AXE => new IronAxe(),
-				self::IRON_HOE => new IronHoe(),
-				self::DIAMOND_SWORD => new DiamondSword(),
-				self::DIAMOND_SHOVEL => new DiamondShovel(),
-				self::DIAMOND_PICKAXE => new DiamondPickaxe(),
-				self::DIAMOND_AXE => new DiamondAxe(),
-				self::DIAMOND_HOE => new DiamondHoe(),
-				self::GOLD_SWORD => new GoldSword(),
-				self::GOLD_SHOVEL => new GoldShovel(),
-				self::GOLD_PICKAXE => new GoldPickaxe(),
-				self::GOLD_AXE => new GoldAxe(),
-				self::GOLD_HOE => new GoldHoe(),
-				self::STONE_SWORD => new StoneSword(),
-				self::STONE_SHOVEL => new StoneShovel(),
-				self::STONE_PICKAXE => new StonePickaxe(),
-				self::STONE_AXE => new StoneAxe(),
-				self::STONE_HOE => new StoneHoe(),
-				self::WOODEN_SWORD => new WoodenSword(),
-				self::WOODEN_SHOVEL => new WoodenShovel(),
-				self::WOODEN_PICKAXE => new WoodenPickaxe(),
-				self::WOODEN_AXE => new WoodenAxe(),
-				self::WOODEN_HOE => new WoodenHoe(),
-				self::FLINT_STEEL => new FlintSteel(),
-				self::SHEARS => new Shears(),
-				self::BOW => new Bow(),
-			);
+			self::$list = [
+				self::SUGARCANE => Sugarcane::class,
+				self::WHEAT_SEEDS => WheatSeeds::class,
+				self::PUMPKIN_SEEDS => PumpkinSeeds::class,
+				self::MELON_SEEDS => MelonSeeds::class,
+				self::MUSHROOM_STEW => MushroomStew::class,
+				self::BEETROOT_SOUP => BeetrootSoup::class,
+				self::CARROT => Carrot::class,
+				self::POTATO => Potato::class,
+				self::BEETROOT_SEEDS => BeetrootSeeds::class,
+				self::SIGN => Sign::class,
+				self::WOODEN_DOOR => WoodenDoor::class,
+				self::BUCKET => Bucket::class,
+				self::IRON_DOOR => IronDoor::class,
+				self::CAKE => Cake::class,
+				self::BED => Bed::class,
+				self::PAINTING => Painting::class,
+				self::COAL => Coal::class,
+				self::APPLE => Apple::class,
+				self::SPAWN_EGG => SpawnEgg::class,
+				self::DIAMOND => Diamond::class,
+				self::STICK => Stick::class,
+				self::BOWL => Bowl::class,
+				self::FEATHER => Feather::class,
+				self::BRICK => Brick::class,
+				self::IRON_SWORD => IronSword::class,
+				self::IRON_INGOT => IronIngot::class,
+				self::GOLD_INGOT => GoldIngot::class,
+				self::IRON_SHOVEL => IronShovel::class,
+				self::IRON_PICKAXE => IronPickaxe::class,
+				self::IRON_AXE => IronAxe::class,
+				self::IRON_HOE => IronHoe::class,
+				self::DIAMOND_SWORD => DiamondSword::class,
+				self::DIAMOND_SHOVEL => DiamondShovel::class,
+				self::DIAMOND_PICKAXE => DiamondPickaxe::class,
+				self::DIAMOND_AXE => DiamondAxe::class,
+				self::DIAMOND_HOE => DiamondHoe::class,
+				self::GOLD_SWORD => GoldSword::class,
+				self::GOLD_SHOVEL => GoldShovel::class,
+				self::GOLD_PICKAXE => GoldPickaxe::class,
+				self::GOLD_AXE => GoldAxe::class,
+				self::GOLD_HOE => GoldHoe::class,
+				self::STONE_SWORD => StoneSword::class,
+				self::STONE_SHOVEL => StoneShovel::class,
+				self::STONE_PICKAXE => StonePickaxe::class,
+				self::STONE_AXE => StoneAxe::class,
+				self::STONE_HOE => StoneHoe::class,
+				self::WOODEN_SWORD => WoodenSword::class,
+				self::WOODEN_SHOVEL => WoodenShovel::class,
+				self::WOODEN_PICKAXE => WoodenPickaxe::class,
+				self::WOODEN_AXE => WoodenAxe::class,
+				self::WOODEN_HOE => WoodenHoe::class,
+				self::FLINT_STEEL => FlintSteel::class,
+				self::SHEARS => Shears::class,
+				self::BOW => Bow::class,
+			];
 			foreach(Block::$list as $id => $class){
-				self::$list[$id] = new ItemBlock($class);
+				self::$list[$id] = $class;
 			}
 
 		}
@@ -452,9 +456,12 @@ class Item{
 
 	public static function get($id, $meta = 0, $count = 1){
 		if(isset(self::$list[$id])){
-			$item = clone self::$list[$id];
-			$item->setDamage($meta);
-			$item->setCount($count);
+			$class = self::$list[$id];
+			if($id < 256){
+				$item = new ItemBlock(new $class($meta), $meta, $count);
+			}else{
+				$item = new $class($meta, $count);
+			}
 		}else{
 			$item = new Item($id, $meta, $count);
 		}

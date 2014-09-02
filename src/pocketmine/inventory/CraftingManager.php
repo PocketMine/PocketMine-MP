@@ -53,7 +53,7 @@ class CraftingManager{
 
 		$this->registerRecipe((new ShapelessRecipe(Item::get(Item::CLAY_BLOCK, 0, 1)))->addIngredient(Item::get(Item::CLAY, 0, 4)));
 		$this->registerRecipe((new ShapelessRecipe(Item::get(Item::WORKBENCH, 0, 1)))->addIngredient(Item::get(Item::WOODEN_PLANK, null, 4)));
-		$this->registerRecipe((new ShapelessRecipe(Item::get(Item::GLOWSTONE_BLOCK, 0, 1)))->addIngredient(Item::get(Item::GLOWSTONE_DUST, 0, 1)));
+		$this->registerRecipe((new ShapelessRecipe(Item::get(Item::GLOWSTONE_BLOCK, 0, 1)))->addIngredient(Item::get(Item::GLOWSTONE_DUST, 0, 4)));
 		$this->registerRecipe((new ShapelessRecipe(Item::get(Item::LIT_PUMPKIN, 0, 1)))->addIngredient(Item::get(Item::PUMPKIN, 0, 1))->addIngredient(Item::get(Item::TORCH, 0, 1)));
 		$this->registerRecipe((new ShapelessRecipe(Item::get(Item::SNOW_BLOCK, 0, 1)))->addIngredient(Item::get(Item::SNOWBALL, 0, 1)));
 		$this->registerRecipe((new ShapelessRecipe(Item::get(Item::STICK, 0, 4)))->addIngredient(Item::get(Item::WOODEN_PLANK, null, 2)));
@@ -180,7 +180,7 @@ class CraftingManager{
 			[Item::LEATHER_PANTS, Item::CHAIN_LEGGINGS, Item::IRON_LEGGINGS, Item::DIAMOND_LEGGINGS, Item::GOLD_LEGGINGS],
 			[Item::LEATHER_BOOTS, Item::CHAIN_BOOTS, Item::IRON_BOOTS, Item::DIAMOND_BOOTS, Item::GOLD_BOOTS],
 		];
-		for($i = 1; $i < 2; ++$i){
+		for($i = 1; $i < 5; ++$i){
 			foreach($types[$i] as $j => $type){
 				$this->registerRecipe((new BigShapelessRecipe(Item::get($type, 0, 1)))->addIngredient(Item::get($types[0][$j], 0, $cost[$i - 1])));
 			}
@@ -195,7 +195,7 @@ class CraftingManager{
 		];
 		for($i = 1; $i < 2; ++$i){
 			foreach($types[$i] as $j => $type){
-				$this->registerRecipe((new BigShapelessRecipe(Item::get($type, 0, 1)))->addIngredient(Item::get($types[0][$j], 0, $cost[$i - 1]))->addIngredient(Item::get(Item::STICK, 0, 1)));
+				$this->registerRecipe((new BigShapelessRecipe(Item::get($type, 0, 1)))->addIngredient(Item::get($types[0][$j], null, $cost[$i - 1]))->addIngredient(Item::get(Item::STICK, 0, 1)));
 			}
 		}
 
@@ -214,7 +214,7 @@ class CraftingManager{
 		];
 		for($i = 1; $i < 5; ++$i){
 			foreach($types[$i] as $j => $type){
-				$this->registerRecipe((new BigShapelessRecipe(Item::get($type, 0, 1)))->addIngredient(Item::get($types[0][$j], 0, $cost[$i - 1]))->addIngredient(Item::get(Item::STICK, 0, 2)));
+				$this->registerRecipe((new BigShapelessRecipe(Item::get($type, 0, 1)))->addIngredient(Item::get($types[0][$j], null, $cost[$i - 1]))->addIngredient(Item::get(Item::STICK, 0, 2)));
 			}
 		}
 
@@ -321,7 +321,7 @@ class CraftingManager{
 	public function matchFurnaceRecipe(Item $input){
 		if(isset($this->furnaceRecipes[$input->getID() . ":" . $input->getDamage()])){
 			return $this->furnaceRecipes[$input->getID() . ":" . $input->getDamage()];
-		}elseif($this->furnaceRecipes[$input->getID() . ":?"]){
+		}elseif(isset($this->furnaceRecipes[$input->getID() . ":?"])){
 			return $this->furnaceRecipes[$input->getID() . ":?"];
 		}
 
@@ -343,7 +343,7 @@ class CraftingManager{
 		$this->recipes[spl_object_hash($recipe)] = $recipe;
 		$hash = "";
 		$ingredients = $recipe->getIngredientList();
-		usort($ingredients, array($this, "sort"));
+		usort($ingredients, [$this, "sort"]);
 		foreach($ingredients as $item){
 			$hash .= $item->getID() . ":" . ($item->getDamage() === null ? "?" : $item->getDamage()) . "x" . $item->getCount() . ",";
 		}
@@ -376,7 +376,7 @@ class CraftingManager{
 		}
 		$hash = "";
 		$input = $ts->getRecipe();
-		usort($input, array($this, "sort"));
+		usort($input, [$this, "sort"]);
 		$inputCount = 0;
 		foreach($input as $item){
 			$inputCount += $item->getCount();

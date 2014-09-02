@@ -22,10 +22,12 @@
 namespace pocketmine\level\generator;
 
 
-class GenerationThread extends \Thread{
+use pocketmine\Thread;
+
+class GenerationThread extends Thread{
 
 	protected $loadPaths;
-	/** @var \SplAutoloader */
+	/** @var \ClassLoader */
 	protected $loader;
 	/** @var \ThreadedLogger */
 	protected $logger;
@@ -48,7 +50,7 @@ class GenerationThread extends \Thread{
 		return $this->logger;
 	}
 
-	public function __construct(\ThreadedLogger $logger, \SplAutoloader $loader){
+	public function __construct(\ThreadedLogger $logger, \ClassLoader $loader){
 		$this->loader = $loader;
 		$this->logger = $logger;
 		$loadPaths = [];
@@ -69,7 +71,7 @@ class GenerationThread extends \Thread{
 		@socket_set_option($this->externalSocket, SOL_SOCKET, SO_SNDBUF, 1024 * 1024 * 2);
 		@socket_set_option($this->externalSocket, SOL_SOCKET, SO_RCVBUF, 1024 * 1024 * 2);
 
-		$this->start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
+		$this->start();
 	}
 
 	protected function addDependency(array &$loadPaths, \ReflectionClass $dep){
@@ -87,6 +89,7 @@ class GenerationThread extends \Thread{
 	}
 
 	public function run(){
+		error_reporting(-1);
 		//Load removed dependencies, can't use require_once()
 		foreach($this->loadPaths as $name => $path){
 			if(!class_exists($name, false) and !class_exists($name, false)){

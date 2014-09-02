@@ -6,3 +6,6 @@
 	path = src/raklib
 	url = https://github.com/PocketMine/RakLib.git
 	branch = master
+[submodule "src/spl"]
+	path = src/spl
+	url = https://github.com/PocketMine/PocketMine-SPL.git

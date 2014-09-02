@@ -32,10 +32,15 @@ class Sugarcane extends Flowable{
 		$this->hardness = 0;
 	}
 
+	public function getBoundingBox(){
+		return null;
+	}
+
+
 	public function getDrops(Item $item){
-		return array(
-			array(Item::SUGARCANE, 0, 1),
-		);
+		return [
+			[Item::SUGARCANE, 0, 1],
+		];
 	}
 
 	public function onActivate(Item $item, Player $player = null){

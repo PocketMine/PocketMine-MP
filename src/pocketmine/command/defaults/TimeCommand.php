@@ -23,6 +23,7 @@ namespace pocketmine\command\defaults;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\level\Level;
 use pocketmine\utils\TextFormat;
 
 class TimeCommand extends VanillaCommand{
@@ -39,19 +40,21 @@ class TimeCommand extends VanillaCommand{
 	public function execute(CommandSender $sender, $currentAlias, array $args){
 		if(count($args) < 2){
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+
 			return false;
 		}
 
 		if($args[0] === "set"){
 			if(!$sender->hasPermission("pocketmine.command.time.set")){
 				$sender->sendMessage(TextFormat::RED . "You don't have permission to set the time");
+
 				return true;
 			}
 
 			if($args[1] === "day"){
 				$value = 0;
 			}elseif($args[1] === "night"){
-				$value = 12500;
+				$value = Level::TIME_NIGHT;
 			}else{
 				$value = $this->getInteger($sender, $args[1], 0);
 			}
@@ -65,6 +68,7 @@ class TimeCommand extends VanillaCommand{
 		}elseif($args[0] === "add"){
 			if(!$sender->hasPermission("pocketmine.command.time.add")){
 				$sender->sendMessage(TextFormat::RED . "You don't have permission to add the time");
+
 				return true;
 			}
 

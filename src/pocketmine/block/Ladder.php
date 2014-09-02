@@ -23,6 +23,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 
 class Ladder extends Transparent{
@@ -33,14 +34,59 @@ class Ladder extends Transparent{
 		$this->hardness = 2;
 	}
 
+	public function getBoundingBox(){
+		$f = 0.125;
+
+		if($this->meta === 2){
+			return new AxisAlignedBB(
+				$this->x,
+				$this->y,
+				$this->z + 1 - $f,
+				$this->x + 1,
+				$this->y + 1,
+				$this->z + 1
+			);
+		}elseif($this->meta === 3){
+			return new AxisAlignedBB(
+				$this->x,
+				$this->y,
+				$this->z,
+				$this->x + 1,
+				$this->y + 1,
+				$this->z + $f
+			);
+		}elseif($this->meta === 4){
+			return new AxisAlignedBB(
+				$this->x + 1 - $f,
+				$this->y,
+				$this->z,
+				$this->x + 1,
+				$this->y + 1,
+				$this->z + 1
+			);
+		}elseif($this->meta === 5){
+			return new AxisAlignedBB(
+				$this->x,
+				$this->y,
+				$this->z,
+				$this->x + $f,
+				$this->y + 1,
+				$this->z + 1
+			);
+		}
+
+		return null;
+	}
+
+
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		if($target->isTransparent === false){
-			$faces = array(
+			$faces = [
 				2 => 2,
 				3 => 3,
 				4 => 4,
 				5 => 5,
-			);
+			];
 			if(isset($faces[$face])){
 				$this->meta = $faces[$face];
 				$this->getLevel()->setBlock($block, $this, true, false, true);
@@ -65,8 +111,8 @@ class Ladder extends Transparent{
 	}
 
 	public function getDrops(Item $item){
-		return array(
-			array($this->id, 0, 1),
-		);
+		return [
+			[$this->id, 0, 1],
+		];
 	}
 }

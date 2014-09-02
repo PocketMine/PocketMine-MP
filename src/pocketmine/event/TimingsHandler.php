@@ -46,7 +46,7 @@ class TimingsHandler{
 	 * @param string         $name
 	 * @param TimingsHandler $parent
 	 */
-	public function __construct($name, $parent = null){
+	public function __construct($name, TimingsHandler $parent = null){
 		$this->name = $name;
 		if($parent instanceof TimingsHandler){
 			$this->parent = $parent;
@@ -67,11 +67,11 @@ class TimingsHandler{
 
 			$avg = $time / $count;
 
-			fwrite($fp, "    " . $timings->name ." Time: ". round($time * 1000000000) ." Count: ". $count ." Avg: ". round($avg * 1000000000) ." Violations: ". $timings->violations . PHP_EOL);
+			fwrite($fp, "    " . $timings->name . " Time: " . round($time * 1000000000) . " Count: " . $count . " Avg: " . round($avg * 1000000000) . " Violations: " . $timings->violations . PHP_EOL);
 		}
 
 		fwrite($fp, "# Version " . Server::getInstance()->getVersion() . PHP_EOL);
-		fwrite($fp, "# PocketMine-MP " . Server::getInstance()->getPocketMineVersion() . PHP_EOL);
+		fwrite($fp, "# ". Server::getInstance()->getName() . " " . Server::getInstance()->getPocketMineVersion() . PHP_EOL);
 
 		$entities = 0;
 		$livingEntities = 0;
@@ -84,8 +84,8 @@ class TimingsHandler{
 			}
 		}
 
-		fwrite($fp, "# Entities ". $entities . PHP_EOL);
-		fwrite($fp, "# LivingEntities ". $livingEntities . PHP_EOL);
+		fwrite($fp, "# Entities " . $entities . PHP_EOL);
+		fwrite($fp, "# LivingEntities " . $livingEntities . PHP_EOL);
 	}
 
 	public static function reload(){

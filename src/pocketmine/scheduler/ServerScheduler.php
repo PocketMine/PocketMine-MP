@@ -168,9 +168,9 @@ class ServerScheduler{
 	private function addTask(Task $task, $delay, $period){
 		if($task instanceof PluginTask){
 			if(!($task->getOwner() instanceof Plugin)){
-				throw new \Exception("Invalid owner of PluginTask ".get_class($task));
+				throw new \Exception("Invalid owner of PluginTask " . get_class($task));
 			}elseif(!$task->getOwner()->isEnabled()){
-				throw new \Exception("Plugin '".$task->getOwner()->getName()."' attempted to register a task while disabled");
+				throw new \Exception("Plugin '" . $task->getOwner()->getName() . "' attempted to register a task while disabled");
 			}
 		}
 
@@ -184,7 +184,18 @@ class ServerScheduler{
 			$period = 1;
 		}
 
-		return $this->handle(new TaskHandler(get_class($task), $task, $this->nextId(), $delay, $period));
+		if($task instanceof CallbackTask){
+			$callable = $task->getCallable();
+			if(is_array($callable)){
+				$taskName = "Callback#" . get_class($callable[0]) . "::" . $callable[1];
+			}else{
+				$taskName = "Callback#" . $callable;
+			}
+		}else{
+			$taskName = get_class($task);
+		}
+
+		return $this->handle(new TaskHandler($taskName, $task, $this->nextId(), $delay, $period));
 	}
 
 	private function handle(TaskHandler $handler){
@@ -243,8 +254,10 @@ class ServerScheduler{
 			$task->onCompletion(Server::getInstance());
 			$task->setCompleted();
 			unset($this->asyncTaskStorage[$task->getTaskId()]);
+
 			return true;
 		}
+
 		return false;
 	}
 

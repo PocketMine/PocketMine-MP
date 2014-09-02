@@ -136,12 +136,13 @@ class PluginManager{
 	}
 
 	/**
-	 * @param string $path
+	 * @param string         $path
+	 * @param PluginLoader[] $loaders
 	 *
 	 * @return Plugin
 	 */
-	public function loadPlugin($path){
-		foreach($this->fileAssociations as $loader){
+	public function loadPlugin($path, $loaders = null){
+		foreach(($loaders === null ? $this->fileAssociations : $loaders) as $loader){
 			if(preg_match($loader->getPluginFilters(), basename($path)) > 0){
 				$description = $loader->getPluginDescription($path);
 				if($description instanceof PluginDescription){
@@ -192,57 +193,61 @@ class PluginManager{
 						continue;
 					}
 					$file = $directory . $file;
-					$description = $loader->getPluginDescription($file);
-					if($description instanceof PluginDescription){
-						$name = $description->getName();
-						if(stripos($name, "pocketmine") !== false or stripos($name, "minecraft") !== false or stripos($name, "mojang") !== false){
-							$this->server->getLogger()->error("Could not load plugin '" . $name . "': restricted name");
-							continue;
-						}elseif(strpos($name, " ") !== false){
-							$this->server->getLogger()->warning("Plugin '" . $name . "' uses spaces in its name, this is discouraged");
-						}
-
-						if(isset($plugins[$name]) or $this->getPlugin($name) instanceof Plugin){
-							$this->server->getLogger()->error("Could not load duplicate plugin '" . $name . "': plugin exists");
-							continue;
-						}
-
-						$compatible = false;
-						//Check multiple dependencies
-						foreach($description->getCompatibleApis() as $version){
-							//Format: majorVersion.minorVersion.patch
-							$version = array_map("intval", explode(".", $version));
-							$apiVersion = array_map("intval", explode(".", $this->server->getApiVersion()));
-							//Completely different API version
-							if($version[0] !== $apiVersion[0]){
+					try{
+						$description = $loader->getPluginDescription($file);
+						if($description instanceof PluginDescription){
+							$name = $description->getName();
+							if(stripos($name, "pocketmine") !== false or stripos($name, "minecraft") !== false or stripos($name, "mojang") !== false){
+								$this->server->getLogger()->error("Could not load plugin '" . $name . "': restricted name");
 								continue;
+							}elseif(strpos($name, " ") !== false){
+								$this->server->getLogger()->warning("Plugin '" . $name . "' uses spaces in its name, this is discouraged");
 							}
-							//If the plugin requires new API features, being backwards compatible
-							if($version[1] > $apiVersion[1]){
+
+							if(isset($plugins[$name]) or $this->getPlugin($name) instanceof Plugin){
+								$this->server->getLogger()->error("Could not load duplicate plugin '" . $name . "': plugin exists");
 								continue;
 							}
 
-							$compatible = true;
-							break;
-						}
+							$compatible = false;
+							//Check multiple dependencies
+							foreach($description->getCompatibleApis() as $version){
+								//Format: majorVersion.minorVersion.patch
+								$version = array_map("intval", explode(".", $version));
+								$apiVersion = array_map("intval", explode(".", $this->server->getApiVersion()));
+								//Completely different API version
+								if($version[0] !== $apiVersion[0]){
+									continue;
+								}
+								//If the plugin requires new API features, being backwards compatible
+								if($version[1] > $apiVersion[1]){
+									continue;
+								}
 
-						if($compatible === false){
-							$this->server->getLogger()->error("Could not load plugin '" . $name . "': API version not compatible");
-							continue;
-						}
+								$compatible = true;
+								break;
+							}
 
-						$plugins[$name] = $file;
+							if($compatible === false){
+								$this->server->getLogger()->error("Could not load plugin '" . $name . "': API version not compatible");
+								continue;
+							}
 
-						$softDependencies[$name] = (array) $description->getSoftDepend();
-						$dependencies[$name] = (array) $description->getDepend();
+							$plugins[$name] = $file;
 
-						foreach($description->getLoadBefore() as $before){
-							if(isset($softDependencies[$before])){
-								$softDependencies[$before][] = $name;
-							}else{
-								$softDependencies[$before] = array($name);
+							$softDependencies[$name] = (array) $description->getSoftDepend();
+							$dependencies[$name] = (array) $description->getDepend();
+
+							foreach($description->getLoadBefore() as $before){
+								if(isset($softDependencies[$before])){
+									$softDependencies[$before][] = $name;
+								}else{
+									$softDependencies[$before] = [$name];
+								}
 							}
 						}
+					}catch(\Exception $e){
+						$this->server->getLogger()->error("Could not load '" . $file . "' in folder '" . $directory . "': " . $e->getMessage());
 					}
 				}
 			}
@@ -281,7 +286,7 @@ class PluginManager{
 					if(!isset($dependencies[$name]) and !isset($softDependencies[$name])){
 						unset($plugins[$name]);
 						$missingDependency = false;
-						if($plugin = $this->loadPlugin($file) and $plugin instanceof Plugin){
+						if($plugin = $this->loadPlugin($file, $loaders) and $plugin instanceof Plugin){
 							$loadedPlugins[$name] = $plugin;
 						}else{
 							$this->server->getLogger()->critical("Could not load plugin '" . $name . "'");
@@ -295,7 +300,7 @@ class PluginManager{
 							unset($softDependencies[$name]);
 							unset($plugins[$name]);
 							$missingDependency = false;
-							if($plugin = $this->loadPlugin($file) and $plugin instanceof Plugin){
+							if($plugin = $this->loadPlugin($file, $loaders) and $plugin instanceof Plugin){
 								$loadedPlugins[$name] = $plugin;
 							}else{
 								$this->server->getLogger()->critical("Could not load plugin '" . $name . "'");
@@ -314,9 +319,11 @@ class PluginManager{
 			}
 
 			TimingsCommand::$timingStart = microtime(true);
+
 			return $loadedPlugins;
 		}else{
 			TimingsCommand::$timingStart = microtime(true);
+
 			return [];
 		}
 	}
@@ -681,7 +688,7 @@ class PluginManager{
 					$class = $parameters[0]->getClass()->getName();
 					$reflection = new \ReflectionClass($class);
 					if(preg_match("/^[\t ]*\\* @deprecated[\t ]{1,}$/m", (string) $reflection->getDocComment(), $matches) > 0 and $this->server->getProperty("settings.deprecated-verbose", true)){
-						$this->server->getLogger()->warning('"'.$plugin->getName().'" has registered a listener for '.$class.' on method "'.get_class($listener).'::'.$method.', but the event is Deprecated.');
+						$this->server->getLogger()->warning('"' . $plugin->getName() . '" has registered a listener for ' . $class . ' on method "' . get_class($listener) . '::' . $method . ', but the event is Deprecated.');
 					}
 					$this->registerEvent($class, $listener, $priority, new MethodEventExecutor($method->getName()), $plugin, $ignoreCancelled);
 				}
@@ -700,7 +707,7 @@ class PluginManager{
 	 * @throws \Exception
 	 */
 	public function registerEvent($event, Listener $listener, $priority, EventExecutor $executor, Plugin $plugin, $ignoreCancelled = false){
-		if(!is_subclass_of($event, "pocketmine\\event\\Event")){
+		if(!is_subclass_of($event, "pocketmine\\event\\Event") or (new \ReflectionClass($event))->isAbstract()){
 			throw new \Exception($event . " is not a valid Event");
 		}
 
@@ -708,7 +715,7 @@ class PluginManager{
 			throw new \Exception("Plugin attempted to register " . $event . " while not enabled");
 		}
 
-		$timings = new TimingsHandler("Plugin: ".$plugin->getDescription()->getFullName()." Event: ".get_class($listener)."::".($executor instanceof MethodEventExecutor ? $executor->getMethod() : "???")."(".(new \ReflectionClass($event))->getShortName().")", self::$pluginParentTimer);
+		$timings = new TimingsHandler("Plugin: " . $plugin->getDescription()->getFullName() . " Event: " . get_class($listener) . "::" . ($executor instanceof MethodEventExecutor ? $executor->getMethod() : "???") . "(" . (new \ReflectionClass($event))->getShortName() . ")", self::$pluginParentTimer);
 
 		$this->getEventListeners($event)->register(new RegisteredListener($listener, $executor, $priority, $plugin, $ignoreCancelled, $timings));
 	}

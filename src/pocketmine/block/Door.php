@@ -23,6 +23,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\network\protocol\LevelEventPacket;
 use pocketmine\Player;
 use pocketmine\Server;
@@ -32,6 +33,152 @@ abstract class Door extends Transparent{
 	public function __construct($id, $meta = 0, $name = "Unknown"){
 		parent::__construct($id, $meta, $name);
 		$this->isSolid = false;
+	}
+
+	public function getBoundingBox(){
+		$f = 0.1875;
+		$damage = $this->getDamage();
+
+		$bb = new AxisAlignedBB(
+			$this->x,
+			$this->y,
+			$this->z,
+			$this->x + 1,
+			$this->y + 2,
+			$this->z + 1
+		);
+
+		$j = $damage & 0x03;
+		$flag = (($damage & 0x04) > 0);
+		$flag1 = (($damage & 0x0f) > 0);
+
+		if($j === 0){
+			if($flag){
+				if(!$flag1){
+					$bb = new AxisAlignedBB(
+						$this->x,
+						$this->y,
+						$this->z,
+						$this->x + 1,
+						$this->y + 1,
+						$this->z + $f
+					);
+				}else{
+					$bb = new AxisAlignedBB(
+						$this->x,
+						$this->y,
+						$this->z + 1 - $f,
+						$this->x + 1,
+						$this->y + 1,
+						$this->z + 1
+					);
+				}
+			}else{
+				$bb = new AxisAlignedBB(
+					$this->x,
+					$this->y,
+					$this->z,
+					$this->x + $f,
+					$this->y + 1,
+					$this->z + 1
+				);
+			}
+		}elseif($j === 1){
+			if($flag){
+				if(!$flag1){
+					$bb = new AxisAlignedBB(
+						$this->x + 1 - $f,
+						$this->y,
+						$this->z,
+						$this->x + 1,
+						$this->y + 1,
+						$this->z + 1
+					);
+				}else{
+					$bb = new AxisAlignedBB(
+						$this->x,
+						$this->y,
+						$this->z,
+						$this->x + $f,
+						$this->y + 1,
+						$this->z + 1
+					);
+				}
+			}else{
+				$bb = new AxisAlignedBB(
+					$this->x,
+					$this->y,
+					$this->z,
+					$this->x + 1,
+					$this->y + 1,
+					$this->z + $f
+				);
+			}
+		}elseif($j === 2){
+			if($flag){
+				if(!$flag1){
+					$bb = new AxisAlignedBB(
+						$this->x,
+						$this->y,
+						$this->z + 1 - $f,
+						$this->x + 1,
+						$this->y + 1,
+						$this->z + 1
+					);
+				}else{
+					$bb = new AxisAlignedBB(
+						$this->x,
+						$this->y,
+						$this->z,
+						$this->x + 1,
+						$this->y + 1,
+						$this->z + $f
+					);
+				}
+			}else{
+				$bb = new AxisAlignedBB(
+					$this->x + 1 - $f,
+					$this->y,
+					$this->z,
+					$this->x + 1,
+					$this->y + 1,
+					$this->z + 1
+				);
+			}
+		}elseif($j === 3){
+			if($flag){
+				if(!$flag1){
+					$bb = new AxisAlignedBB(
+						$this->x,
+						$this->y,
+						$this->z,
+						$this->x + $f,
+						$this->y + 1,
+						$this->z + 1
+					);
+				}else{
+					$bb = new AxisAlignedBB(
+						$this->x + 1 - $f,
+						$this->y,
+						$this->z,
+						$this->x + 1,
+						$this->y + 1,
+						$this->z + 1
+					);
+				}
+			}else{
+				$bb = new AxisAlignedBB(
+					$this->x,
+					$this->y,
+					$this->z + 1 - $f,
+					$this->x + 1,
+					$this->y + 1,
+					$this->z + 1
+				);
+			}
+		}
+
+		return $bb;
 	}
 
 	public function onUpdate($type){
@@ -57,12 +204,12 @@ abstract class Door extends Transparent{
 				return false;
 			}
 			$direction = $player instanceof Player ? $player->getDirection() : 0;
-			$face = array(
+			$face = [
 				0 => 3,
 				1 => 4,
 				2 => 2,
 				3 => 5,
-			);
+			];
 			$next = $this->getSide($face[(($direction + 2) % 4)]);
 			$next2 = $this->getSide($face[$direction]);
 			$metaUp = 0x08;

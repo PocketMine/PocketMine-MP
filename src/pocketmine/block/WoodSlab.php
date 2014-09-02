@@ -22,19 +22,20 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 
 class WoodSlab extends Transparent{
 	public function __construct($meta = 0){
 		parent::__construct(self::WOOD_SLAB, $meta, "Wooden Slab");
-		$names = array(
+		$names = [
 			0 => "Oak",
 			1 => "Spruce",
 			2 => "Birch",
 			3 => "Jungle",
 			4 => "Acacia",
 			5 => "Dark Oak",
-		);
+		];
 		$this->name = (($this->meta & 0x08) === 0x08 ? "Upper " : "") . $names[$this->meta & 0x07] . " Wooden Slab";
 		if(($this->meta & 0x08) === 0x08){
 			$this->isFullBlock = true;
@@ -42,6 +43,17 @@ class WoodSlab extends Transparent{
 			$this->isFullBlock = false;
 		}
 		$this->hardness = 15;
+	}
+
+	public function getBoundingBox(){
+		return new AxisAlignedBB(
+			$this->x,
+			$this->y + (($this->meta & 0x08) === 0x08 ? 0.5 : 0),
+			$this->z,
+			$this->x + 1,
+			$this->y + (($this->meta & 0x08) === 0x08 ? 1 : 0.5),
+			$this->z + 1
+		);
 	}
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
@@ -112,8 +124,8 @@ class WoodSlab extends Transparent{
 	}
 
 	public function getDrops(Item $item){
-		return array(
-			array($this->id, $this->meta & 0x07, 1),
-		);
+		return [
+			[$this->id, $this->meta & 0x07, 1],
+		];
 	}
 }

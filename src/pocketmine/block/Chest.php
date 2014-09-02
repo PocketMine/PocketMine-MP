@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Enum;
@@ -41,13 +42,24 @@ class Chest extends Transparent{
 		$this->hardness = 15;
 	}
 
+	public function getBoundingBox(){
+		return new AxisAlignedBB(
+			$this->x + 0.0625,
+			$this->y,
+			$this->z + 0.0625,
+			$this->x + 0.9375,
+			$this->y + 0.875,
+			$this->z + 0.9375
+		);
+	}
+
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$faces = array(
+		$faces = [
 			0 => 4,
 			1 => 2,
 			2 => 5,
 			3 => 3,
-		);
+		];
 
 		$chest = false;
 		$this->meta = $faces[$player instanceof Player ? $player->getDirection() : 0];
@@ -69,13 +81,13 @@ class Chest extends Transparent{
 		}
 
 		$this->getLevel()->setBlock($block, $this, true, false, true);
-		$nbt = new Compound(false, array(
+		$nbt = new Compound(false, [
 			new Enum("Items", []),
 			new String("id", Tile::CHEST),
 			new Int("x", $this->x),
 			new Int("y", $this->y),
 			new Int("z", $this->z)
-		));
+		]);
 		$nbt->Items->setTagType(NBT::TAG_Compound);
 		$tile = new TileChest($this->getLevel()->getChunkAt($this->x >> 4, $this->z >> 4), $nbt);
 
@@ -109,13 +121,13 @@ class Chest extends Transparent{
 			if($t instanceof TileChest){
 				$chest = $t;
 			}else{
-				$nbt = new Compound(false, array(
+				$nbt = new Compound(false, [
 					new Enum("Items", []),
 					new String("id", Tile::CHEST),
 					new Int("x", $this->x),
 					new Int("y", $this->y),
 					new Int("z", $this->z)
-				));
+				]);
 				$nbt->Items->setTagType(NBT::TAG_Compound);
 				$chest = new TileChest($this->getLevel()->getChunkAt($this->x >> 4, $this->z >> 4), $nbt);
 			}
@@ -131,15 +143,15 @@ class Chest extends Transparent{
 	}
 
 	public function getDrops(Item $item){
-		$drops = array(
-			array($this->id, 0, 1),
-		);
+		$drops = [
+			[$this->id, 0, 1],
+		];
 		$t = $this->getLevel()->getTile($this);
 		if($t instanceof TileChest){
 			for($s = 0; $s < $t->getRealInventory()->getSize(); ++$s){
 				$slot = $t->getRealInventory()->getItem($s);
 				if($slot->getID() > Item::AIR and $slot->getCount() > 0){
-					$drops[] = array($slot->getID(), $slot->getDamage(), $slot->getCount());
+					$drops[] = [$slot->getID(), $slot->getDamage(), $slot->getCount()];
 				}
 			}
 		}

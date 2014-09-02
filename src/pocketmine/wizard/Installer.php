@@ -89,6 +89,7 @@ LICENSE;
 		if(strtolower($this->getInput("n")) != "y"){
 			echo "[!] " . $this->lang->you_have_to_accept_the_license . "\n";
 			sleep(5);
+
 			return false;
 		}
 
@@ -196,7 +197,7 @@ LICENSE;
 		$externalIP = Utils::getIP();
 		$internalIP = gethostbyname(trim(`hostname`));
 
-		echo "[!] " . $this->lang->get("ip_warning", array("{{EXTERNAL_IP}}", "{{INTERNAL_IP}}"), array($externalIP, $internalIP)) . "\n";
+		echo "[!] " . $this->lang->get("ip_warning", ["{{EXTERNAL_IP}}", "{{INTERNAL_IP}}"], [$externalIP, $internalIP]) . "\n";
 		echo "[!] " . $this->lang->ip_confirm;
 		$this->getInput();
 	}

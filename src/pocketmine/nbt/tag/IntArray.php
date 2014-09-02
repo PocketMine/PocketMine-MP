@@ -32,15 +32,11 @@ class IntArray extends NamedTag{
 	public function read(NBT $nbt){
 		$this->value = [];
 		$size = $nbt->getInt();
-		for($i = 0; $i < $size and !$nbt->feof(); ++$i){
-			$this->value[] = $nbt->getInt();
-		}
+		$this->value = unpack($nbt->endianness === NBT::LITTLE_ENDIAN ? "V*" : "N*", $nbt->get($size * 4));
 	}
 
 	public function write(NBT $nbt){
 		$nbt->putInt(count($this->value));
-		foreach($this->value as $v){
-			$nbt->putInt($v);
-		}
+		$nbt->put(pack($nbt->endianness === NBT::LITTLE_ENDIAN ? "V*" : "N*", ...$this->value));
 	}
 }

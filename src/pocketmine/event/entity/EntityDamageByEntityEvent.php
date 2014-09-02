@@ -22,17 +22,15 @@
 namespace pocketmine\event\entity;
 
 use pocketmine\entity\Entity;
-use pocketmine\event\Cancellable;
 
 class EntityDamageByEntityEvent extends EntityDamageEvent{
-	public static $handlerList = null;
 
 	/** @var Entity */
 	private $damager;
 
 
 	/**
-	 * @param Entity     $damager
+	 * @param Entity    $damager
 	 * @param Entity    $entity
 	 * @param int       $cause
 	 * @param int|int[] $damage

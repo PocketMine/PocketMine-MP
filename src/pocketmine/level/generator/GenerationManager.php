@@ -21,7 +21,7 @@
 
 namespace pocketmine\level\generator;
 
-use pocketmine\level\format\SimpleChunk;
+use pocketmine\level\format\FullChunk;
 use pocketmine\level\Level;
 use pocketmine\utils\Binary;
 
@@ -60,7 +60,8 @@ class GenerationManager{
 	 * int32 levelID
 	 * int32 chunkX
 	 * int32 chunkZ
-	 * byte flags (1 generated, 2 populated)
+	 * byte className length
+	 * byte[] className
 	 * byte[] chunk (none if generated flag is not set)
 	 */
 	const PACKET_SEND_CHUNK = 0x02;
@@ -92,7 +93,7 @@ class GenerationManager{
 	protected $socket;
 	/** @var \Logger */
 	protected $logger;
-	/** @var \SplAutoLoader */
+	/** @var \ClassLoader */
 	protected $loader;
 
 	/** @var GenerationChunkManager[] */
@@ -100,31 +101,36 @@ class GenerationManager{
 
 	protected $generatedQueue = [];
 
-	/** @var \SplQueue */
-	protected $requestQueue;
+	/** @var array */
+	protected $requestQueue = [];
 
-	protected $needsChunk = null;
+	/** @var array */
+	protected $needsChunk = [];
 
 	protected $shutdown = false;
 
 	/**
-	 * @param resource       $socket
-	 * @param \Logger        $logger
-	 * @param \SplAutoloader $loader
+	 * @param resource     $socket
+	 * @param \Logger      $logger
+	 * @param \ClassLoader $loader
 	 */
-	public function __construct($socket, \Logger $logger, \SplAutoloader $loader){
+	public function __construct($socket, \Logger $logger, \ClassLoader $loader){
 		$this->socket = $socket;
 		$this->logger = $logger;
 		$this->loader = $loader;
-		$this->requestQueue = new \SplQueue();
+		$chunkX = $chunkZ = null;
 
 		while($this->shutdown !== true){
-			if($this->requestQueue->count() > 0){
-				$r = $this->requestQueue->dequeue();
-				$levelID = $r[0];
-				$chunkX = $r[1];
-				$chunkZ = $r[2];
-				$this->generateChunk($levelID, $chunkX, $chunkZ);
+			if(count($this->requestQueue) > 0){
+				foreach($this->requestQueue as $levelID => $chunks){
+					if(count($chunks) === 0){
+						unset($this->requestQueue[$levelID]);
+					}else{
+						Level::getXZ($key = key($chunks), $chunkX, $chunkZ);
+						unset($this->requestQueue[$levelID][$key]);
+						$this->generateChunk($levelID, $chunkX, $chunkZ);
+					}
+				}
 			}else{
 				$this->readPacket();
 			}
@@ -143,12 +149,17 @@ class GenerationManager{
 			$this->levels[$levelID]->populateChunk($chunkX, $chunkZ); //Request population directly
 			if(isset($this->levels[$levelID])){
 				$this->generatedQueue[$levelID][$index] = true;
-				if(count($this->generatedQueue[$levelID]) > 6){
-					$this->levels[$levelID]->doGarbageCollection();
-					foreach($this->levels[$levelID]->getChangedChunks(true) as $chunk){
+				foreach($this->levels[$levelID]->getChangedChunks() as $index => $chunk){
+					if($chunk->isPopulated()){
 						$this->sendChunk($levelID, $chunk);
+						$this->levels[$levelID]->cleanChangedChunk($index);
 					}
+				}
+
+				if(count($this->generatedQueue[$levelID]) > 4){
+					$this->levels[$levelID]->doGarbageCollection();
 					$this->generatedQueue[$levelID] = [];
+					$this->levels[$levelID]->cleanChangedChunks();
 				}
 			}
 		}
@@ -163,13 +174,21 @@ class GenerationManager{
 	}
 
 	protected function enqueueChunk($levelID, $chunkX, $chunkZ){
-		$this->requestQueue->enqueue([$levelID, $chunkX, $chunkZ]);
+		if(!isset($this->requestQueue[$levelID])){
+			$this->requestQueue[$levelID] = [];
+		}
+		if(!isset($this->requestQueue[$levelID][$index = "$chunkX:$chunkZ"])){
+			$this->requestQueue[$levelID][$index] = 1;
+		}else{
+			$this->requestQueue[$levelID][$index]++;
+			arsort($this->requestQueue[$levelID]);
+		}
 	}
 
-	protected function receiveChunk($levelID, SimpleChunk $chunk){
-		if($this->needsChunk !== null and $this->needsChunk[0] === $levelID){
-			if($this->needsChunk[1] === $chunk->getX() and $this->needsChunk[2] === $chunk->getZ()){
-				$this->needsChunk = $chunk;
+	protected function receiveChunk($levelID, FullChunk $chunk){
+		if($this->needsChunk[$levelID] !== null){
+			if($this->needsChunk[$levelID][0] === $chunk->getX() and $this->needsChunk[$levelID][1] === $chunk->getZ()){
+				$this->needsChunk[$levelID] = $chunk;
 			}
 		}
 		//TODO: set new received chunks
@@ -180,27 +199,28 @@ class GenerationManager{
 	 * @param $chunkX
 	 * @param $chunkZ
 	 *
-	 * @return SimpleChunk
+	 * @return FullChunk
 	 */
 	public function requestChunk($levelID, $chunkX, $chunkZ){
-		$this->needsChunk = [$levelID, $chunkX, $chunkZ];
+		$this->needsChunk[$levelID] = [$chunkX, $chunkZ];
 		$binary = chr(self::PACKET_REQUEST_CHUNK) . Binary::writeInt($levelID) . Binary::writeInt($chunkX) . Binary::writeInt($chunkZ);
 		@socket_write($this->socket, Binary::writeInt(strlen($binary)) . $binary);
+
 		do{
 			$this->readPacket();
-		}while($this->shutdown !== true and !($this->needsChunk instanceof SimpleChunk));
+		}while($this->shutdown !== true and !($this->needsChunk[$levelID] instanceof FullChunk));
 
-		$chunk = $this->needsChunk;
-		$this->needsChunk = null;
-		if($chunk instanceof SimpleChunk){
+		$chunk = $this->needsChunk[$levelID];
+		$this->needsChunk[$levelID] = null;
+		if($chunk instanceof FullChunk){
 			return $chunk;
 		}else{
-			return new SimpleChunk($chunkX, $chunkZ, 0);
+			return null;
 		}
 	}
 
-	public function sendChunk($levelID, SimpleChunk $chunk){
-		$binary = chr(self::PACKET_SEND_CHUNK) . Binary::writeInt($levelID) . $chunk->toBinary();
+	public function sendChunk($levelID, FullChunk $chunk){
+		$binary = chr(self::PACKET_SEND_CHUNK) . Binary::writeInt($levelID) . chr(strlen($class = get_class($chunk))) . $class . $chunk->toBinary();
 		@socket_write($this->socket, Binary::writeInt(strlen($binary)) . $binary);
 	}
 
@@ -218,10 +238,12 @@ class GenerationManager{
 		if(($len = Binary::readInt($len)) <= 0){
 			$this->shutdown = true;
 			$this->getLogger()->critical("Generation Thread found a stream error, shutting down");
+
 			return;
 		}
 
 		$packet = $this->socketRead($len);
+
 		$pid = ord($packet{0});
 		$offset = 1;
 		if($pid === self::PACKET_REQUEST_CHUNK){
@@ -234,7 +256,11 @@ class GenerationManager{
 		}elseif($pid === self::PACKET_SEND_CHUNK){
 			$levelID = Binary::readInt(substr($packet, $offset, 4));
 			$offset += 4;
-			$chunk = SimpleChunk::fromBinary(substr($packet, $offset));
+			$len = ord($packet{$offset++});
+			/** @var FullChunk $class */
+			$class = substr($packet, $offset, $len);
+			$offset += $len;
+			$chunk = $class::fromBinary(substr($packet, $offset));
 			$this->receiveChunk($levelID, $chunk);
 		}elseif($pid === self::PACKET_OPEN_LEVEL){
 			$levelID = Binary::readInt(substr($packet, $offset, 4));
@@ -256,7 +282,7 @@ class GenerationManager{
 			$namespace = substr($packet, $offset, $len);
 			$offset += $len;
 			$path = substr($packet, $offset);
-			$this->loader->add($namespace, [$path]);
+			$this->loader->addPath($path);
 		}elseif($pid === self::PACKET_SHUTDOWN){
 			foreach($this->levels as $level){
 				$level->shutdown();

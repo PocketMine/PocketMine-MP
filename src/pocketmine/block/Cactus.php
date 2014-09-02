@@ -23,15 +23,26 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3 as Vector3;
 use pocketmine\Player;
-use pocketmine\Server;
 
 class Cactus extends Transparent{
 	public function __construct($meta = 0){
 		parent::__construct(self::CACTUS, $meta, "Cactus");
 		$this->isFullBlock = false;
 		$this->hardness = 2;
+	}
+
+	public function getBoundingBox(){
+		return new AxisAlignedBB(
+			$this->x + 0.0625,
+			$this->y,
+			$this->z + 0.0625,
+			$this->x + 0.9375,
+			$this->y + 1,
+			$this->z + 0.9375
+		);
 	}
 
 	public function onUpdate($type){
@@ -85,8 +96,8 @@ class Cactus extends Transparent{
 	}
 
 	public function getDrops(Item $item){
-		return array(
-			array($this->id, 0, 1),
-		);
+		return [
+			[$this->id, 0, 1],
+		];
 	}
 }

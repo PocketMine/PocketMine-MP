@@ -43,7 +43,7 @@ class CrashDump{
 		$this->path = $this->server->getDataPath() . "CrashDump_" . date("D_M_j-H.i.s-T_Y", $this->time) . ".log";
 		$this->fp = fopen($this->path, "wb");
 		$this->data["time"] = $this->time;
-		$this->addLine("PocketMine-MP Crash Dump " . date("D M j H:i:s T Y", $this->time));
+		$this->addLine($this->server->getName() . " Crash Dump " . date("D M j H:i:s T Y", $this->time));
 		$this->addLine();
 		$this->baseCrash();
 		$this->generalData();
@@ -97,7 +97,7 @@ class CrashDump{
 					"load" => $d->getOrder() === PluginLoadOrder::POSTWORLD ? "POSTWORLD" : "STARTUP",
 					"website" => $d->getWebsite()
 				];
-				$this->addLine($d->getName() . " " . $d->getVersion() . " by " . implode(", ", $d->getAuthors())." for API(s) ". implode(", ", $d->getCompatibleApis()));
+				$this->addLine($d->getName() . " " . $d->getVersion() . " by " . implode(", ", $d->getAuthors()) . " for API(s) " . implode(", ", $d->getCompatibleApis()));
 			}
 		}
 	}
@@ -130,32 +130,36 @@ class CrashDump{
 	}
 
 	private function baseCrash(){
-		global $lastError;
+		global $lastExceptionError, $lastError;
 
-		$error = (array) error_get_last();
-		$error["trace"] = getTrace(4);
-		$errorConversion = array(
-			E_ERROR => "E_ERROR",
-			E_WARNING => "E_WARNING",
-			E_PARSE => "E_PARSE",
-			E_NOTICE => "E_NOTICE",
-			E_CORE_ERROR => "E_CORE_ERROR",
-			E_CORE_WARNING => "E_CORE_WARNING",
-			E_COMPILE_ERROR => "E_COMPILE_ERROR",
-			E_COMPILE_WARNING => "E_COMPILE_WARNING",
-			E_USER_ERROR => "E_USER_ERROR",
-			E_USER_WARNING => "E_USER_WARNING",
-			E_USER_NOTICE => "E_USER_NOTICE",
-			E_STRICT => "E_STRICT",
-			E_RECOVERABLE_ERROR => "E_RECOVERABLE_ERROR",
-			E_DEPRECATED => "E_DEPRECATED",
-			E_USER_DEPRECATED => "E_USER_DEPRECATED",
-		);
-		$error["fullFile"] = $error["file"];
-		$error["file"] = cleanPath($error["file"]);
-		$error["type"] = isset($errorConversion[$error["type"]]) ? $errorConversion[$error["type"]] : $error["type"];
-		if(($pos = strpos($error["message"], "\n")) !== false){
-			$error["message"] = substr($error["message"], 0, $pos);
+		if(isset($lastExceptionError)){
+			$error = $lastExceptionError;
+		}else{
+			$error = (array) error_get_last();
+			$error["trace"] = getTrace(4);
+			$errorConversion = [
+				E_ERROR => "E_ERROR",
+				E_WARNING => "E_WARNING",
+				E_PARSE => "E_PARSE",
+				E_NOTICE => "E_NOTICE",
+				E_CORE_ERROR => "E_CORE_ERROR",
+				E_CORE_WARNING => "E_CORE_WARNING",
+				E_COMPILE_ERROR => "E_COMPILE_ERROR",
+				E_COMPILE_WARNING => "E_COMPILE_WARNING",
+				E_USER_ERROR => "E_USER_ERROR",
+				E_USER_WARNING => "E_USER_WARNING",
+				E_USER_NOTICE => "E_USER_NOTICE",
+				E_STRICT => "E_STRICT",
+				E_RECOVERABLE_ERROR => "E_RECOVERABLE_ERROR",
+				E_DEPRECATED => "E_DEPRECATED",
+				E_USER_DEPRECATED => "E_USER_DEPRECATED",
+			];
+			$error["fullFile"] = $error["file"];
+			$error["file"] = cleanPath($error["file"]);
+			$error["type"] = isset($errorConversion[$error["type"]]) ? $errorConversion[$error["type"]] : $error["type"];
+			if(($pos = strpos($error["message"], "\n")) !== false){
+				$error["message"] = substr($error["message"], 0, $pos);
+			}
 		}
 
 		if(isset($lastError)){
@@ -165,10 +169,10 @@ class CrashDump{
 		$this->data["error"] = $error;
 		unset($this->data["error"]["fullFile"]);
 		unset($this->data["error"]["trace"]);
-		$this->addLine("Error: ". $error["message"]);
-		$this->addLine("File: ". $error["file"]);
-		$this->addLine("Line: ". $error["line"]);
-		$this->addLine("Type: ". $error["type"]);
+		$this->addLine("Error: " . $error["message"]);
+		$this->addLine("File: " . $error["file"]);
+		$this->addLine("Line: " . $error["line"]);
+		$this->addLine("Type: " . $error["type"]);
 
 		if(strpos($error["file"], "src/pocketmine/") === false and strpos($error["file"], "src/raklib/") === false and file_exists($error["fullFile"])){
 			$this->addLine();
@@ -182,7 +186,7 @@ class CrashDump{
 				$filePath = \pocketmine\cleanPath($file->getValue($plugin));
 				if(strpos($error["file"], $filePath) === 0){
 					$this->data["plugin"] = $plugin->getName();
-					$this->addLine("BAD PLUGIN: ".$plugin->getDescription()->getFullName());
+					$this->addLine("BAD PLUGIN: " . $plugin->getDescription()->getFullName());
 					break;
 				}
 			}
@@ -224,7 +228,7 @@ class CrashDump{
 		$this->data["general"]["zend"] = zend_version();
 		$this->data["general"]["php_os"] = PHP_OS;
 		$this->data["general"]["os"] = Utils::getOS();
-		$this->addLine("PocketMine-MP version: " . $version->get(false). " #" . $version->getNumber() . " [Protocol " . Info::CURRENT_PROTOCOL . "; API " . API_VERSION . "]");
+		$this->addLine("PocketMine-MP version: " . $version->get(false) . " #" . $version->getBuild() . " [Protocol " . Info::CURRENT_PROTOCOL . "; API " . API_VERSION . "]");
 		$this->addLine("Git commit: " . GIT_COMMIT);
 		$this->addLine("uname -a: " . php_uname("a"));
 		$this->addLine("PHP Version: " . phpversion());

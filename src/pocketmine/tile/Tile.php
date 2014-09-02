@@ -27,7 +27,8 @@ namespace pocketmine\tile;
 
 use pocketmine\event\Timings;
 use pocketmine\level\format\Chunk;
-use pocketmine\level\format\LevelProvider;
+use pocketmine\level\format\FullChunk;
+use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\nbt\tag\Compound;
 
@@ -39,11 +40,6 @@ abstract class Tile extends Position{
 	//TODO: pre-close step NBT data saving method
 
 	public static $tileCount = 1;
-
-	/**
-	 * @var Tile[]
-	 */
-	public static $needUpdate = [];
 
 	/** @var Chunk */
 	public $chunk;
@@ -62,14 +58,14 @@ abstract class Tile extends Position{
 	/** @var \pocketmine\event\TimingsHandler */
 	public $tickTimer;
 
-	public function __construct(Chunk $chunk, Compound $nbt){
-		if($chunk->getLevel() === null){
+	public function __construct(FullChunk $chunk, Compound $nbt){
+		if($chunk === null or $chunk->getProvider() === null){
 			throw new \Exception("Invalid garbage Chunk given to Tile");
 		}
 
-		$this->server = $chunk->getLevel()->getLevel()->getServer();
+		$this->server = $chunk->getProvider()->getLevel()->getServer();
 		$this->chunk = $chunk;
-		$this->setLevel($chunk->getLevel()->getLevel(), true); //Strong reference
+		$this->setLevel($chunk->getProvider()->getLevel());
 		$this->namedtag = $nbt;
 		$this->closed = false;
 		$this->name = "";
@@ -99,7 +95,7 @@ abstract class Tile extends Position{
 	}
 
 	public final function scheduleUpdate(){
-		Tile::$needUpdate[$this->id] = $this;
+		$this->level->updateTiles[$this->id] = $this;
 	}
 
 	public function __destruct(){
@@ -109,9 +105,13 @@ abstract class Tile extends Position{
 	public function close(){
 		if($this->closed === false){
 			$this->closed = true;
-			unset(Tile::$needUpdate[$this->id]);
-			$this->getLevel()->removeTile($this);
-			$this->chunk->removeTile($this);
+			unset($this->level->updateTiles[$this->id]);
+			if($this->chunk instanceof FullChunk){
+				$this->chunk->removeTile($this);
+			}
+			if(($level = $this->getLevel()) instanceof Level){
+				$level->removeTile($this);
+			}
 		}
 	}
 

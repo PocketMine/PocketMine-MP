@@ -25,7 +25,7 @@ use pocketmine\inventory\ChestInventory;
 use pocketmine\inventory\DoubleChestInventory;
 use pocketmine\inventory\InventoryHolder;
 use pocketmine\item\Item;
-use pocketmine\level\format\Chunk;
+use pocketmine\level\format\FullChunk;
 use pocketmine\math\Vector3 as Vector3;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\Byte;
@@ -42,7 +42,7 @@ class Chest extends Spawnable implements InventoryHolder, Container{
 	/** @var DoubleChestInventory */
 	protected $doubleInventory = null;
 
-	public function __construct(Chunk $chunk, Compound $nbt){
+	public function __construct(FullChunk $chunk, Compound $nbt){
 		$nbt["id"] = Tile::CHEST;
 		parent::__construct($chunk, $nbt);
 		$this->inventory = new ChestInventory($this);
@@ -56,6 +56,19 @@ class Chest extends Spawnable implements InventoryHolder, Container{
 			$this->inventory->setItem($i, $this->getItem($i));
 		}
 		$this->checkPairing();
+	}
+
+	public function close(){
+		if($this->closed === false){
+			foreach($this->getInventory()->getViewers() as $player){
+				$this->getInventory()->close($player);
+			}
+
+			foreach($this->getRealInventory()->getViewers() as $player){
+				$this->getRealInventory()->close($player);
+			}
+			parent::close();
+		}
 	}
 
 	public function saveNBT(){
@@ -115,12 +128,12 @@ class Chest extends Spawnable implements InventoryHolder, Container{
 	public function setItem($index, Item $item){
 		$i = $this->getSlotIndex($index);
 
-		$d = new Compound(false, array(
+		$d = new Compound(false, [
 			new Byte("Count", $item->getCount()),
 			new Byte("Slot", $index),
 			new Short("id", $item->getID()),
 			new Short("Damage", $item->getDamage()),
-		));
+		]);
 
 		if($item->getID() === Item::AIR or $item->getCount() <= 0){
 			if($i >= 0){
@@ -226,21 +239,21 @@ class Chest extends Spawnable implements InventoryHolder, Container{
 
 	public function getSpawnCompound(){
 		if($this->isPaired()){
-			return new Compound("", array(
+			return new Compound("", [
 				new String("id", Tile::CHEST),
 				new Int("x", (int) $this->x),
 				new Int("y", (int) $this->y),
 				new Int("z", (int) $this->z),
 				new Int("pairx", (int) $this->namedtag->pairx),
 				new Int("pairz", (int) $this->namedtag->pairz)
-			));
+			]);
 		}else{
-			return new Compound("", array(
+			return new Compound("", [
 				new String("id", Tile::CHEST),
 				new Int("x", (int) $this->x),
 				new Int("y", (int) $this->y),
 				new Int("z", (int) $this->z)
-			));
+			]);
 		}
 	}
 }

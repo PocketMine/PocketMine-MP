@@ -32,6 +32,10 @@ class Beetroot extends Flowable{
 		$this->hardness = 0;
 	}
 
+	public function getBoundingBox(){
+		return null;
+	}
+
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$down = $this->getSide(0);
 		if($down->getID() === self::FARMLAND){
@@ -82,10 +86,10 @@ class Beetroot extends Flowable{
 	public function getDrops(Item $item){
 		$drops = [];
 		if($this->meta >= 0x07){
-			$drops[] = array(Item::BEETROOT, 0, 1);
-			$drops[] = array(Item::BEETROOT_SEEDS, 0, mt_rand(0, 3));
+			$drops[] = [Item::BEETROOT, 0, 1];
+			$drops[] = [Item::BEETROOT_SEEDS, 0, mt_rand(0, 3)];
 		}else{
-			$drops[] = array(Item::BEETROOT_SEEDS, 0, 1);
+			$drops[] = [Item::BEETROOT_SEEDS, 0, 1];
 		}
 
 		return $drops;

@@ -68,6 +68,10 @@ class DroppedItem extends Entity{
 	public function onUpdate(){
 		$this->entityBaseTick();
 
+		if($this->closed !== false){
+			return false;
+		}
+
 		if($this->pickupDelay > 0 and $this->pickupDelay < 32767){ //Infinite delay
 			--$this->pickupDelay;
 		}
@@ -103,12 +107,12 @@ class DroppedItem extends Entity{
 		}
 		$this->updateMovement();
 
-		//TODO: handle scheduled updates
-		return true;
+		return !$this->onGround or ($this->motionX == 0 and $this->motionY == 0 and $this->motionZ == 0);
 	}
 
 	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
-
+		$this->setLastDamageCause($source);
+		$this->setHealth($this->getHealth() - $damage);
 	}
 
 	public function heal($amount){
@@ -137,7 +141,7 @@ class DroppedItem extends Entity{
 		$flags |= $this->fireTicks > 0 ? 1 : 0;
 
 		return [
-			0 => array("type" => 0, "value" => $flags)
+			0 => ["type" => 0, "value" => $flags]
 		];
 	}
 

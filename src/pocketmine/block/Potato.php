@@ -32,6 +32,11 @@ class Potato extends Flowable{
 		$this->hardness = 0;
 	}
 
+	public function getBoundingBox(){
+		return null;
+	}
+
+
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$down = $this->getSide(0);
 		if($down->getID() === self::FARMLAND){
@@ -84,9 +89,9 @@ class Potato extends Flowable{
 	public function getDrops(Item $item){
 		$drops = [];
 		if($this->meta >= 0x07){
-			$drops[] = array(Item::POTATO, 0, mt_rand(1, 4));
+			$drops[] = [Item::POTATO, 0, mt_rand(1, 4)];
 		}else{
-			$drops[] = array(Item::POTATO, 0, 1);
+			$drops[] = [Item::POTATO, 0, 1];
 		}
 
 		return $drops;

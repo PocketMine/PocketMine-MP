@@ -117,7 +117,14 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 	}
 
 	public function process(){
-		return $this->interface->handlePacket();
+		$work = false;
+		if($this->interface->handlePacket()){
+			$work = true;
+			while($this->interface->handlePacket()){
+			}
+		}
+
+		return $work;
 	}
 
 	public function closeSession($identifier, $reason){
@@ -150,7 +157,7 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 	}
 
 	public function openSession($identifier, $address, $port, $clientID){
-		$player = new Player($this, $clientID, $address, $port);
+		$player = new Player($this, null, $address, $port);
 		$this->players[$identifier] = $player;
 		$this->identifiersACK[$identifier] = 0;
 		$this->identifers->attach($player, $identifier);
@@ -181,6 +188,10 @@ class RakLibInterface implements ServerInstance, SourceInterface{
 
 	public function setName($name){
 		$this->interface->sendOption("name", "MCCPP;Demo;$name");
+	}
+
+	public function setPortCheck($name){
+		$this->interface->sendOption("portChecking", (bool) $name);
 	}
 
 	public function handleOption($name, $value){

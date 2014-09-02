@@ -21,7 +21,6 @@
 
 namespace pocketmine\level;
 
-use pocketmine\level\format\pmf\LevelFormat;
 use pocketmine\level\format\PocketChunkParser;
 use pocketmine\nbt\NBT;
 use pocketmine\utils\Config;
@@ -66,7 +65,7 @@ class LevelImport{
 			return false;
 		}
 
-		$pmf = new LevelFormat($this->path . "level.pmf", array(
+		$pmf = new LevelFormat($this->path . "level.pmf", [
 			"name" => $level->LevelName,
 			"seed" => $level->RandomSeed,
 			"time" => $level->Time,
@@ -77,13 +76,13 @@ class LevelImport{
 			"generator" => "default",
 			"generatorSettings" => "",
 			"extra" => ""
-		));
+		]);
 		$chunks = new PocketChunkParser();
 		$chunks->loadFile($this->path . "chunks.dat");
 		$chunks->loadMap();
 		for($Z = 0; $Z < 16; ++$Z){
 			for($X = 0; $X < 16; ++$X){
-				$chunk = array(
+				$chunk = [
 					0 => "",
 					1 => "",
 					2 => "",
@@ -92,7 +91,7 @@ class LevelImport{
 					5 => "",
 					6 => "",
 					7 => ""
-				);
+				];
 
 				$pmf->initCleanChunk($X, $Z);
 				for($z = 0; $z < 16; ++$z){

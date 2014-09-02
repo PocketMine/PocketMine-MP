@@ -24,10 +24,14 @@
  */
 namespace pocketmine\block;
 
+use pocketmine\entity\Villager;
+use pocketmine\entity\Zombie;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\level\MovingObjectPosition;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
+use pocketmine\math\Vector3;
 use pocketmine\metadata\Metadatable;
 use pocketmine\metadata\MetadataValue;
 use pocketmine\Player;
@@ -97,7 +101,7 @@ abstract class Block extends Position implements Metadatable{
 	const OBSIDIAN = 49;
 	const TORCH = 50;
 	const FIRE = 51;
-
+	const MONSTER_SPAWNER = 52;
 	const WOOD_STAIRS = 53;
 	const WOODEN_STAIRS = 53;
 	const OAK_WOOD_STAIRS = 53;
@@ -166,11 +170,15 @@ abstract class Block extends Position implements Metadatable{
 	const FENCE_GATE = 107;
 	const BRICK_STAIRS = 108;
 	const STONE_BRICK_STAIRS = 109;
+	const MYCELIUM = 110;
 
 	const NETHER_BRICKS = 112;
 	const NETHER_BRICK_BLOCK = 112;
 
 	const NETHER_BRICKS_STAIRS = 114;
+
+	const END_PORTAL = 120;
+	const END_STONE = 121;
 
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
@@ -218,17 +226,19 @@ abstract class Block extends Position implements Metadatable{
 	const HARDENED_CLAY = 172;
 	const COAL_BLOCK = 173;
 
+	const PODZOL = 243;
 	const BEETROOT_BLOCK = 244;
 	const STONECUTTER = 245;
 	const GLOWING_OBSIDIAN = 246;
 	const NETHER_REACTOR = 247;
 
-	public static $creative = array(
+	public static $creative = [
 		//Building
 		[Item::COBBLESTONE, 0],
 		[Item::STONE_BRICKS, 0],
 		[Item::STONE_BRICKS, 1],
 		[Item::STONE_BRICKS, 2],
+		[Item::STONE_BRICKS, 3],
 		[Item::MOSS_STONE, 0],
 		[Item::WOODEN_PLANKS, 0],
 		[Item::WOODEN_PLANKS, 1],
@@ -246,9 +256,9 @@ abstract class Block extends Position implements Metadatable{
 		[Item::STONE, 5],
 		[Item::STONE, 6],
 		[Item::DIRT, 0],
-		//TODO: PODZOL
+		[Item::PODZOL, 0],
 		[Item::GRASS, 0],
-		//TODO: MYCELIUM
+		[Item::MYCELIUM, 0],
 		[Item::CLAY_BLOCK, 0],
 		[Item::HARDENED_CLAY, 0],
 		[Item::STAINED_CLAY, 0],
@@ -271,6 +281,7 @@ abstract class Block extends Position implements Metadatable{
 		[Item::SANDSTONE, 1],
 		[Item::SANDSTONE, 2],
 		[Item::SAND, 0],
+		[Item::SAND, 1],
 		[Item::GRAVEL, 0],
 		[Item::TRUNK, 0],
 		[Item::TRUNK, 1],
@@ -318,7 +329,7 @@ abstract class Block extends Position implements Metadatable{
 		[Item::OBSIDIAN, 0],
 		[Item::ICE, 0],
 		[Item::SNOW_BLOCK, 0],
-		//TODO: ENDSTONE
+		[Item::END_STONE, 0],
 
 		//Decoration
 		[Item::COBBLESTONE_WALL, 0],
@@ -351,6 +362,7 @@ abstract class Block extends Position implements Metadatable{
 		[Item::CHEST, 0],
 		[Item::FURNACE, 0],
 		//TODO: End Portal
+		[Item::END_PORTAL, 0],
 		[Item::DANDELION, 0],
 		[Item::POPPY, 0],
 		//TODO: blue orchid
@@ -396,7 +408,7 @@ abstract class Block extends Position implements Metadatable{
 		[Item::LEAVES2, 1],
 		[Item::CAKE, 0],
 		[Item::SIGN, 0],
-		//TODO: Monster Spawner
+		[Item::MONSTER_SPAWNER, 0],
 		[Item::WOOL, 0],
 		[Item::WOOL, 7],
 		[Item::WOOL, 6],
@@ -446,11 +458,11 @@ abstract class Block extends Position implements Metadatable{
 		[Item::CLOCK, 0],
 		[Item::COMPASS, 0],
 		[Item::MINECART, 0],
-		//TODO: Villager
-		[Item::SPAWN_EGG, 10], //Chicken
-		[Item::SPAWN_EGG, 11], //Cow
-		[Item::SPAWN_EGG, 12], //Pig
-		[Item::SPAWN_EGG, 13], //Sheep
+		[Item::SPAWN_EGG, Villager::NETWORK_ID],
+		//[Item::SPAWN_EGG, 10], //Chicken
+		//[Item::SPAWN_EGG, 11], //Cow
+		//[Item::SPAWN_EGG, 12], //Pig
+		//[Item::SPAWN_EGG, 13], //Sheep
 		//TODO: Wolf
 		//TODO: Mooshroom
 		//TODO: Creeper
@@ -458,7 +470,7 @@ abstract class Block extends Position implements Metadatable{
 		//TODO: Silverfish
 		//TODO: Skeleton
 		//TODO: Slime
-		//TODO: Zombie
+		[Item::SPAWN_EGG, Zombie::NETWORK_ID],
 		//TODO: PigZombie
 		//TODO: Replace with Entity constants
 
@@ -490,15 +502,15 @@ abstract class Block extends Position implements Metadatable{
 		[Item::DYE, 9],
 		[Item::DYE, 8],
 
-	);
+	];
 
 	/** @var Block[] */
 	public static $list = [];
 	protected $id;
 	protected $meta;
-	protected $name;
-	protected $breakTime;
-	protected $hardness;
+	protected $name = "Unknown";
+	protected $breakTime = 0.20;
+	protected $hardness = 10;
 	public $isActivable = false;
 	public $breakable = true;
 	public $isFlowable = false;
@@ -516,140 +528,144 @@ abstract class Block extends Position implements Metadatable{
 
 	public static function init(){
 		if(count(self::$list) === 0){
-			self::$list = array(
-				self::AIR => new Air(),
-				self::STONE => new Stone(),
-				self::GRASS => new Grass(),
-				self::DIRT => new Dirt(),
-				self::COBBLESTONE => new Cobblestone(),
-				self::PLANKS => new Planks(),
-				self::SAPLING => new Sapling(),
-				self::BEDROCK => new Bedrock(),
-				self::WATER => new Water(),
-				self::STILL_WATER => new StillWater(),
-				self::LAVA => new Lava(),
-				self::STILL_LAVA => new StillLava(),
-				self::SAND => new Sand(),
-				self::GRAVEL => new Gravel(),
-				self::GOLD_ORE => new GoldOre(),
-				self::IRON_ORE => new IronOre(),
-				self::COAL_ORE => new CoalOre(),
-				self::WOOD => new Wood(),
-				self::LEAVES => new Leaves(),
-				self::SPONGE => new Sponge(),
-				self::GLASS => new Glass(),
-				self::LAPIS_ORE => new LapisOre(),
-				self::LAPIS_BLOCK => new Lapis(),
-				self::SANDSTONE => new Sandstone(),
-				self::BED_BLOCK => new Bed(),
-				self::COBWEB => new Cobweb(),
-				self::TALL_GRASS => new TallGrass(),
-				self::DEAD_BUSH => new DeadBush(),
-				self::WOOL => new Wool(),
-				self::DANDELION => new Dandelion(),
-				self::POPPY => new CyanFlower(),
-				self::BROWN_MUSHROOM => new BrownMushroom(),
-				self::RED_MUSHROOM => new RedMushroom(),
-				self::GOLD_BLOCK => new Gold(),
-				self::IRON_BLOCK => new Iron(),
-				self::DOUBLE_SLAB => new DoubleSlab(),
-				self::SLAB => new Slab(),
-				self::BRICKS_BLOCK => new Bricks(),
-				self::TNT => new TNT(),
-				self::BOOKSHELF => new Bookshelf(),
-				self::MOSS_STONE => new MossStone(),
-				self::OBSIDIAN => new Obsidian(),
-				self::TORCH => new Torch(),
-				self::FIRE => new Fire(),
+			self::$list = [
+				self::AIR => Air::class,
+				self::STONE => Stone::class,
+				self::GRASS => Grass::class,
+				self::DIRT => Dirt::class,
+				self::COBBLESTONE => Cobblestone::class,
+				self::PLANKS => Planks::class,
+				self::SAPLING => Sapling::class,
+				self::BEDROCK => Bedrock::class,
+				self::WATER => Water::class,
+				self::STILL_WATER => StillWater::class,
+				self::LAVA => Lava::class,
+				self::STILL_LAVA => StillLava::class,
+				self::SAND => Sand::class,
+				self::GRAVEL => Gravel::class,
+				self::GOLD_ORE => GoldOre::class,
+				self::IRON_ORE => IronOre::class,
+				self::COAL_ORE => CoalOre::class,
+				self::WOOD => Wood::class,
+				self::LEAVES => Leaves::class,
+				self::SPONGE => Sponge::class,
+				self::GLASS => Glass::class,
+				self::LAPIS_ORE => LapisOre::class,
+				self::LAPIS_BLOCK => Lapis::class,
+				self::SANDSTONE => Sandstone::class,
+				self::BED_BLOCK => Bed::class,
+				self::COBWEB => Cobweb::class,
+				self::TALL_GRASS => TallGrass::class,
+				self::DEAD_BUSH => DeadBush::class,
+				self::WOOL => Wool::class,
+				self::DANDELION => Dandelion::class,
+				self::POPPY => CyanFlower::class,
+				self::BROWN_MUSHROOM => BrownMushroom::class,
+				self::RED_MUSHROOM => RedMushroom::class,
+				self::GOLD_BLOCK => Gold::class,
+				self::IRON_BLOCK => Iron::class,
+				self::DOUBLE_SLAB => DoubleSlab::class,
+				self::SLAB => Slab::class,
+				self::BRICKS_BLOCK => Bricks::class,
+				self::TNT => TNT::class,
+				self::BOOKSHELF => Bookshelf::class,
+				self::MOSS_STONE => MossStone::class,
+				self::OBSIDIAN => Obsidian::class,
+				self::TORCH => Torch::class,
+				self::FIRE => Fire::class,
+				self::MONSTER_SPAWNER => MonsterSpawner::class,
+				self::WOOD_STAIRS => WoodStairs::class,
+				self::CHEST => Chest::class,
 
-				self::WOOD_STAIRS => new WoodStairs(),
-				self::CHEST => new Chest(),
+				self::DIAMOND_ORE => DiamondOre::class,
+				self::DIAMOND_BLOCK => Diamond::class,
+				self::WORKBENCH => Workbench::class,
+				self::WHEAT_BLOCK => Wheat::class,
+				self::FARMLAND => Farmland::class,
+				self::FURNACE => Furnace::class,
+				self::BURNING_FURNACE => BurningFurnace::class,
+				self::SIGN_POST => SignPost::class,
+				self::WOOD_DOOR_BLOCK => WoodDoor::class,
+				self::LADDER => Ladder::class,
 
-				self::DIAMOND_ORE => new DiamondOre(),
-				self::DIAMOND_BLOCK => new Diamond(),
-				self::WORKBENCH => new Workbench(),
-				self::WHEAT_BLOCK => new Wheat(),
-				self::FARMLAND => new Farmland(),
-				self::FURNACE => new Furnace(),
-				self::BURNING_FURNACE => new BurningFurnace(),
-				self::SIGN_POST => new SignPost(),
-				self::WOOD_DOOR_BLOCK => new WoodDoor(),
-				self::LADDER => new Ladder(),
+				self::COBBLESTONE_STAIRS => CobblestoneStairs::class,
+				self::WALL_SIGN => WallSign::class,
 
-				self::COBBLESTONE_STAIRS => new CobblestoneStairs(),
-				self::WALL_SIGN => new WallSign(),
+				self::IRON_DOOR_BLOCK => IronDoor::class,
+				self::REDSTONE_ORE => RedstoneOre::class,
+				self::GLOWING_REDSTONE_ORE => GlowingRedstoneOre::class,
 
-				self::IRON_DOOR_BLOCK => new IronDoor(),
-				self::REDSTONE_ORE => new RedstoneOre(),
-				self::GLOWING_REDSTONE_ORE => new GlowingRedstoneOre(),
+				self::SNOW_LAYER => SnowLayer::class,
+				self::ICE => Ice::class,
+				self::SNOW_BLOCK => Snow::class,
+				self::CACTUS => Cactus::class,
+				self::CLAY_BLOCK => Clay::class,
+				self::SUGARCANE_BLOCK => Sugarcane::class,
 
-				self::SNOW_LAYER => new SnowLayer(),
-				self::ICE => new Ice(),
-				self::SNOW_BLOCK => new Snow(),
-				self::CACTUS => new Cactus(),
-				self::CLAY_BLOCK => new Clay(),
-				self::SUGARCANE_BLOCK => new Sugarcane(),
+				self::FENCE => Fence::class,
+				self::PUMPKIN => Pumpkin::class,
+				self::NETHERRACK => Netherrack::class,
+				self::SOUL_SAND => SoulSand::class,
+				self::GLOWSTONE_BLOCK => Glowstone::class,
 
-				self::FENCE => new Fence(),
-				self::PUMPKIN => new Pumpkin(),
-				self::NETHERRACK => new Netherrack(),
-				self::SOUL_SAND => new SoulSand(),
-				self::GLOWSTONE_BLOCK => new Glowstone(),
+				self::LIT_PUMPKIN => LitPumpkin::class,
+				self::CAKE_BLOCK => Cake::class,
 
-				self::LIT_PUMPKIN => new LitPumpkin(),
-				self::CAKE_BLOCK => new Cake(),
+				self::TRAPDOOR => Trapdoor::class,
 
-				self::TRAPDOOR => new Trapdoor(),
+				self::STONE_BRICKS => StoneBricks::class,
 
-				self::STONE_BRICKS => new StoneBricks(),
+				self::IRON_BARS => IronBars::class,
+				self::GLASS_PANE => GlassPane::class,
+				self::MELON_BLOCK => Melon::class,
+				self::PUMPKIN_STEM => PumpkinStem::class,
+				self::MELON_STEM => MelonStem::class,
 
-				self::IRON_BARS => new IronBars(),
-				self::GLASS_PANE => new GlassPane(),
-				self::MELON_BLOCK => new Melon(),
-				self::PUMPKIN_STEM => new PumpkinStem(),
-				self::MELON_STEM => new MelonStem(),
+				self::FENCE_GATE => FenceGate::class,
+				self::BRICK_STAIRS => BrickStairs::class,
+				self::STONE_BRICK_STAIRS => StoneBrickStairs::class,
 
-				self::FENCE_GATE => new FenceGate(),
-				self::BRICK_STAIRS => new BrickStairs(),
-				self::STONE_BRICK_STAIRS => new StoneBrickStairs(),
+				self::MYCELIUM => Mycelium::class,
+				self::NETHER_BRICKS => NetherBrick::class,
 
-				self::NETHER_BRICKS => new NetherBrick(),
+				self::NETHER_BRICKS_STAIRS => NetherBrickStairs::class,
 
-				self::NETHER_BRICKS_STAIRS => new NetherBrickStairs(),
+				self::END_PORTAL => EndPortal::class,
+				self::END_STONE => EndStone::class,
+				self::SANDSTONE_STAIRS => SandstoneStairs::class,
+				self::EMERALD_ORE => EmeraldOre::class,
 
-				self::SANDSTONE_STAIRS => new SandstoneStairs(),
-				self::EMERALD_ORE => new EmeraldOre(),
+				self::EMERALD_BLOCK => Emerald::class,
+				self::SPRUCE_WOOD_STAIRS => SpruceWoodStairs::class,
+				self::BIRCH_WOOD_STAIRS => BirchWoodStairs::class,
+				self::JUNGLE_WOOD_STAIRS => JungleWoodStairs::class,
+				self::STONE_WALL => StoneWall::class,
 
-				self::EMERALD_BLOCK => new Emerald(),
-				self::SPRUCE_WOOD_STAIRS => new SpruceWoodStairs(),
-				self::BIRCH_WOOD_STAIRS => new BirchWoodStairs(),
-				self::JUNGLE_WOOD_STAIRS => new JungleWoodStairs(),
-				self::STONE_WALL => new StoneWall(),
+				self::CARROT_BLOCK => Carrot::class,
+				self::POTATO_BLOCK => Potato::class,
 
-				self::CARROT_BLOCK => new Carrot(),
-				self::POTATO_BLOCK => new Potato(),
+				self::QUARTZ_BLOCK => Quartz::class,
+				self::QUARTZ_STAIRS => QuartzStairs::class,
+				self::DOUBLE_WOOD_SLAB => DoubleWoodSlab::class,
+				self::WOOD_SLAB => WoodSlab::class,
+				self::STAINED_CLAY => StainedClay::class,
 
-				self::QUARTZ_BLOCK => new Quartz(),
-				self::QUARTZ_STAIRS => new QuartzStairs(),
-				self::DOUBLE_WOOD_SLAB => new DoubleWoodSlab(),
-				self::WOOD_SLAB => new WoodSlab(),
-				self::STAINED_CLAY => new StainedClay(),
+				self::LEAVES2 => Leaves2::class,
+				self::WOOD2 => Wood2::class,
+				self::ACACIA_WOOD_STAIRS => AcaciaWoodStairs::class,
+				self::DARK_OAK_WOOD_STAIRS => DarkOakWoodStairs::class,
 
-				self::LEAVES2 => new Leaves2(),
-				self::WOOD2 => new Wood2(),
-				self::ACACIA_WOOD_STAIRS => new AcaciaWoodStairs(),
-				self::DARK_OAK_WOOD_STAIRS => new DarkOakWoodStairs(),
+				self::HAY_BALE => HayBale::class,
+				self::CARPET => Carpet::class,
+				self::HARDENED_CLAY => HardenedClay::class,
+				self::COAL_BLOCK => Coal::class,
 
-				self::HAY_BALE => new HayBale(),
-				self::CARPET => new Carpet(),
-				self::HARDENED_CLAY => new HardenedClay(),
-				self::COAL_BLOCK => new Coal(),
-
-				self::BEETROOT_BLOCK => new Beetroot(),
-				self::STONECUTTER => new Stonecutter(),
-				self::GLOWING_OBSIDIAN => new GlowingObsidian(),
-				self::NETHER_REACTOR => new NetherReactor(),
-			);
+				self::PODZOL => Podzol::class,
+				self::BEETROOT_BLOCK => Beetroot::class,
+				self::STONECUTTER => Stonecutter::class,
+				self::GLOWING_OBSIDIAN => GlowingObsidian::class,
+				self::NETHER_REACTOR => NetherReactor::class,
+			];
 		}
 	}
 
@@ -662,11 +678,12 @@ abstract class Block extends Position implements Metadatable{
 	 */
 	public static function get($id, $meta = 0, Position $pos = null){
 		if(isset(self::$list[$id])){
-			$block = clone self::$list[$id];
-			$block->setDamage($meta);
+			$block = self::$list[$id];
+			$block = new $block($meta);
 		}else{
 			$block = new Generic($id, $meta);
 		}
+
 		if($pos instanceof Position){
 			$block->position($pos);
 		}
@@ -683,8 +700,6 @@ abstract class Block extends Position implements Metadatable{
 		$this->id = (int) $id;
 		$this->meta = (int) $meta;
 		$this->name = $name;
-		$this->breakTime = 0.20;
-		$this->hardness = 10;
 	}
 
 	/**
@@ -746,7 +761,7 @@ abstract class Block extends Position implements Metadatable{
 			return [];
 		}else{
 			return [
-				array($this->id, $this->meta, 1),
+				[$this->id, $this->meta, 1],
 			];
 		}
 	}
@@ -810,9 +825,9 @@ abstract class Block extends Position implements Metadatable{
 	 * @param AxisAlignedBB $bb
 	 * @param Block[]       $list
 	 */
-	public function collidesWithBB(AxisAlignedBB $bb, &$list = array()){
+	public function collidesWithBB(AxisAlignedBB $bb, &$list = []){
 		$bb2 = $this->getBoundingBox();
-		if($bb2->intersectsWith($bb)){
+		if($bb2 !== null and $bb2->intersectsWith($bb)){
 			$list[] = $bb2;
 		}
 	}
@@ -829,6 +844,88 @@ abstract class Block extends Position implements Metadatable{
 			$this->y + 1,
 			$this->z + 1
 		);
+	}
+
+	public function calculateIntercept(Vector3 $pos1, Vector3 $pos2){
+		$bb = $this->getBoundingBox();
+		if($bb === null){
+			return null;
+		}
+
+		$v1 = $pos1->getIntermediateWithXValue($pos2, $bb->minX);
+		$v2 = $pos1->getIntermediateWithXValue($pos2, $bb->maxX);
+		$v3 = $pos1->getIntermediateWithYValue($pos2, $bb->minY);
+		$v4 = $pos1->getIntermediateWithYValue($pos2, $bb->maxY);
+		$v5 = $pos1->getIntermediateWithZValue($pos2, $bb->minZ);
+		$v6 = $pos1->getIntermediateWithZValue($pos2, $bb->maxZ);
+
+		if($v1 !== null and !$bb->isVectorInYZ($v1)){
+			$v1 = null;
+		}
+
+		if($v2 !== null and !$bb->isVectorInYZ($v2)){
+			$v2 = null;
+		}
+
+		if($v3 !== null and !$bb->isVectorInXZ($v3)){
+			$v3 = null;
+		}
+
+		if($v4 !== null and !$bb->isVectorInXZ($v4)){
+			$v4 = null;
+		}
+
+		if($v5 !== null and !$bb->isVectorInXY($v5)){
+			$v5 = null;
+		}
+
+		if($v6 !== null and !$bb->isVectorInXY($v6)){
+			$v6 = null;
+		}
+
+		$vector = $v1;
+
+		if($v2 !== null and ($vector === null or $pos1->distanceSquared($v2) < $pos1->distanceSquared($vector))){
+			$vector = $v2;
+		}
+
+		if($v3 !== null and ($vector === null or $pos1->distanceSquared($v3) < $pos1->distanceSquared($vector))){
+			$vector = $v3;
+		}
+
+		if($v4 !== null and ($vector === null or $pos1->distanceSquared($v4) < $pos1->distanceSquared($vector))){
+			$vector = $v4;
+		}
+
+		if($v5 !== null and ($vector === null or $pos1->distanceSquared($v5) < $pos1->distanceSquared($vector))){
+			$vector = $v5;
+		}
+
+		if($v6 !== null and ($vector === null or $pos1->distanceSquared($v6) < $pos1->distanceSquared($vector))){
+			$vector = $v6;
+		}
+
+		if($vector === null){
+			return null;
+		}
+
+		$f = -1;
+
+		if($vector === $v1){
+			$f = 4;
+		}elseif($vector === $v2){
+			$f = 5;
+		}elseif($vector === $v3){
+			$f = 0;
+		}elseif($vector === $v4){
+			$f = 1;
+		}elseif($vector === $v5){
+			$f = 2;
+		}elseif($vector === $v6){
+			$f = 3;
+		}
+
+		return MovingObjectPosition::fromBlock($this->x, $this->y, $this->z, $f, $vector->add($this->x, $this->y, $this->z));
 	}
 
 	/**

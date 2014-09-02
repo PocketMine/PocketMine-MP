@@ -21,7 +21,7 @@
 
 namespace pocketmine\level\generator;
 
-use pocketmine\level\format\SimpleChunk;
+use pocketmine\level\format\FullChunk;
 use pocketmine\level\Level;
 use pocketmine\Server;
 use pocketmine\utils\Binary;
@@ -77,8 +77,8 @@ class GenerationRequestManager{
 		return $buffer;
 	}
 
-	protected function sendChunk($levelID, SimpleChunk $chunk){
-		$binary = chr(GenerationManager::PACKET_SEND_CHUNK) . Binary::writeInt($levelID) . $chunk->toBinary();
+	protected function sendChunk($levelID, FullChunk $chunk){
+		$binary = chr(GenerationManager::PACKET_SEND_CHUNK) . Binary::writeInt($levelID) . chr(strlen($class = get_class($chunk))) . $class . $chunk->toBinary();
 		@socket_write($this->socket, Binary::writeInt(strlen($binary)) . $binary);
 	}
 
@@ -89,14 +89,19 @@ class GenerationRequestManager{
 
 	protected function handleRequest($levelID, $chunkX, $chunkZ){
 		if(($level = $this->server->getLevel($levelID)) instanceof Level){
-			$this->sendChunk($levelID, $level->getChunk($chunkX, $chunkZ, false));
+			$chunk = $level->getChunkAt($chunkX, $chunkZ, true);
+			if($chunk instanceof FullChunk){
+				$this->sendChunk($levelID, $chunk);
+			}else{
+				throw new \Exception("Invalid Chunk given");
+			}
 		}else{
 			$buffer = chr(GenerationManager::PACKET_CLOSE_LEVEL) . Binary::writeInt($levelID);
 			@socket_write($this->socket, Binary::writeInt(strlen($buffer)) . $buffer);
 		}
 	}
 
-	protected function receiveChunk($levelID, SimpleChunk $chunk){
+	protected function receiveChunk($levelID, FullChunk $chunk){
 		if(($level = $this->server->getLevel($levelID)) instanceof Level){
 			$level->generateChunkCallback($chunk->getX(), $chunk->getZ(), $chunk);
 		}else{
@@ -106,10 +111,11 @@ class GenerationRequestManager{
 	}
 
 	public function handlePackets(){
-		if(($len = @socket_read($this->socket, 4)) !== false){
+		if(($len = @socket_read($this->socket, 4)) !== false and $len !== ""){
 			if(strlen($len) < 4){
 				$len .= $this->socketRead(4 - strlen($len));
 			}
+
 			$packet = $this->socketRead(Binary::readInt($len));
 			$pid = ord($packet{0});
 			$offset = 1;
@@ -124,8 +130,15 @@ class GenerationRequestManager{
 			}elseif($pid === GenerationManager::PACKET_SEND_CHUNK){
 				$levelID = Binary::readInt(substr($packet, $offset, 4));
 				$offset += 4;
-				$chunk = SimpleChunk::fromBinary(substr($packet, $offset));
-				$this->receiveChunk($levelID, $chunk);
+				$len = ord($packet{$offset++});
+				/** @var FullChunk $class */
+				$class = substr($packet, $offset, $len);
+				$offset += $len;
+				$level = $this->server->getLevel($levelID);
+				if($level instanceof Level){
+					$chunk = $class::fromBinary(substr($packet, $offset), $level->getProvider());
+					$this->receiveChunk($levelID, $chunk);
+				}
 			}
 		}
 	}

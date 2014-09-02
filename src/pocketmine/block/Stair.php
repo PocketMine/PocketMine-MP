@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 
 class Stair extends Transparent{
@@ -36,13 +37,35 @@ class Stair extends Transparent{
 		$this->hardness = 30;
 	}
 
+	public function getBoundingBox(){
+		if(($this->getDamage() & 0x04) > 0){
+			return new AxisAlignedBB(
+				$this->x,
+				$this->y + 0.5,
+				$this->z,
+				$this->x + 1,
+				$this->y + 1,
+				$this->z + 1
+			);
+		}else{
+			return new AxisAlignedBB(
+				$this->x,
+				$this->y,
+				$this->z,
+				$this->x + 1,
+				$this->y + 0.5,
+				$this->z + 1
+			);
+		}
+	}
+
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$faces = array(
+		$faces = [
 			0 => 0,
 			1 => 2,
 			2 => 1,
 			3 => 3,
-		);
+		];
 		$this->meta = $faces[$player->getDirection()] & 0x03;
 		if(($fy > 0.5 and $face !== 1) or $face === 0){
 			$this->meta |= 0x04; //Upside-down stairs
@@ -54,9 +77,9 @@ class Stair extends Transparent{
 
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= 1){
-			return array(
-				array($this->id, 0, 1),
-			);
+			return [
+				[$this->id, 0, 1],
+			];
 		}else{
 			return [];
 		}

@@ -26,18 +26,19 @@ use pocketmine\inventory\FurnaceInventory;
 use pocketmine\inventory\FurnaceRecipe;
 use pocketmine\inventory\InventoryHolder;
 use pocketmine\item\Item;
-use pocketmine\level\format\Chunk;
+use pocketmine\level\format\FullChunk;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\Byte;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Short;
+use pocketmine\network\protocol\ContainerSetDataPacket;
 
 class Furnace extends Tile implements InventoryHolder, Container{
 	/** @var FurnaceInventory */
 	protected $inventory;
 
-	public function __construct(Chunk $chunk, Compound $nbt){
+	public function __construct(FullChunk $chunk, Compound $nbt){
 		$nbt["id"] = Tile::FURNACE;
 		parent::__construct($chunk, $nbt);
 		$this->inventory = new FurnaceInventory($this);
@@ -46,7 +47,7 @@ class Furnace extends Tile implements InventoryHolder, Container{
 			$this->namedtag->Items = new Enum("Inventory", []);
 			$this->namedtag->Items->setTagType(NBT::TAG_Compound);
 		}
-		
+
 		for($i = 0; $i < $this->getSize(); ++$i){
 			$this->inventory->setItem($i, $this->getItem($i));
 		}
@@ -59,10 +60,19 @@ class Furnace extends Tile implements InventoryHolder, Container{
 		}
 		if(!isset($this->namedtag->MaxTime)){
 			$this->namedtag->MaxTime = new Short("BurnTime", $this->namedtag["BurnTime"]);
-			$this->namedtag->BurnTicks =  new Short("BurnTicks", 0);
+			$this->namedtag->BurnTicks = new Short("BurnTicks", 0);
 		}
 		if($this->namedtag["BurnTime"] > 0){
 			$this->scheduleUpdate();
+		}
+	}
+
+	public function close(){
+		if($this->closed === false){
+			foreach($this->getInventory()->getViewers() as $player){
+				$this->getInventory()->close($player);
+			}
+			parent::close();
 		}
 	}
 
@@ -123,12 +133,12 @@ class Furnace extends Tile implements InventoryHolder, Container{
 	public function setItem($index, Item $item){
 		$i = $this->getSlotIndex($index);
 
-		$d = new Compound(false, array(
+		$d = new Compound(false, [
 			new Byte("Count", $item->getCount()),
 			new Byte("Slot", $index),
 			new Short("id", $item->getID()),
 			new Short("Damage", $item->getDamage()),
-		));
+		]);
 
 		if($item->getID() === Item::AIR or $item->getCount() <= 0){
 			if($i >= 0){
@@ -216,6 +226,24 @@ class Furnace extends Tile implements InventoryHolder, Container{
 			$this->namedtag->BurnTime = new Short("BurnTime", 0);
 			$this->namedtag->CookTime = new Short("CookTime", 0);
 			$this->namedtag->BurnTicks = new Short("BurnTicks", 0);
+		}
+
+		foreach($this->getInventory()->getViewers() as $player){
+			$windowId = $player->getWindowId($this->getInventory());
+			if($windowId > 0){
+				$pk = new ContainerSetDataPacket;
+				$pk->windowid = $windowId;
+				$pk->property = 0; //Smelting
+				$pk->value = floor($this->namedtag["CookTime"]);
+				$player->dataPacket($pk);
+
+				$pk = new ContainerSetDataPacket;
+				$pk->windowid = $windowId;
+				$pk->property = 1; //Fire icon
+				$pk->value = $this->namedtag["BurnTicks"];
+				$player->dataPacket($pk);
+			}
+
 		}
 
 		$this->lastUpdate = microtime(true);

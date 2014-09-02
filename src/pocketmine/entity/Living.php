@@ -27,11 +27,11 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\Timings;
+use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\Short;
 use pocketmine\network\protocol\EntityEventPacket;
 use pocketmine\Server;
-use pocketmine\item\Item;
 
 abstract class Living extends Entity implements Damageable{
 
@@ -57,6 +57,11 @@ abstract class Living extends Entity implements Damageable{
 	}
 
 	public abstract function getName();
+
+	public function hasLineOfSight(Entity $entity){
+		//TODO: head height
+		return $this->getLevel()->rayTraceBlocks(new Vector3($this->x, $this->y + $this->height, $this->z), new Vector3($entity->x, $entity->y + $entity->height, $entity->z)) === null;
+	}
 
 	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
 		//TODO: attack tick limit

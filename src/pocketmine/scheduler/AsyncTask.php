@@ -20,6 +20,7 @@
 */
 
 namespace pocketmine\scheduler;
+
 use pocketmine\Server;
 
 /**
@@ -32,6 +33,7 @@ abstract class AsyncTask extends \Threaded{
 	protected $complete = null;
 	protected $finished = null;
 	protected $result = null;
+	protected $taskId = null;
 
 	public function run(){
 		$this->finished = false;
@@ -100,11 +102,14 @@ abstract class AsyncTask extends \Threaded{
 
 	/**
 	 * Actions to execute when completed (on main thread)
+	 * Implement this if you want to handle the data in your AsyncTask after it has been processed
 	 *
 	 * @param Server $server
 	 *
 	 * @return void
 	 */
-	public abstract function onCompletion(Server $server);
+	public function onCompletion(Server $server){
+
+	}
 
 }

@@ -28,14 +28,19 @@ class TallGrass extends Flowable{
 	public function __construct($meta = 1){
 		parent::__construct(self::TALL_GRASS, $meta, "Tall Grass");
 		$this->isReplaceable = true;
-		$names = array(
+		$names = [
 			0 => "Dead Shrub",
 			1 => "Tall Grass",
 			2 => "Fern",
-		);
+		];
 		$this->name = $names[$this->meta & 0x03];
 		$this->hardness = 0;
 	}
+
+	public function getBoundingBox(){
+		return null;
+	}
+
 
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
@@ -50,28 +55,11 @@ class TallGrass extends Flowable{
 	}
 
 	public function getDrops(Item $item){
-		$drops = [];
-		$possibleDrops = array(
-			array(Item::WHEAT_SEEDS, 0, 1),
-			array(Item::CARROT, 0, 1),
-			array(Item::POTATO, 0, 1),
-			array(Item::BEETROOT_SEEDS, 0, 1),
-			array(Item::MELON_SEEDS, 0, 1),
-			array(Item::PUMPKIN_SEEDS, 0, 1),
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-		);
-		if(($item = $possibleDrops[mt_rand(0, count($possibleDrops) - 1)]) !== 0){
-			$drops[] = $item;
+		if(mt_rand(0, 15) === 0){
+			return [Item::WHEAT_SEEDS, 0, 1];
 		}
 
-		return $drops;
+		return [];
 	}
 
 }
