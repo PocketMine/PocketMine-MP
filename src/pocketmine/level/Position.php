@@ -123,6 +123,36 @@ class Position extends Vector3{
 		return parent::distance($pos);
 	}
 
+	/**
+	 * @param callable[] $exceptions
+	 * @return \pocketmine\Player[]
+	 */
+	public function getNearestPlayers(array $exceptions = []){ // this function will get useful when entity AI is implemented anyways
+		$currentDistance = PHP_INT_MAX;
+		$nearest = [];
+		foreach($this->getLevel()->getPlayers() as $player){
+			foreach($exceptions as $e){
+				if(call_user_func($e, $player) === false){
+					$continue = true;
+					break;
+				}
+			}
+			if(isset($continue)){
+				continue;
+			}
+			if($player === $this){
+				continue;
+			}
+			if($this->distance($player) === $currentDistance){
+				$nearest[] = $player;
+			}
+			elseif($this->distance($player) < $currentDistance){
+				$nearest = [$player];
+			}
+		}
+		return $nearest;
+	}
+
 	public function __toString(){
 		return "Position(level=" . ($this->isValid() ? $this->getLevel()->getName() : "null") . ",x=" . $this->x . ",y=" . $this->y . ",z=" . $this->z . ")";
 	}
