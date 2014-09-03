@@ -22,8 +22,6 @@
 namespace pocketmine\command;
 
 
-use pocketmine\command\selector\Selector;
-
 interface CommandMap{
 
 	/**
@@ -46,11 +44,6 @@ interface CommandMap{
 	 * @return boolean
 	 */
 	public function dispatch(CommandSender $sender, $cmdLine);
-
-	/**
-	 * @param Selector $selector
-	 */
-	public function registerSelector(Selector $selector);
 
 	/**
 	 * @return void
