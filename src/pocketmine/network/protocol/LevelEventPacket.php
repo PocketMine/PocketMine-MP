@@ -23,27 +23,27 @@ namespace pocketmine\network\protocol;
 
 
 class LevelEventPacket extends DataPacket{
-	public $evid;
-	public $x;
-	public $y;
-	public $z;
-	public $data;
+    public $evid;
+    public $x;
+    public $y;
+    public $z;
+    public $data;
 
-	public function pid(){
-		return Info::LEVEL_EVENT_PACKET;
-	}
+    public function pid(){
+        return Info::LEVEL_EVENT_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putShort($this->evid);
-		$this->putInt($this->x);
-		$this->putShort($this->y);
-		$this->putInt($this->z);
-		$this->putInt($this->data);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putShort($this->evid);
+        $this->putInt($this->x);
+        $this->putShort($this->y);
+        $this->putInt($this->z);
+        $this->putInt($this->data);
+    }
 
 }

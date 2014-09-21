@@ -25,27 +25,27 @@ use pocketmine\entity\Entity;
 
 class EntityDamageByEntityEvent extends EntityDamageEvent{
 
-	/** @var Entity */
-	private $damager;
+    /** @var Entity */
+    private $damager;
 
 
-	/**
-	 * @param Entity    $damager
-	 * @param Entity    $entity
-	 * @param int       $cause
-	 * @param int|int[] $damage
-	 */
-	public function __construct(Entity $damager, Entity $entity, $cause, $damage){
-		$this->damager = $damager;
-		parent::__construct($entity, $cause, $damage);
-	}
+    /**
+     * @param Entity    $damager
+     * @param Entity    $entity
+     * @param int       $cause
+     * @param int|int[] $damage
+     */
+    public function __construct(Entity $damager, Entity $entity, $cause, $damage){
+        $this->damager = $damager;
+        parent::__construct($entity, $cause, $damage);
+    }
 
-	/**
-	 * @return Entity
-	 */
-	public function getDamager(){
-		return $this->damager;
-	}
+    /**
+     * @return Entity
+     */
+    public function getDamager(){
+        return $this->damager;
+    }
 
 
 }

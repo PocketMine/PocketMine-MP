@@ -27,32 +27,32 @@ use pocketmine\Player;
 
 class ListCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Lists all online players",
-			"/list"
-		);
-		$this->setPermission("pocketmine.command.list");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Lists all online players",
+            "/list"
+        );
+        $this->setPermission("pocketmine.command.list");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		$online = "";
-		$onlineCount = 0;
+        $online = "";
+        $onlineCount = 0;
 
-		foreach($sender->getServer()->getOnlinePlayers() as $player){
-			if($player->isOnline() and (!($sender instanceof Player) or $sender->canSee($player))){
-				$online .= $player->getDisplayName() . ", ";
-				++$onlineCount;
-			}
-		}
+        foreach($sender->getServer()->getOnlinePlayers() as $player){
+            if($player->isOnline() and (!($sender instanceof Player) or $sender->canSee($player))){
+                $online .= $player->getDisplayName() . ", ";
+                ++$onlineCount;
+            }
+        }
 
-		$sender->sendMessage("There are " . $onlineCount . "/" . $sender->getServer()->getMaxPlayers() . " players online:\n" . substr($online, 0, -2));
+        $sender->sendMessage("There are " . $onlineCount . "/" . $sender->getServer()->getMaxPlayers() . " players online:\n" . substr($online, 0, -2));
 
-		return true;
-	}
+        return true;
+    }
 }

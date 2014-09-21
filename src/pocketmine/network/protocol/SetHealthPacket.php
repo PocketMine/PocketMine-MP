@@ -23,19 +23,19 @@ namespace pocketmine\network\protocol;
 
 
 class SetHealthPacket extends DataPacket{
-	public $health;
+    public $health;
 
-	public function pid(){
-		return Info::SET_HEALTH_PACKET;
-	}
+    public function pid(){
+        return Info::SET_HEALTH_PACKET;
+    }
 
-	public function decode(){
-		$this->health = $this->getByte();
-	}
+    public function decode(){
+        $this->health = $this->getByte();
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putByte($this->health);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putByte($this->health);
+    }
 
 }

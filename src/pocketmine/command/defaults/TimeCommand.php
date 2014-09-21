@@ -28,60 +28,60 @@ use pocketmine\utils\TextFormat;
 
 class TimeCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Changes the time on each world",
-			"/time set <value>\n/time add <value>"
-		);
-		$this->setPermission("pocketmine.command.time.add;pocketmine.command.time.set");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Changes the time on each world",
+            "/time set <value>\n/time add <value>"
+        );
+        $this->setPermission("pocketmine.command.time.add;pocketmine.command.time.set");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(count($args) < 2){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(count($args) < 2){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		if($args[0] === "set"){
-			if(!$sender->hasPermission("pocketmine.command.time.set")){
-				$sender->sendMessage(TextFormat::RED . "You don't have permission to set the time");
+        if($args[0] === "set"){
+            if(!$sender->hasPermission("pocketmine.command.time.set")){
+                $sender->sendMessage(TextFormat::RED . "You don't have permission to set the time");
 
-				return true;
-			}
+                return true;
+            }
 
-			if($args[1] === "day"){
-				$value = 0;
-			}elseif($args[1] === "night"){
-				$value = Level::TIME_NIGHT;
-			}else{
-				$value = $this->getInteger($sender, $args[1], 0);
-			}
+            if($args[1] === "day"){
+                $value = 0;
+            }elseif($args[1] === "night"){
+                $value = Level::TIME_NIGHT;
+            }else{
+                $value = $this->getInteger($sender, $args[1], 0);
+            }
 
-			foreach($sender->getServer()->getLevels() as $level){
-				$level->checkTime();
-				$level->setTime($value);
-				$level->checkTime();
-			}
-			Command::broadcastCommandMessage($sender, "Set time to " . $value);
-		}elseif($args[0] === "add"){
-			if(!$sender->hasPermission("pocketmine.command.time.add")){
-				$sender->sendMessage(TextFormat::RED . "You don't have permission to add the time");
+            foreach($sender->getServer()->getLevels() as $level){
+                $level->checkTime();
+                $level->setTime($value);
+                $level->checkTime();
+            }
+            Command::broadcastCommandMessage($sender, "Set time to " . $value);
+        }elseif($args[0] === "add"){
+            if(!$sender->hasPermission("pocketmine.command.time.add")){
+                $sender->sendMessage(TextFormat::RED . "You don't have permission to add the time");
 
-				return true;
-			}
+                return true;
+            }
 
-			$value = $this->getInteger($sender, $args[1], 0);
-			foreach($sender->getServer()->getLevels() as $level){
-				$level->checkTime();
-				$level->setTime($level->getTime() + $value);
-				$level->checkTime();
-			}
-		}else{
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
-		}
+            $value = $this->getInteger($sender, $args[1], 0);
+            foreach($sender->getServer()->getLevels() as $level){
+                $level->checkTime();
+                $level->setTime($level->getTime() + $value);
+                $level->checkTime();
+            }
+        }else{
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

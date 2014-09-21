@@ -27,41 +27,41 @@ use pocketmine\Server;
 use pocketmine\tile\Chest;
 
 class ChestInventory extends ContainerInventory{
-	public function __construct(Chest $tile){
-		parent::__construct($tile, InventoryType::get(InventoryType::CHEST));
-	}
+    public function __construct(Chest $tile){
+        parent::__construct($tile, InventoryType::get(InventoryType::CHEST));
+    }
 
-	/**
-	 * @return Chest
-	 */
-	public function getHolder(){
-		return $this->holder;
-	}
+    /**
+     * @return Chest
+     */
+    public function getHolder(){
+        return $this->holder;
+    }
 
-	public function onOpen(Player $who){
-		parent::onOpen($who);
+    public function onOpen(Player $who){
+        parent::onOpen($who);
 
-		if(count($this->getViewers()) === 1){
-			$pk = new TileEventPacket;
-			$pk->x = $this->getHolder()->getX();
-			$pk->y = $this->getHolder()->getY();
-			$pk->z = $this->getHolder()->getZ();
-			$pk->case1 = 1;
-			$pk->case2 = 2;
-			Server::broadcastPacket($this->getHolder()->getLevel()->getPlayers(), $pk);
-		}
-	}
+        if(count($this->getViewers()) === 1){
+            $pk = new TileEventPacket;
+            $pk->x = $this->getHolder()->getX();
+            $pk->y = $this->getHolder()->getY();
+            $pk->z = $this->getHolder()->getZ();
+            $pk->case1 = 1;
+            $pk->case2 = 2;
+            Server::broadcastPacket($this->getHolder()->getLevel()->getPlayers(), $pk);
+        }
+    }
 
-	public function onClose(Player $who){
-		if(count($this->getViewers()) === 1){
-			$pk = new TileEventPacket;
-			$pk->x = $this->getHolder()->getX();
-			$pk->y = $this->getHolder()->getY();
-			$pk->z = $this->getHolder()->getZ();
-			$pk->case1 = 1;
-			$pk->case2 = 0;
-			Server::broadcastPacket($this->getHolder()->getLevel()->getPlayers(), $pk);
-		}
-		parent::onClose($who);
-	}
+    public function onClose(Player $who){
+        if(count($this->getViewers()) === 1){
+            $pk = new TileEventPacket;
+            $pk->x = $this->getHolder()->getX();
+            $pk->y = $this->getHolder()->getY();
+            $pk->z = $this->getHolder()->getZ();
+            $pk->case1 = 1;
+            $pk->case2 = 0;
+            Server::broadcastPacket($this->getHolder()->getLevel()->getPlayers(), $pk);
+        }
+        parent::onClose($who);
+    }
 }

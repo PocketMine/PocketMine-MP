@@ -26,29 +26,29 @@ use pocketmine\utils\TextFormat;
 
 class StatusCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Reads back the server's performance.",
-			"/status"
-		);
-		$this->setPermission("pocketmine.command.status");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Reads back the server's performance.",
+            "/status"
+        );
+        $this->setPermission("pocketmine.command.status");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		$server = $sender->getServer();
-		$sender->sendMessage(TextFormat::GREEN . "---- " . TextFormat::WHITE . "Server status" . TextFormat::GREEN . " ----");
-		$sender->sendMessage(TextFormat::GOLD . "TPS: " . TextFormat::WHITE . $server->getTicksPerSecond());
-		$sender->sendMessage(TextFormat::GOLD . "TPS Load: " . TextFormat::WHITE . $server->getTickUsage() . "%");
-		//TODO: implement network speed
-		//$sender->sendMessage(TextFormat::GOLD . "Upload: " . TextFormat::WHITE . round($server->getNetwork()->getUploadSpeed() / 1024, 2) . " kB/s");
-		//$sender->sendMessage(TextFormat::GOLD . "Download: " . TextFormat::WHITE . round($server->getNetwork()->getDownloadSpeed() / 1024, 2) . " kB/s");
-		$sender->sendMessage(TextFormat::GOLD . "Memory: " . TextFormat::WHITE . round((memory_get_usage() / 1024) / 1024, 2) . TextFormat::YELLOW . "/" . TextFormat::WHITE . round((memory_get_usage(true) / 1024) / 1024, 2) . " MB");
+        $server = $sender->getServer();
+        $sender->sendMessage(TextFormat::GREEN . "---- " . TextFormat::WHITE . "Server status" . TextFormat::GREEN . " ----");
+        $sender->sendMessage(TextFormat::GOLD . "TPS: " . TextFormat::WHITE . $server->getTicksPerSecond());
+        $sender->sendMessage(TextFormat::GOLD . "TPS Load: " . TextFormat::WHITE . $server->getTickUsage() . "%");
+        //TODO: implement network speed
+        //$sender->sendMessage(TextFormat::GOLD . "Upload: " . TextFormat::WHITE . round($server->getNetwork()->getUploadSpeed() / 1024, 2) . " kB/s");
+        //$sender->sendMessage(TextFormat::GOLD . "Download: " . TextFormat::WHITE . round($server->getNetwork()->getDownloadSpeed() / 1024, 2) . " kB/s");
+        $sender->sendMessage(TextFormat::GOLD . "Memory: " . TextFormat::WHITE . round((memory_get_usage() / 1024) / 1024, 2) . TextFormat::YELLOW . "/" . TextFormat::WHITE . round((memory_get_usage(true) / 1024) / 1024, 2) . " MB");
 
-		return true;
-	}
+        return true;
+    }
 }

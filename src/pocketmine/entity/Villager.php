@@ -29,77 +29,77 @@ use pocketmine\network\protocol\SetEntityMotionPacket;
 use pocketmine\Player;
 
 class Villager extends Creature implements NPC, Ageable{
-	const PROFESSION_FARMER = 0;
-	const PROFESSION_LIBRARIAN = 1;
-	const PROFESSION_PRIEST = 2;
-	const PROFESSION_BLACKSMITH = 3;
-	const PROFESSION_BUTCHER = 4;
-	const PROFESSION_GENERIC = 5;
+    const PROFESSION_FARMER = 0;
+    const PROFESSION_LIBRARIAN = 1;
+    const PROFESSION_PRIEST = 2;
+    const PROFESSION_BLACKSMITH = 3;
+    const PROFESSION_BUTCHER = 4;
+    const PROFESSION_GENERIC = 5;
 
-	const NETWORK_ID = 15;
+    const NETWORK_ID = 15;
 
-	public $width = 0.6;
-	public $length = 0.6;
-	public $height = 1.8;
+    public $width = 0.6;
+    public $length = 0.6;
+    public $height = 1.8;
 
-	public function getName(){
-		return "Villager";
-	}
+    public function getName(){
+        return "Villager";
+    }
 
-	protected function initEntity(){
-		parent::initEntity();
-		$this->namedtag->id = new String("id", "Villager");
-		if(!isset($this->namedtag->Profession)){
-			$this->setProfession(self::PROFESSION_GENERIC);
-		}
-	}
+    protected function initEntity(){
+        parent::initEntity();
+        $this->namedtag->id = new String("id", "Villager");
+        if(!isset($this->namedtag->Profession)){
+            $this->setProfession(self::PROFESSION_GENERIC);
+        }
+    }
 
-	public function spawnTo(Player $player){
-		$pk = new AddMobPacket();
-		$pk->eid = $this->getID();
-		$pk->type = Villager::NETWORK_ID;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->yaw = $this->yaw;
-		$pk->pitch = $this->pitch;
-		$pk->metadata = $this->getData();
-		$player->dataPacket($pk);
+    public function spawnTo(Player $player){
+        $pk = new AddMobPacket();
+        $pk->eid = $this->getID();
+        $pk->type = Villager::NETWORK_ID;
+        $pk->x = $this->x;
+        $pk->y = $this->y;
+        $pk->z = $this->z;
+        $pk->yaw = $this->yaw;
+        $pk->pitch = $this->pitch;
+        $pk->metadata = $this->getData();
+        $player->dataPacket($pk);
 
-		$pk = new SetEntityMotionPacket();
-		$pk->entities = [
-			[$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
-		];
-		$player->dataPacket($pk);
+        $pk = new SetEntityMotionPacket();
+        $pk->entities = [
+            [$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
+        ];
+        $player->dataPacket($pk);
 
-		parent::spawnTo($player);
-	}
+        parent::spawnTo($player);
+    }
 
-	public function getData(){ //TODO
-		$flags = 0;
-		$flags |= $this->fireTicks > 0 ? 1 : 0;
-		//$flags |= ($this->crouched === true ? 0b10:0) << 1;
-		//$flags |= ($this->inAction === true ? 0b10000:0);
-		$d = [
-			0 => ["type" => 0, "value" => $flags],
-			1 => ["type" => 1, "value" => $this->airTicks],
-			16 => ["type" => 0, "value" => 0],
-			17 => ["type" => 6, "value" => [0, 0, 0]],
-		];
+    public function getData(){ //TODO
+        $flags = 0;
+        $flags |= $this->fireTicks > 0 ? 1 : 0;
+        //$flags |= ($this->crouched === true ? 0b10:0) << 1;
+        //$flags |= ($this->inAction === true ? 0b10000:0);
+        $d = [
+            0 => ["type" => 0, "value" => $flags],
+            1 => ["type" => 1, "value" => $this->airTicks],
+            16 => ["type" => 0, "value" => 0],
+            17 => ["type" => 6, "value" => [0, 0, 0]],
+        ];
 
-		return $d;
-	}
+        return $d;
+    }
 
-	/**
-	 * Sets the villager profession
-	 *
-	 * @param $profession
-	 */
-	public function setProfession($profession){
-		$this->namedtag->Profession = new Int("Profession", $profession);
-	}
+    /**
+     * Sets the villager profession
+     *
+     * @param $profession
+     */
+    public function setProfession($profession){
+        $this->namedtag->Profession = new Int("Profession", $profession);
+    }
 
-	public function getProfession(){
-		return $this->namedtag["Profession"];
-	}
+    public function getProfession(){
+        return $this->namedtag["Profession"];
+    }
 }

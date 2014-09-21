@@ -25,132 +25,132 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class FormattedCommandAlias extends Command{
-	private $formatStrings = [];
+    private $formatStrings = [];
 
-	/**
-	 * @param string   $alias
-	 * @param string[] $formatStrings
-	 */
-	public function __construct($alias, array $formatStrings){
-		parent::__construct($alias);
-		$this->formatStrings = $formatStrings;
-	}
+    /**
+     * @param string   $alias
+     * @param string[] $formatStrings
+     */
+    public function __construct($alias, array $formatStrings){
+        parent::__construct($alias);
+        $this->formatStrings = $formatStrings;
+    }
 
-	public function execute(CommandSender $sender, $commandLabel, array $args){
+    public function execute(CommandSender $sender, $commandLabel, array $args){
 
-		$commands = [];
-		$result = false;
+        $commands = [];
+        $result = false;
 
-		foreach($this->formatStrings as $formatString){
-			try{
-				$commands[] = $this->buildCommand($formatString, $args);
-			}catch(\Exception $e){
-				if($e instanceof \InvalidArgumentException){
-					$sender->sendMessage(TextFormat::RED . $e->getMessage());
-				}else{
-					$sender->sendMessage(TextFormat::RED . "An internal error occurred while attempting to perform this command");
-				}
+        foreach($this->formatStrings as $formatString){
+            try{
+                $commands[] = $this->buildCommand($formatString, $args);
+            }catch(\Exception $e){
+                if($e instanceof \InvalidArgumentException){
+                    $sender->sendMessage(TextFormat::RED . $e->getMessage());
+                }else{
+                    $sender->sendMessage(TextFormat::RED . "An internal error occurred while attempting to perform this command");
+                }
 
-				return false;
-			}
-		}
+                return false;
+            }
+        }
 
-		foreach($commands as $command){
-			$result |= Server::getInstance()->dispatchCommand($sender, $command);
-		}
+        foreach($commands as $command){
+            $result |= Server::getInstance()->dispatchCommand($sender, $command);
+        }
 
-		return (bool) $result;
-	}
+        return (bool) $result;
+    }
 
-	/**
-	 * @param string $formatString
-	 * @param array  $args
-	 *
-	 * @return string
-	 * @throws \InvalidArgumentException
-	 */
-	private function buildCommand($formatString, array $args){
-		$index = strpos($formatString, '$');
-		while($index !== false){
-			$start = $index;
-			if($index > 0 and $formatString{$start - 1} === "\\"){
-				$formatString = substr($formatString, 0, $start - 1) . substr($formatString, $start);
-				$index = strpos($formatString, '$', $index);
-				continue;
-			}
+    /**
+     * @param string $formatString
+     * @param array  $args
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    private function buildCommand($formatString, array $args){
+        $index = strpos($formatString, '$');
+        while($index !== false){
+            $start = $index;
+            if($index > 0 and $formatString{$start - 1} === "\\"){
+                $formatString = substr($formatString, 0, $start - 1) . substr($formatString, $start);
+                $index = strpos($formatString, '$', $index);
+                continue;
+            }
 
-			$required = false;
-			if($formatString{$index + 1} == '$'){
-				$required = true;
+            $required = false;
+            if($formatString{$index + 1} == '$'){
+                $required = true;
 
-				++$index;
-			}
+                ++$index;
+            }
 
-			++$index;
+            ++$index;
 
-			$argStart = $index;
+            $argStart = $index;
 
-			while($index < strlen($formatString) and self::inRange($formatString{$index} - 48, 0, 9)){
-				++$index;
-			}
+            while($index < strlen($formatString) and self::inRange($formatString{$index} - 48, 0, 9)){
+                ++$index;
+            }
 
-			if($argStart === $index){
-				throw new \InvalidArgumentException("Invalid replacement token");
-			}
+            if($argStart === $index){
+                throw new \InvalidArgumentException("Invalid replacement token");
+            }
 
-			$position = intval(substr($formatString, $argStart, $index));
+            $position = intval(substr($formatString, $argStart, $index));
 
-			if($position === 0){
-				throw new \InvalidArgumentException("Invalid replacement token");
-			}
+            if($position === 0){
+                throw new \InvalidArgumentException("Invalid replacement token");
+            }
 
-			--$position;
+            --$position;
 
-			$rest = false;
+            $rest = false;
 
-			if($index < strlen($formatString) and $formatString{$index} === "-"){
-				$rest = true;
-				++$index;
-			}
+            if($index < strlen($formatString) and $formatString{$index} === "-"){
+                $rest = true;
+                ++$index;
+            }
 
-			$end = $index;
+            $end = $index;
 
-			if($required and $position >= count($args)){
-				throw new \InvalidArgumentException("Missing required argument " . ($position + 1));
-			}
+            if($required and $position >= count($args)){
+                throw new \InvalidArgumentException("Missing required argument " . ($position + 1));
+            }
 
-			$replacement = "";
-			if($rest and $position < count($args)){
-				for($i = $position; $i < count($args); ++$i){
-					if($i !== $position){
-						$replacement .= " ";
-					}
+            $replacement = "";
+            if($rest and $position < count($args)){
+                for($i = $position; $i < count($args); ++$i){
+                    if($i !== $position){
+                        $replacement .= " ";
+                    }
 
-					$replacement .= $args[$i];
-				}
-			}elseif($position < count($args)){
-				$replacement .= $args[$position];
-			}
+                    $replacement .= $args[$i];
+                }
+            }elseif($position < count($args)){
+                $replacement .= $args[$position];
+            }
 
-			$formatString = substr($formatString, 0, $start) . $replacement . substr($formatString, $end);
+            $formatString = substr($formatString, 0, $start) . $replacement . substr($formatString, $end);
 
-			$index = $start + strlen($replacement);
+            $index = $start + strlen($replacement);
 
-			$index = strpos($formatString, '$', $index);
-		}
+            $index = strpos($formatString, '$', $index);
+        }
 
-		return $formatString;
-	}
+        return $formatString;
+    }
 
-	/**
-	 * @param int $i
-	 * @param int $j
-	 * @param int $k
-	 *
-	 * @return bool
-	 */
-	private static function inRange($i, $j, $k){
-		return $i >= $j and $i <= $k;
-	}
+    /**
+     * @param int $i
+     * @param int $j
+     * @param int $k
+     *
+     * @return bool
+     */
+    private static function inRange($i, $j, $k){
+        return $i >= $j and $i <= $k;
+    }
 
 }

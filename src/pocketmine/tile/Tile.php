@@ -33,90 +33,90 @@ use pocketmine\level\Position;
 use pocketmine\nbt\tag\Compound;
 
 abstract class Tile extends Position{
-	const SIGN = "Sign";
-	const CHEST = "Chest";
-	const FURNACE = "Furnace";
+    const SIGN = "Sign";
+    const CHEST = "Chest";
+    const FURNACE = "Furnace";
 
-	//TODO: pre-close step NBT data saving method
+    //TODO: pre-close step NBT data saving method
 
-	public static $tileCount = 1;
+    public static $tileCount = 1;
 
-	/** @var Chunk */
-	public $chunk;
-	public $name;
-	public $id;
-	public $x;
-	public $y;
-	public $z;
-	public $attach;
-	public $metadata;
-	public $closed;
-	public $namedtag;
-	protected $lastUpdate;
-	protected $server;
+    /** @var Chunk */
+    public $chunk;
+    public $name;
+    public $id;
+    public $x;
+    public $y;
+    public $z;
+    public $attach;
+    public $metadata;
+    public $closed;
+    public $namedtag;
+    protected $lastUpdate;
+    protected $server;
 
-	/** @var \pocketmine\event\TimingsHandler */
-	public $tickTimer;
+    /** @var \pocketmine\event\TimingsHandler */
+    public $tickTimer;
 
-	public function __construct(FullChunk $chunk, Compound $nbt){
-		if($chunk === null or $chunk->getProvider() === null){
-			throw new \Exception("Invalid garbage Chunk given to Tile");
-		}
+    public function __construct(FullChunk $chunk, Compound $nbt){
+        if($chunk === null or $chunk->getProvider() === null){
+            throw new \Exception("Invalid garbage Chunk given to Tile");
+        }
 
-		$this->server = $chunk->getProvider()->getLevel()->getServer();
-		$this->chunk = $chunk;
-		$this->setLevel($chunk->getProvider()->getLevel());
-		$this->namedtag = $nbt;
-		$this->closed = false;
-		$this->name = "";
-		$this->lastUpdate = microtime(true);
-		$this->id = Tile::$tileCount++;
-		$this->x = (int) $this->namedtag["x"];
-		$this->y = (int) $this->namedtag["y"];
-		$this->z = (int) $this->namedtag["z"];
+        $this->server = $chunk->getProvider()->getLevel()->getServer();
+        $this->chunk = $chunk;
+        $this->setLevel($chunk->getProvider()->getLevel());
+        $this->namedtag = $nbt;
+        $this->closed = false;
+        $this->name = "";
+        $this->lastUpdate = microtime(true);
+        $this->id = Tile::$tileCount++;
+        $this->x = (int) $this->namedtag["x"];
+        $this->y = (int) $this->namedtag["y"];
+        $this->z = (int) $this->namedtag["z"];
 
-		$this->chunk->addTile($this);
-		$this->getLevel()->addTile($this);
-		$this->tickTimer = Timings::getTileEntityTimings($this);
-	}
+        $this->chunk->addTile($this);
+        $this->getLevel()->addTile($this);
+        $this->tickTimer = Timings::getTileEntityTimings($this);
+    }
 
-	public function getID(){
-		return $this->id;
-	}
+    public function getID(){
+        return $this->id;
+    }
 
-	public function saveNBT(){
-		$this->namedtag["x"] = $this->x;
-		$this->namedtag["y"] = $this->y;
-		$this->namedtag["z"] = $this->z;
-	}
+    public function saveNBT(){
+        $this->namedtag["x"] = $this->x;
+        $this->namedtag["y"] = $this->y;
+        $this->namedtag["z"] = $this->z;
+    }
 
-	public function onUpdate(){
-		return false;
-	}
+    public function onUpdate(){
+        return false;
+    }
 
-	public final function scheduleUpdate(){
-		$this->level->updateTiles[$this->id] = $this;
-	}
+    public final function scheduleUpdate(){
+        $this->level->updateTiles[$this->id] = $this;
+    }
 
-	public function __destruct(){
-		$this->close();
-	}
+    public function __destruct(){
+        $this->close();
+    }
 
-	public function close(){
-		if($this->closed === false){
-			$this->closed = true;
-			unset($this->level->updateTiles[$this->id]);
-			if($this->chunk instanceof FullChunk){
-				$this->chunk->removeTile($this);
-			}
-			if(($level = $this->getLevel()) instanceof Level){
-				$level->removeTile($this);
-			}
-		}
-	}
+    public function close(){
+        if($this->closed === false){
+            $this->closed = true;
+            unset($this->level->updateTiles[$this->id]);
+            if($this->chunk instanceof FullChunk){
+                $this->chunk->removeTile($this);
+            }
+            if(($level = $this->getLevel()) instanceof Level){
+                $level->removeTile($this);
+            }
+        }
+    }
 
-	public function getName(){
-		return $this->name;
-	}
+    public function getName(){
+        return $this->name;
+    }
 
 }

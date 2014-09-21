@@ -27,47 +27,47 @@ namespace pocketmine\level\generator;
 use pocketmine\utils\Random;
 
 abstract class Generator{
-	private static $list = [];
+    private static $list = [];
 
-	public static function addGenerator($object, $name){
-		if(is_subclass_of($object, Generator::class) and !isset(Generator::$list[$name = strtolower($name)])){
-			Generator::$list[$name] = $object;
+    public static function addGenerator($object, $name){
+        if(is_subclass_of($object, Generator::class) and !isset(Generator::$list[$name = strtolower($name)])){
+            Generator::$list[$name] = $object;
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public static function getGenerator($name){
-		if(isset(Generator::$list[$name = strtolower($name)])){
-			return Generator::$list[$name];
-		}
+    public static function getGenerator($name){
+        if(isset(Generator::$list[$name = strtolower($name)])){
+            return Generator::$list[$name];
+        }
 
-		return Normal::class;
-	}
+        return Normal::class;
+    }
 
-	public static function getGeneratorName($class){
-		foreach(Generator::$list as $name => $c){
-			if($c === $class){
-				return $name;
-			}
-		}
+    public static function getGeneratorName($class){
+        foreach(Generator::$list as $name => $c){
+            if($c === $class){
+                return $name;
+            }
+        }
 
-		return "unknown";
-	}
+        return "unknown";
+    }
 
-	public abstract function __construct(array $settings = []);
+    public abstract function __construct(array $settings = []);
 
-	public abstract function init(GenerationChunkManager $level, Random $random);
+    public abstract function init(GenerationChunkManager $level, Random $random);
 
-	public abstract function generateChunk($chunkX, $chunkZ);
+    public abstract function generateChunk($chunkX, $chunkZ);
 
-	public abstract function populateChunk($chunkX, $chunkZ);
+    public abstract function populateChunk($chunkX, $chunkZ);
 
-	public abstract function getSettings();
+    public abstract function getSettings();
 
-	public abstract function getName();
+    public abstract function getName();
 
-	public abstract function getSpawn();
+    public abstract function getSpawn();
 }

@@ -35,75 +35,75 @@ use pocketmine\nbt\tag\Short;
 use pocketmine\Player;
 
 class SpawnEgg extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::SPAWN_EGG, 0, $count, "Spawn Egg");
-		$this->meta = $meta;
-		$this->isActivable = true;
-	}
+    public function __construct($meta = 0, $count = 1){
+        parent::__construct(self::SPAWN_EGG, 0, $count, "Spawn Egg");
+        $this->meta = $meta;
+        $this->isActivable = true;
+    }
 
-	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
-		$entity = null;
-		$chunk = $level->getChunkAt($block->getX() >> 4, $block->getZ() >> 4);
+    public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
+        $entity = null;
+        $chunk = $level->getChunkAt($block->getX() >> 4, $block->getZ() >> 4);
 
-		if(!($chunk instanceof FullChunk)){
-			return false;
-		}
+        if(!($chunk instanceof FullChunk)){
+            return false;
+        }
 
-		$nbt = new Compound("", [
-			"Pos" => new Enum("Pos", [
-					new Double("", $block->getX()),
-					new Double("", $block->getY()),
-					new Double("", $block->getZ())
-				]),
-			"Motion" => new Enum("Motion", [
-					new Double("", 0),
-					new Double("", 0),
-					new Double("", 0)
-				]),
-			"Rotation" => new Enum("Rotation", [
-					new Float("", lcg_value() * 360),
-					new Float("", 0)
-				]),
-		]);
+        $nbt = new Compound("", [
+            "Pos" => new Enum("Pos", [
+                new Double("", $block->getX()),
+                new Double("", $block->getY()),
+                new Double("", $block->getZ())
+            ]),
+            "Motion" => new Enum("Motion", [
+                new Double("", 0),
+                new Double("", 0),
+                new Double("", 0)
+            ]),
+            "Rotation" => new Enum("Rotation", [
+                new Float("", lcg_value() * 360),
+                new Float("", 0)
+            ]),
+        ]);
 
-		switch($this->meta){
-			case Villager::NETWORK_ID:
-				$nbt->Health = new Short("Health", 20);
-				$entity = new Villager($chunk, $nbt);
-				break;
-			case Zombie::NETWORK_ID:
-				$nbt->Health = new Short("Health", 20);
-				$entity = new Zombie($chunk, $nbt);
-				break;
-			/*
-			//TODO: use entity constants
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-				$data = array(
-					"x" => $block->x + 0.5,
-					"y" => $block->y,
-					"z" => $block->z + 0.5,
-				);
-				//$e = Server::getInstance()->api->entity->add($block->level, ENTITY_MOB, $this->meta, $data);
-				//Server::getInstance()->api->entity->spawnToAll($e);
-				if(($player->gamemode & 0x01) === 0){
-					--$this->count;
-				}
+        switch($this->meta){
+            case Villager::NETWORK_ID:
+                $nbt->Health = new Short("Health", 20);
+                $entity = new Villager($chunk, $nbt);
+                break;
+            case Zombie::NETWORK_ID:
+                $nbt->Health = new Short("Health", 20);
+                $entity = new Zombie($chunk, $nbt);
+                break;
+            /*
+            //TODO: use entity constants
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+                $data = array(
+                    "x" => $block->x + 0.5,
+                    "y" => $block->y,
+                    "z" => $block->z + 0.5,
+                );
+                //$e = Server::getInstance()->api->entity->add($block->level, ENTITY_MOB, $this->meta, $data);
+                //Server::getInstance()->api->entity->spawnToAll($e);
+                if(($player->gamemode & 0x01) === 0){
+                    --$this->count;
+                }
 
-				return true;*/
-		}
+                return true;*/
+        }
 
-		if($entity instanceof Entity){
-			if(($player->gamemode & 0x01) === 0){
-				--$this->count;
-			}
-			$entity->spawnToAll();
+        if($entity instanceof Entity){
+            if(($player->gamemode & 0x01) === 0){
+                --$this->count;
+            }
+            $entity->spawnToAll();
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 }

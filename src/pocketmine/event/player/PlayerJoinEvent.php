@@ -27,25 +27,25 @@ use pocketmine\Player;
  * Called when a player joins the server, after sending all the spawn packets
  */
 class PlayerJoinEvent extends PlayerEvent{
-	public static $handlerList = null;
+    public static $handlerList = null;
 
-	/** @var string */
-	protected $joinMessage;
+    /** @var string */
+    protected $joinMessage;
 
-	public function __construct(Player $player, $joinMessage){
-		$this->player = $player;
-		$this->joinMessage = $joinMessage;
-	}
+    public function __construct(Player $player, $joinMessage){
+        $this->player = $player;
+        $this->joinMessage = $joinMessage;
+    }
 
-	/**
-	 * @param string $joinMessage
-	 */
-	public function setJoinMessage($joinMessage){
-		$this->joinMessage = $joinMessage;
-	}
+    /**
+     * @param string $joinMessage
+     */
+    public function setJoinMessage($joinMessage){
+        $this->joinMessage = $joinMessage;
+    }
 
-	public function getJoinMessage(){
-		return $this->joinMessage;
-	}
+    public function getJoinMessage(){
+        return $this->joinMessage;
+    }
 
 }

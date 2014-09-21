@@ -25,7 +25,7 @@ namespace pocketmine\entity;
 use pocketmine\nbt\tag\String;
 
 class Wolf extends Animal implements Tameable{
-	protected function initEntity(){
-		$this->namedtag->id = new String("id", "Wolf");
-	}
+    protected function initEntity(){
+        $this->namedtag->id = new String("id", "Wolf");
+    }
 }

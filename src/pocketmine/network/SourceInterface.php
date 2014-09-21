@@ -32,39 +32,39 @@ use pocketmine\Player;
  */
 interface SourceInterface{
 
-	/**
-	 * Sends a DataPacket to the interface, returns an unique identifier for the packet if $needACK is true
-	 *
-	 * @param Player     $player
-	 * @param DataPacket $packet
-	 * @param bool       $needACK
-	 * @param bool       $immediate
-	 *
-	 * @return int
-	 */
-	public function putPacket(Player $player, DataPacket $packet, $needACK = false, $immediate = true);
+    /**
+     * Sends a DataPacket to the interface, returns an unique identifier for the packet if $needACK is true
+     *
+     * @param Player     $player
+     * @param DataPacket $packet
+     * @param bool       $needACK
+     * @param bool       $immediate
+     *
+     * @return int
+     */
+    public function putPacket(Player $player, DataPacket $packet, $needACK = false, $immediate = true);
 
-	/**
-	 * Terminates the connection
-	 *
-	 * @param Player $player
-	 * @param string $reason
-	 *
-	 */
-	public function close(Player $player, $reason = "unknown reason");
+    /**
+     * Terminates the connection
+     *
+     * @param Player $player
+     * @param string $reason
+     *
+     */
+    public function close(Player $player, $reason = "unknown reason");
 
-	/**
-	 * @param string $name
-	 */
-	public function setName($name);
+    /**
+     * @param string $name
+     */
+    public function setName($name);
 
-	/**
-	 * @return bool
-	 */
-	public function process();
+    /**
+     * @return bool
+     */
+    public function process();
 
-	public function shutdown();
+    public function shutdown();
 
-	public function emergencyShutdown();
+    public function emergencyShutdown();
 
 }

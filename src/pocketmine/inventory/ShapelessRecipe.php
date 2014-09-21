@@ -25,87 +25,87 @@ use pocketmine\item\Item;
 use pocketmine\Server;
 
 class ShapelessRecipe implements Recipe{
-	/** @var Item */
-	private $output;
+    /** @var Item */
+    private $output;
 
-	/** @var Item[] */
-	private $ingredients = [];
+    /** @var Item[] */
+    private $ingredients = [];
 
-	public function __construct(Item $result){
-		$this->output = clone $result;
-	}
+    public function __construct(Item $result){
+        $this->output = clone $result;
+    }
 
-	public function getResult(){
-		return clone $this->output;
-	}
+    public function getResult(){
+        return clone $this->output;
+    }
 
-	/**
-	 * @param Item $item
-	 *
-	 * @returns ShapelessRecipe
-	 *
-	 * @throws \Exception
-	 */
-	public function addIngredient(Item $item){
-		if(count($this->ingredients) >= 9){
-			throw new \Exception("Shapeless recipes cannot have more than 9 ingredients");
-		}
+    /**
+     * @param Item $item
+     *
+     * @returns ShapelessRecipe
+     *
+     * @throws \Exception
+     */
+    public function addIngredient(Item $item){
+        if(count($this->ingredients) >= 9){
+            throw new \Exception("Shapeless recipes cannot have more than 9 ingredients");
+        }
 
-		$it = clone $item;
-		$it->setCount(1);
+        $it = clone $item;
+        $it->setCount(1);
 
-		while($item->getCount() > 0){
-			$this->ingredients[] = clone $it;
-			$item->setCount($item->getCount() - 1);
-		}
+        while($item->getCount() > 0){
+            $this->ingredients[] = clone $it;
+            $item->setCount($item->getCount() - 1);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @param Item $item
-	 *
-	 * @return $this
-	 */
-	public function removeIngredient(Item $item){
-		foreach($this->ingredients as $index => $ingredient){
-			if($item->getCount() <= 0){
-				break;
-			}
-			if($ingredient->equals($item, $item->getDamage() === null ? false : true)){
-				unset($this->ingredients[$index]);
-				$item->setCount($item->getCount() - 1);
-			}
-		}
+    /**
+     * @param Item $item
+     *
+     * @return $this
+     */
+    public function removeIngredient(Item $item){
+        foreach($this->ingredients as $index => $ingredient){
+            if($item->getCount() <= 0){
+                break;
+            }
+            if($ingredient->equals($item, $item->getDamage() === null ? false : true)){
+                unset($this->ingredients[$index]);
+                $item->setCount($item->getCount() - 1);
+            }
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return Item[]
-	 */
-	public function getIngredientList(){
-		$ingredients = [];
-		foreach($this->ingredients as $ingredient){
-			$ingredients[] = clone $ingredient;
-		}
+    /**
+     * @return Item[]
+     */
+    public function getIngredientList(){
+        $ingredients = [];
+        foreach($this->ingredients as $ingredient){
+            $ingredients[] = clone $ingredient;
+        }
 
-		return $ingredients;
-	}
+        return $ingredients;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getIngredientCount(){
-		$count = 0;
-		foreach($this->ingredients as $ingredient){
-			$count += $ingredient->getCount();
-		}
+    /**
+     * @return int
+     */
+    public function getIngredientCount(){
+        $count = 0;
+        foreach($this->ingredients as $ingredient){
+            $count += $ingredient->getCount();
+        }
 
-		return $count;
-	}
+        return $count;
+    }
 
-	public function registerToCraftingManager(){
-		Server::getInstance()->getCraftingManager()->registerShapelessRecipe($this);
-	}
+    public function registerToCraftingManager(){
+        Server::getInstance()->getCraftingManager()->registerShapelessRecipe($this);
+    }
 }

@@ -46,267 +46,268 @@ use pocketmine\utils\Utils;
  */
 class NBT{
 
-	const LITTLE_ENDIAN = 0;
-	const BIG_ENDIAN = 1;
-	const TAG_End = 0;
-	const TAG_Byte = 1;
-	const TAG_Short = 2;
-	const TAG_Int = 3;
-	const TAG_Long = 4;
-	const TAG_Float = 5;
-	const TAG_Double = 6;
-	const TAG_ByteArray = 7;
-	const TAG_String = 8;
-	const TAG_Enum = 9;
-	const TAG_Compound = 10;
-	const TAG_IntArray = 11;
+    const LITTLE_ENDIAN = 0;
+    const BIG_ENDIAN = 1;
+    const TAG_End = 0;
+    const TAG_Byte = 1;
+    const TAG_Short = 2;
+    const TAG_Int = 3;
+    const TAG_Long = 4;
+    const TAG_Float = 5;
+    const TAG_Double = 6;
+    const TAG_ByteArray = 7;
+    const TAG_String = 8;
+    const TAG_Enum = 9;
+    const TAG_Compound = 10;
+    const TAG_IntArray = 11;
 
-	private $buffer;
-	private $offset;
-	public $endianness;
-	private $data;
+    private $buffer;
+    private $offset;
+    public $endianness;
+    private $data;
 
-	public function get($len){
-		if($len < 0){
-			$this->offset = strlen($this->buffer) - 1;
+    public function get($len){
+        if($len < 0){
+            $this->offset = strlen($this->buffer) - 1;
 
-			return "";
-		}elseif($len === true){
-			return substr($this->buffer, $this->offset);
-		}
-		if($len > 16){
-			return substr($this->buffer, ($this->offset += $len) - $len, $len);
-		}
-		$buffer = "";
-		for(; $len > 0; --$len, ++$this->offset){
-			$buffer .= $this->buffer{$this->offset};
-		}
+            return "";
+        }elseif($len === true){
+            return substr($this->buffer, $this->offset);
+        }
+        if($len > 16){
+            return substr($this->buffer, ($this->offset += $len) - $len, $len);
+        }
+        $buffer = "";
+        for(; $len > 0; --$len, ++$this->offset){
+            $buffer .= $this->buffer{$this->offset};
+        }
 
-		return $buffer;
-	}
+        return $buffer;
+    }
 
-	public function put($v){
-		$this->buffer .= $v;
-	}
+    public function put($v){
+        $this->buffer .= $v;
+    }
 
-	public function feof(){
-		return !isset($this->buffer{$this->offset});
-	}
+    public function feof(){
+        return !isset($this->buffer{$this->offset});
+    }
 
-	public function __construct($endianness = self::LITTLE_ENDIAN){
-		$this->offset = 0;
-		$this->endianness = $endianness & 0x01;
-	}
+    public function __construct($endianness = self::LITTLE_ENDIAN){
+        $this->offset = 0;
+        $this->endianness = $endianness & 0x01;
+    }
 
-	public function read($buffer){
-		$this->offset = 0;
-		$this->buffer = $buffer;
-		$this->data = $this->readTag();
-		$this->buffer = "";
-	}
+    public function read($buffer){
+        $this->offset = 0;
+        $this->buffer = $buffer;
+        $this->data = $this->readTag();
+        $this->buffer = "";
+    }
 
-	public function readCompressed($buffer, $compression = ZLIB_ENCODING_GZIP){
-		$this->read(zlib_decode($buffer));
-	}
+    public function readCompressed($buffer, $compression = ZLIB_ENCODING_GZIP){
+        $this->read(zlib_decode($buffer));
+    }
 
-	public function write(){
-		$this->offset = 0;
-		if($this->data instanceof Compound){
-			$this->writeTag($this->data);
+    public function write(){
+        $this->offset = 0;
+        if($this->data instanceof Compound){
+            $this->writeTag($this->data);
 
-			return $this->buffer;
-		}else{
-			return false;
-		}
-	}
+            return $this->buffer;
+        }else{
+            return false;
+        }
+    }
 
-	public function writeCompressed($compression = ZLIB_ENCODING_GZIP, $level = 7){
-		if(($write = $this->write()) !== false){
-			return zlib_encode($write, $compression, $level);
-		}
+    public function writeCompressed($compression = ZLIB_ENCODING_GZIP, $level = 7){
+        if(($write = $this->write()) !== false){
+            return zlib_encode($write, $compression, $level);
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public function readTag(){
-		switch($this->getByte()){
-			case NBT::TAG_Byte:
-				$tag = new Byte($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_Short:
-				$tag = new Short($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_Int:
-				$tag = new Int($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_Long:
-				$tag = new Long($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_Float:
-				$tag = new Float($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_Double:
-				$tag = new Double($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_ByteArray:
-				$tag = new ByteArray($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_String:
-				$tag = new String($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_Enum:
-				$tag = new Enum($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_Compound:
-				$tag = new Compound($this->getString());
-				$tag->read($this);
-				break;
-			case NBT::TAG_IntArray:
-				$tag = new IntArray($this->getString());
-				$tag->read($this);
-				break;
+    public function readTag(){
+        switch($this->getByte()){
+            case NBT::TAG_Byte:
+                $tag = new Byte($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_Short:
+                $tag = new Short($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_Int:
+                $tag = new Int($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_Long:
+                $tag = new Long($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_Float:
+                $tag = new Float($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_Double:
+                $tag = new Double($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_ByteArray:
+                $tag = new ByteArray($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_String:
+                $tag = new String($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_Enum:
+                $tag = new Enum($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_Compound:
+                $tag = new Compound($this->getString());
+                $tag->read($this);
+                break;
+            case NBT::TAG_IntArray:
+                $tag = new IntArray($this->getString());
+                $tag->read($this);
+                break;
 
-			case NBT::TAG_End: //No named tag
-			default:
-				$tag = new End;
-				break;
-		}
-		return $tag;
-	}
+            case NBT::TAG_End: //No named tag
+            default:
+                $tag = new End;
+                break;
+        }
 
-	public function writeTag(Tag $tag){
-		$this->putByte($tag->getType());
-		if($tag instanceof NamedTAG){
-			$this->putString($tag->getName());
-		}
-		$tag->write($this);
-	}
+        return $tag;
+    }
 
-	public function getByte($signed = false){
-		return Binary::readByte($this->get(1), $signed);
-	}
+    public function writeTag(Tag $tag){
+        $this->putByte($tag->getType());
+        if($tag instanceof NamedTAG){
+            $this->putString($tag->getName());
+        }
+        $tag->write($this);
+    }
 
-	public function putByte($v){
-		$this->buffer .= Binary::writeByte($v);
-	}
+    public function getByte($signed = false){
+        return Binary::readByte($this->get(1), $signed);
+    }
 
-	public function getShort(){
-		return $this->endianness === self::BIG_ENDIAN ? Binary::readShort($this->get(2)) : Binary::readLShort($this->get(2));
-	}
+    public function putByte($v){
+        $this->buffer .= Binary::writeByte($v);
+    }
 
-	public function putShort($v){
-		$this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeShort($v) : Binary::writeLShort($v);
-	}
+    public function getShort(){
+        return $this->endianness === self::BIG_ENDIAN ? Binary::readShort($this->get(2)) : Binary::readLShort($this->get(2));
+    }
 
-	public function getInt(){
-		return $this->endianness === self::BIG_ENDIAN ? Binary::readInt($this->get(4)) : Binary::readLInt($this->get(4));
-	}
+    public function putShort($v){
+        $this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeShort($v) : Binary::writeLShort($v);
+    }
 
-	public function putInt($v){
-		$this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeInt($v) : Binary::writeLInt($v);
-	}
+    public function getInt(){
+        return $this->endianness === self::BIG_ENDIAN ? Binary::readInt($this->get(4)) : Binary::readLInt($this->get(4));
+    }
 
-	public function getLong(){
-		return $this->endianness === self::BIG_ENDIAN ? Binary::readLong($this->get(8)) : Binary::readLLong($this->get(8));
-	}
+    public function putInt($v){
+        $this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeInt($v) : Binary::writeLInt($v);
+    }
 
-	public function putLong($v){
-		$this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeLong($v) : Binary::writeLLong($v);
-	}
+    public function getLong(){
+        return $this->endianness === self::BIG_ENDIAN ? Binary::readLong($this->get(8)) : Binary::readLLong($this->get(8));
+    }
 
-	public function getFloat(){
-		return $this->endianness === self::BIG_ENDIAN ? Binary::readFloat($this->get(4)) : Binary::readLFloat($this->get(4));
-	}
+    public function putLong($v){
+        $this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeLong($v) : Binary::writeLLong($v);
+    }
 
-	public function putFloat($v){
-		$this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeFloat($v) : Binary::writeLFloat($v);
-	}
+    public function getFloat(){
+        return $this->endianness === self::BIG_ENDIAN ? Binary::readFloat($this->get(4)) : Binary::readLFloat($this->get(4));
+    }
 
-	public function getDouble(){
-		return $this->endianness === self::BIG_ENDIAN ? Binary::readDouble($this->get(8)) : Binary::readLDouble($this->get(8));
-	}
+    public function putFloat($v){
+        $this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeFloat($v) : Binary::writeLFloat($v);
+    }
 
-	public function putDouble($v){
-		$this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeDouble($v) : Binary::writeLDouble($v);
-	}
+    public function getDouble(){
+        return $this->endianness === self::BIG_ENDIAN ? Binary::readDouble($this->get(8)) : Binary::readLDouble($this->get(8));
+    }
 
-	public function getString(){
-		return $this->get($this->getShort());
-	}
+    public function putDouble($v){
+        $this->buffer .= $this->endianness === self::BIG_ENDIAN ? Binary::writeDouble($v) : Binary::writeLDouble($v);
+    }
 
-	public function putString($v){
-		$this->putShort(strlen($v));
-		$this->buffer .= $v;
-	}
+    public function getString(){
+        return $this->get($this->getShort());
+    }
 
-	public function getArray(){
-		$data = [];
-		$this->toArray($data, $this->data);
-	}
+    public function putString($v){
+        $this->putShort(strlen($v));
+        $this->buffer .= $v;
+    }
 
-	private function toArray(array &$data, Tag $tag){
-		/** @var Compound[]|Enum[]|IntArray[] $tag */
-		foreach($tag as $key => $value){
-			if($value instanceof Compound or $value instanceof Enum or $value instanceof IntArray){
-				$data[$key] = [];
-				$this->toArray($data[$key], $value);
-			}else{
-				$data[$key] = $value->getValue();
-			}
-		}
-	}
+    public function getArray(){
+        $data = [];
+        $this->toArray($data, $this->data);
+    }
 
-	private function fromArray(Tag $tag, array $data){
-		foreach($data as $key => $value){
-			if(is_array($value)){
-				$isNumeric = true;
-				$isIntArray = true;
-				foreach($value as $k => $v){
-					if(!is_numeric($k)){
-						$isNumeric = false;
-						break;
-					}elseif(!is_int($v)){
-						$isIntArray = false;
-					}
-				}
-				$tag{$key} = $isNumeric ? ($isIntArray ? new IntArray($key, []) : new Enum($key, [])) : new Compound($key, []);
-				$this->fromArray($tag->{$key}, $value);
-			}elseif(is_int($value)){
-				$tag{$key} = new Int($key, $value);
-			}elseif(is_float($value)){
-				$tag{$key} = new Float($key, $value);
-			}elseif(is_string($value)){
-				if(Utils::printable($value) !== $value){
-					$tag{$key} = new ByteArray($key, $value);
-				}else{
-					$tag{$key} = new String($key, $value);
-				}
-			}elseif(is_bool($value)){
-				$tag{$key} = new Byte($key, $value ? 1 : 0);
-			}
-		}
-	}
+    private function toArray(array &$data, Tag $tag){
+        /** @var Compound[]|Enum[]|IntArray[] $tag */
+        foreach($tag as $key => $value){
+            if($value instanceof Compound or $value instanceof Enum or $value instanceof IntArray){
+                $data[$key] = [];
+                $this->toArray($data[$key], $value);
+            }else{
+                $data[$key] = $value->getValue();
+            }
+        }
+    }
 
-	public function setArray(array $data){
-		$this->data = new Compound(null, []);
-		$this->fromArray($this->data, $data);
-	}
+    private function fromArray(Tag $tag, array $data){
+        foreach($data as $key => $value){
+            if(is_array($value)){
+                $isNumeric = true;
+                $isIntArray = true;
+                foreach($value as $k => $v){
+                    if(!is_numeric($k)){
+                        $isNumeric = false;
+                        break;
+                    }elseif(!is_int($v)){
+                        $isIntArray = false;
+                    }
+                }
+                $tag{$key} = $isNumeric ? ($isIntArray ? new IntArray($key, []) : new Enum($key, [])) : new Compound($key, []);
+                $this->fromArray($tag->{$key}, $value);
+            }elseif(is_int($value)){
+                $tag{$key} = new Int($key, $value);
+            }elseif(is_float($value)){
+                $tag{$key} = new Float($key, $value);
+            }elseif(is_string($value)){
+                if(Utils::printable($value) !== $value){
+                    $tag{$key} = new ByteArray($key, $value);
+                }else{
+                    $tag{$key} = new String($key, $value);
+                }
+            }elseif(is_bool($value)){
+                $tag{$key} = new Byte($key, $value ? 1 : 0);
+            }
+        }
+    }
 
-	public function getData(){
-		return $this->data;
-	}
+    public function setArray(array $data){
+        $this->data = new Compound(null, []);
+        $this->fromArray($this->data, $data);
+    }
 
-	public function setData(Compound $data){
-		$this->data = $data;
-	}
+    public function getData(){
+        return $this->data;
+    }
+
+    public function setData(Compound $data){
+        $this->data = $data;
+    }
 
 }

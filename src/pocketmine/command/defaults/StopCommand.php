@@ -27,31 +27,31 @@ use pocketmine\command\CommandSender;
 
 class StopCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Stops the server, with optional reason",
-			"/stop [reason]"
-		);
-		$this->setPermission("pocketmine.command.stop");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Stops the server, with optional reason",
+            "/stop [reason]"
+        );
+        $this->setPermission("pocketmine.command.stop");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		Command::broadcastCommandMessage($sender, "Stopping the server...");
+        Command::broadcastCommandMessage($sender, "Stopping the server...");
 
-		$reason = implode(" ", $args);
-		if($reason !== ""){
-			foreach($sender->getServer()->getOnlinePlayers() as $player){
-				$player->kick($reason);
-			}
-		}
+        $reason = implode(" ", $args);
+        if($reason !== ""){
+            foreach($sender->getServer()->getOnlinePlayers() as $player){
+                $player->kick($reason);
+            }
+        }
 
-		$sender->getServer()->shutdown();
+        $sender->getServer()->shutdown();
 
-		return true;
-	}
+        return true;
+    }
 }

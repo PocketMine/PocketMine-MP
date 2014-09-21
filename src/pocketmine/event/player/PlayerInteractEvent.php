@@ -30,35 +30,35 @@ use pocketmine\Player;
  * Called when a player interacts or touches a block (including air?)
  */
 class PlayerInteractEvent extends PlayerEvent implements Cancellable{
-	public static $handlerList = null;
+    public static $handlerList = null;
 
-	/**
-	 * @var \pocketmine\block\Block;
-	 */
-	protected $blockTouched;
+    /**
+     * @var \pocketmine\block\Block;
+     */
+    protected $blockTouched;
 
-	/** @var int */
-	protected $blockFace;
+    /** @var int */
+    protected $blockFace;
 
-	/** @var \pocketmine\item\Item */
-	protected $item;
+    /** @var \pocketmine\item\Item */
+    protected $item;
 
-	public function __construct(Player $player, Item $item, Block $block, $face){
-		$this->blockTouched = $block;
-		$this->player = $player;
-		$this->item = $item;
-		$this->blockFace = (int) $face;
-	}
+    public function __construct(Player $player, Item $item, Block $block, $face){
+        $this->blockTouched = $block;
+        $this->player = $player;
+        $this->item = $item;
+        $this->blockFace = (int) $face;
+    }
 
-	public function getItem(){
-		return $this->item;
-	}
+    public function getItem(){
+        return $this->item;
+    }
 
-	public function getBlock(){
-		return $this->blockTouched;
-	}
+    public function getBlock(){
+        return $this->blockTouched;
+    }
 
-	public function getFace(){
-		return $this->blockFace;
-	}
+    public function getFace(){
+        return $this->blockFace;
+    }
 }

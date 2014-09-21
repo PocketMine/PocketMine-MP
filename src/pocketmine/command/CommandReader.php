@@ -25,71 +25,71 @@ use pocketmine\Thread;
 
 class CommandReader extends Thread{
 
-	private $stream;
-	/** @var resource */
-	private $fp;
-	private $readline;
+    private $stream;
+    /** @var resource */
+    private $fp;
+    private $readline;
 
-	/** @var \Threaded */
-	private $buffer;
+    /** @var \Threaded */
+    private $buffer;
 
-	/**
-	 * @param string $stream
-	 */
-	public function __construct($stream = "php://stdin"){
-		$this->stream = $stream;
-		$this->start();
-	}
+    /**
+     * @param string $stream
+     */
+    public function __construct($stream = "php://stdin"){
+        $this->stream = $stream;
+        $this->start();
+    }
 
-	private function readLine(){
-		if(!$this->readline){
-			$line = trim(fgets($this->fp));
-		}else{
-			$line = trim(readline("> "));
-			if($line != ""){
-				readline_add_history($line);
-			}
-		}
+    private function readLine(){
+        if(!$this->readline){
+            $line = trim(fgets($this->fp));
+        }else{
+            $line = trim(readline("> "));
+            if($line != ""){
+                readline_add_history($line);
+            }
+        }
 
-		return $line;
-	}
+        return $line;
+    }
 
-	/**
-	 * Reads a line from console, if available. Returns null if not available
-	 *
-	 * @return string|null
-	 */
-	public function getLine(){
-		if($this->buffer->count() !== 0){
-			return $this->buffer->synchronized(function (){
-				return $this->buffer->shift();
-			});
-		}
+    /**
+     * Reads a line from console, if available. Returns null if not available
+     *
+     * @return string|null
+     */
+    public function getLine(){
+        if($this->buffer->count() !== 0){
+            return $this->buffer->synchronized(function (){
+                return $this->buffer->shift();
+            });
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public function run(){
-		$this->buffer = new \Threaded;
-		$opts = getopt("", ["disable-readline"]);
-		if(extension_loaded("readline") and $this->stream === "php://stdin" and !isset($opts["disable-readline"])){
-			$this->readline = true;
-		}else{
-			$this->readline = false;
-			$this->fp = fopen($this->stream, "r");
-			stream_set_blocking($this->fp, 1); //Non-blocking STDIN won't work on Windows
-		}
+    public function run(){
+        $this->buffer = new \Threaded;
+        $opts = getopt("", ["disable-readline"]);
+        if(extension_loaded("readline") and $this->stream === "php://stdin" and !isset($opts["disable-readline"])){
+            $this->readline = true;
+        }else{
+            $this->readline = false;
+            $this->fp = fopen($this->stream, "r");
+            stream_set_blocking($this->fp, 1); //Non-blocking STDIN won't work on Windows
+        }
 
-		$lastLine = microtime(true);
-		while(true){
-			if(($line = $this->readLine()) !== ""){
-				$this->buffer->synchronized(function (\Threaded $buffer, $line){
-					$buffer[] = preg_replace("#\\x1b\\x5b([^\\x1b]*\\x7e|[\\x40-\\x50])#", "", $line);
-				}, $this->buffer, $line);
-				$lastLine = microtime(true);
-			}elseif((microtime(true) - $lastLine) <= 0.1){ //Non blocking! Sleep to save CPU
-				usleep(40000);
-			}
-		}
-	}
+        $lastLine = microtime(true);
+        while(true){
+            if(($line = $this->readLine()) !== ""){
+                $this->buffer->synchronized(function (\Threaded $buffer, $line){
+                    $buffer[] = preg_replace("#\\x1b\\x5b([^\\x1b]*\\x7e|[\\x40-\\x50])#", "", $line);
+                }, $this->buffer, $line);
+                $lastLine = microtime(true);
+            }elseif((microtime(true) - $lastLine) <= 0.1){ //Non blocking! Sleep to save CPU
+                usleep(40000);
+            }
+        }
+    }
 }

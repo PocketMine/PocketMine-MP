@@ -27,38 +27,38 @@ use pocketmine\utils\TextFormat;
 
 class TellCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Sends a private message to the given player",
-			"/tell <player> <message>",
-			["w", "msg"]
-		);
-		$this->setPermission("pocketmine.command.tell");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Sends a private message to the given player",
+            "/tell <player> <message>",
+            ["w", "msg"]
+        );
+        $this->setPermission("pocketmine.command.tell");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		if(count($args) < 2){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(count($args) < 2){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		$name = strtolower(array_shift($args));
+        $name = strtolower(array_shift($args));
 
-		$player = $sender->getServer()->getPlayer($name);
+        $player = $sender->getServer()->getPlayer($name);
 
-		if($player instanceof Player){
-			$sender->sendMessage("[me -> " . $player->getName() . "] " . implode(" ", $args));
-			$player->sendMessage("[" . $sender->getName() . " -> me] " . implode(" ", $args));
-		}else{
-			$sender->sendMessage("There's no player by that name online.");
-		}
+        if($player instanceof Player){
+            $sender->sendMessage("[me -> " . $player->getName() . "] " . implode(" ", $args));
+            $player->sendMessage("[" . $sender->getName() . " -> me] " . implode(" ", $args));
+        }else{
+            $sender->sendMessage("There's no player by that name online.");
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

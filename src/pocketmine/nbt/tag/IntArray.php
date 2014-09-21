@@ -25,18 +25,18 @@ use pocketmine\nbt\NBT;
 
 class IntArray extends NamedTag{
 
-	public function getType(){
-		return NBT::TAG_IntArray;
-	}
+    public function getType(){
+        return NBT::TAG_IntArray;
+    }
 
-	public function read(NBT $nbt){
-		$this->value = [];
-		$size = $nbt->getInt();
-		$this->value = unpack($nbt->endianness === NBT::LITTLE_ENDIAN ? "V*" : "N*", $nbt->get($size * 4));
-	}
+    public function read(NBT $nbt){
+        $this->value = [];
+        $size = $nbt->getInt();
+        $this->value = unpack($nbt->endianness === NBT::LITTLE_ENDIAN ? "V*" : "N*", $nbt->get($size * 4));
+    }
 
-	public function write(NBT $nbt){
-		$nbt->putInt(count($this->value));
-		$nbt->put(pack($nbt->endianness === NBT::LITTLE_ENDIAN ? "V*" : "N*", ...$this->value));
-	}
+    public function write(NBT $nbt){
+        $nbt->putInt(count($this->value));
+        $nbt->put(pack($nbt->endianness === NBT::LITTLE_ENDIAN ? "V*" : "N*", ...$this->value));
+    }
 }

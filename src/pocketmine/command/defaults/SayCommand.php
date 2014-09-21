@@ -28,37 +28,37 @@ use pocketmine\utils\TextFormat;
 
 class SayCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Broadcasts the given message as the sender",
-			"/say <message...>"
-		);
-		$this->setPermission("pocketmine.command.say");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Broadcasts the given message as the sender",
+            "/say <message...>"
+        );
+        $this->setPermission("pocketmine.command.say");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		if(count($args) === 0){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(count($args) === 0){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		$message = TextFormat::LIGHT_PURPLE . "[";
-		if($sender instanceof ConsoleCommandSender){
-			$message .= "Server";
-		}elseif($sender instanceof Player){
-			$message .= $sender->getDisplayName();
-		}else{
-			$message .= $sender->getName();
-		}
-		$message .= TextFormat::LIGHT_PURPLE . "] " . implode(" ", $args);
-		$sender->getServer()->broadcastMessage($message);
+        $message = TextFormat::LIGHT_PURPLE . "[";
+        if($sender instanceof ConsoleCommandSender){
+            $message .= "Server";
+        }elseif($sender instanceof Player){
+            $message .= $sender->getDisplayName();
+        }else{
+            $message .= $sender->getName();
+        }
+        $message .= TextFormat::LIGHT_PURPLE . "] " . implode(" ", $args);
+        $sender->getServer()->broadcastMessage($message);
 
-		return true;
-	}
+        return true;
+    }
 }

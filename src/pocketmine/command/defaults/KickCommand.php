@@ -28,41 +28,41 @@ use pocketmine\utils\TextFormat;
 
 class KickCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Removes the specified player from the server",
-			"/kick <player> [reason...]"
-		);
-		$this->setPermission("pocketmine.command.kick");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Removes the specified player from the server",
+            "/kick <player> [reason...]"
+        );
+        $this->setPermission("pocketmine.command.kick");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		if(count($args) === 0){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(count($args) === 0){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		$name = array_shift($args);
-		$reason = trim(implode(" ", $args));
+        $name = array_shift($args);
+        $reason = trim(implode(" ", $args));
 
-		if(($player = $sender->getServer()->getPlayer($name)) instanceof Player){
-			$player->kick($reason);
-			if(strlen($reason) >= 1){
-				Command::broadcastCommandMessage($sender, "Kicked " . $player->getName() . " from the game: '{$reason}'");
-			}else{
-				Command::broadcastCommandMessage($sender, "Kicked " . $player->getName() . " from the game.");
-			}
-		}else{
-			$sender->sendMessage($name . " not found.");
-		}
+        if(($player = $sender->getServer()->getPlayer($name)) instanceof Player){
+            $player->kick($reason);
+            if(strlen($reason) >= 1){
+                Command::broadcastCommandMessage($sender, "Kicked " . $player->getName() . " from the game: '{$reason}'");
+            }else{
+                Command::broadcastCommandMessage($sender, "Kicked " . $player->getName() . " from the game.");
+            }
+        }else{
+            $sender->sendMessage($name . " not found.");
+        }
 
 
-		return true;
-	}
+        return true;
+    }
 }

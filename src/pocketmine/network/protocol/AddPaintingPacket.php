@@ -23,29 +23,29 @@ namespace pocketmine\network\protocol;
 
 
 class AddPaintingPacket extends DataPacket{
-	public $eid;
-	public $x;
-	public $y;
-	public $z;
-	public $direction;
-	public $title;
+    public $eid;
+    public $x;
+    public $y;
+    public $z;
+    public $direction;
+    public $title;
 
-	public function pid(){
-		return Info::ADD_PAINTING_PACKET;
-	}
+    public function pid(){
+        return Info::ADD_PAINTING_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->eid);
-		$this->putInt($this->x);
-		$this->putInt($this->y);
-		$this->putInt($this->z);
-		$this->putInt($this->direction);
-		$this->putString($this->title);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->eid);
+        $this->putInt($this->x);
+        $this->putInt($this->y);
+        $this->putInt($this->z);
+        $this->putInt($this->direction);
+        $this->putString($this->title);
+    }
 
 }

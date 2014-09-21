@@ -23,19 +23,19 @@ namespace pocketmine\network\protocol;
 
 
 class ChatPacket extends DataPacket{
-	public $message;
+    public $message;
 
-	public function pid(){
-		return Info::CHAT_PACKET;
-	}
+    public function pid(){
+        return Info::CHAT_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putString($this->message);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putString($this->message);
+    }
 
 }

@@ -26,22 +26,22 @@ use pocketmine\Player;
 
 //TODO: check orientation
 class Stonecutter extends Solid{
-	public function __construct($meta = 0){
-		parent::__construct(self::STONECUTTER, $meta, "Stonecutter");
-		$this->isActivable = true;
-	}
+    public function __construct($meta = 0){
+        parent::__construct(self::STONECUTTER, $meta, "Stonecutter");
+        $this->isActivable = true;
+    }
 
-	public function onActivate(Item $item, Player $player = null){
-		if($player instanceof Player){
-			$player->craftingType = 2;
-		}
+    public function onActivate(Item $item, Player $player = null){
+        if($player instanceof Player){
+            $player->craftingType = 2;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[$this->id, 0, 1],
-		];
-	}
+    public function getDrops(Item $item){
+        return [
+            [$this->id, 0, 1],
+        ];
+    }
 }

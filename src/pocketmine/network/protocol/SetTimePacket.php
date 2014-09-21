@@ -25,21 +25,21 @@ namespace pocketmine\network\protocol;
 use pocketmine\level\Level;
 
 class SetTimePacket extends DataPacket{
-	public $time;
-	public $started = true;
+    public $time;
+    public $started = true;
 
-	public function pid(){
-		return Info::SET_TIME_PACKET;
-	}
+    public function pid(){
+        return Info::SET_TIME_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt((int) (($this->time / Level::TIME_FULL) * 19200));
-		$this->putByte($this->started == true ? 0x80 : 0x00);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt((int) (($this->time / Level::TIME_FULL) * 19200));
+        $this->putByte($this->started == true ? 0x80 : 0x00);
+    }
 
 }

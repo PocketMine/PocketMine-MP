@@ -29,32 +29,32 @@ namespace pocketmine\inventory;
  */
 class CraftingInventory extends BaseInventory{
 
-	/** @var Inventory */
-	private $resultInventory;
+    /** @var Inventory */
+    private $resultInventory;
 
-	/**
-	 * @param InventoryHolder $holder
-	 * @param Inventory       $resultInventory
-	 * @param InventoryType   $inventoryType
-	 *
-	 * @throws \Exception
-	 */
-	public function __construct(InventoryHolder $holder, Inventory $resultInventory, InventoryType $inventoryType){
-		if($inventoryType->getDefaultTitle() !== "Crafting"){
-			throw new \Exception("Invalid Inventory type, expected CRAFTING or WORKBENCH");
-		}
-		$this->resultInventory = $resultInventory;
-		parent::__construct($holder, $inventoryType);
-	}
+    /**
+     * @param InventoryHolder $holder
+     * @param Inventory       $resultInventory
+     * @param InventoryType   $inventoryType
+     *
+     * @throws \Exception
+     */
+    public function __construct(InventoryHolder $holder, Inventory $resultInventory, InventoryType $inventoryType){
+        if($inventoryType->getDefaultTitle() !== "Crafting"){
+            throw new \Exception("Invalid Inventory type, expected CRAFTING or WORKBENCH");
+        }
+        $this->resultInventory = $resultInventory;
+        parent::__construct($holder, $inventoryType);
+    }
 
-	/**
-	 * @return Inventory
-	 */
-	public function getResultInventory(){
-		return $this->resultInventory;
-	}
+    /**
+     * @return Inventory
+     */
+    public function getResultInventory(){
+        return $this->resultInventory;
+    }
 
-	public function getSize(){
-		return $this->getResultInventory()->getSize() + parent::getSize();
-	}
+    public function getSize(){
+        return $this->getResultInventory()->getSize() + parent::getSize();
+    }
 }

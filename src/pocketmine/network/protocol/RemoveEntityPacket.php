@@ -23,19 +23,19 @@ namespace pocketmine\network\protocol;
 
 
 class RemoveEntityPacket extends DataPacket{
-	public $eid;
+    public $eid;
 
-	public function pid(){
-		return Info::REMOVE_ENTITY_PACKET;
-	}
+    public function pid(){
+        return Info::REMOVE_ENTITY_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->eid);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->eid);
+    }
 
 }

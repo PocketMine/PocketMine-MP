@@ -27,55 +27,55 @@ use pocketmine\event\Cancellable;
 use pocketmine\item\Item;
 
 class EntityShootBowEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+    public static $handlerList = null;
 
-	/** @var Item */
-	private $bow;
-	/** @var Projectile */
-	private $projectile;
-	/** @var float */
-	private $force;
+    /** @var Item */
+    private $bow;
+    /** @var Projectile */
+    private $projectile;
+    /** @var float */
+    private $force;
 
-	/**
-	 * @param Living     $shooter
-	 * @param Item        $bow
-	 * @param Projectile $projectile
-	 * @param float      $force
-	 */
-	public function __construct(Living $shooter, Item $bow, Projectile $projectile, $force){
-		$this->entity = $shooter;
-		$this->bow = $bow;
-		$this->projectile = $projectile;
-		$this->force = $force;
-	}
+    /**
+     * @param Living     $shooter
+     * @param Item       $bow
+     * @param Projectile $projectile
+     * @param float      $force
+     */
+    public function __construct(Living $shooter, Item $bow, Projectile $projectile, $force){
+        $this->entity = $shooter;
+        $this->bow = $bow;
+        $this->projectile = $projectile;
+        $this->force = $force;
+    }
 
-	/**
-	 * @return Living
-	 */
-	public function getEntity(){
-		return $this->entity;
-	}
+    /**
+     * @return Living
+     */
+    public function getEntity(){
+        return $this->entity;
+    }
 
-	/**
-	 * @return Item
-	 */
-	public function getBow(){
-		return $this->bow;
-	}
+    /**
+     * @return Item
+     */
+    public function getBow(){
+        return $this->bow;
+    }
 
-	/**
-	 * @return Projectile
-	 */
-	public function getProjectile(){
-		return $this->projectile;
-	}
+    /**
+     * @return Projectile
+     */
+    public function getProjectile(){
+        return $this->projectile;
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getForce(){
-		return $this->force;
-	}
+    /**
+     * @return float
+     */
+    public function getForce(){
+        return $this->force;
+    }
 
 
 }

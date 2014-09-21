@@ -30,45 +30,45 @@ use pocketmine\level\Level;
 use pocketmine\Player;
 
 class Bucket extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::BUCKET, $meta, $count, "Bucket");
-		$this->isActivable = true;
-		$this->maxStackSize = 1;
-	}
+    public function __construct($meta = 0, $count = 1){
+        parent::__construct(self::BUCKET, $meta, $count, "Bucket");
+        $this->isActivable = true;
+        $this->maxStackSize = 1;
+    }
 
-	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
-		if($this->meta === Item::AIR){
-			if($target instanceof Liquid){
-				$level->setBlock($target, new Air(), true);
-				if(($player->gamemode & 0x01) === 0){
-					$this->meta = ($target instanceof Water) ? Item::WATER : Item::LAVA;
-				}
+    public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
+        if($this->meta === Item::AIR){
+            if($target instanceof Liquid){
+                $level->setBlock($target, new Air(), true);
+                if(($player->gamemode & 0x01) === 0){
+                    $this->meta = ($target instanceof Water) ? Item::WATER : Item::LAVA;
+                }
 
-				return true;
-			}
-		}elseif($this->meta === Item::WATER){
-			//Support Make Non-Support Water to Support Water
-			if($block->getID() === self::AIR || ($block instanceof Water && ($block->getDamage() & 0x07) != 0x00)){
-				$water = new Water();
-				$level->setBlock($block, $water, true);
-				$water->place(clone $this, $block, $target, $face, $fx, $fy, $fz, $player);
-				if(($player->gamemode & 0x01) === 0){
-					$this->meta = 0;
-				}
+                return true;
+            }
+        }elseif($this->meta === Item::WATER){
+            //Support Make Non-Support Water to Support Water
+            if($block->getID() === self::AIR || ($block instanceof Water && ($block->getDamage() & 0x07) != 0x00)){
+                $water = new Water();
+                $level->setBlock($block, $water, true);
+                $water->place(clone $this, $block, $target, $face, $fx, $fy, $fz, $player);
+                if(($player->gamemode & 0x01) === 0){
+                    $this->meta = 0;
+                }
 
-				return true;
-			}
-		}elseif($this->meta === Item::LAVA){
-			if($block->getID() === self::AIR){
-				$level->setBlock($block, new Lava(), true);
-				if(($player->gamemode & 0x01) === 0){
-					$this->meta = 0;
-				}
+                return true;
+            }
+        }elseif($this->meta === Item::LAVA){
+            if($block->getID() === self::AIR){
+                $level->setBlock($block, new Lava(), true);
+                if(($player->gamemode & 0x01) === 0){
+                    $this->meta = 0;
+                }
 
-				return true;
-			}
-		}
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 }

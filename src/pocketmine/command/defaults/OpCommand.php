@@ -28,35 +28,35 @@ use pocketmine\utils\TextFormat;
 
 class OpCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Gives the specified player operator status",
-			"/op <player>"
-		);
-		$this->setPermission("pocketmine.command.op.give");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Gives the specified player operator status",
+            "/op <player>"
+        );
+        $this->setPermission("pocketmine.command.op.give");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		if(count($args) === 0){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(count($args) === 0){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		$name = array_shift($args);
+        $name = array_shift($args);
 
-		$player = $sender->getServer()->getOfflinePlayer($name);
-		Command::broadcastCommandMessage($sender, "Opped " . $player->getName());
-		if($player instanceof Player){
-			$player->sendMessage("You are now op!");
-		}
-		$player->setOp(true);
+        $player = $sender->getServer()->getOfflinePlayer($name);
+        Command::broadcastCommandMessage($sender, "Opped " . $player->getName());
+        if($player instanceof Player){
+            $player->sendMessage("You are now op!");
+        }
+        $player->setOp(true);
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -30,114 +30,114 @@ use pocketmine\utils\Binary;
 
 class ChunkRequestTask extends AsyncTask{
 
-	protected $levelId;
-	protected $chunkX;
-	protected $chunkZ;
-	protected $compressionLevel;
+    protected $levelId;
+    protected $chunkX;
+    protected $chunkZ;
+    protected $compressionLevel;
 
-	/** @var \pocketmine\level\format\ChunkSection[] */
-	protected $sections;
-	/** @var string[256] */
-	protected $biomeIds;
-	/** @var int[] */
-	protected $biomeColors;
+    /** @var \pocketmine\level\format\ChunkSection[] */
+    protected $sections;
+    /** @var string[256] */
+    protected $biomeIds;
+    /** @var int[] */
+    protected $biomeColors;
 
-	protected $tiles;
+    protected $tiles;
 
-	public function __construct(Anvil $level, $levelId, $chunkX, $chunkZ){
-		$this->levelId = $levelId;
-		$this->chunkX = $chunkX;
-		$this->chunkZ = $chunkZ;
-		$chunk = $level->getChunk($chunkX, $chunkZ, false);
-		if(!($chunk instanceof Chunk)){
-			throw new \Exception("Invalid Chunk sent");
-		}
-		$this->biomeIds = $chunk->getBiomeIdArray();
-		$this->biomeColors = $chunk->getBiomeColorArray();
+    public function __construct(Anvil $level, $levelId, $chunkX, $chunkZ){
+        $this->levelId = $levelId;
+        $this->chunkX = $chunkX;
+        $this->chunkZ = $chunkZ;
+        $chunk = $level->getChunk($chunkX, $chunkZ, false);
+        if(!($chunk instanceof Chunk)){
+            throw new \Exception("Invalid Chunk sent");
+        }
+        $this->biomeIds = $chunk->getBiomeIdArray();
+        $this->biomeColors = $chunk->getBiomeColorArray();
 
-		$this->sections = $chunk->getSections();
+        $this->sections = $chunk->getSections();
 
-		$tiles = "";
-		$nbt = new NBT(NBT::LITTLE_ENDIAN);
-		foreach($chunk->getTiles() as $tile){
-			if($tile instanceof Spawnable){
-				$nbt->setData($tile->getSpawnCompound());
-				$tiles .= $nbt->write();
-			}
-		}
+        $tiles = "";
+        $nbt = new NBT(NBT::LITTLE_ENDIAN);
+        foreach($chunk->getTiles() as $tile){
+            if($tile instanceof Spawnable){
+                $nbt->setData($tile->getSpawnCompound());
+                $tiles .= $nbt->write();
+            }
+        }
 
-		$this->tiles = $tiles;
+        $this->tiles = $tiles;
 
-		$this->compressionLevel = Level::$COMPRESSION_LEVEL;
+        $this->compressionLevel = Level::$COMPRESSION_LEVEL;
 
-	}
+    }
 
-	public function onRun(){
-		$orderedIds = "";
-		$orderedData = "";
-		$orderedSkyLight = "";
-		$orderedLight = "";
+    public function onRun(){
+        $orderedIds = "";
+        $orderedData = "";
+        $orderedSkyLight = "";
+        $orderedLight = "";
 
-		$ids = "";
-		$meta = "";
-		$blockLight = "";
-		$skyLight = "";
-		$biomeColors = "";
+        $ids = "";
+        $meta = "";
+        $blockLight = "";
+        $skyLight = "";
+        $biomeColors = "";
 
-		foreach($this->sections as $section){
-			$ids .= $section->getIdArray();
-			$meta .= $section->getDataArray();
-			$blockLight .= $section->getLightArray();
-			$skyLight .= $section->getSkyLightArray();
-		}
+        foreach($this->sections as $section){
+            $ids .= $section->getIdArray();
+            $meta .= $section->getDataArray();
+            $blockLight .= $section->getLightArray();
+            $skyLight .= $section->getSkyLightArray();
+        }
 
-		for($x = 0; $x < 16; ++$x){
-			for($z = 0; $z < 16; ++$z){
-				$orderedIds .= $this->getColumn($ids, $x, $z);
-				$orderedData .= $this->getHalfColumn($meta, $x, $z);
-				$orderedSkyLight .= $this->getHalfColumn($skyLight, $x, $z);
-				$orderedLight .= $this->getHalfColumn($blockLight, $x, $z);
-			}
-		}
+        for($x = 0; $x < 16; ++$x){
+            for($z = 0; $z < 16; ++$z){
+                $orderedIds .= $this->getColumn($ids, $x, $z);
+                $orderedData .= $this->getHalfColumn($meta, $x, $z);
+                $orderedSkyLight .= $this->getHalfColumn($skyLight, $x, $z);
+                $orderedLight .= $this->getHalfColumn($blockLight, $x, $z);
+            }
+        }
 
-		$biomeColors = pack("N*", ...$this->biomeColors);
+        $biomeColors = pack("N*", ...$this->biomeColors);
 
-		$ordered = zlib_encode(Binary::writeLInt($this->chunkX) . Binary::writeLInt($this->chunkZ) . $orderedIds . $orderedData . $orderedSkyLight . $orderedLight . $this->biomeIds . $biomeColors . $this->tiles, ZLIB_ENCODING_DEFLATE, $this->compressionLevel);
+        $ordered = zlib_encode(Binary::writeLInt($this->chunkX) . Binary::writeLInt($this->chunkZ) . $orderedIds . $orderedData . $orderedSkyLight . $orderedLight . $this->biomeIds . $biomeColors . $this->tiles, ZLIB_ENCODING_DEFLATE, $this->compressionLevel);
 
-		$this->setResult($ordered);
-	}
+        $this->setResult($ordered);
+    }
 
-	public function getColumn(&$data, $x, $z){
-		$i = ($z << 4) + $x;
-		$column = "";
-		for($y = 0; $y < 128; ++$y){
-			$column .= $data{($y << 8) + $i};
-		}
+    public function getColumn(&$data, $x, $z){
+        $i = ($z << 4) + $x;
+        $column = "";
+        for($y = 0; $y < 128; ++$y){
+            $column .= $data{($y << 8) + $i};
+        }
 
-		return $column;
-	}
+        return $column;
+    }
 
-	public function getHalfColumn(&$data, $x, $z){
-		$i = ($z << 3) + ($x >> 1);
-		$column = "";
-		if(($x & 1) === 0){
-			for($y = 0; $y < 128; $y += 2){
-				$column .= ($data{($y << 7) + $i} & "\x0f") | chr((ord($data{(($y + 1) << 7) + $i}) & 0x0f) << 4);
-			}
-		}else{
-			for($y = 0; $y < 128; $y += 2){
-				$column .= chr((ord($data{($y << 7) + $i}) & 0xf0) >> 4) | ($data{(($y + 1) << 7) + $i} & "\xf0");
-			}
-		}
+    public function getHalfColumn(&$data, $x, $z){
+        $i = ($z << 3) + ($x >> 1);
+        $column = "";
+        if(($x & 1) === 0){
+            for($y = 0; $y < 128; $y += 2){
+                $column .= ($data{($y << 7) + $i} & "\x0f") | chr((ord($data{(($y + 1) << 7) + $i}) & 0x0f) << 4);
+            }
+        }else{
+            for($y = 0; $y < 128; $y += 2){
+                $column .= chr((ord($data{($y << 7) + $i}) & 0xf0) >> 4) | ($data{(($y + 1) << 7) + $i} & "\xf0");
+            }
+        }
 
-		return $column;
-	}
+        return $column;
+    }
 
-	public function onCompletion(Server $server){
-		$level = $server->getLevel($this->levelId);
-		if($level instanceof Level and $this->hasResult()){
-			$level->chunkRequestCallback($this->chunkX, $this->chunkZ, $this->getResult());
-		}
-	}
+    public function onCompletion(Server $server){
+        $level = $server->getLevel($this->levelId);
+        if($level instanceof Level and $this->hasResult()){
+            $level->chunkRequestCallback($this->chunkX, $this->chunkZ, $this->getResult());
+        }
+    }
 
 }

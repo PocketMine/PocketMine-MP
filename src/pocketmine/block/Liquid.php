@@ -23,18 +23,18 @@ namespace pocketmine\block;
 
 
 class Liquid extends Transparent{
-	public $isLiquid = true;
-	public $breakable = false;
-	public $isReplaceable = true;
-	public $isSolid = false;
-	public $isFullBlock = true;
+    public $isLiquid = true;
+    public $breakable = false;
+    public $isReplaceable = true;
+    public $isSolid = false;
+    public $isFullBlock = true;
 
-	public function getFluidHeightPercent(){
-		$d = $this->meta;
-		if($d >= 8){
-			$d = 0;
-		}
+    public function getFluidHeightPercent(){
+        $d = $this->meta;
+        if($d >= 8){
+            $d = 0;
+        }
 
-		return ($d + 1) / 9;
-	}
+        return ($d + 1) / 9;
+    }
 }

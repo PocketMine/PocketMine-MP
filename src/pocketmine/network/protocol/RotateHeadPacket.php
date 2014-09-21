@@ -24,25 +24,25 @@ namespace pocketmine\network\protocol;
 
 class RotateHeadPacket extends DataPacket{
 
-	// eid, yaw
-	/** @var array[] */
-	public $entities = [];
+    // eid, yaw
+    /** @var array[] */
+    public $entities = [];
 
-	public function pid(){
-		return Info::ROTATE_HEAD_PACKET;
-	}
+    public function pid(){
+        return Info::ROTATE_HEAD_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt(count($this->entities));
-		foreach($this->entities as $d){
-			$this->putInt($d[0]); //eid
-			$this->putByte((int) ($d[1] / 360));
-		}
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt(count($this->entities));
+        foreach($this->entities as $d){
+            $this->putInt($d[0]); //eid
+            $this->putByte((int) ($d[1] / 360));
+        }
+    }
 
 }

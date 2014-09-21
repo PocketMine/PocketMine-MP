@@ -26,20 +26,20 @@ use pocketmine\utils\Utils;
 
 class SendUsageTask extends AsyncTask{
 
-	public $endpoint;
-	public $data;
+    public $endpoint;
+    public $data;
 
-	public function __construct($endpoint, array $data){
-		$this->endpoint = $endpoint;
-		$this->data = serialize($data);
-	}
+    public function __construct($endpoint, array $data){
+        $this->endpoint = $endpoint;
+        $this->data = serialize($data);
+    }
 
-	public function onRun(){
-		Utils::postURL($this->endpoint, unserialize($this->data));
-	}
+    public function onRun(){
+        Utils::postURL($this->endpoint, unserialize($this->data));
+    }
 
-	public function onCompletion(Server $server){
+    public function onCompletion(Server $server){
 
-	}
+    }
 
 }

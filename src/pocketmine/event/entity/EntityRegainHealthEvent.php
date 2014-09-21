@@ -25,34 +25,34 @@ use pocketmine\entity\Entity;
 use pocketmine\event\Cancellable;
 
 class EntityRegainHealthEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+    public static $handlerList = null;
 
-	//TODO: add cause
+    //TODO: add cause
 
-	private $amount;
+    private $amount;
 
 
-	/**
-	 * @param Entity $entity
-	 * @param float  $amount
-	 */
-	public function __construct(Entity $entity, $amount){
-		$this->entity = $entity;
-		$this->amount = $amount;
-	}
+    /**
+     * @param Entity $entity
+     * @param float  $amount
+     */
+    public function __construct(Entity $entity, $amount){
+        $this->entity = $entity;
+        $this->amount = $amount;
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getAmount(){
-		return $this->amount;
-	}
+    /**
+     * @return float
+     */
+    public function getAmount(){
+        return $this->amount;
+    }
 
-	/**
-	 * @param float $amount
-	 */
-	public function setAmount($amount){
-		$this->amount = $amount;
-	}
+    /**
+     * @param float $amount
+     */
+    public function setAmount($amount){
+        $this->amount = $amount;
+    }
 
 }

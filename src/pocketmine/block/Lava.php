@@ -21,150 +21,150 @@
 
 namespace pocketmine\block;
 
-use pocketmine\item\Item;
 use pocketmine\entity\Entity;
+use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\event\entity\EntityDamageEvent;
 
 class Lava extends Liquid{
-	public function __construct($meta = 0){
-		parent::__construct(self::LAVA, $meta, "Lava");
-		$this->hardness = 0;
-	}
+    public function __construct($meta = 0){
+        parent::__construct(self::LAVA, $meta, "Lava");
+        $this->hardness = 0;
+    }
 
-	public function getBoundingBox(){
-		return null;
-	}
+    public function getBoundingBox(){
+        return null;
+    }
 
-	public function onEntityCollide(Entity $entity){
-		$entity->setOnFire(15);
-		$ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_LAVA, 4);
-		Server::getInstance()->getPluginManager()->callEvent($ev);
-		if(!$ev->isCancelled()){
-			$entity->attack($ev->getFinalDamage(), $ev);
-		}
-		$entity->attack(4, EntityDamageEvent::CAUSE_LAVA);
-	}
+    public function onEntityCollide(Entity $entity){
+        $entity->setOnFire(15);
+        $ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_LAVA, 4);
+        Server::getInstance()->getPluginManager()->callEvent($ev);
+        if(!$ev->isCancelled()){
+            $entity->attack($ev->getFinalDamage(), $ev);
+        }
+        $entity->attack(4, EntityDamageEvent::CAUSE_LAVA);
+    }
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$ret = $this->getLevel()->setBlock($this, $this, true);
-		$this->getLevel()->scheduleUpdate(clone $this, 40);
+    public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+        $ret = $this->getLevel()->setBlock($this, $this, true);
+        $this->getLevel()->scheduleUpdate(clone $this, 40);
 
-		return $ret;
-	}
+        return $ret;
+    }
 
-	public function getSourceCount(){
-		$count = 0;
-		for($side = 2; $side <= 5; ++$side){
-			if($this->getSide($side) instanceof Lava){
-				$b = $this->getSide($side);
-				$level = $b->meta & 0x07;
-				if($level == 0x00){
-					$count++;
-				}
-			}
-		}
+    public function getSourceCount(){
+        $count = 0;
+        for($side = 2; $side <= 5; ++$side){
+            if($this->getSide($side) instanceof Lava){
+                $b = $this->getSide($side);
+                $level = $b->meta & 0x07;
+                if($level == 0x00){
+                    $count++;
+                }
+            }
+        }
 
-		return $count;
-	}
+        return $count;
+    }
 
-	public function checkWater(){
-		for($side = 1; $side <= 5; ++$side){
-			$b = $this->getSide($side);
-			if($b instanceof Water){
-				$level = $this->meta & 0x07;
-				if($level == 0x00){
-					$this->getLevel()->setBlock($this, new Obsidian(), false, false, true);
-				}else{
-					$this->getLevel()->setBlock($this, new Cobblestone(), false, false, true);
-				}
-			}
-		}
-	}
+    public function checkWater(){
+        for($side = 1; $side <= 5; ++$side){
+            $b = $this->getSide($side);
+            if($b instanceof Water){
+                $level = $this->meta & 0x07;
+                if($level == 0x00){
+                    $this->getLevel()->setBlock($this, new Obsidian(), false, false, true);
+                }else{
+                    $this->getLevel()->setBlock($this, new Cobblestone(), false, false, true);
+                }
+            }
+        }
+    }
 
-	public function getFrom(){
-		for($side = 0; $side <= 5; ++$side){
-			$b = $this->getSide($side);
-			if($b instanceof Lava){
-				$tlevel = $b->meta & 0x07;
-				$level = $this->meta & 0x07;
-				if(($tlevel + 2) == $level || ($side == 0x01 && $level == 0x01) || ($tlevel == 6 && $level == 7)){
-					return $b;
-				}
-			}
-		}
+    public function getFrom(){
+        for($side = 0; $side <= 5; ++$side){
+            $b = $this->getSide($side);
+            if($b instanceof Lava){
+                $tlevel = $b->meta & 0x07;
+                $level = $this->meta & 0x07;
+                if(($tlevel + 2) == $level || ($side == 0x01 && $level == 0x01) || ($tlevel == 6 && $level == 7)){
+                    return $b;
+                }
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public function onUpdate($type){
-		return false;
-		$newId = $this->id;
-		$level = $this->meta & 0x07;
-		if($type !== Level::BLOCK_UPDATE_NORMAL){
-			return false;
-		}
+    public function onUpdate($type){
+        return false;
+        $newId = $this->id;
+        $level = $this->meta & 0x07;
+        if($type !== Level::BLOCK_UPDATE_NORMAL){
+            return false;
+        }
 
-		if($this->checkWater()){
-			return;
-		}
+        if($this->checkWater()){
+            return;
+        }
 
-		$falling = $this->meta >> 3;
-		$down = $this->getSide(0);
+        $falling = $this->meta >> 3;
+        $down = $this->getSide(0);
 
-		$from = $this->getFrom();
-		if($from !== null || $level == 0x00){
-			if($level !== 0x07){
-				if($down instanceof Air || $down instanceof Lava){
-					$this->getLevel()->setBlock($down, new Lava(0x01), false, false, true);
-					Server::getInstance()->api->block->scheduleBlockUpdate(new Position($down, 0, 0, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
-				}else{
-					for($side = 2; $side <= 5; ++$side){
-						$b = $this->getSide($side);
-						if($b instanceof Lava){
+        $from = $this->getFrom();
+        if($from !== null || $level == 0x00){
+            if($level !== 0x07){
+                if($down instanceof Air || $down instanceof Lava){
+                    $this->getLevel()->setBlock($down, new Lava(0x01), false, false, true);
+                    Server::getInstance()->api->block->scheduleBlockUpdate(new Position($down, 0, 0, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
+                }else{
+                    for($side = 2; $side <= 5; ++$side){
+                        $b = $this->getSide($side);
+                        if($b instanceof Lava){
 
-						}elseif($b->isFlowable === true){
-							$this->getLevel()->setBlock($b, new Lava(min($level + 2, 7)), false, false, true);
-							Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
-						}
-					}
-				}
-			}
-		}else{
-			//Extend Remove for Left Lavas
-			for($side = 2; $side <= 5; ++$side){
-				$sb = $this->getSide($side);
-				if($sb instanceof Lava){
-					$tlevel = $sb->meta & 0x07;
-					if($tlevel != 0x00){
-						for($s = 0; $s <= 5; $s++){
-							$ssb = $sb->getSide($s);
-							Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
-						}
-						$this->getLevel()->setBlock($sb, new Air(), false, false, true);
-					}
-				}
-				$b = $this->getSide(0)->getSide($side);
-				if($b instanceof Lava){
-					$tlevel = $b->meta & 0x07;
-					if($tlevel != 0x00){
-						for($s = 0; $s <= 5; $s++){
-							$ssb = $sb->getSide($s);
-							Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
-						}
-						$this->getLevel()->setBlock($b, new Air(), false, false, true);
-					}
-				}
-				//Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
-			}
+                        }elseif($b->isFlowable === true){
+                            $this->getLevel()->setBlock($b, new Lava(min($level + 2, 7)), false, false, true);
+                            Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
+                        }
+                    }
+                }
+            }
+        }else{
+            //Extend Remove for Left Lavas
+            for($side = 2; $side <= 5; ++$side){
+                $sb = $this->getSide($side);
+                if($sb instanceof Lava){
+                    $tlevel = $sb->meta & 0x07;
+                    if($tlevel != 0x00){
+                        for($s = 0; $s <= 5; $s++){
+                            $ssb = $sb->getSide($s);
+                            Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
+                        }
+                        $this->getLevel()->setBlock($sb, new Air(), false, false, true);
+                    }
+                }
+                $b = $this->getSide(0)->getSide($side);
+                if($b instanceof Lava){
+                    $tlevel = $b->meta & 0x07;
+                    if($tlevel != 0x00){
+                        for($s = 0; $s <= 5; $s++){
+                            $ssb = $sb->getSide($s);
+                            Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 40, Level::BLOCK_UPDATE_NORMAL);
+                        }
+                        $this->getLevel()->setBlock($b, new Air(), false, false, true);
+                    }
+                }
+                //Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
+            }
 
-			$this->getLevel()->setBlock($this, new Air(), false, false, true);
-		}
+            $this->getLevel()->setBlock($this, new Air(), false, false, true);
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 }

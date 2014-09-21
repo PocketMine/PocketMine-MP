@@ -34,181 +34,181 @@ use pocketmine\Player;
 
 class DroppedItem extends Entity{
 
-	protected $owner = null;
-	protected $thrower = null;
-	protected $pickupDelay = 0;
-	/** @var Item */
-	protected $item;
+    protected $owner = null;
+    protected $thrower = null;
+    protected $pickupDelay = 0;
+    /** @var Item */
+    protected $item;
 
-	public $width = 0.25;
-	public $length = 0.25;
-	public $height = 0.25;
-	protected $gravity = 0.04;
-	protected $drag = 0.02;
+    public $width = 0.25;
+    public $length = 0.25;
+    public $height = 0.25;
+    protected $gravity = 0.04;
+    protected $drag = 0.02;
 
-	protected function initEntity(){
-		$this->namedtag->id = new String("id", "Item");
-		$this->setMaxHealth(5);
-		$this->setHealth(@$this->namedtag["Health"]);
-		if(isset($this->namedtag->Age)){
-			$this->age = $this->namedtag["Age"];
-		}
-		if(isset($this->namedtag->PickupDelay)){
-			$this->pickupDelay = $this->namedtag["PickupDelay"];
-		}
-		if(isset($this->namedtag->Owner)){
-			$this->owner = $this->namedtag["Owner"];
-		}
-		if(isset($this->namedtag->Thrower)){
-			$this->thrower = $this->namedtag["Thrower"];
-		}
-		$this->item = Item::get($this->namedtag->Item["id"], $this->namedtag->Item["Damage"], $this->namedtag->Item["Count"]);
-	}
+    protected function initEntity(){
+        $this->namedtag->id = new String("id", "Item");
+        $this->setMaxHealth(5);
+        $this->setHealth(@$this->namedtag["Health"]);
+        if(isset($this->namedtag->Age)){
+            $this->age = $this->namedtag["Age"];
+        }
+        if(isset($this->namedtag->PickupDelay)){
+            $this->pickupDelay = $this->namedtag["PickupDelay"];
+        }
+        if(isset($this->namedtag->Owner)){
+            $this->owner = $this->namedtag["Owner"];
+        }
+        if(isset($this->namedtag->Thrower)){
+            $this->thrower = $this->namedtag["Thrower"];
+        }
+        $this->item = Item::get($this->namedtag->Item["id"], $this->namedtag->Item["Damage"], $this->namedtag->Item["Count"]);
+    }
 
-	public function onUpdate(){
-		$this->entityBaseTick();
+    public function onUpdate(){
+        $this->entityBaseTick();
 
-		if($this->closed !== false){
-			return false;
-		}
+        if($this->closed !== false){
+            return false;
+        }
 
-		if($this->pickupDelay > 0 and $this->pickupDelay < 32767){ //Infinite delay
-			--$this->pickupDelay;
-		}
+        if($this->pickupDelay > 0 and $this->pickupDelay < 32767){ //Infinite delay
+            --$this->pickupDelay;
+        }
 
-		$this->motionY -= $this->gravity;
+        $this->motionY -= $this->gravity;
 
-		$this->inBlock = $this->checkObstruction($this->x, ($this->boundingBox->minY + $this->boundingBox->maxY) / 2, $this->z);
-		$this->move($this->motionX, $this->motionY, $this->motionZ);
+        $this->inBlock = $this->checkObstruction($this->x, ($this->boundingBox->minY + $this->boundingBox->maxY) / 2, $this->z);
+        $this->move($this->motionX, $this->motionY, $this->motionZ);
 
-		$friction = 1 - $this->drag;
+        $friction = 1 - $this->drag;
 
-		if($this->onGround){
-			$friction = $this->getLevel()->getBlock(new Vector3($this->getFloorX(), $this->getFloorY() - 1, $this->getFloorZ()))->frictionFactor * $friction;
-		}
+        if($this->onGround){
+            $friction = $this->getLevel()->getBlock(new Vector3($this->getFloorX(), $this->getFloorY() - 1, $this->getFloorZ()))->frictionFactor * $friction;
+        }
 
-		$this->motionX *= $friction;
-		$this->motionY *= 1 - $this->drag;
-		$this->motionZ *= $friction;
+        $this->motionX *= $friction;
+        $this->motionY *= 1 - $this->drag;
+        $this->motionZ *= $friction;
 
-		if($this->onGround){
-			$this->motionY *= -0.5;
-		}
+        if($this->onGround){
+            $this->motionY *= -0.5;
+        }
 
-		if($this->age > 6000){
-			$this->kill();
-		}
-		$this->updateMovement();
+        if($this->age > 6000){
+            $this->kill();
+        }
+        $this->updateMovement();
 
-		return !$this->onGround or ($this->motionX == 0 and $this->motionY == 0 and $this->motionZ == 0);
-	}
+        return !$this->onGround or ($this->motionX == 0 and $this->motionY == 0 and $this->motionZ == 0);
+    }
 
-	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
-		$this->setLastDamageCause($source);
-		$this->setHealth($this->getHealth() - $damage);
-	}
+    public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
+        $this->setLastDamageCause($source);
+        $this->setHealth($this->getHealth() - $damage);
+    }
 
-	public function heal($amount){
+    public function heal($amount){
 
-	}
+    }
 
-	public function saveNBT(){
-		$this->namedtag->Item = new Compound("Item", [
-			"id" => new Short("id", $this->item->getID()),
-			"Damage" => new Short("Damage", $this->item->getDamage()),
-			"Count" => new Byte("Count", $this->item->getCount())
-		]);
-		$this->namedtag->Health = new Short("Health", $this->getHealth());
-		$this->namedtag->Age = new Short("Age", $this->age);
-		$this->namedtag->PickupDelay = new Short("PickupDelay", $this->pickupDelay);
-		if($this->owner !== null){
-			$this->namedtag->Owner = new String("Owner", $this->owner);
-		}
-		if($this->thrower !== null){
-			$this->namedtag->Thrower = new String("Thrower", $this->thrower);
-		}
-	}
+    public function saveNBT(){
+        $this->namedtag->Item = new Compound("Item", [
+            "id" => new Short("id", $this->item->getID()),
+            "Damage" => new Short("Damage", $this->item->getDamage()),
+            "Count" => new Byte("Count", $this->item->getCount())
+        ]);
+        $this->namedtag->Health = new Short("Health", $this->getHealth());
+        $this->namedtag->Age = new Short("Age", $this->age);
+        $this->namedtag->PickupDelay = new Short("PickupDelay", $this->pickupDelay);
+        if($this->owner !== null){
+            $this->namedtag->Owner = new String("Owner", $this->owner);
+        }
+        if($this->thrower !== null){
+            $this->namedtag->Thrower = new String("Thrower", $this->thrower);
+        }
+    }
 
-	public function getData(){
-		$flags = 0;
-		$flags |= $this->fireTicks > 0 ? 1 : 0;
+    public function getData(){
+        $flags = 0;
+        $flags |= $this->fireTicks > 0 ? 1 : 0;
 
-		return [
-			0 => ["type" => 0, "value" => $flags]
-		];
-	}
+        return [
+            0 => ["type" => 0, "value" => $flags]
+        ];
+    }
 
-	/**
-	 * @return Item
-	 */
-	public function getItem(){
-		return $this->item;
-	}
+    /**
+     * @return Item
+     */
+    public function getItem(){
+        return $this->item;
+    }
 
-	public function canCollideWith(Entity $entity){
-		return false;
-	}
+    public function canCollideWith(Entity $entity){
+        return false;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getPickupDelay(){
-		return $this->pickupDelay;
-	}
+    /**
+     * @return int
+     */
+    public function getPickupDelay(){
+        return $this->pickupDelay;
+    }
 
-	/**
-	 * @param int $delay
-	 */
-	public function setPickupDelay($delay){
-		$this->pickupDelay = $delay;
-	}
+    /**
+     * @param int $delay
+     */
+    public function setPickupDelay($delay){
+        $this->pickupDelay = $delay;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getOwner(){
-		return $this->owner;
-	}
+    /**
+     * @return string
+     */
+    public function getOwner(){
+        return $this->owner;
+    }
 
-	/**
-	 * @param string $owner
-	 */
-	public function setOwner($owner){
-		$this->owner = $owner;
-	}
+    /**
+     * @param string $owner
+     */
+    public function setOwner($owner){
+        $this->owner = $owner;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getThrower(){
-		return $this->thrower;
-	}
+    /**
+     * @return string
+     */
+    public function getThrower(){
+        return $this->thrower;
+    }
 
-	/**
-	 * @param string $thrower
-	 */
-	public function setThrower($thrower){
-		$this->thrower = $thrower;
-	}
+    /**
+     * @param string $thrower
+     */
+    public function setThrower($thrower){
+        $this->thrower = $thrower;
+    }
 
-	public function spawnTo(Player $player){
-		$pk = new AddItemEntityPacket();
-		$pk->eid = $this->getID();
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->yaw = $this->yaw;
-		$pk->pitch = $this->pitch;
-		$pk->roll = 0;
-		$pk->item = $this->getItem();
-		$player->dataPacket($pk);
+    public function spawnTo(Player $player){
+        $pk = new AddItemEntityPacket();
+        $pk->eid = $this->getID();
+        $pk->x = $this->x;
+        $pk->y = $this->y;
+        $pk->z = $this->z;
+        $pk->yaw = $this->yaw;
+        $pk->pitch = $this->pitch;
+        $pk->roll = 0;
+        $pk->item = $this->getItem();
+        $player->dataPacket($pk);
 
-		$pk = new SetEntityMotionPacket;
-		$pk->entities = [
-			[$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
-		];
-		$player->dataPacket($pk);
+        $pk = new SetEntityMotionPacket;
+        $pk->entities = [
+            [$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
+        ];
+        $player->dataPacket($pk);
 
-		parent::spawnTo($player);
-	}
+        parent::spawnTo($player);
+    }
 }

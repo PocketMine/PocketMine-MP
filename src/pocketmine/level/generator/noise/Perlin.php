@@ -24,81 +24,81 @@ namespace pocketmine\level\generator\noise;
 use pocketmine\utils\Random;
 
 class Perlin extends Generator{
-	public static $grad3 = [
-		[1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
-		[1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
-		[0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]
-	];
+    public static $grad3 = [
+        [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
+        [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
+        [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]
+    ];
 
 
-	public function __construct(Random $random, $octaves, $frequency, $amplitude){
-		$this->octaves = $octaves;
-		$this->frequency = $frequency;
-		$this->amplitude = $amplitude;
-		$this->offsetX = $random->nextFloat() * 256;
-		$this->offsetY = $random->nextFloat() * 256;
-		$this->offsetZ = $random->nextFloat() * 256;
+    public function __construct(Random $random, $octaves, $frequency, $amplitude){
+        $this->octaves = $octaves;
+        $this->frequency = $frequency;
+        $this->amplitude = $amplitude;
+        $this->offsetX = $random->nextFloat() * 256;
+        $this->offsetY = $random->nextFloat() * 256;
+        $this->offsetZ = $random->nextFloat() * 256;
 
-		for($i = 0; $i < 512; ++$i){
-			$this->perm[$i] = 0;
-		}
+        for($i = 0; $i < 512; ++$i){
+            $this->perm[$i] = 0;
+        }
 
-		for($i = 0; $i < 256; ++$i){
-			$this->perm[$i] = $random->nextRange(0, 255);
-		}
+        for($i = 0; $i < 256; ++$i){
+            $this->perm[$i] = $random->nextRange(0, 255);
+        }
 
-		for($i = 0; $i < 256; ++$i){
-			$pos = $random->nextRange(0, 255 - $i) + $i;
-			$old = $this->perm[$i];
+        for($i = 0; $i < 256; ++$i){
+            $pos = $random->nextRange(0, 255 - $i) + $i;
+            $old = $this->perm[$i];
 
-			$this->perm[$i] = $this->perm[$pos];
-			$this->perm[$pos] = $old;
-			$this->perm[$i + 256] = $this->perm[$i];
-		}
+            $this->perm[$i] = $this->perm[$pos];
+            $this->perm[$pos] = $old;
+            $this->perm[$i + 256] = $this->perm[$i];
+        }
 
-	}
+    }
 
-	public function getNoise3D($x, $y, $z){
-		$x += $this->offsetX;
-		$y += $this->offsetY;
-		$z += $this->offsetZ;
+    public function getNoise3D($x, $y, $z){
+        $x += $this->offsetX;
+        $y += $this->offsetY;
+        $z += $this->offsetZ;
 
-		$floorX = (int) floor($x);
-		$floorY = (int) floor($y);
-		$floorZ = (int) floor($z);
+        $floorX = (int) floor($x);
+        $floorY = (int) floor($y);
+        $floorZ = (int) floor($z);
 
-		$X = $floorX & 0xFF;
-		$Y = $floorY & 0xFF;
-		$Z = $floorZ & 0xFF;
+        $X = $floorX & 0xFF;
+        $Y = $floorY & 0xFF;
+        $Z = $floorZ & 0xFF;
 
-		$x -= $floorX;
-		$y -= $floorY;
-		$z -= $floorZ;
+        $x -= $floorX;
+        $y -= $floorY;
+        $z -= $floorZ;
 
-		//Fade curves
-		$fX = self::fade($x);
-		$fY = self::fade($y);
-		$fZ = self::fade($z);
+        //Fade curves
+        $fX = self::fade($x);
+        $fY = self::fade($y);
+        $fZ = self::fade($z);
 
-		//Cube corners
-		$A = $this->perm[$X] + $Y;
-		$AA = $this->perm[$A] + $Z;
-		$AB = $this->perm[$A + 1] + $Z;
-		$B = $this->perm[$X + 1] + $Y;
-		$BA = $this->perm[$B] + $Z;
-		$BB = $this->perm[$B + 1] + $Z;
+        //Cube corners
+        $A = $this->perm[$X] + $Y;
+        $AA = $this->perm[$A] + $Z;
+        $AB = $this->perm[$A + 1] + $Z;
+        $B = $this->perm[$X + 1] + $Y;
+        $BA = $this->perm[$B] + $Z;
+        $BB = $this->perm[$B + 1] + $Z;
 
-		return self::lerp($fZ, self::lerp($fY, self::lerp($fX, self::grad($this->perm[$AA], $x, $y, $z),
-					self::grad($this->perm[$BA], $x - 1, $y, $z)),
-				self::lerp($fX, self::grad($this->perm[$AB], $x, $y - 1, $z),
-					self::grad($this->perm[$BB], $x - 1, $y - 1, $z))),
-			self::lerp($fY, self::lerp($fX, self::grad($this->perm[$AA + 1], $x, $y, $z - 1),
-					self::grad($this->perm[$BA + 1], $x - 1, $y, $z - 1)),
-				self::lerp($fX, self::grad($this->perm[$AB + 1], $x, $y - 1, $z - 1),
-					self::grad($this->perm[$BB + 1], $x - 1, $y - 1, $z - 1))));
-	}
+        return self::lerp($fZ, self::lerp($fY, self::lerp($fX, self::grad($this->perm[$AA], $x, $y, $z),
+                    self::grad($this->perm[$BA], $x - 1, $y, $z)),
+                self::lerp($fX, self::grad($this->perm[$AB], $x, $y - 1, $z),
+                    self::grad($this->perm[$BB], $x - 1, $y - 1, $z))),
+            self::lerp($fY, self::lerp($fX, self::grad($this->perm[$AA + 1], $x, $y, $z - 1),
+                    self::grad($this->perm[$BA + 1], $x - 1, $y, $z - 1)),
+                self::lerp($fX, self::grad($this->perm[$AB + 1], $x, $y - 1, $z - 1),
+                    self::grad($this->perm[$BB + 1], $x - 1, $y - 1, $z - 1))));
+    }
 
-	public function getNoise2D($x, $y){
-		return $this->getNoise3D($x, $y, 0);
-	}
+    public function getNoise2D($x, $y){
+        return $this->getNoise3D($x, $y, 0);
+    }
 }

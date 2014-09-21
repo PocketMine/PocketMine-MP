@@ -23,21 +23,21 @@ namespace pocketmine\network\protocol;
 
 
 class FullChunkDataPacket extends DataPacket{
-	public $chunkX;
-	public $chunkZ;
-	public $data;
+    public $chunkX;
+    public $chunkZ;
+    public $data;
 
-	public function pid(){
-		return Info::FULL_CHUNK_DATA_PACKET;
-	}
+    public function pid(){
+        return Info::FULL_CHUNK_DATA_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->put($this->data);
-	}
+    public function encode(){
+        $this->reset();
+        $this->put($this->data);
+    }
 
 }

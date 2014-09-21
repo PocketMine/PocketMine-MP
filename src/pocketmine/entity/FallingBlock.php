@@ -22,122 +22,123 @@
 namespace pocketmine\entity;
 
 
-use pocketmine\nbt\tag\String;
-use pocketmine\nbt\tag\Byte;
 use pocketmine\block\Block;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item;
+use pocketmine\nbt\tag\Byte;
+use pocketmine\nbt\tag\String;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\SetEntityMotionPacket;
 use pocketmine\Player;
-use pocketmine\event\entity\EntityDamageEvent;
 
 class FallingBlock extends Entity{
 
-	const NETWORK_ID = 66;
+    const NETWORK_ID = 66;
 
-	public $width = 0.98;
-	public $length = 0.98;
-	public $height = 0.98;
+    public $width = 0.98;
+    public $length = 0.98;
+    public $height = 0.98;
 
-	protected $gravity = 0.04;
-	protected $drag = 0.02;
-	protected $blockId = 0;
+    protected $gravity = 0.04;
+    protected $drag = 0.02;
+    protected $blockId = 0;
 
-	protected function initEntity(){
-		$this->namedtag->id = new String("id", "FallingSand");
-		if(isset($this->namedtag->Tile)){
-			$this->blockId = $this->namedtag["Tile"];
-		}
+    protected function initEntity(){
+        $this->namedtag->id = new String("id", "FallingSand");
+        if(isset($this->namedtag->Tile)){
+            $this->blockId = $this->namedtag["Tile"];
+        }
 
-		if($this->blockId === 0){
-			$this->close();
-		}
-	}
+        if($this->blockId === 0){
+            $this->close();
+        }
+    }
 
-	public function canCollideWith(Entity $entity){
-		return false;
-	}
+    public function canCollideWith(Entity $entity){
+        return false;
+    }
 
-	public function getData(){
-		return [];
-	}
+    public function getData(){
+        return [];
+    }
 
-	public function onUpdate(){
-		$this->entityBaseTick();
+    public function onUpdate(){
+        $this->entityBaseTick();
 
-		if($this->closed !== false){
-			return false;
-		}
+        if($this->closed !== false){
+            return false;
+        }
 
-		$this->motionY -= $this->gravity;
+        $this->motionY -= $this->gravity;
 
-		$this->move($this->motionX, $this->motionY, $this->motionZ);
+        $this->move($this->motionX, $this->motionY, $this->motionZ);
 
-		$friction = 1 - $this->drag;
+        $friction = 1 - $this->drag;
 
-		$this->motionX *= $friction;
-		$this->motionY *= 1 - $this->drag;
-		$this->motionZ *= $friction;
+        $this->motionX *= $friction;
+        $this->motionY *= 1 - $this->drag;
+        $this->motionZ *= $friction;
 
-		$pos = $this->floor();
+        $pos = $this->floor();
 
-		if($this->ticksLived === 1){
-			$block = $this->level->getBlock($pos);
-			if($block->getID() != $this->blockId){
-				$this->kill();
-				return true;
-			}
-			$this->level->setBlock($pos, Block::get(0, true));
+        if($this->ticksLived === 1){
+            $block = $this->level->getBlock($pos);
+            if($block->getID() != $this->blockId){
+                $this->kill();
 
-		}
+                return true;
+            }
+            $this->level->setBlock($pos, Block::get(0, true));
 
-		if($this->onGround){
-			$this->kill();
-			$block = $this->level->getBlock($pos);
-			if(!$block->isFullBlock){
-				$this->getLevel()->dropItem($this, Item::get($this->getBlock(), 0, 1));
-			}else{
-				$this->getLevel()->setBlock($pos, Block::get($this->getBlock(), 0), true);
-			}
-		}
+        }
 
-		$this->updateMovement();
+        if($this->onGround){
+            $this->kill();
+            $block = $this->level->getBlock($pos);
+            if(!$block->isFullBlock){
+                $this->getLevel()->dropItem($this, Item::get($this->getBlock(), 0, 1));
+            }else{
+                $this->getLevel()->setBlock($pos, Block::get($this->getBlock(), 0), true);
+            }
+        }
 
-		return !$this->onGround or ($this->motionX == 0 and $this->motionY == 0 and $this->motionZ == 0);
-	}
+        $this->updateMovement();
 
-	public function getBlock(){
-		return $this->blockId;
-	}
+        return !$this->onGround or ($this->motionX == 0 and $this->motionY == 0 and $this->motionZ == 0);
+    }
 
-	public function saveNBT(){
-		$this->namedtag->Tile = new Byte("Tile", $this->blockId);
-	}
+    public function getBlock(){
+        return $this->blockId;
+    }
 
-	public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
+    public function saveNBT(){
+        $this->namedtag->Tile = new Byte("Tile", $this->blockId);
+    }
 
-	}
+    public function attack($damage, $source = EntityDamageEvent::CAUSE_MAGIC){
 
-	public function heal($amount){
+    }
 
-	}
+    public function heal($amount){
 
-	public function spawnTo(Player $player){
-		$pk = new AddEntityPacket;
-		$pk->type = FallingBlock::NETWORK_ID;
-		$pk->eid = $this->getID();
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->did = -$this->getBlock();
-		$player->dataPacket($pk);
+    }
 
-		$pk = new SetEntityMotionPacket;
-		$pk->entities = [
-			[$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
-		];
-		$player->dataPacket($pk);
+    public function spawnTo(Player $player){
+        $pk = new AddEntityPacket;
+        $pk->type = FallingBlock::NETWORK_ID;
+        $pk->eid = $this->getID();
+        $pk->x = $this->x;
+        $pk->y = $this->y;
+        $pk->z = $this->z;
+        $pk->did = -$this->getBlock();
+        $player->dataPacket($pk);
 
-		parent::spawnTo($player);
-	}
+        $pk = new SetEntityMotionPacket;
+        $pk->entities = [
+            [$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
+        ];
+        $player->dataPacket($pk);
+
+        parent::spawnTo($player);
+    }
 }

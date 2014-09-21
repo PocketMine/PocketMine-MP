@@ -27,25 +27,25 @@ use pocketmine\utils\TextFormat;
 
 class ReloadCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Reloads the server configuration and plugins",
-			"/reload"
-		);
-		$this->setPermission("pocketmine.command.reload");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Reloads the server configuration and plugins",
+            "/reload"
+        );
+        $this->setPermission("pocketmine.command.reload");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		Command::broadcastCommandMessage($sender, TextFormat::YELLOW . "Reloading server...");
+        Command::broadcastCommandMessage($sender, TextFormat::YELLOW . "Reloading server...");
 
-		$sender->getServer()->reload();
-		Command::broadcastCommandMessage($sender, TextFormat::GOLD . "Reload complete.");
+        $sender->getServer()->reload();
+        Command::broadcastCommandMessage($sender, TextFormat::GOLD . "Reload complete.");
 
-		return true;
-	}
+        return true;
+    }
 }

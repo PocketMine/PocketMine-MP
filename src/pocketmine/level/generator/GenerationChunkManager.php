@@ -28,235 +28,240 @@ use pocketmine\utils\Random;
 
 class GenerationChunkManager implements ChunkManager{
 
-	protected $levelID;
+    protected $levelID;
 
-	/** @var FullChunk[] */
-	protected $chunks = [];
+    /** @var FullChunk[] */
+    protected $chunks = [];
 
-	/** @var Generator */
-	protected $generator;
+    /** @var Generator */
+    protected $generator;
 
-	/** @var GenerationManager */
-	protected $manager;
+    /** @var GenerationManager */
+    protected $manager;
 
-	protected $seed;
+    protected $seed;
 
-	protected $changes = [];
+    protected $changes = [];
 
-	public function __construct(GenerationManager $manager, $levelID, $seed, $class, array $options){
-		if(!class_exists($class, true) or !is_subclass_of($class, Generator::class)){
-			throw new \Exception("Class $class does not exists or is not a subclass of Generator");
-		}
+    public function __construct(GenerationManager $manager, $levelID, $seed, $class, array $options){
+        if(!class_exists($class, true) or !is_subclass_of($class, Generator::class)){
+            throw new \Exception("Class $class does not exists or is not a subclass of Generator");
+        }
 
-		$this->levelID = $levelID;
-		$this->seed = $seed;
-		$this->manager = $manager;
-		$this->generator = new $class($options);
-		$this->generator->init($this, new Random($seed));
-	}
+        $this->levelID = $levelID;
+        $this->seed = $seed;
+        $this->manager = $manager;
+        $this->generator = new $class($options);
+        $this->generator->init($this, new Random($seed));
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getSeed(){
-		return $this->seed;
-	}
+    /**
+     * @return int
+     */
+    public function getSeed(){
+        return $this->seed;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getID(){
-		return $this->levelID;
-	}
+    /**
+     * @return int
+     */
+    public function getID(){
+        return $this->levelID;
+    }
 
-	/**
-	 * @param $chunkX
-	 * @param $chunkZ
-	 *
-	 * @return FullChunk
-	 *
-	 * @throws \Exception
-	 */
-	public function getChunk($chunkX, $chunkZ){
-		$index = Level::chunkHash($chunkX, $chunkZ);
-		$chunk = !isset($this->chunks[$index]) ? $this->requestChunk($chunkX, $chunkZ) : $this->chunks[$index];
-		if($chunk === null){
-			throw new \Exception("null chunk received");
-		}
-		$this->changes[$index] = $chunk;
+    /**
+     * @param $chunkX
+     * @param $chunkZ
+     *
+     * @return FullChunk
+     *
+     * @throws \Exception
+     */
+    public function getChunk($chunkX, $chunkZ){
+        $index = Level::chunkHash($chunkX, $chunkZ);
+        $chunk = !isset($this->chunks[$index]) ? $this->requestChunk($chunkX, $chunkZ) : $this->chunks[$index];
+        if($chunk === null){
+            throw new \Exception("null chunk received");
+        }
+        $this->changes[$index] = $chunk;
 
-		return $chunk;
-	}
+        return $chunk;
+    }
 
-	/**
-	 * @return FullChunk[]
-	 */
-	public function getChangedChunks(){
-		return $this->changes;
-	}
+    /**
+     * @return FullChunk[]
+     */
+    public function getChangedChunks(){
+        return $this->changes;
+    }
 
-	public function cleanChangedChunks(){
-		$this->changes = [];
-	}
+    public function cleanChangedChunks(){
+        $this->changes = [];
+    }
 
-	public function cleanChangedChunk($index){
-		unset($this->changes[$index]);
-	}
+    public function cleanChangedChunk($index){
+        unset($this->changes[$index]);
+    }
 
-	public function doGarbageCollection(){
-		foreach($this->chunks as $index => $chunk){
-			if(!isset($this->changes[$index]) or $chunk->isPopulated()){
-				unset($this->chunks[$index]);
-				unset($this->changes[$index]);
-			}
-		}
-	}
+    public function doGarbageCollection(){
+        foreach($this->chunks as $index => $chunk){
+            if(!isset($this->changes[$index]) or $chunk->isPopulated()){
+                unset($this->chunks[$index]);
+                unset($this->changes[$index]);
+            }
+        }
+    }
 
-	public function generateChunk($chunkX, $chunkZ){
-		try{
-			$this->getChunk($chunkX, $chunkZ);
-			$this->generator->generateChunk($chunkX, $chunkZ);
-			$this->setChunkGenerated($chunkX, $chunkZ);
-		}catch(\Exception $e){}
-	}
+    public function generateChunk($chunkX, $chunkZ){
+        try{
+            $this->getChunk($chunkX, $chunkZ);
+            $this->generator->generateChunk($chunkX, $chunkZ);
+            $this->setChunkGenerated($chunkX, $chunkZ);
+        }catch(\Exception $e){
+        }
+    }
 
-	public function populateChunk($chunkX, $chunkZ){
-		if(!$this->isChunkGenerated($chunkX, $chunkZ)){
-			$this->generateChunk($chunkX, $chunkZ);
-		}
+    public function populateChunk($chunkX, $chunkZ){
+        if(!$this->isChunkGenerated($chunkX, $chunkZ)){
+            $this->generateChunk($chunkX, $chunkZ);
+        }
 
-		for($z = $chunkZ - 1; $z <= $chunkZ + 1; ++$z){
-			for($x = $chunkX - 1; $x <= $chunkX + 1; ++$x){
-				if(!$this->isChunkGenerated($x, $z)){
-					$this->generateChunk($x, $z);
-				}
-			}
-		}
+        for($z = $chunkZ - 1; $z <= $chunkZ + 1; ++$z){
+            for($x = $chunkX - 1; $x <= $chunkX + 1; ++$x){
+                if(!$this->isChunkGenerated($x, $z)){
+                    $this->generateChunk($x, $z);
+                }
+            }
+        }
 
-		$this->generator->populateChunk($chunkX, $chunkZ);
-		$this->setChunkPopulated($chunkX, $chunkZ);
-	}
+        $this->generator->populateChunk($chunkX, $chunkZ);
+        $this->setChunkPopulated($chunkX, $chunkZ);
+    }
 
-	public function isChunkGenerated($chunkX, $chunkZ){
-		try{
-			return $this->getChunk($chunkX, $chunkZ)->isGenerated();
-		}catch(\Exception $e){
-			return false;
-		}
-	}
+    public function isChunkGenerated($chunkX, $chunkZ){
+        try{
+            return $this->getChunk($chunkX, $chunkZ)->isGenerated();
+        }catch(\Exception $e){
+            return false;
+        }
+    }
 
-	public function isChunkPopulated($chunkX, $chunkZ){
-		try{
-			return $this->getChunk($chunkX, $chunkZ)->isPopulated();
-		}catch(\Exception $e){
-			return false;
-		}
-	}
+    public function isChunkPopulated($chunkX, $chunkZ){
+        try{
+            return $this->getChunk($chunkX, $chunkZ)->isPopulated();
+        }catch(\Exception $e){
+            return false;
+        }
+    }
 
-	public function setChunkGenerated($chunkX, $chunkZ){
-		$chunk = $this->getChunk($chunkX, $chunkZ);
-		$chunk->setGenerated(true);
-		try{
-			$chunk = $this->getChunk($chunkX, $chunkZ);
-			$chunk->setGenerated(true);
-		}catch(\Exception $e){}
-	}
+    public function setChunkGenerated($chunkX, $chunkZ){
+        $chunk = $this->getChunk($chunkX, $chunkZ);
+        $chunk->setGenerated(true);
+        try{
+            $chunk = $this->getChunk($chunkX, $chunkZ);
+            $chunk->setGenerated(true);
+        }catch(\Exception $e){
+        }
+    }
 
-	public function setChunkPopulated($chunkX, $chunkZ){
+    public function setChunkPopulated($chunkX, $chunkZ){
 
-		try{
-			$chunk = $this->getChunk($chunkX, $chunkZ);
-			$chunk->setPopulated(true);
-		}catch(\Exception $e){}
-	}
+        try{
+            $chunk = $this->getChunk($chunkX, $chunkZ);
+            $chunk->setPopulated(true);
+        }catch(\Exception $e){
+        }
+    }
 
-	protected function requestChunk($chunkX, $chunkZ){
-		$chunk = $this->manager->requestChunk($this->levelID, $chunkX, $chunkZ);
-		$this->chunks[$index = Level::chunkHash($chunkX, $chunkZ)] = $chunk;
+    protected function requestChunk($chunkX, $chunkZ){
+        $chunk = $this->manager->requestChunk($this->levelID, $chunkX, $chunkZ);
+        $this->chunks[$index = Level::chunkHash($chunkX, $chunkZ)] = $chunk;
 
-		return $chunk;
-	}
+        return $chunk;
+    }
 
-	/**
-	 * @param int       $chunkX
-	 * @param int       $chunkZ
-	 * @param FullChunk $chunk
-	 */
-	public function setChunk($chunkX, $chunkZ, FullChunk $chunk){
-		$this->chunks[$index = Level::chunkHash($chunkX, $chunkZ)] = $chunk;
-		$this->changes[$index] = $chunk;
-		if($chunk->isPopulated()){
-			//TODO: Queue to be sent
-		}
-	}
+    /**
+     * @param int       $chunkX
+     * @param int       $chunkZ
+     * @param FullChunk $chunk
+     */
+    public function setChunk($chunkX, $chunkZ, FullChunk $chunk){
+        $this->chunks[$index = Level::chunkHash($chunkX, $chunkZ)] = $chunk;
+        $this->changes[$index] = $chunk;
+        if($chunk->isPopulated()){
+            //TODO: Queue to be sent
+        }
+    }
 
-	/**
-	 * Gets the raw block id.
-	 *
-	 * @param int $x
-	 * @param int $y
-	 * @param int $z
-	 *
-	 * @return int 0-255
-	 */
-	public function getBlockIdAt($x, $y, $z){
-		try{
-			return $this->getChunk($x >> 4, $z >> 4)->getBlockId($x & 0x0f, $y & 0x7f, $z & 0x0f);
-		}catch(\Exception $e){
-			return 0;
-		}
-	}
+    /**
+     * Gets the raw block id.
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $z
+     *
+     * @return int 0-255
+     */
+    public function getBlockIdAt($x, $y, $z){
+        try{
+            return $this->getChunk($x >> 4, $z >> 4)->getBlockId($x & 0x0f, $y & 0x7f, $z & 0x0f);
+        }catch(\Exception $e){
+            return 0;
+        }
+    }
 
-	/**
-	 * Sets the raw block id.
-	 *
-	 * @param int $x
-	 * @param int $y
-	 * @param int $z
-	 * @param int $id 0-255
-	 */
-	public function setBlockIdAt($x, $y, $z, $id){
-		try{
-			$this->getChunk($x >> 4, $z >> 4)->setBlockId($x & 0x0f, $y & 0x7f, $z & 0x0f, $id & 0xff);
-		}catch(\Exception $e){}
-	}
+    /**
+     * Sets the raw block id.
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $z
+     * @param int $id 0-255
+     */
+    public function setBlockIdAt($x, $y, $z, $id){
+        try{
+            $this->getChunk($x >> 4, $z >> 4)->setBlockId($x & 0x0f, $y & 0x7f, $z & 0x0f, $id & 0xff);
+        }catch(\Exception $e){
+        }
+    }
 
-	/**
-	 * Gets the raw block metadata
-	 *
-	 * @param int $x
-	 * @param int $y
-	 * @param int $z
-	 *
-	 * @return int 0-15
-	 */
-	public function getBlockDataAt($x, $y, $z){
-		try{
-			return $this->getChunk($x >> 4, $z >> 4)->getBlockData($x & 0x0f, $y & 0x7f, $z & 0x0f);
-		}catch(\Exception $e){
-			return 0;
-		}
-	}
+    /**
+     * Gets the raw block metadata
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $z
+     *
+     * @return int 0-15
+     */
+    public function getBlockDataAt($x, $y, $z){
+        try{
+            return $this->getChunk($x >> 4, $z >> 4)->getBlockData($x & 0x0f, $y & 0x7f, $z & 0x0f);
+        }catch(\Exception $e){
+            return 0;
+        }
+    }
 
-	/**
-	 * Sets the raw block metadata.
-	 *
-	 * @param int $x
-	 * @param int $y
-	 * @param int $z
-	 * @param int $data 0-15
-	 */
-	public function setBlockDataAt($x, $y, $z, $data){
-		try{
-			$this->getChunk($x >> 4, $z >> 4)->setBlockData($x & 0x0f, $y & 0x7f, $z & 0x0f, $data & 0x0f);
-		}catch(\Exception $e){}
-	}
+    /**
+     * Sets the raw block metadata.
+     *
+     * @param int $x
+     * @param int $y
+     * @param int $z
+     * @param int $data 0-15
+     */
+    public function setBlockDataAt($x, $y, $z, $data){
+        try{
+            $this->getChunk($x >> 4, $z >> 4)->setBlockData($x & 0x0f, $y & 0x7f, $z & 0x0f, $data & 0x0f);
+        }catch(\Exception $e){
+        }
+    }
 
-	public function shutdown(){
-		foreach($this->chunks as $chunk){
-			//TODO: send generated chunks to be saved
-		}
-	}
+    public function shutdown(){
+        foreach($this->chunks as $chunk){
+            //TODO: send generated chunks to be saved
+        }
+    }
 
 
 }

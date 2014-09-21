@@ -29,39 +29,39 @@ use pocketmine\Player;
 
 abstract class Spawnable extends Tile{
 
-	public function spawnTo(Player $player){
-		if($this->closed){
-			return false;
-		}
+    public function spawnTo(Player $player){
+        if($this->closed){
+            return false;
+        }
 
-		$nbt = new NBT(NBT::LITTLE_ENDIAN);
-		$nbt->setData($this->getSpawnCompound());
-		$pk = new EntityDataPacket;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->namedtag = $nbt->write();
-		$player->dataPacket($pk);
+        $nbt = new NBT(NBT::LITTLE_ENDIAN);
+        $nbt->setData($this->getSpawnCompound());
+        $pk = new EntityDataPacket;
+        $pk->x = $this->x;
+        $pk->y = $this->y;
+        $pk->z = $this->z;
+        $pk->namedtag = $nbt->write();
+        $player->dataPacket($pk);
 
-		return true;
-	}
+        return true;
+    }
 
-	public abstract function getSpawnCompound();
+    public abstract function getSpawnCompound();
 
-	public function __construct(FullChunk $chunk, Compound $nbt){
-		parent::__construct($chunk, $nbt);
-		$this->spawnToAll();
-	}
+    public function __construct(FullChunk $chunk, Compound $nbt){
+        parent::__construct($chunk, $nbt);
+        $this->spawnToAll();
+    }
 
-	public function spawnToAll(){
-		if($this->closed){
-			return;
-		}
+    public function spawnToAll(){
+        if($this->closed){
+            return;
+        }
 
-		foreach($this->getLevel()->getPlayers() as $player){
-			if($player->spawned === true){
-				$this->spawnTo($player);
-			}
-		}
-	}
+        foreach($this->getLevel()->getPlayers() as $player){
+            if($player->spawned === true){
+                $this->spawnTo($player);
+            }
+        }
+    }
 }
