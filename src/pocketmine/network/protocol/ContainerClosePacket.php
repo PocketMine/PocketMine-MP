@@ -23,19 +23,19 @@ namespace pocketmine\network\protocol;
 
 
 class ContainerClosePacket extends DataPacket{
-	public $windowid;
+    public $windowid;
 
-	public function pid(){
-		return Info::CONTAINER_CLOSE_PACKET;
-	}
+    public function pid(){
+        return Info::CONTAINER_CLOSE_PACKET;
+    }
 
-	public function decode(){
-		$this->windowid = $this->getByte();
-	}
+    public function decode(){
+        $this->windowid = $this->getByte();
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putByte($this->windowid);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putByte($this->windowid);
+    }
 
 }

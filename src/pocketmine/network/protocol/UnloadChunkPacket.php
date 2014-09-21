@@ -23,21 +23,21 @@ namespace pocketmine\network\protocol;
 
 
 class UnloadChunkPacket extends DataPacket{
-	public $chunkX;
-	public $chunkZ;
+    public $chunkX;
+    public $chunkZ;
 
-	public function pid(){
-		return Info::UNLOAD_CHUNK_PACKET;
-	}
+    public function pid(){
+        return Info::UNLOAD_CHUNK_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->chunkX);
-		$this->putInt($this->chunkZ);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->chunkX);
+        $this->putInt($this->chunkZ);
+    }
 
 }

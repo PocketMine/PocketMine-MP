@@ -30,274 +30,274 @@ use pocketmine\Server;
 
 
 abstract class Door extends Transparent{
-	public function __construct($id, $meta = 0, $name = "Unknown"){
-		parent::__construct($id, $meta, $name);
-		$this->isSolid = false;
-	}
+    public function __construct($id, $meta = 0, $name = "Unknown"){
+        parent::__construct($id, $meta, $name);
+        $this->isSolid = false;
+    }
 
-	private function getFullDamage(){
-		$damage = $this->getDamage();
-		$flag = ($damage & 0x08) > 0;
+    private function getFullDamage(){
+        $damage = $this->getDamage();
+        $flag = ($damage & 0x08) > 0;
 
-		if($flag){
-			$first = $this->getSide(0)->getDamage();
-			$second = $damage;
-		}else{
-			$first = $damage;
-			$second = $this->getSide(1)->getDamage();
-		}
+        if($flag){
+            $first = $this->getSide(0)->getDamage();
+            $second = $damage;
+        }else{
+            $first = $damage;
+            $second = $this->getSide(1)->getDamage();
+        }
 
-		$flag1 = ($second & 0x01) > 0;
+        $flag1 = ($second & 0x01) > 0;
 
-		return $first & 0x07 | ($flag ? 8 : 0) | ($flag1 ? 0x10 : 0);
-	}
+        return $first & 0x07 | ($flag ? 8 : 0) | ($flag1 ? 0x10 : 0);
+    }
 
-	public function getBoundingBox(){
-		$f = 0.1875;
-		$damage = $this->getFullDamage();
+    public function getBoundingBox(){
+        $f = 0.1875;
+        $damage = $this->getFullDamage();
 
-		$bb = new AxisAlignedBB(
-			$this->x,
-			$this->y,
-			$this->z,
-			$this->x + 1,
-			$this->y + 2,
-			$this->z + 1
-		);
+        $bb = new AxisAlignedBB(
+            $this->x,
+            $this->y,
+            $this->z,
+            $this->x + 1,
+            $this->y + 2,
+            $this->z + 1
+        );
 
-		$j = $damage & 0x03;
-		$flag = (($damage & 0x04) > 0);
-		$flag1 = (($damage & 0x10) > 0);
+        $j = $damage & 0x03;
+        $flag = (($damage & 0x04) > 0);
+        $flag1 = (($damage & 0x10) > 0);
 
-		if($j === 0){
-			if($flag){
-				if(!$flag1){
-					$bb = new AxisAlignedBB(
-						$this->x,
-						$this->y,
-						$this->z,
-						$this->x + 1,
-						$this->y + 1,
-						$this->z + $f
-					);
-				}else{
-					$bb = new AxisAlignedBB(
-						$this->x,
-						$this->y,
-						$this->z + 1 - $f,
-						$this->x + 1,
-						$this->y + 1,
-						$this->z + 1
-					);
-				}
-			}else{
-				$bb = new AxisAlignedBB(
-					$this->x,
-					$this->y,
-					$this->z,
-					$this->x + $f,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}
-		}elseif($j === 1){
-			if($flag){
-				if(!$flag1){
-					$bb = new AxisAlignedBB(
-						$this->x + 1 - $f,
-						$this->y,
-						$this->z,
-						$this->x + 1,
-						$this->y + 1,
-						$this->z + 1
-					);
-				}else{
-					$bb = new AxisAlignedBB(
-						$this->x,
-						$this->y,
-						$this->z,
-						$this->x + $f,
-						$this->y + 1,
-						$this->z + 1
-					);
-				}
-			}else{
-				$bb = new AxisAlignedBB(
-					$this->x,
-					$this->y,
-					$this->z,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + $f
-				);
-			}
-		}elseif($j === 2){
-			if($flag){
-				if(!$flag1){
-					$bb = new AxisAlignedBB(
-						$this->x,
-						$this->y,
-						$this->z + 1 - $f,
-						$this->x + 1,
-						$this->y + 1,
-						$this->z + 1
-					);
-				}else{
-					$bb = new AxisAlignedBB(
-						$this->x,
-						$this->y,
-						$this->z,
-						$this->x + 1,
-						$this->y + 1,
-						$this->z + $f
-					);
-				}
-			}else{
-				$bb = new AxisAlignedBB(
-					$this->x + 1 - $f,
-					$this->y,
-					$this->z,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}
-		}elseif($j === 3){
-			if($flag){
-				if(!$flag1){
-					$bb = new AxisAlignedBB(
-						$this->x,
-						$this->y,
-						$this->z,
-						$this->x + $f,
-						$this->y + 1,
-						$this->z + 1
-					);
-				}else{
-					$bb = new AxisAlignedBB(
-						$this->x + 1 - $f,
-						$this->y,
-						$this->z,
-						$this->x + 1,
-						$this->y + 1,
-						$this->z + 1
-					);
-				}
-			}else{
-				$bb = new AxisAlignedBB(
-					$this->x,
-					$this->y,
-					$this->z + 1 - $f,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}
-		}
+        if($j === 0){
+            if($flag){
+                if(!$flag1){
+                    $bb = new AxisAlignedBB(
+                        $this->x,
+                        $this->y,
+                        $this->z,
+                        $this->x + 1,
+                        $this->y + 1,
+                        $this->z + $f
+                    );
+                }else{
+                    $bb = new AxisAlignedBB(
+                        $this->x,
+                        $this->y,
+                        $this->z + 1 - $f,
+                        $this->x + 1,
+                        $this->y + 1,
+                        $this->z + 1
+                    );
+                }
+            }else{
+                $bb = new AxisAlignedBB(
+                    $this->x,
+                    $this->y,
+                    $this->z,
+                    $this->x + $f,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }
+        }elseif($j === 1){
+            if($flag){
+                if(!$flag1){
+                    $bb = new AxisAlignedBB(
+                        $this->x + 1 - $f,
+                        $this->y,
+                        $this->z,
+                        $this->x + 1,
+                        $this->y + 1,
+                        $this->z + 1
+                    );
+                }else{
+                    $bb = new AxisAlignedBB(
+                        $this->x,
+                        $this->y,
+                        $this->z,
+                        $this->x + $f,
+                        $this->y + 1,
+                        $this->z + 1
+                    );
+                }
+            }else{
+                $bb = new AxisAlignedBB(
+                    $this->x,
+                    $this->y,
+                    $this->z,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + $f
+                );
+            }
+        }elseif($j === 2){
+            if($flag){
+                if(!$flag1){
+                    $bb = new AxisAlignedBB(
+                        $this->x,
+                        $this->y,
+                        $this->z + 1 - $f,
+                        $this->x + 1,
+                        $this->y + 1,
+                        $this->z + 1
+                    );
+                }else{
+                    $bb = new AxisAlignedBB(
+                        $this->x,
+                        $this->y,
+                        $this->z,
+                        $this->x + 1,
+                        $this->y + 1,
+                        $this->z + $f
+                    );
+                }
+            }else{
+                $bb = new AxisAlignedBB(
+                    $this->x + 1 - $f,
+                    $this->y,
+                    $this->z,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }
+        }elseif($j === 3){
+            if($flag){
+                if(!$flag1){
+                    $bb = new AxisAlignedBB(
+                        $this->x,
+                        $this->y,
+                        $this->z,
+                        $this->x + $f,
+                        $this->y + 1,
+                        $this->z + 1
+                    );
+                }else{
+                    $bb = new AxisAlignedBB(
+                        $this->x + 1 - $f,
+                        $this->y,
+                        $this->z,
+                        $this->x + 1,
+                        $this->y + 1,
+                        $this->z + 1
+                    );
+                }
+            }else{
+                $bb = new AxisAlignedBB(
+                    $this->x,
+                    $this->y,
+                    $this->z + 1 - $f,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }
+        }
 
-		return $bb;
-	}
+        return $bb;
+    }
 
-	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->getID() === self::AIR){ //Replace with common break method
-				$this->getLevel()->setBlock($this, new Air(), false);
-				if($this->getSide(1) instanceof Door){
-					$this->getLevel()->setBlock($this->getSide(1), new Air(), false);
-				}
+    public function onUpdate($type){
+        if($type === Level::BLOCK_UPDATE_NORMAL){
+            if($this->getSide(0)->getID() === self::AIR){ //Replace with common break method
+                $this->getLevel()->setBlock($this, new Air(), false);
+                if($this->getSide(1) instanceof Door){
+                    $this->getLevel()->setBlock($this->getSide(1), new Air(), false);
+                }
 
-				return Level::BLOCK_UPDATE_NORMAL;
-			}
-		}
+                return Level::BLOCK_UPDATE_NORMAL;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		if($face === 1){
-			$blockUp = $this->getSide(1);
-			$blockDown = $this->getSide(0);
-			if($blockUp->isReplaceable === false or $blockDown->isTransparent === true){
-				return false;
-			}
-			$direction = $player instanceof Player ? $player->getDirection() : 0;
-			$face = [
-				0 => 3,
-				1 => 4,
-				2 => 2,
-				3 => 5,
-			];
-			$next = $this->getSide($face[(($direction + 2) % 4)]);
-			$next2 = $this->getSide($face[$direction]);
-			$metaUp = 0x08;
-			if($next->getID() === $this->id or ($next2->isTransparent === false and $next->isTransparent === true)){ //Door hinge
-				$metaUp |= 0x01;
-			}
+    public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+        if($face === 1){
+            $blockUp = $this->getSide(1);
+            $blockDown = $this->getSide(0);
+            if($blockUp->isReplaceable === false or $blockDown->isTransparent === true){
+                return false;
+            }
+            $direction = $player instanceof Player ? $player->getDirection() : 0;
+            $face = [
+                0 => 3,
+                1 => 4,
+                2 => 2,
+                3 => 5,
+            ];
+            $next = $this->getSide($face[(($direction + 2) % 4)]);
+            $next2 = $this->getSide($face[$direction]);
+            $metaUp = 0x08;
+            if($next->getID() === $this->id or ($next2->isTransparent === false and $next->isTransparent === true)){ //Door hinge
+                $metaUp |= 0x01;
+            }
 
-			$this->meta = $player->getDirection() & 0x03;
-			$this->getLevel()->setBlock($block, $this, true, true); //Bottom
-			$this->getLevel()->setBlock($blockUp, $b = Block::get($this->id, $metaUp), true); //Top
-			return true;
-		}
+            $this->meta = $player->getDirection() & 0x03;
+            $this->getLevel()->setBlock($block, $this, true, true); //Bottom
+            $this->getLevel()->setBlock($blockUp, $b = Block::get($this->id, $metaUp), true); //Top
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public function onBreak(Item $item){
-		if(($this->meta & 0x08) === 0x08){
-			$down = $this->getSide(0);
-			if($down->getID() === $this->id){
-				$this->getLevel()->setBlock($down, new Air(), true);
-			}
-		}else{
-			$up = $this->getSide(1);
-			if($up->getID() === $this->id){
-				$this->getLevel()->setBlock($up, new Air(), true);
-			}
-		}
-		$this->getLevel()->setBlock($this, new Air(), true);
+    public function onBreak(Item $item){
+        if(($this->meta & 0x08) === 0x08){
+            $down = $this->getSide(0);
+            if($down->getID() === $this->id){
+                $this->getLevel()->setBlock($down, new Air(), true);
+            }
+        }else{
+            $up = $this->getSide(1);
+            if($up->getID() === $this->id){
+                $this->getLevel()->setBlock($up, new Air(), true);
+            }
+        }
+        $this->getLevel()->setBlock($this, new Air(), true);
 
-		return true;
-	}
+        return true;
+    }
 
-	public function onActivate(Item $item, Player $player = null){
-		if(($this->meta & 0x08) === 0x08){ //Top
-			$down = $this->getSide(0);
-			if($down->getID() === $this->id){
-				$meta = $down->getDamage() ^ 0x04;
-				$this->getLevel()->setBlock($down, Block::get($this->id, $meta), true);
-				$players = $this->getLevel()->getUsingChunk($this->x >> 4, $this->z >> 4);
-				if($player instanceof Player){
-					unset($players[$player->getID()]);
-				}
-				$pk = new LevelEventPacket;
-				$pk->x = $this->x;
-				$pk->y = $this->y;
-				$pk->z = $this->z;
-				$pk->evid = 1003;
-				$pk->data = 0;
-				Server::broadcastPacket($players, $pk);
+    public function onActivate(Item $item, Player $player = null){
+        if(($this->meta & 0x08) === 0x08){ //Top
+            $down = $this->getSide(0);
+            if($down->getID() === $this->id){
+                $meta = $down->getDamage() ^ 0x04;
+                $this->getLevel()->setBlock($down, Block::get($this->id, $meta), true);
+                $players = $this->getLevel()->getUsingChunk($this->x >> 4, $this->z >> 4);
+                if($player instanceof Player){
+                    unset($players[$player->getID()]);
+                }
+                $pk = new LevelEventPacket;
+                $pk->x = $this->x;
+                $pk->y = $this->y;
+                $pk->z = $this->z;
+                $pk->evid = 1003;
+                $pk->data = 0;
+                Server::broadcastPacket($players, $pk);
 
-				return true;
-			}
+                return true;
+            }
 
-			return false;
-		}else{
-			$this->meta ^= 0x04;
-			$this->getLevel()->setBlock($this, $this, true);
-			$players = $this->getLevel()->getUsingChunk($this->x >> 4, $this->z >> 4);
-			if($player instanceof Player){
-				unset($players[$player->getID()]);
-			}
-			$pk = new LevelEventPacket;
-			$pk->x = $this->x;
-			$pk->y = $this->y;
-			$pk->z = $this->z;
-			$pk->evid = 1003;
-			$pk->data = 0;
-			Server::broadcastPacket($players, $pk);
-		}
+            return false;
+        }else{
+            $this->meta ^= 0x04;
+            $this->getLevel()->setBlock($this, $this, true);
+            $players = $this->getLevel()->getUsingChunk($this->x >> 4, $this->z >> 4);
+            if($player instanceof Player){
+                unset($players[$player->getID()]);
+            }
+            $pk = new LevelEventPacket;
+            $pk->x = $this->x;
+            $pk->y = $this->y;
+            $pk->z = $this->z;
+            $pk->evid = 1003;
+            $pk->data = 0;
+            Server::broadcastPacket($players, $pk);
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

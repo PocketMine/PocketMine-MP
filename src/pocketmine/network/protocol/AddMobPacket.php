@@ -24,33 +24,33 @@ namespace pocketmine\network\protocol;
 use pocketmine\utils\Binary;
 
 class AddMobPacket extends DataPacket{
-	public $eid;
-	public $type;
-	public $x;
-	public $y;
-	public $z;
-	public $pitch;
-	public $yaw;
-	public $metadata;
+    public $eid;
+    public $type;
+    public $x;
+    public $y;
+    public $z;
+    public $pitch;
+    public $yaw;
+    public $metadata;
 
-	public function pid(){
-		return Info::ADD_MOB_PACKET;
-	}
+    public function pid(){
+        return Info::ADD_MOB_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->eid);
-		$this->putInt($this->type);
-		$this->putInt($this->x);
-		$this->putInt($this->y);
-		$this->putInt($this->z);
-		$this->putByte(floor($this->yaw * (256 / 360)));
-		$this->putByte(floor($this->pitch * (256 / 360)));
-		$this->put(Binary::writeMetadata($this->metadata));
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->eid);
+        $this->putInt($this->type);
+        $this->putInt($this->x);
+        $this->putInt($this->y);
+        $this->putInt($this->z);
+        $this->putByte(floor($this->yaw * (256 / 360)));
+        $this->putByte(floor($this->pitch * (256 / 360)));
+        $this->put(Binary::writeMetadata($this->metadata));
+    }
 
 }

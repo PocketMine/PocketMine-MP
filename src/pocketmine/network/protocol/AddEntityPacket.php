@@ -23,37 +23,37 @@ namespace pocketmine\network\protocol;
 
 
 class AddEntityPacket extends DataPacket{
-	public $eid;
-	public $type;
-	public $x;
-	public $y;
-	public $z;
-	public $did;
-	public $speedX;
-	public $speedY;
-	public $speedZ;
+    public $eid;
+    public $type;
+    public $x;
+    public $y;
+    public $z;
+    public $did;
+    public $speedX;
+    public $speedY;
+    public $speedZ;
 
-	public function pid(){
-		return Info::ADD_ENTITY_PACKET;
-	}
+    public function pid(){
+        return Info::ADD_ENTITY_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->eid);
-		$this->putInt($this->type);
-		$this->putFloat($this->x);
-		$this->putFloat($this->y);
-		$this->putFloat($this->z);
-		$this->putInt($this->did);
-		if($this->did > 0){
-			$this->putShort($this->speedX * 8000);
-			$this->putShort($this->speedY * 8000);
-			$this->putShort($this->speedZ * 8000);
-		}
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->eid);
+        $this->putInt($this->type);
+        $this->putFloat($this->x);
+        $this->putFloat($this->y);
+        $this->putFloat($this->z);
+        $this->putInt($this->did);
+        if($this->did > 0){
+            $this->putShort($this->speedX * 8000);
+            $this->putShort($this->speedY * 8000);
+            $this->putShort($this->speedZ * 8000);
+        }
+    }
 
 }

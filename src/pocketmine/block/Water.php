@@ -21,150 +21,150 @@
 
 namespace pocketmine\block;
 
+use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\entity\Entity;
 
 class Water extends Liquid{
-	public function __construct($meta = 0){
-		parent::__construct(self::WATER, $meta, "Water");
-		$this->hardness = 500;
-	}
+    public function __construct($meta = 0){
+        parent::__construct(self::WATER, $meta, "Water");
+        $this->hardness = 500;
+    }
 
-	public function getBoundingBox(){
-		return null;
-	}
-	
-	public function onEntityCollide(Entity $entity){
-		$entity->fallDistance = 0;
-		$entity->extinguish();
-	}
+    public function getBoundingBox(){
+        return null;
+    }
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$ret = $this->getLevel()->setBlock($this, $this, true);
-		$this->getLevel()->scheduleUpdate(clone $this, 10);
+    public function onEntityCollide(Entity $entity){
+        $entity->fallDistance = 0;
+        $entity->extinguish();
+    }
 
-		return $ret;
-	}
+    public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+        $ret = $this->getLevel()->setBlock($this, $this, true);
+        $this->getLevel()->scheduleUpdate(clone $this, 10);
 
-	public function getSourceCount(){
-		$count = 0;
-		for($side = 2; $side <= 5; ++$side){
-			if($this->getSide($side) instanceof Water){
-				$b = $this->getSide($side);
-				$level = $b->meta & 0x07;
-				if($level == 0x00){
-					$count++;
-				}
-			}
-		}
+        return $ret;
+    }
 
-		return $count;
-	}
+    public function getSourceCount(){
+        $count = 0;
+        for($side = 2; $side <= 5; ++$side){
+            if($this->getSide($side) instanceof Water){
+                $b = $this->getSide($side);
+                $level = $b->meta & 0x07;
+                if($level == 0x00){
+                    $count++;
+                }
+            }
+        }
 
-	public function checkLava(){
-		for($side = 0; $side <= 5; ++$side){
-			if($side == 1){
-				continue;
-			}
-			$b = $this->getSide($side);
-			if($b instanceof Lava){
-				$level = $b->meta & 0x07;
-				if($level == 0x00){
-					$this->getLevel()->setBlock($b, new Obsidian(), false, false, true);
-				}else{
-					$this->getLevel()->setBlock($b, new Cobblestone(), false, false, true);
-				}
+        return $count;
+    }
 
-				return true;
-			}
-		}
+    public function checkLava(){
+        for($side = 0; $side <= 5; ++$side){
+            if($side == 1){
+                continue;
+            }
+            $b = $this->getSide($side);
+            if($b instanceof Lava){
+                $level = $b->meta & 0x07;
+                if($level == 0x00){
+                    $this->getLevel()->setBlock($b, new Obsidian(), false, false, true);
+                }else{
+                    $this->getLevel()->setBlock($b, new Cobblestone(), false, false, true);
+                }
 
-		return false;
-	}
+                return true;
+            }
+        }
 
-	public function getFrom(){
-		for($side = 0; $side <= 5; ++$side){
-			$b = $this->getSide($side);
-			if($b instanceof Water){
-				$tlevel = $b->meta & 0x07;
-				$level = $this->meta & 0x07;
-				if(($tlevel + 1) == $level || ($side == 0x01 && $level == 0x01)){
-					return $b;
-				}
-			}
-		}
+        return false;
+    }
 
-		return null;
-	}
+    public function getFrom(){
+        for($side = 0; $side <= 5; ++$side){
+            $b = $this->getSide($side);
+            if($b instanceof Water){
+                $tlevel = $b->meta & 0x07;
+                $level = $this->meta & 0x07;
+                if(($tlevel + 1) == $level || ($side == 0x01 && $level == 0x01)){
+                    return $b;
+                }
+            }
+        }
 
-	public function onUpdate($type){
-		return false;
-		$newId = $this->id;
-		$level = $this->meta & 0x07;
-		if($type !== Level::BLOCK_UPDATE_NORMAL){
-			return false;
-		}
+        return null;
+    }
 
-		$this->checkLava();
+    public function onUpdate($type){
+        return false;
+        $newId = $this->id;
+        $level = $this->meta & 0x07;
+        if($type !== Level::BLOCK_UPDATE_NORMAL){
+            return false;
+        }
 
-		$falling = $this->meta >> 3;
-		$down = $this->getSide(0);
+        $this->checkLava();
 
-		$from = $this->getFrom();
-		//Has Source or Its Source
-		if($from !== null || $level == 0x00){
-			if($level !== 0x07){
-				if($down instanceof Air || $down instanceof Water){
-					$this->getLevel()->setBlock($down, new Water(0x01), false, false, true);
-					//Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($down, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
-				}else{
-					for($side = 2; $side <= 5; ++$side){
-						$b = $this->getSide($side);
-						if($b instanceof Water){
-							if($this->getSourceCount() >= 2 && $level != 0x00){
-								$this->getLevel()->setBlock($this, new Water(0), false, false, true);
-							}
-						}elseif($b->isFlowable === true){
-							$this->getLevel()->setBlock($b, new Water($level + 1), false, false, true);
-							//Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
-						}
-					}
-				}
-			}
-		}else{
-			//Extend Remove for Left Waters
-			for($side = 2; $side <= 5; ++$side){
-				$sb = $this->getSide($side);
-				if($sb instanceof Water){
-					$tlevel = $sb->meta & 0x07;
-					if($tlevel != 0x00){
-						for($s = 0; $s <= 5; $s++){
-							$ssb = $sb->getSide($s);
-							Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
-						}
-						$this->getLevel()->setBlock($sb, new Air(), false, false, true);
-					}
-				}
-				$b = $this->getSide(0)->getSide($side);
-				if($b instanceof Water){
-					$tlevel = $b->meta & 0x07;
-					if($tlevel != 0x00){
-						for($s = 0; $s <= 5; $s++){
-							$ssb = $sb->getSide($s);
-							Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
-						}
-						$this->getLevel()->setBlock($b, new Air(), false, false, true);
-					}
-				}
-				//Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
-			}
-			$this->getLevel()->setBlock($this, new Air(), false, false, true);
-		}
+        $falling = $this->meta >> 3;
+        $down = $this->getSide(0);
 
-		return false;
-	}
+        $from = $this->getFrom();
+        //Has Source or Its Source
+        if($from !== null || $level == 0x00){
+            if($level !== 0x07){
+                if($down instanceof Air || $down instanceof Water){
+                    $this->getLevel()->setBlock($down, new Water(0x01), false, false, true);
+                    //Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($down, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
+                }else{
+                    for($side = 2; $side <= 5; ++$side){
+                        $b = $this->getSide($side);
+                        if($b instanceof Water){
+                            if($this->getSourceCount() >= 2 && $level != 0x00){
+                                $this->getLevel()->setBlock($this, new Water(0), false, false, true);
+                            }
+                        }elseif($b->isFlowable === true){
+                            $this->getLevel()->setBlock($b, new Water($level + 1), false, false, true);
+                            //Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
+                        }
+                    }
+                }
+            }
+        }else{
+            //Extend Remove for Left Waters
+            for($side = 2; $side <= 5; ++$side){
+                $sb = $this->getSide($side);
+                if($sb instanceof Water){
+                    $tlevel = $sb->meta & 0x07;
+                    if($tlevel != 0x00){
+                        for($s = 0; $s <= 5; $s++){
+                            $ssb = $sb->getSide($s);
+                            Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
+                        }
+                        $this->getLevel()->setBlock($sb, new Air(), false, false, true);
+                    }
+                }
+                $b = $this->getSide(0)->getSide($side);
+                if($b instanceof Water){
+                    $tlevel = $b->meta & 0x07;
+                    if($tlevel != 0x00){
+                        for($s = 0; $s <= 5; $s++){
+                            $ssb = $sb->getSide($s);
+                            Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($ssb, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
+                        }
+                        $this->getLevel()->setBlock($b, new Air(), false, false, true);
+                    }
+                }
+                //Server::getInstance()->api->block->scheduleBlockUpdate(Position::fromObject($b, $this->level), 10, Level::BLOCK_UPDATE_NORMAL);
+            }
+            $this->getLevel()->setBlock($this, new Air(), false, false, true);
+        }
+
+        return false;
+    }
 }

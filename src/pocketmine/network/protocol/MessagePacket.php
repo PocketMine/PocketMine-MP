@@ -23,22 +23,22 @@ namespace pocketmine\network\protocol;
 
 
 class MessagePacket extends DataPacket{
-	public $source;
-	public $message;
+    public $source;
+    public $message;
 
-	public function pid(){
-		return Info::MESSAGE_PACKET;
-	}
+    public function pid(){
+        return Info::MESSAGE_PACKET;
+    }
 
-	public function decode(){
-		$this->source = $this->getString();
-		$this->message = $this->getString();
-	}
+    public function decode(){
+        $this->source = $this->getString();
+        $this->message = $this->getString();
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putString($this->source);
-		$this->putString($this->message);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putString($this->source);
+        $this->putString($this->message);
+    }
 
 }

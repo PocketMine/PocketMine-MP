@@ -23,19 +23,19 @@ namespace pocketmine\network\protocol;
 
 
 class AdventureSettingsPacket extends DataPacket{
-	public $flags;
+    public $flags;
 
-	public function pid(){
-		return Info::ADVENTURE_SETTINGS_PACKET;
-	}
+    public function pid(){
+        return Info::ADVENTURE_SETTINGS_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->flags);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->flags);
+    }
 
 }

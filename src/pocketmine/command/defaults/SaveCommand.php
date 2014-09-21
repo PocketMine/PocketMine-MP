@@ -27,32 +27,32 @@ use pocketmine\command\CommandSender;
 
 class SaveCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Saves the server to disk",
-			"/save-all"
-		);
-		$this->setPermission("pocketmine.command.save.perform");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Saves the server to disk",
+            "/save-all"
+        );
+        $this->setPermission("pocketmine.command.save.perform");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		Command::broadcastCommandMessage($sender, "Forcing save...");
+        Command::broadcastCommandMessage($sender, "Forcing save...");
 
-		foreach($sender->getServer()->getOnlinePlayers() as $player){
-			$player->save();
-		}
+        foreach($sender->getServer()->getOnlinePlayers() as $player){
+            $player->save();
+        }
 
-		foreach($sender->getServer()->getLevels() as $level){
-			$level->save(true);
-		}
+        foreach($sender->getServer()->getLevels() as $level){
+            $level->save(true);
+        }
 
-		Command::broadcastCommandMessage($sender, "Save complete.");
+        Command::broadcastCommandMessage($sender, "Save complete.");
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -26,43 +26,43 @@ use pocketmine\level\ChunkManager;
 use pocketmine\utils\Random;
 
 class Tree{
-	public $overridable = [
-		0 => true,
-		2 => true,
-		3 => true,
-		6 => true,
-		17 => true,
-		18 => true,
-	];
+    public $overridable = [
+        0 => true,
+        2 => true,
+        3 => true,
+        6 => true,
+        17 => true,
+        18 => true,
+    ];
 
-	public static function growTree(ChunkManager $level, $x, $y, $z, Random $random, $type = 0){
-		switch($type & 0x03){
-			case Sapling::SPRUCE:
-				if($random->nextRange(0, 1) === 1){
-					$tree = new SpruceTree();
-				}else{
-					$tree = new PineTree();
-				}
-				break;
-			case Sapling::BIRCH:
-				$tree = new SmallTree();
-				$tree->type = Sapling::BIRCH;
-				break;
-			case Sapling::JUNGLE:
-				$tree = new SmallTree();
-				$tree->type = Sapling::JUNGLE;
-				break;
-			case Sapling::OAK:
-			default:
-				/*if($random->nextRange(0, 9) === 0){
-					$tree = new BigTree();
-				}else{*/
-				$tree = new SmallTree();
-				//}
-				break;
-		}
-		if($tree->canPlaceObject($level, $x, $y, $z, $random)){
-			$tree->placeObject($level, $x, $y, $z, $random);
-		}
-	}
+    public static function growTree(ChunkManager $level, $x, $y, $z, Random $random, $type = 0){
+        switch($type & 0x03){
+            case Sapling::SPRUCE:
+                if($random->nextRange(0, 1) === 1){
+                    $tree = new SpruceTree();
+                }else{
+                    $tree = new PineTree();
+                }
+                break;
+            case Sapling::BIRCH:
+                $tree = new SmallTree();
+                $tree->type = Sapling::BIRCH;
+                break;
+            case Sapling::JUNGLE:
+                $tree = new SmallTree();
+                $tree->type = Sapling::JUNGLE;
+                break;
+            case Sapling::OAK:
+            default:
+                /*if($random->nextRange(0, 9) === 0){
+                    $tree = new BigTree();
+                }else{*/
+                $tree = new SmallTree();
+                //}
+                break;
+        }
+        if($tree->canPlaceObject($level, $x, $y, $z, $random)){
+            $tree->placeObject($level, $x, $y, $z, $random);
+        }
+    }
 }

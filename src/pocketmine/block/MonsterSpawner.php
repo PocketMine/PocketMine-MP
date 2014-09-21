@@ -24,10 +24,10 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 
 class MonsterSpawner extends Solid{
-	public function __construct(){
-		parent::__construct(self::MONSTER_SPAWNER, 0, "Monster Spawner");
-		$this->hardness = 25;
-	}
+    public function __construct(){
+        parent::__construct(self::MONSTER_SPAWNER, 0, "Monster Spawner");
+        $this->hardness = 25;
+    }
 
     public function getBreakTime(Item $item){
         switch($item->isPickaxe()){

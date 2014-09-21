@@ -27,30 +27,30 @@ use pocketmine\utils\TextFormat;
 
 class PardonCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Allows the specified player to use this server",
-			"/pardon <player>"
-		);
-		$this->setPermission("pocketmine.command.unban.player");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Allows the specified player to use this server",
+            "/pardon <player>"
+        );
+        $this->setPermission("pocketmine.command.unban.player");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		if(count($args) !== 1){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(count($args) !== 1){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		$sender->getServer()->getNameBans()->remove($args[0]);
+        $sender->getServer()->getNameBans()->remove($args[0]);
 
-		Command::broadcastCommandMessage($sender, "Pardoned " . $args[0]);
+        Command::broadcastCommandMessage($sender, "Pardoned " . $args[0]);
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -23,21 +23,21 @@ namespace pocketmine\network\protocol;
 
 
 class TakeItemEntityPacket extends DataPacket{
-	public $target;
-	public $eid;
+    public $target;
+    public $eid;
 
-	public function pid(){
-		return Info::TAKE_ITEM_ENTITY_PACKET;
-	}
+    public function pid(){
+        return Info::TAKE_ITEM_ENTITY_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->target);
-		$this->putInt($this->eid);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->target);
+        $this->putInt($this->eid);
+    }
 
 }

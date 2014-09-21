@@ -26,17 +26,17 @@ use pocketmine\event\Listener;
 
 class MethodEventExecutor implements EventExecutor{
 
-	private $method;
+    private $method;
 
-	public function __construct($method){
-		$this->method = $method;
-	}
+    public function __construct($method){
+        $this->method = $method;
+    }
 
-	public function execute(Listener $listener, Event $event){
-		$listener->{$this->getMethod()}($event);
-	}
+    public function execute(Listener $listener, Event $event){
+        $listener->{$this->getMethod()}($event);
+    }
 
-	public function getMethod(){
-		return $this->method;
-	}
+    public function getMethod(){
+        return $this->method;
+    }
 }

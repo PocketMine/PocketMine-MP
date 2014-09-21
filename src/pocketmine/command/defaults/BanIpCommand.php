@@ -28,53 +28,53 @@ use pocketmine\utils\TextFormat;
 
 class BanIpCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Prevents the specified IP address from using this server",
-			"/ban <address|player> [reason...]"
-		);
-		$this->setPermission("pocketmine.command.ban.ip");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Prevents the specified IP address from using this server",
+            "/ban <address|player> [reason...]"
+        );
+        $this->setPermission("pocketmine.command.ban.ip");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		if(count($args) === 0){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(count($args) === 0){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		$value = array_shift($args);
-		$reason = implode(" ", $args);
+        $value = array_shift($args);
+        $reason = implode(" ", $args);
 
-		if(preg_match("/^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$/", $value)){
-			$this->processIPBan($value, $sender, $reason);
-		}else{
-			if(($player = $sender->getServer()->getPlayer($value)) instanceof Player){
-				$this->processIPBan($player->getAddress(), $sender, $reason);
-			}else{
-				$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(preg_match("/^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$/", $value)){
+            $this->processIPBan($value, $sender, $reason);
+        }else{
+            if(($player = $sender->getServer()->getPlayer($value)) instanceof Player){
+                $this->processIPBan($player->getAddress(), $sender, $reason);
+            }else{
+                $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-				return false;
-			}
-		}
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	private function processIPBan($ip, CommandSender $sender, $reason){
-		$sender->getServer()->getIPBans()->addBan($ip, $reason, null, $sender->getName());
+    private function processIPBan($ip, CommandSender $sender, $reason){
+        $sender->getServer()->getIPBans()->addBan($ip, $reason, null, $sender->getName());
 
-		foreach($sender->getServer()->getOnlinePlayers() as $player){
-			if($player->getAddress() === $ip){
-				$player->kick("You have been IP banned.");
-			}
-		}
+        foreach($sender->getServer()->getOnlinePlayers() as $player){
+            if($player->getAddress() === $ip){
+                $player->kick("You have been IP banned.");
+            }
+        }
 
-		Command::broadcastCommandMessage($sender, "Banned IP Address " . $ip);
-	}
+        Command::broadcastCommandMessage($sender, "Banned IP Address " . $ip);
+    }
 }

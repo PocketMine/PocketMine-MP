@@ -23,34 +23,34 @@ namespace pocketmine\network\protocol;
 
 
 class ExplodePacket extends DataPacket{
-	public $x;
-	public $y;
-	public $z;
-	public $radius;
-	public $records;
+    public $x;
+    public $y;
+    public $z;
+    public $radius;
+    public $records;
 
-	public function pid(){
-		return Info::EXPLODE_PACKET;
-	}
+    public function pid(){
+        return Info::EXPLODE_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putFloat($this->x);
-		$this->putFloat($this->y);
-		$this->putFloat($this->z);
-		$this->putFloat($this->radius);
-		$this->putInt(@count($this->records));
-		if(@count($this->records) > 0){
-			foreach($this->records as $record){
-				$this->putByte($record->x);
-				$this->putByte($record->y);
-				$this->putByte($record->z);
-			}
-		}
-	}
+    public function encode(){
+        $this->reset();
+        $this->putFloat($this->x);
+        $this->putFloat($this->y);
+        $this->putFloat($this->z);
+        $this->putFloat($this->radius);
+        $this->putInt(@count($this->records));
+        if(@count($this->records) > 0){
+            foreach($this->records as $record){
+                $this->putByte($record->x);
+                $this->putByte($record->y);
+                $this->putByte($record->z);
+            }
+        }
+    }
 
 }

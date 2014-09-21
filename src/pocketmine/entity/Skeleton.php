@@ -23,7 +23,7 @@ namespace pocketmine\entity;
 
 
 class Skeleton extends Monster implements ProjectileSource{
-	protected function initEntity(){
-		$this->namedtag->id = new Skeleton("id", "Chicken");
-	}
+    protected function initEntity(){
+        $this->namedtag->id = new Skeleton("id", "Chicken");
+    }
 }

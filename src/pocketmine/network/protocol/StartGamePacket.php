@@ -23,37 +23,37 @@ namespace pocketmine\network\protocol;
 
 
 class StartGamePacket extends DataPacket{
-	public $seed;
-	public $generator;
-	public $gamemode;
-	public $eid;
-	public $spawnX;
-	public $spawnY;
-	public $spawnZ;
-	public $x;
-	public $y;
-	public $z;
+    public $seed;
+    public $generator;
+    public $gamemode;
+    public $eid;
+    public $spawnX;
+    public $spawnY;
+    public $spawnZ;
+    public $x;
+    public $y;
+    public $z;
 
-	public function pid(){
-		return Info::START_GAME_PACKET;
-	}
+    public function pid(){
+        return Info::START_GAME_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->seed);
-		$this->putInt($this->generator);
-		$this->putInt($this->gamemode);
-		$this->putInt($this->eid);
-		$this->putInt($this->spawnX);
-		$this->putInt($this->spawnY);
-		$this->putInt($this->spawnZ);
-		$this->putFloat($this->x);
-		$this->putFloat($this->y);
-		$this->putFloat($this->z);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->seed);
+        $this->putInt($this->generator);
+        $this->putInt($this->gamemode);
+        $this->putInt($this->eid);
+        $this->putInt($this->spawnX);
+        $this->putInt($this->spawnY);
+        $this->putInt($this->spawnZ);
+        $this->putFloat($this->x);
+        $this->putFloat($this->y);
+        $this->putFloat($this->z);
+    }
 
 }

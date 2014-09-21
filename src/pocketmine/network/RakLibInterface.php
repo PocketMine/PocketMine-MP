@@ -73,7 +73,6 @@ use pocketmine\network\protocol\UnloadChunkPacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\network\protocol\UseItemPacket;
 use pocketmine\Player;
-use pocketmine\scheduler\CallbackTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use raklib\protocol\EncapsulatedPacket;
@@ -84,293 +83,293 @@ use raklib\server\ServerInstance;
 
 class RakLibInterface implements ServerInstance, SourceInterface{
 
-	private $server;
-	/** @var Player[] */
-	private $players = [];
+    private $server;
+    /** @var Player[] */
+    private $players = [];
 
-	/** @var \SplObjectStorage */
-	private $identifers;
+    /** @var \SplObjectStorage */
+    private $identifers;
 
-	/** @var int[] */
-	private $identifiersACK = [];
+    /** @var int[] */
+    private $identifiersACK = [];
 
-	/** @var ServerHandler */
-	private $interface;
+    /** @var ServerHandler */
+    private $interface;
 
-	private $upload = 0;
-	private $download = 0;
+    private $upload = 0;
+    private $download = 0;
 
-	public function __construct(Server $server){
-		$this->server = $server;
-		$this->identifers = new \SplObjectStorage();
+    public function __construct(Server $server){
+        $this->server = $server;
+        $this->identifers = new \SplObjectStorage();
 
-		$server = new RakLibServer($this->server->getLogger(), $this->server->getLoader(), $this->server->getPort(), $this->server->getIp() === "" ? "0.0.0.0" : $this->server->getIp());
-		$this->interface = new ServerHandler($server, $this);
-		$this->setName($this->server->getMotd());
-	}
+        $server = new RakLibServer($this->server->getLogger(), $this->server->getLoader(), $this->server->getPort(), $this->server->getIp() === "" ? "0.0.0.0" : $this->server->getIp());
+        $this->interface = new ServerHandler($server, $this);
+        $this->setName($this->server->getMotd());
+    }
 
-	public function doTick(){
-		$this->interface->sendTick();
-	}
+    public function doTick(){
+        $this->interface->sendTick();
+    }
 
-	public function process(){
-		$work = false;
-		if($this->interface->handlePacket()){
-			$work = true;
-			while($this->interface->handlePacket()){
-			}
-		}
+    public function process(){
+        $work = false;
+        if($this->interface->handlePacket()){
+            $work = true;
+            while($this->interface->handlePacket()){
+            }
+        }
 
-		$this->doTick();
+        $this->doTick();
 
-		return $work;
-	}
+        return $work;
+    }
 
-	public function closeSession($identifier, $reason){
-		if(isset($this->players[$identifier])){
-			$player = $this->players[$identifier];
-			$this->identifers->detach($player);
-			unset($this->players[$identifier]);
-			unset($this->identifiersACK[$identifier]);
-			$player->close(TextFormat::YELLOW . $player->getName() . " has left the game", $reason);
-		}
-	}
+    public function closeSession($identifier, $reason){
+        if(isset($this->players[$identifier])){
+            $player = $this->players[$identifier];
+            $this->identifers->detach($player);
+            unset($this->players[$identifier]);
+            unset($this->identifiersACK[$identifier]);
+            $player->close(TextFormat::YELLOW . $player->getName() . " has left the game", $reason);
+        }
+    }
 
-	public function close(Player $player, $reason = "unknown reason"){
-		if(isset($this->identifers[$player])){
-			unset($this->players[$this->identifers[$player]]);
-			unset($this->identifiersACK[$this->identifers[$player]]);
-			$this->interface->closeSession($this->identifers[$player], $reason);
-			$this->identifers->detach($player);
-		}
-	}
+    public function close(Player $player, $reason = "unknown reason"){
+        if(isset($this->identifers[$player])){
+            unset($this->players[$this->identifers[$player]]);
+            unset($this->identifiersACK[$this->identifers[$player]]);
+            $this->interface->closeSession($this->identifers[$player], $reason);
+            $this->identifers->detach($player);
+        }
+    }
 
-	public function shutdown(){
-		$this->interface->shutdown();
-	}
+    public function shutdown(){
+        $this->interface->shutdown();
+    }
 
-	public function emergencyShutdown(){
-		$this->interface->emergencyShutdown();
-	}
+    public function emergencyShutdown(){
+        $this->interface->emergencyShutdown();
+    }
 
-	public function openSession($identifier, $address, $port, $clientID){
-		$player = new Player($this, null, $address, $port);
-		$this->players[$identifier] = $player;
-		$this->identifiersACK[$identifier] = 0;
-		$this->identifers->attach($player, $identifier);
-		$this->server->addPlayer($identifier, $player);
-	}
+    public function openSession($identifier, $address, $port, $clientID){
+        $player = new Player($this, null, $address, $port);
+        $this->players[$identifier] = $player;
+        $this->identifiersACK[$identifier] = 0;
+        $this->identifers->attach($player, $identifier);
+        $this->server->addPlayer($identifier, $player);
+    }
 
-	public function handleEncapsulated($identifier, EncapsulatedPacket $packet, $flags){
-		if(isset($this->players[$identifier])){
-			$pk = $this->getPacket($packet->buffer);
-			$pk->decode();
-			$this->players[$identifier]->handleDataPacket($pk);
-		}
-	}
+    public function handleEncapsulated($identifier, EncapsulatedPacket $packet, $flags){
+        if(isset($this->players[$identifier])){
+            $pk = $this->getPacket($packet->buffer);
+            $pk->decode();
+            $this->players[$identifier]->handleDataPacket($pk);
+        }
+    }
 
-	public function handleRaw($address, $port, $payload){
-		$this->server->handlePacket($address, $port, $payload);
-	}
+    public function handleRaw($address, $port, $payload){
+        $this->server->handlePacket($address, $port, $payload);
+    }
 
-	public function putRaw($address, $port, $payload){
-		$this->interface->sendRaw($address, $port, $payload);
-	}
+    public function putRaw($address, $port, $payload){
+        $this->interface->sendRaw($address, $port, $payload);
+    }
 
-	public function notifyACK($identifier, $identifierACK){
-		if(isset($this->players[$identifier])){
-			$this->players[$identifier]->handleACK($identifierACK);
-		}
-	}
+    public function notifyACK($identifier, $identifierACK){
+        if(isset($this->players[$identifier])){
+            $this->players[$identifier]->handleACK($identifierACK);
+        }
+    }
 
-	public function setName($name){
-		$this->interface->sendOption("name", "MCCPP;Demo;$name");
-	}
+    public function setName($name){
+        $this->interface->sendOption("name", "MCCPP;Demo;$name");
+    }
 
-	public function setPortCheck($name){
-		$this->interface->sendOption("portChecking", (bool) $name);
-	}
+    public function setPortCheck($name){
+        $this->interface->sendOption("portChecking", (bool) $name);
+    }
 
-	public function handleOption($name, $value){
-		if($name === "bandwidth"){
-			$v = unserialize($value);
-			$this->upload = $v["up"];
-			$this->download = $v["down"];
-		}
-	}
+    public function handleOption($name, $value){
+        if($name === "bandwidth"){
+            $v = unserialize($value);
+            $this->upload = $v["up"];
+            $this->download = $v["down"];
+        }
+    }
 
-	public function getUploadUsage(){
-		return $this->upload;
-	}
+    public function getUploadUsage(){
+        return $this->upload;
+    }
 
-	public function getDownloadUsage(){
-		return $this->download;
-	}
+    public function getDownloadUsage(){
+        return $this->download;
+    }
 
-	public function putPacket(Player $player, DataPacket $packet, $needACK = false, $immediate = false){
-		if(isset($this->identifers[$player])){
-			$identifier = $this->identifers[$player];
-			$packet->encode();
-			$pk = new EncapsulatedPacket();
-			$pk->buffer = $packet->buffer;
-			$pk->reliability = 2;
-			if($needACK === true){
-				$pk->identifierACK = $this->identifiersACK[$identifier]++;
-			}
-			$this->interface->sendEncapsulated($identifier, $pk, ($needACK === true ? RakLib::FLAG_NEED_ACK : 0) | ($immediate === true ? RakLib::PRIORITY_IMMEDIATE : RakLib::PRIORITY_NORMAL));
+    public function putPacket(Player $player, DataPacket $packet, $needACK = false, $immediate = false){
+        if(isset($this->identifers[$player])){
+            $identifier = $this->identifers[$player];
+            $packet->encode();
+            $pk = new EncapsulatedPacket();
+            $pk->buffer = $packet->buffer;
+            $pk->reliability = 2;
+            if($needACK === true){
+                $pk->identifierACK = $this->identifiersACK[$identifier]++;
+            }
+            $this->interface->sendEncapsulated($identifier, $pk, ($needACK === true ? RakLib::FLAG_NEED_ACK : 0) | ($immediate === true ? RakLib::PRIORITY_IMMEDIATE : RakLib::PRIORITY_NORMAL));
 
-			return $pk->identifierACK;
-		}
+            return $pk->identifierACK;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	private function getPacket($buffer){
-		$pid = ord($buffer{0});
-		switch($pid){ //TODO: more efficient selection based on range
-			case ProtocolInfo::LOGIN_PACKET:
-				$data = new LoginPacket();
-				break;
-			case ProtocolInfo::LOGIN_STATUS_PACKET:
-				$data = new LoginStatusPacket();
-				break;
-			case ProtocolInfo::MESSAGE_PACKET:
-				$data = new MessagePacket();
-				break;
-			case ProtocolInfo::SET_TIME_PACKET:
-				$data = new SetTimePacket();
-				break;
-			case ProtocolInfo::START_GAME_PACKET:
-				$data = new StartGamePacket();
-				break;
-			case ProtocolInfo::ADD_MOB_PACKET:
-				$data = new AddMobPacket();
-				break;
-			case ProtocolInfo::ADD_PLAYER_PACKET:
-				$data = new AddPlayerPacket();
-				break;
-			case ProtocolInfo::REMOVE_PLAYER_PACKET:
-				$data = new RemovePlayerPacket();
-				break;
-			case ProtocolInfo::ADD_ENTITY_PACKET:
-				$data = new AddEntityPacket();
-				break;
-			case ProtocolInfo::REMOVE_ENTITY_PACKET:
-				$data = new RemoveEntityPacket();
-				break;
-			case ProtocolInfo::ADD_ITEM_ENTITY_PACKET:
-				$data = new AddItemEntityPacket();
-				break;
-			case ProtocolInfo::TAKE_ITEM_ENTITY_PACKET:
-				$data = new TakeItemEntityPacket();
-				break;
-			case ProtocolInfo::MOVE_ENTITY_PACKET:
-				$data = new MoveEntityPacket();
-				break;
-			case ProtocolInfo::ROTATE_HEAD_PACKET:
-				$data = new RotateHeadPacket();
-				break;
-			case ProtocolInfo::MOVE_PLAYER_PACKET:
-				$data = new MovePlayerPacket();
-				break;
-			case ProtocolInfo::REMOVE_BLOCK_PACKET:
-				$data = new RemoveBlockPacket();
-				break;
-			case ProtocolInfo::UPDATE_BLOCK_PACKET:
-				$data = new UpdateBlockPacket();
-				break;
-			case ProtocolInfo::ADD_PAINTING_PACKET:
-				$data = new AddPaintingPacket();
-				break;
-			case ProtocolInfo::EXPLODE_PACKET:
-				$data = new ExplodePacket();
-				break;
-			case ProtocolInfo::LEVEL_EVENT_PACKET:
-				$data = new LevelEventPacket();
-				break;
-			case ProtocolInfo::TILE_EVENT_PACKET:
-				$data = new TileEventPacket();
-				break;
-			case ProtocolInfo::ENTITY_EVENT_PACKET:
-				$data = new EntityEventPacket();
-				break;
-			case ProtocolInfo::PLAYER_EQUIPMENT_PACKET:
-				$data = new PlayerEquipmentPacket();
-				break;
-			case ProtocolInfo::PLAYER_ARMOR_EQUIPMENT_PACKET:
-				$data = new PlayerArmorEquipmentPacket();
-				break;
-			case ProtocolInfo::INTERACT_PACKET:
-				$data = new InteractPacket();
-				break;
-			case ProtocolInfo::USE_ITEM_PACKET:
-				$data = new UseItemPacket();
-				break;
-			case ProtocolInfo::PLAYER_ACTION_PACKET:
-				$data = new PlayerActionPacket();
-				break;
-			case ProtocolInfo::HURT_ARMOR_PACKET:
-				$data = new HurtArmorPacket();
-				break;
-			case ProtocolInfo::SET_ENTITY_DATA_PACKET:
-				$data = new SetEntityDataPacket();
-				break;
-			case ProtocolInfo::SET_ENTITY_MOTION_PACKET:
-				$data = new SetEntityMotionPacket();
-				break;
-			case ProtocolInfo::SET_HEALTH_PACKET:
-				$data = new SetHealthPacket();
-				break;
-			case ProtocolInfo::SET_SPAWN_POSITION_PACKET:
-				$data = new SetSpawnPositionPacket();
-				break;
-			case ProtocolInfo::ANIMATE_PACKET:
-				$data = new AnimatePacket();
-				break;
-			case ProtocolInfo::RESPAWN_PACKET:
-				$data = new RespawnPacket();
-				break;
-			case ProtocolInfo::SEND_INVENTORY_PACKET:
-				$data = new SendInventoryPacket();
-				break;
-			case ProtocolInfo::DROP_ITEM_PACKET:
-				$data = new DropItemPacket();
-				break;
-			case ProtocolInfo::CONTAINER_OPEN_PACKET:
-				$data = new ContainerOpenPacket();
-				break;
-			case ProtocolInfo::CONTAINER_CLOSE_PACKET:
-				$data = new ContainerClosePacket();
-				break;
-			case ProtocolInfo::CONTAINER_SET_SLOT_PACKET:
-				$data = new ContainerSetSlotPacket();
-				break;
-			case ProtocolInfo::CONTAINER_SET_DATA_PACKET:
-				$data = new ContainerSetDataPacket();
-				break;
-			case ProtocolInfo::CONTAINER_SET_CONTENT_PACKET:
-				$data = new ContainerSetContentPacket();
-				break;
-			case ProtocolInfo::CHAT_PACKET:
-				$data = new ChatPacket();
-				break;
-			case ProtocolInfo::ADVENTURE_SETTINGS_PACKET:
-				$data = new AdventureSettingsPacket();
-				break;
-			case ProtocolInfo::ENTITY_DATA_PACKET:
-				$data = new EntityDataPacket();
-				break;
-			case ProtocolInfo::UNLOAD_CHUNK_PACKET:
-				$data = new UnloadChunkPacket();
-				break;
-			default:
-				$data = new UnknownPacket();
-				$data->packetID = $pid;
-				break;
-		}
+    private function getPacket($buffer){
+        $pid = ord($buffer{0});
+        switch($pid){ //TODO: more efficient selection based on range
+            case ProtocolInfo::LOGIN_PACKET:
+                $data = new LoginPacket();
+                break;
+            case ProtocolInfo::LOGIN_STATUS_PACKET:
+                $data = new LoginStatusPacket();
+                break;
+            case ProtocolInfo::MESSAGE_PACKET:
+                $data = new MessagePacket();
+                break;
+            case ProtocolInfo::SET_TIME_PACKET:
+                $data = new SetTimePacket();
+                break;
+            case ProtocolInfo::START_GAME_PACKET:
+                $data = new StartGamePacket();
+                break;
+            case ProtocolInfo::ADD_MOB_PACKET:
+                $data = new AddMobPacket();
+                break;
+            case ProtocolInfo::ADD_PLAYER_PACKET:
+                $data = new AddPlayerPacket();
+                break;
+            case ProtocolInfo::REMOVE_PLAYER_PACKET:
+                $data = new RemovePlayerPacket();
+                break;
+            case ProtocolInfo::ADD_ENTITY_PACKET:
+                $data = new AddEntityPacket();
+                break;
+            case ProtocolInfo::REMOVE_ENTITY_PACKET:
+                $data = new RemoveEntityPacket();
+                break;
+            case ProtocolInfo::ADD_ITEM_ENTITY_PACKET:
+                $data = new AddItemEntityPacket();
+                break;
+            case ProtocolInfo::TAKE_ITEM_ENTITY_PACKET:
+                $data = new TakeItemEntityPacket();
+                break;
+            case ProtocolInfo::MOVE_ENTITY_PACKET:
+                $data = new MoveEntityPacket();
+                break;
+            case ProtocolInfo::ROTATE_HEAD_PACKET:
+                $data = new RotateHeadPacket();
+                break;
+            case ProtocolInfo::MOVE_PLAYER_PACKET:
+                $data = new MovePlayerPacket();
+                break;
+            case ProtocolInfo::REMOVE_BLOCK_PACKET:
+                $data = new RemoveBlockPacket();
+                break;
+            case ProtocolInfo::UPDATE_BLOCK_PACKET:
+                $data = new UpdateBlockPacket();
+                break;
+            case ProtocolInfo::ADD_PAINTING_PACKET:
+                $data = new AddPaintingPacket();
+                break;
+            case ProtocolInfo::EXPLODE_PACKET:
+                $data = new ExplodePacket();
+                break;
+            case ProtocolInfo::LEVEL_EVENT_PACKET:
+                $data = new LevelEventPacket();
+                break;
+            case ProtocolInfo::TILE_EVENT_PACKET:
+                $data = new TileEventPacket();
+                break;
+            case ProtocolInfo::ENTITY_EVENT_PACKET:
+                $data = new EntityEventPacket();
+                break;
+            case ProtocolInfo::PLAYER_EQUIPMENT_PACKET:
+                $data = new PlayerEquipmentPacket();
+                break;
+            case ProtocolInfo::PLAYER_ARMOR_EQUIPMENT_PACKET:
+                $data = new PlayerArmorEquipmentPacket();
+                break;
+            case ProtocolInfo::INTERACT_PACKET:
+                $data = new InteractPacket();
+                break;
+            case ProtocolInfo::USE_ITEM_PACKET:
+                $data = new UseItemPacket();
+                break;
+            case ProtocolInfo::PLAYER_ACTION_PACKET:
+                $data = new PlayerActionPacket();
+                break;
+            case ProtocolInfo::HURT_ARMOR_PACKET:
+                $data = new HurtArmorPacket();
+                break;
+            case ProtocolInfo::SET_ENTITY_DATA_PACKET:
+                $data = new SetEntityDataPacket();
+                break;
+            case ProtocolInfo::SET_ENTITY_MOTION_PACKET:
+                $data = new SetEntityMotionPacket();
+                break;
+            case ProtocolInfo::SET_HEALTH_PACKET:
+                $data = new SetHealthPacket();
+                break;
+            case ProtocolInfo::SET_SPAWN_POSITION_PACKET:
+                $data = new SetSpawnPositionPacket();
+                break;
+            case ProtocolInfo::ANIMATE_PACKET:
+                $data = new AnimatePacket();
+                break;
+            case ProtocolInfo::RESPAWN_PACKET:
+                $data = new RespawnPacket();
+                break;
+            case ProtocolInfo::SEND_INVENTORY_PACKET:
+                $data = new SendInventoryPacket();
+                break;
+            case ProtocolInfo::DROP_ITEM_PACKET:
+                $data = new DropItemPacket();
+                break;
+            case ProtocolInfo::CONTAINER_OPEN_PACKET:
+                $data = new ContainerOpenPacket();
+                break;
+            case ProtocolInfo::CONTAINER_CLOSE_PACKET:
+                $data = new ContainerClosePacket();
+                break;
+            case ProtocolInfo::CONTAINER_SET_SLOT_PACKET:
+                $data = new ContainerSetSlotPacket();
+                break;
+            case ProtocolInfo::CONTAINER_SET_DATA_PACKET:
+                $data = new ContainerSetDataPacket();
+                break;
+            case ProtocolInfo::CONTAINER_SET_CONTENT_PACKET:
+                $data = new ContainerSetContentPacket();
+                break;
+            case ProtocolInfo::CHAT_PACKET:
+                $data = new ChatPacket();
+                break;
+            case ProtocolInfo::ADVENTURE_SETTINGS_PACKET:
+                $data = new AdventureSettingsPacket();
+                break;
+            case ProtocolInfo::ENTITY_DATA_PACKET:
+                $data = new EntityDataPacket();
+                break;
+            case ProtocolInfo::UNLOAD_CHUNK_PACKET:
+                $data = new UnloadChunkPacket();
+                break;
+            default:
+                $data = new UnknownPacket();
+                $data->packetID = $pid;
+                break;
+        }
 
-		$data->setBuffer(substr($buffer, 1));
+        $data->setBuffer(substr($buffer, 1));
 
-		return $data;
-	}
+        return $data;
+    }
 }

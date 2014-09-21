@@ -35,7 +35,7 @@ It is mainly [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accept
 * Opening braces MUST go on the same line, and MUST NOT have spaces before.
 * `else if` MUST be written as `elseif`. _(It is in PSR-2, but using a SHOULD)_
 * Control structure keywords or opening braces MUST NOT have one space after them.
-* Code MUST use tabs for indenting.
+* Code MUST use 4 spaces for indenting.
 * Long arrays MAY be split across multiple lines, where each subsequent line is indented once. 
 * Files MUST use only the `<?php` tag.
 * Files MUST NOT have an ending `?>` tag.
@@ -49,26 +49,26 @@ It is mainly [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accept
 namespace pocketmine\example;
 
 class ExampleClass{
-	const EXAMPLE_CLASS_CONSTANT = 1;
-	public $examplePublicVariable = "defaultValue";
-	private $examplePrivateVariable;
-	
-	public function __construct($firstArgument, &$secondArgument = null){
-		if($firstArgument === "exampleValue"){ //Remember to use === instead == when possible
-			//do things
-		}elseif($firstArgument === "otherValue"){
-			$secondArgument = function(){
-				return [
-					0 => "value1",
-					1 => "value2",
-					2 => "value3",
-					3 => "value4",
-					4 => "value5",
-					5 => "value6",
-				];
-			}
-		}
-	}
+    const EXAMPLE_CLASS_CONSTANT = 1;
+    public $examplePublicVariable = "defaultValue";
+    private $examplePrivateVariable;
+
+    public function __construct($firstArgument, &$secondArgument = null){
+        if($firstArgument === "exampleValue"){ //Remember to use === instead == when possible
+            //do things
+        }elseif($firstArgument === "otherValue"){
+            $secondArgument = function(){
+                return [
+                    0 => "value1",
+                    1 => "value2",
+                    2 => "value3",
+                    3 => "value4",
+                    4 => "value5",
+                    5 => "value6",
+                ];
+            }
+        }
+    }
 
 }
 ```

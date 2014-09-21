@@ -22,23 +22,23 @@
 namespace pocketmine\event\entity;
 
 use pocketmine\entity\Entity;
-use pocketmine\event\Cancellable;
 use pocketmine\Event;
+use pocketmine\event\Cancellable;
 use pocketmine\math\Vector3 as Vector3;
 
 class EntityMotionEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+    public static $handlerList = null;
 
-	private $mot;
+    private $mot;
 
-	public function __construct(Entity $entity, Vector3 $mot){
-		$this->entity = $entity;
-		$this->mot = $mot;
-	}
+    public function __construct(Entity $entity, Vector3 $mot){
+        $this->entity = $entity;
+        $this->mot = $mot;
+    }
 
-	public function getVector(){
-		return $this->mot;
-	}
+    public function getVector(){
+        return $this->mot;
+    }
 
 
 }

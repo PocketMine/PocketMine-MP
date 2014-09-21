@@ -35,251 +35,251 @@ use pocketmine\utils\Binary;
 
 abstract class BaseFullChunk implements FullChunk{
 
-	/** @var Entity[] */
-	protected $entities = [];
+    /** @var Entity[] */
+    protected $entities = [];
 
-	/** @var Tile[] */
-	protected $tiles = [];
+    /** @var Tile[] */
+    protected $tiles = [];
 
-	/** @var string */
-	protected $biomeIds;
+    /** @var string */
+    protected $biomeIds;
 
-	/** @var int[256] */
-	protected $biomeColors;
+    /** @var int[256] */
+    protected $biomeColors;
 
-	protected $blocks;
+    protected $blocks;
 
-	protected $data;
+    protected $data;
 
-	protected $skyLight;
+    protected $skyLight;
 
-	protected $blockLight;
+    protected $blockLight;
 
-	/** @var LevelProvider */
-	protected $provider;
+    /** @var LevelProvider */
+    protected $provider;
 
-	protected $x;
-	protected $z;
+    protected $x;
+    protected $z;
 
-	/**
-	 * @param LevelProvider $provider
-	 * @param int           $x
-	 * @param int           $z
-	 * @param string        $blocks
-	 * @param string        $data
-	 * @param string        $skyLight
-	 * @param string        $blockLight
-	 * @param string        $biomeIds
-	 * @param int[]         $biomeColors
-	 * @param Compound[]    $entities
-	 * @param Compound[]    $tiles
-	 *
-	 * @throws \Exception
-	 */
-	protected function __construct($provider, $x, $z, $blocks, $data, $skyLight, $blockLight, $biomeIds = null, array $biomeColors = [], array $entities = [], array $tiles = []){
-		$this->provider = $provider;
-		$this->x = (int) $x;
-		$this->z = (int) $z;
+    /**
+     * @param LevelProvider $provider
+     * @param int           $x
+     * @param int           $z
+     * @param string        $blocks
+     * @param string        $data
+     * @param string        $skyLight
+     * @param string        $blockLight
+     * @param string        $biomeIds
+     * @param int[]         $biomeColors
+     * @param Compound[]    $entities
+     * @param Compound[]    $tiles
+     *
+     * @throws \Exception
+     */
+    protected function __construct($provider, $x, $z, $blocks, $data, $skyLight, $blockLight, $biomeIds = null, array $biomeColors = [], array $entities = [], array $tiles = []){
+        $this->provider = $provider;
+        $this->x = (int) $x;
+        $this->z = (int) $z;
 
-		$this->blocks = $blocks;
-		$this->data = $data;
-		$this->skyLight = $skyLight;
-		$this->blockLight = $blockLight;
+        $this->blocks = $blocks;
+        $this->data = $data;
+        $this->skyLight = $skyLight;
+        $this->blockLight = $blockLight;
 
-		if(strlen($biomeIds) === 256){
-			$this->biomeIds = $biomeIds;
-		}else{
-			$this->biomeIds = str_repeat("\x01", 256);
-		}
+        if(strlen($biomeIds) === 256){
+            $this->biomeIds = $biomeIds;
+        }else{
+            $this->biomeIds = str_repeat("\x01", 256);
+        }
 
-		if(count($biomeColors) === 256){
-			$this->biomeColors = $biomeColors;
-		}else{
-			$this->biomeColors = array_fill(0, 256, Binary::readInt("\x00\x85\xb2\x4a"));
-		}
+        if(count($biomeColors) === 256){
+            $this->biomeColors = $biomeColors;
+        }else{
+            $this->biomeColors = array_fill(0, 256, Binary::readInt("\x00\x85\xb2\x4a"));
+        }
 
-		if($this->getProvider() instanceof LevelProvider){
-			$this->getProvider()->getLevel()->timings->syncChunkLoadEntitiesTimer->startTiming();
-			foreach($entities as $nbt){
-				if($nbt instanceof Compound){
-					if(!isset($nbt->id)){
-						continue;
-					}
+        if($this->getProvider() instanceof LevelProvider){
+            $this->getProvider()->getLevel()->timings->syncChunkLoadEntitiesTimer->startTiming();
+            foreach($entities as $nbt){
+                if($nbt instanceof Compound){
+                    if(!isset($nbt->id)){
+                        continue;
+                    }
 
-					//TODO: add all entities
-					if($nbt->id instanceof String){ //New format
-						switch($nbt["id"]){
-							case "Item":
-								(new DroppedItem($this, $nbt))->spawnToAll();
-								break;
-						}
-					}else{ //Old format
+                    //TODO: add all entities
+                    if($nbt->id instanceof String){ //New format
+                        switch($nbt["id"]){
+                            case "Item":
+                                (new DroppedItem($this, $nbt))->spawnToAll();
+                                break;
+                        }
+                    }else{ //Old format
 
-					}
-				}
-			}
-			$this->getProvider()->getLevel()->timings->syncChunkLoadEntitiesTimer->stopTiming();
+                    }
+                }
+            }
+            $this->getProvider()->getLevel()->timings->syncChunkLoadEntitiesTimer->stopTiming();
 
-			$this->getProvider()->getLevel()->timings->syncChunkLoadTileEntitiesTimer->startTiming();
-			foreach($tiles as $nbt){
-				if($nbt instanceof Compound){
-					if(!isset($nbt->id)){
-						continue;
-					}
-					switch($nbt["id"]){
-						case Tile::CHEST:
-							new Chest($this, $nbt);
-							break;
-						case Tile::FURNACE:
-							new Furnace($this, $nbt);
-							break;
-						case Tile::SIGN:
-							new Sign($this, $nbt);
-							break;
-					}
-				}
-			}
-			$this->getProvider()->getLevel()->timings->syncChunkLoadTileEntitiesTimer->stopTiming();
-		}
-	}
+            $this->getProvider()->getLevel()->timings->syncChunkLoadTileEntitiesTimer->startTiming();
+            foreach($tiles as $nbt){
+                if($nbt instanceof Compound){
+                    if(!isset($nbt->id)){
+                        continue;
+                    }
+                    switch($nbt["id"]){
+                        case Tile::CHEST:
+                            new Chest($this, $nbt);
+                            break;
+                        case Tile::FURNACE:
+                            new Furnace($this, $nbt);
+                            break;
+                        case Tile::SIGN:
+                            new Sign($this, $nbt);
+                            break;
+                    }
+                }
+            }
+            $this->getProvider()->getLevel()->timings->syncChunkLoadTileEntitiesTimer->stopTiming();
+        }
+    }
 
-	public function getX(){
-		return $this->x;
-	}
+    public function getX(){
+        return $this->x;
+    }
 
-	public function getZ(){
-		return $this->z;
-	}
+    public function getZ(){
+        return $this->z;
+    }
 
-	public function setX($x){
-		$this->x = $x;
-	}
+    public function setX($x){
+        $this->x = $x;
+    }
 
-	public function setZ($z){
-		$this->z = $z;
-	}
+    public function setZ($z){
+        $this->z = $z;
+    }
 
-	/**
-	 * @return LevelProvider
-	 *
-	 * @deprecated
-	 */
-	public function getLevel(){
-		return $this->getProvider();
-	}
+    /**
+     * @return LevelProvider
+     *
+     * @deprecated
+     */
+    public function getLevel(){
+        return $this->getProvider();
+    }
 
-	/**
-	 * @return LevelProvider
-	 */
-	public function getProvider(){
-		return $this->provider;
-	}
+    /**
+     * @return LevelProvider
+     */
+    public function getProvider(){
+        return $this->provider;
+    }
 
-	public function setProvider(LevelProvider $provider){
-		$this->provider = $provider;
-	}
+    public function setProvider(LevelProvider $provider){
+        $this->provider = $provider;
+    }
 
-	public function getBiomeId($x, $z){
-		return ord($this->biomeIds{($z << 4) + $x});
-	}
+    public function getBiomeId($x, $z){
+        return ord($this->biomeIds{($z << 4) + $x});
+    }
 
-	public function setBiomeId($x, $z, $biomeId){
-		$this->biomeIds{($z << 4) + $x} = chr($biomeId);
-	}
+    public function setBiomeId($x, $z, $biomeId){
+        $this->biomeIds{($z << 4) + $x} = chr($biomeId);
+    }
 
-	public function getBiomeColor($x, $z){
-		$color = $this->biomeColors[($z << 4) + $x] & 0xFFFFFF;
+    public function getBiomeColor($x, $z){
+        $color = $this->biomeColors[($z << 4) + $x] & 0xFFFFFF;
 
-		return [$color >> 16, ($color >> 8) & 0xFF, $color & 0xFF];
-	}
+        return [$color >> 16, ($color >> 8) & 0xFF, $color & 0xFF];
+    }
 
-	public function setBiomeColor($x, $z, $R, $G, $B){
-		$this->biomeColors[($z << 4) + $x] = 0 | (($R & 0xFF) << 16) | (($G & 0xFF) << 8) | ($B & 0xFF);
-	}
+    public function setBiomeColor($x, $z, $R, $G, $B){
+        $this->biomeColors[($z << 4) + $x] = 0 | (($R & 0xFF) << 16) | (($G & 0xFF) << 8) | ($B & 0xFF);
+    }
 
-	public function getHighestBlockAt($x, $z){
-		$column = $this->getBlockIdColumn($x, $z);
-		for($y = 127; $y >= 0; --$y){
-			if($column{$y} !== "\x00"){
-				return $y;
-			}
-		}
+    public function getHighestBlockAt($x, $z){
+        $column = $this->getBlockIdColumn($x, $z);
+        for($y = 127; $y >= 0; --$y){
+            if($column{$y} !== "\x00"){
+                return $y;
+            }
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	public function addEntity(Entity $entity){
-		$this->entities[$entity->getID()] = $entity;
-	}
+    public function addEntity(Entity $entity){
+        $this->entities[$entity->getID()] = $entity;
+    }
 
-	public function removeEntity(Entity $entity){
-		unset($this->entities[$entity->getID()]);
-	}
+    public function removeEntity(Entity $entity){
+        unset($this->entities[$entity->getID()]);
+    }
 
-	public function addTile(Tile $tile){
-		$this->tiles[$tile->getID()] = $tile;
-	}
+    public function addTile(Tile $tile){
+        $this->tiles[$tile->getID()] = $tile;
+    }
 
-	public function removeTile(Tile $tile){
-		unset($this->tiles[$tile->getID()]);
-	}
+    public function removeTile(Tile $tile){
+        unset($this->tiles[$tile->getID()]);
+    }
 
-	public function getEntities(){
-		return $this->entities;
-	}
+    public function getEntities(){
+        return $this->entities;
+    }
 
-	public function getTiles(){
-		return $this->tiles;
-	}
+    public function getTiles(){
+        return $this->tiles;
+    }
 
-	public function isLoaded(){
-		return $this->getProvider() === null ? false : $this->getProvider()->isChunkLoaded($this->getX(), $this->getZ());
-	}
+    public function isLoaded(){
+        return $this->getProvider() === null ? false : $this->getProvider()->isChunkLoaded($this->getX(), $this->getZ());
+    }
 
-	public function load($generate = true){
-		return $this->getProvider() === null ? false : $this->getProvider()->getChunk($this->getX(), $this->getZ(), true) instanceof FullChunk;
-	}
+    public function load($generate = true){
+        return $this->getProvider() === null ? false : $this->getProvider()->getChunk($this->getX(), $this->getZ(), true) instanceof FullChunk;
+    }
 
-	public function unload($save = true, $safe = true){
-		$level = $this->getProvider();
-		if($level === null){
-			return true;
-		}
-		if($save === true){
-			$level->saveChunk($this->getX(), $this->getZ());
-		}
-		if($this->getProvider()->unloadChunk($this->getX(), $this->getZ(), $safe)){
-			foreach($this->getEntities() as $entity){
-				$entity->close();
-			}
-			foreach($this->getTiles() as $tile){
-				$tile->close();
-			}
-		}
-	}
+    public function unload($save = true, $safe = true){
+        $level = $this->getProvider();
+        if($level === null){
+            return true;
+        }
+        if($save === true){
+            $level->saveChunk($this->getX(), $this->getZ());
+        }
+        if($this->getProvider()->unloadChunk($this->getX(), $this->getZ(), $safe)){
+            foreach($this->getEntities() as $entity){
+                $entity->close();
+            }
+            foreach($this->getTiles() as $tile){
+                $tile->close();
+            }
+        }
+    }
 
-	public function getBlockIdArray(){
-		return $this->blocks;
-	}
+    public function getBlockIdArray(){
+        return $this->blocks;
+    }
 
-	public function getBlockDataArray(){
-		return $this->data;
-	}
+    public function getBlockDataArray(){
+        return $this->data;
+    }
 
-	public function getBlockSkyLightArray(){
-		return $this->skyLight;
-	}
+    public function getBlockSkyLightArray(){
+        return $this->skyLight;
+    }
 
-	public function getBlockLightArray(){
-		return $this->blockLight;
-	}
+    public function getBlockLightArray(){
+        return $this->blockLight;
+    }
 
-	public function getBiomeIdArray(){
-		return $this->biomeIds;
-	}
+    public function getBiomeIdArray(){
+        return $this->biomeIds;
+    }
 
-	public function getBiomeColorArray(){
-		return $this->biomeColors;
-	}
+    public function getBiomeColorArray(){
+        return $this->biomeColors;
+    }
 
 }

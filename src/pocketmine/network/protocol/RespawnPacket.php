@@ -23,28 +23,28 @@ namespace pocketmine\network\protocol;
 
 
 class RespawnPacket extends DataPacket{
-	public $eid;
-	public $x;
-	public $y;
-	public $z;
+    public $eid;
+    public $x;
+    public $y;
+    public $z;
 
-	public function pid(){
-		return Info::RESPAWN_PACKET;
-	}
+    public function pid(){
+        return Info::RESPAWN_PACKET;
+    }
 
-	public function decode(){
-		$this->eid = $this->getInt();
-		$this->x = $this->getFloat();
-		$this->y = $this->getFloat();
-		$this->z = $this->getFloat();
-	}
+    public function decode(){
+        $this->eid = $this->getInt();
+        $this->x = $this->getFloat();
+        $this->y = $this->getFloat();
+        $this->z = $this->getFloat();
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->eid);
-		$this->putFloat($this->x);
-		$this->putFloat($this->y);
-		$this->putFloat($this->z);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->eid);
+        $this->putFloat($this->x);
+        $this->putFloat($this->y);
+        $this->putFloat($this->z);
+    }
 
 }

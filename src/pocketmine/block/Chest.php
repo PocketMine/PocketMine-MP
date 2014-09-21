@@ -34,128 +34,128 @@ use pocketmine\tile\Tile;
 
 class Chest extends Transparent{
 
-	const SLOTS = 27;
+    const SLOTS = 27;
 
-	public function __construct($meta = 0){
-		parent::__construct(self::CHEST, $meta, "Chest");
-		$this->isActivable = true;
-		$this->hardness = 15;
-	}
+    public function __construct($meta = 0){
+        parent::__construct(self::CHEST, $meta, "Chest");
+        $this->isActivable = true;
+        $this->hardness = 15;
+    }
 
-	public function getBoundingBox(){
-		return new AxisAlignedBB(
-			$this->x + 0.0625,
-			$this->y,
-			$this->z + 0.0625,
-			$this->x + 0.9375,
-			$this->y + 0.875,
-			$this->z + 0.9375
-		);
-	}
+    public function getBoundingBox(){
+        return new AxisAlignedBB(
+            $this->x + 0.0625,
+            $this->y,
+            $this->z + 0.0625,
+            $this->x + 0.9375,
+            $this->y + 0.875,
+            $this->z + 0.9375
+        );
+    }
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		$faces = [
-			0 => 4,
-			1 => 2,
-			2 => 5,
-			3 => 3,
-		];
+    public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+        $faces = [
+            0 => 4,
+            1 => 2,
+            2 => 5,
+            3 => 3,
+        ];
 
-		$chest = false;
-		$this->meta = $faces[$player instanceof Player ? $player->getDirection() : 0];
+        $chest = false;
+        $this->meta = $faces[$player instanceof Player ? $player->getDirection() : 0];
 
-		for($side = 2; $side <= 5; ++$side){
-			if(($this->meta === 4 or $this->meta === 5) and ($side === 4 or $side === 5)){
-				continue;
-			}elseif(($this->meta === 3 or $this->meta === 2) and ($side === 2 or $side === 3)){
-				continue;
-			}
-			$c = $this->getSide($side);
-			if($c instanceof Chest and $c->getDamage() === $this->meta){
-				$tile = $this->getLevel()->getTile($c);
-				if($tile instanceof TileChest and !$tile->isPaired()){
-					$chest = $tile;
-					break;
-				}
-			}
-		}
+        for($side = 2; $side <= 5; ++$side){
+            if(($this->meta === 4 or $this->meta === 5) and ($side === 4 or $side === 5)){
+                continue;
+            }elseif(($this->meta === 3 or $this->meta === 2) and ($side === 2 or $side === 3)){
+                continue;
+            }
+            $c = $this->getSide($side);
+            if($c instanceof Chest and $c->getDamage() === $this->meta){
+                $tile = $this->getLevel()->getTile($c);
+                if($tile instanceof TileChest and !$tile->isPaired()){
+                    $chest = $tile;
+                    break;
+                }
+            }
+        }
 
-		$this->getLevel()->setBlock($block, $this, true, true);
-		$nbt = new Compound(false, [
-			new Enum("Items", []),
-			new String("id", Tile::CHEST),
-			new Int("x", $this->x),
-			new Int("y", $this->y),
-			new Int("z", $this->z)
-		]);
-		$nbt->Items->setTagType(NBT::TAG_Compound);
-		$tile = new TileChest($this->getLevel()->getChunkAt($this->x >> 4, $this->z >> 4), $nbt);
+        $this->getLevel()->setBlock($block, $this, true, true);
+        $nbt = new Compound(false, [
+            new Enum("Items", []),
+            new String("id", Tile::CHEST),
+            new Int("x", $this->x),
+            new Int("y", $this->y),
+            new Int("z", $this->z)
+        ]);
+        $nbt->Items->setTagType(NBT::TAG_Compound);
+        $tile = new TileChest($this->getLevel()->getChunkAt($this->x >> 4, $this->z >> 4), $nbt);
 
-		if($chest instanceof TileChest){
-			$chest->pairWith($tile);
-			$tile->pairWith($chest);
-		}
+        if($chest instanceof TileChest){
+            $chest->pairWith($tile);
+            $tile->pairWith($chest);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	public function onBreak(Item $item){
-		$t = $this->getLevel()->getTile($this);
-		if($t instanceof TileChest){
-			$t->unpair();
-		}
-		$this->getLevel()->setBlock($this, new Air(), true, true, true);
+    public function onBreak(Item $item){
+        $t = $this->getLevel()->getTile($this);
+        if($t instanceof TileChest){
+            $t->unpair();
+        }
+        $this->getLevel()->setBlock($this, new Air(), true, true, true);
 
-		return true;
-	}
+        return true;
+    }
 
-	public function onActivate(Item $item, Player $player = null){
-		if($player instanceof Player){
-			$top = $this->getSide(1);
-			if($top->isTransparent !== true){
-				return true;
-			}
+    public function onActivate(Item $item, Player $player = null){
+        if($player instanceof Player){
+            $top = $this->getSide(1);
+            if($top->isTransparent !== true){
+                return true;
+            }
 
-			$t = $this->getLevel()->getTile($this);
-			$chest = null;
-			if($t instanceof TileChest){
-				$chest = $t;
-			}else{
-				$nbt = new Compound(false, [
-					new Enum("Items", []),
-					new String("id", Tile::CHEST),
-					new Int("x", $this->x),
-					new Int("y", $this->y),
-					new Int("z", $this->z)
-				]);
-				$nbt->Items->setTagType(NBT::TAG_Compound);
-				$chest = new TileChest($this->getLevel()->getChunkAt($this->x >> 4, $this->z >> 4), $nbt);
-			}
+            $t = $this->getLevel()->getTile($this);
+            $chest = null;
+            if($t instanceof TileChest){
+                $chest = $t;
+            }else{
+                $nbt = new Compound(false, [
+                    new Enum("Items", []),
+                    new String("id", Tile::CHEST),
+                    new Int("x", $this->x),
+                    new Int("y", $this->y),
+                    new Int("z", $this->z)
+                ]);
+                $nbt->Items->setTagType(NBT::TAG_Compound);
+                $chest = new TileChest($this->getLevel()->getChunkAt($this->x >> 4, $this->z >> 4), $nbt);
+            }
 
 
-			if(($player->gamemode & 0x01) === 0x01){
-				return true;
-			}
-			$player->addWindow($chest->getInventory());
-		}
+            if(($player->gamemode & 0x01) === 0x01){
+                return true;
+            }
+            $player->addWindow($chest->getInventory());
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	public function getDrops(Item $item){
-		$drops = [
-			[$this->id, 0, 1],
-		];
-		$t = $this->getLevel()->getTile($this);
-		if($t instanceof TileChest){
-			for($s = 0; $s < $t->getRealInventory()->getSize(); ++$s){
-				$slot = $t->getRealInventory()->getItem($s);
-				if($slot->getID() > Item::AIR and $slot->getCount() > 0){
-					$drops[] = [$slot->getID(), $slot->getDamage(), $slot->getCount()];
-				}
-			}
-		}
+    public function getDrops(Item $item){
+        $drops = [
+            [$this->id, 0, 1],
+        ];
+        $t = $this->getLevel()->getTile($this);
+        if($t instanceof TileChest){
+            for($s = 0; $s < $t->getRealInventory()->getSize(); ++$s){
+                $slot = $t->getRealInventory()->getItem($s);
+                if($slot->getID() > Item::AIR and $slot->getCount() > 0){
+                    $drops[] = [$slot->getID(), $slot->getDamage(), $slot->getCount()];
+                }
+            }
+        }
 
-		return $drops;
-	}
+        return $drops;
+    }
 }

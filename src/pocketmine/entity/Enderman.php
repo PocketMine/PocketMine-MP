@@ -26,7 +26,7 @@ use pocketmine\inventory\InventoryHolder;
 use pocketmine\nbt\tag\String;
 
 class Enderman extends Monster implements InventoryHolder{
-	protected function initEntity(){
-		$this->namedtag->id = new String("id", "Enderman");
-	}
+    protected function initEntity(){
+        $this->namedtag->id = new String("id", "Enderman");
+    }
 }

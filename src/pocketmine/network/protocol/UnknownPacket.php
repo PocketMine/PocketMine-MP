@@ -24,18 +24,18 @@ namespace pocketmine\network\protocol;
 
 
 class UnknownPacket extends DataPacket{
-	public $packetID = -1;
+    public $packetID = -1;
 
-	public function pid(){
-		return $this->packetID;
-	}
+    public function pid(){
+        return $this->packetID;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
+    public function encode(){
 
-	}
+    }
 
 }

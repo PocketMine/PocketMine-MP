@@ -25,15 +25,15 @@ use pocketmine\Worker;
 
 class AsyncWorker extends Worker{
 
-	public function run(){
-		if(!interface_exists("ClassLoader", false)){
-			require(\pocketmine\PATH . "src/spl/ClassLoader.php");
-		}
-		if(!class_exists("BaseClassLoader", false)){
-			require(\pocketmine\PATH . "src/spl/BaseClassLoader.php");
-		}
-		$autoloader = new \BaseClassLoader();
-		$autoloader->addPath(\pocketmine\PATH . "src");
-		$autoloader->register(true);
-	}
+    public function run(){
+        if(!interface_exists("ClassLoader", false)){
+            require(\pocketmine\PATH . "src/spl/ClassLoader.php");
+        }
+        if(!class_exists("BaseClassLoader", false)){
+            require(\pocketmine\PATH . "src/spl/BaseClassLoader.php");
+        }
+        $autoloader = new \BaseClassLoader();
+        $autoloader->addPath(\pocketmine\PATH . "src");
+        $autoloader->register(true);
+    }
 }

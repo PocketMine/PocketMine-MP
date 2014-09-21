@@ -27,26 +27,26 @@ use pocketmine\command\CommandSender;
 
 class SaveOffCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Disables server autosaving",
-			"/save-off"
-		);
-		$this->setPermission("pocketmine.command.save.disable");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Disables server autosaving",
+            "/save-off"
+        );
+        $this->setPermission("pocketmine.command.save.disable");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		foreach($sender->getServer()->getLevels() as $level){
-			$level->setAutoSave(false);
-		}
+        foreach($sender->getServer()->getLevels() as $level){
+            $level->setAutoSave(false);
+        }
 
-		Command::broadcastCommandMessage($sender, "Disabled level saving");
+        Command::broadcastCommandMessage($sender, "Disabled level saving");
 
-		return true;
-	}
+        return true;
+    }
 }

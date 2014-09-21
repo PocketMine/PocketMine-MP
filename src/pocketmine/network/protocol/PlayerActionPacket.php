@@ -23,28 +23,28 @@ namespace pocketmine\network\protocol;
 
 
 class PlayerActionPacket extends DataPacket{
-	public $action;
-	public $x;
-	public $y;
-	public $z;
-	public $face;
-	public $eid;
+    public $action;
+    public $x;
+    public $y;
+    public $z;
+    public $face;
+    public $eid;
 
-	public function pid(){
-		return Info::PLAYER_ACTION_PACKET;
-	}
+    public function pid(){
+        return Info::PLAYER_ACTION_PACKET;
+    }
 
-	public function decode(){
-		$this->action = $this->getInt();
-		$this->x = $this->getInt();
-		$this->y = $this->getInt();
-		$this->z = $this->getInt();
-		$this->face = $this->getInt();
-		$this->eid = $this->getInt();
-	}
+    public function decode(){
+        $this->action = $this->getInt();
+        $this->x = $this->getInt();
+        $this->y = $this->getInt();
+        $this->z = $this->getInt();
+        $this->face = $this->getInt();
+        $this->eid = $this->getInt();
+    }
 
-	public function encode(){
+    public function encode(){
 
-	}
+    }
 
 }

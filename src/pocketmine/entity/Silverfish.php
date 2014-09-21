@@ -25,7 +25,7 @@ namespace pocketmine\entity;
 use pocketmine\nbt\tag\String;
 
 class Silverfish extends Monster{
-	protected function initEntity(){
-		$this->namedtag->id = new String("id", "Silverfish");
-	}
+    protected function initEntity(){
+        $this->namedtag->id = new String("id", "Silverfish");
+    }
 }

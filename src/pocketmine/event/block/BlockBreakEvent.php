@@ -27,40 +27,40 @@ use pocketmine\item\Item;
 use pocketmine\Player;
 
 class BlockBreakEvent extends BlockEvent implements Cancellable{
-	public static $handlerList = null;
+    public static $handlerList = null;
 
-	/** @var \pocketmine\Player */
-	protected $player;
+    /** @var \pocketmine\Player */
+    protected $player;
 
-	/** @var \pocketmine\item\Item */
-	protected $item;
+    /** @var \pocketmine\item\Item */
+    protected $item;
 
-	/** @var bool */
-	protected $instaBreak = false;
+    /** @var bool */
+    protected $instaBreak = false;
 
-	public function __construct(Player $player, Block $block, Item $item, $instaBreak = false){
-		$this->block = $block;
-		$this->item = $item;
-		$this->player = $player;
-		$this->instaBreak = (bool) $instaBreak;
-	}
+    public function __construct(Player $player, Block $block, Item $item, $instaBreak = false){
+        $this->block = $block;
+        $this->item = $item;
+        $this->player = $player;
+        $this->instaBreak = (bool) $instaBreak;
+    }
 
-	public function getPlayer(){
-		return $this->player;
-	}
+    public function getPlayer(){
+        return $this->player;
+    }
 
-	public function getItem(){
-		return $this->item;
-	}
+    public function getItem(){
+        return $this->item;
+    }
 
-	public function getInstaBreak(){
-		return $this->instaBreak;
-	}
+    public function getInstaBreak(){
+        return $this->instaBreak;
+    }
 
-	/**
-	 * @param boolean $instaBreak
-	 */
-	public function setInstaBreak($instaBreak){
-		$this->instaBreak = (bool) $instaBreak;
-	}
+    /**
+     * @param boolean $instaBreak
+     */
+    public function setInstaBreak($instaBreak){
+        $this->instaBreak = (bool) $instaBreak;
+    }
 }

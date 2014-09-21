@@ -24,21 +24,21 @@ namespace pocketmine\network\protocol;
 use pocketmine\utils\Binary;
 
 class SetEntityDataPacket extends DataPacket{
-	public $eid;
-	public $metadata;
+    public $eid;
+    public $metadata;
 
-	public function pid(){
-		return Info::SET_ENTITY_DATA_PACKET;
-	}
+    public function pid(){
+        return Info::SET_ENTITY_DATA_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->eid);
-		$this->put(Binary::writeMetadata($this->metadata));
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->eid);
+        $this->put(Binary::writeMetadata($this->metadata));
+    }
 
 }

@@ -26,117 +26,119 @@ use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 
 class Trapdoor extends Transparent{
-	public function __construct($meta = 0){
-		parent::__construct(self::TRAPDOOR, $meta, "Trapdoor");
-		$this->isActivable = true;
-		if(($this->meta & 0x04) === 0x04){
-			$this->isFullBlock = false;
-		}else{
-			$this->isFullBlock = true;
-		}
-		$this->hardness = 15;
-	}
+    public function __construct($meta = 0){
+        parent::__construct(self::TRAPDOOR, $meta, "Trapdoor");
+        $this->isActivable = true;
+        if(($this->meta & 0x04) === 0x04){
+            $this->isFullBlock = false;
+        }else{
+            $this->isFullBlock = true;
+        }
+        $this->hardness = 15;
+    }
 
-	public function getBoundingBox(){
-		$damage = $this->getDamage();
+    public function getBoundingBox(){
+        $damage = $this->getDamage();
 
-		$f = 0.1875;
+        $f = 0.1875;
 
-		$bb = null;
+        $bb = null;
 
-		if(($damage & 0x08) > 0){
-			$bb = new AxisAlignedBB(
-				$this->x,
-				$this->y + 1 - $f,
-				$this->z,
-				$this->x + 1,
-				$this->y + 1,
-				$this->z + 1
-			);
-		}else{
-			$bb = new AxisAlignedBB(
-				$this->x,
-				$this->y,
-				$this->z,
-				$this->x + 1,
-				$this->y + $f,
-				$this->z + 1
-			);
-		}
+        if(($damage & 0x08) > 0){
+            $bb = new AxisAlignedBB(
+                $this->x,
+                $this->y + 1 - $f,
+                $this->z,
+                $this->x + 1,
+                $this->y + 1,
+                $this->z + 1
+            );
+        }else{
+            $bb = new AxisAlignedBB(
+                $this->x,
+                $this->y,
+                $this->z,
+                $this->x + 1,
+                $this->y + $f,
+                $this->z + 1
+            );
+        }
 
-		if(($damage & 0x04) > 0){
-			if(($damage & 0x03) === 0){
-				$bb = new AxisAlignedBB(
-					$this->x,
-					$this->y,
-					$this->z + 1 - $f,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}elseif(($damage & 0x03) === 1){
-				$bb = new AxisAlignedBB(
-					$this->x,
-					$this->y,
-					$this->z,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + $f
-				);
-			}if(($damage & 0x03) === 2){
-				$bb = new AxisAlignedBB(
-					$this->x + 1 - $f,
-					$this->y,
-					$this->z,
-					$this->x + 1,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}if(($damage & 0x03) === 3){
-				$bb = new AxisAlignedBB(
-					$this->x,
-					$this->y,
-					$this->z,
-					$this->x + $f,
-					$this->y + 1,
-					$this->z + 1
-				);
-			}
-		}
+        if(($damage & 0x04) > 0){
+            if(($damage & 0x03) === 0){
+                $bb = new AxisAlignedBB(
+                    $this->x,
+                    $this->y,
+                    $this->z + 1 - $f,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }elseif(($damage & 0x03) === 1){
+                $bb = new AxisAlignedBB(
+                    $this->x,
+                    $this->y,
+                    $this->z,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + $f
+                );
+            }
+            if(($damage & 0x03) === 2){
+                $bb = new AxisAlignedBB(
+                    $this->x + 1 - $f,
+                    $this->y,
+                    $this->z,
+                    $this->x + 1,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }
+            if(($damage & 0x03) === 3){
+                $bb = new AxisAlignedBB(
+                    $this->x,
+                    $this->y,
+                    $this->z,
+                    $this->x + $f,
+                    $this->y + 1,
+                    $this->z + 1
+                );
+            }
+        }
 
-		return $bb;
-	}
+        return $bb;
+    }
 
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		if(($target->isTransparent === false or $target->getID() === self::SLAB) and $face !== 0 and $face !== 1){
-			$faces = [
-				2 => 0,
-				3 => 1,
-				4 => 2,
-				5 => 3,
-			];
-			$this->meta = $faces[$face] & 0x03;
-			if($fy > 0.5){
-				$this->meta |= 0x08;
-			}
-			$this->getLevel()->setBlock($block, $this, true, true);
+    public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+        if(($target->isTransparent === false or $target->getID() === self::SLAB) and $face !== 0 and $face !== 1){
+            $faces = [
+                2 => 0,
+                3 => 1,
+                4 => 2,
+                5 => 3,
+            ];
+            $this->meta = $faces[$face] & 0x03;
+            if($fy > 0.5){
+                $this->meta |= 0x08;
+            }
+            $this->getLevel()->setBlock($block, $this, true, true);
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public function getDrops(Item $item){
-		return [
-			[$this->id, 0, 1],
-		];
-	}
+    public function getDrops(Item $item){
+        return [
+            [$this->id, 0, 1],
+        ];
+    }
 
-	public function onActivate(Item $item, Player $player = null){
-		$this->meta ^= 0x04;
-		$this->getLevel()->setBlock($this, $this, true);
+    public function onActivate(Item $item, Player $player = null){
+        $this->meta ^= 0x04;
+        $this->getLevel()->setBlock($this, $this, true);
 
-		return true;
-	}
+        return true;
+    }
 }

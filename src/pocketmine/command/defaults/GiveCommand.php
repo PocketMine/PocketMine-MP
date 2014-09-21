@@ -29,57 +29,57 @@ use pocketmine\utils\TextFormat;
 
 class GiveCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Gives the specified player a certain amount of items",
-			"/give <player> <item[:damage]> [amount]"
-		);
-		$this->setPermission("pocketmine.command.give");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Gives the specified player a certain amount of items",
+            "/give <player> <item[:damage]> [amount]"
+        );
+        $this->setPermission("pocketmine.command.give");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		if(count($args) < 2){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(count($args) < 2){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		$player = $sender->getServer()->getPlayer($args[0]);
-		$item = Item::fromString($args[1]);
+        $player = $sender->getServer()->getPlayer($args[0]);
+        $item = Item::fromString($args[1]);
 
-		if(!isset($args[2])){
-			$item->setCount($item->getMaxStackSize());
-		}else{
-			$item->setCount((int) $args[2]);
-		}
+        if(!isset($args[2])){
+            $item->setCount($item->getMaxStackSize());
+        }else{
+            $item->setCount((int) $args[2]);
+        }
 
-		if($player instanceof Player){
-			if(($player->getGamemode() & 0x01) === 0x01){
-				$sender->sendMessage(TextFormat::RED . "Player is in creative mode");
+        if($player instanceof Player){
+            if(($player->getGamemode() & 0x01) === 0x01){
+                $sender->sendMessage(TextFormat::RED . "Player is in creative mode");
 
-				return true;
-			}
-			if($item->getID() == 0){
-				$sender->sendMessage(TextFormat::RED . "There is no item called " . $args[1] . ".");
+                return true;
+            }
+            if($item->getID() == 0){
+                $sender->sendMessage(TextFormat::RED . "There is no item called " . $args[1] . ".");
 
-				return true;
-			}
+                return true;
+            }
 
-			//TODO: overflow
-			$player->getInventory()->addItem(clone $item);
-		}else{
-			$sender->sendMessage(TextFormat::RED . "Can't find player " . $args[0]);
+            //TODO: overflow
+            $player->getInventory()->addItem(clone $item);
+        }else{
+            $sender->sendMessage(TextFormat::RED . "Can't find player " . $args[0]);
 
-			return true;
-		}
+            return true;
+        }
 
-		Command::broadcastCommandMessage($sender, "Gave " . $player->getName() . " " . $item->getCount() . " of " . $item->getName() . " (" . $item->getID() . ":" . $item->getDamage() . ")");
+        Command::broadcastCommandMessage($sender, "Gave " . $player->getName() . " " . $item->getCount() . " of " . $item->getName() . " (" . $item->getID() . ":" . $item->getDamage() . ")");
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -25,124 +25,124 @@ use pocketmine\entity\Entity;
 use pocketmine\event\Cancellable;
 
 class EntityDamageEvent extends EntityEvent implements Cancellable{
-	public static $handlerList = null;
+    public static $handlerList = null;
 
-	const MODIFIER_BASE = 0;
-	const MODIFIER_ARMOR = 1;
+    const MODIFIER_BASE = 0;
+    const MODIFIER_ARMOR = 1;
 
-	const CAUSE_CONTACT = 0;
-	const CAUSE_ENTITY_ATTACK = 1;
-	const CAUSE_PROJECTILE = 2;
-	const CAUSE_SUFFOCATION = 3;
-	const CAUSE_FALL = 4;
-	const CAUSE_FIRE = 5;
-	const CAUSE_FIRE_TICK = 6;
-	const CAUSE_LAVA = 7;
-	const CAUSE_DROWNING = 8;
-	const CAUSE_BLOCK_EXPLOSION = 9;
-	const CAUSE_ENTITY_EXPLOSION = 10;
-	const CAUSE_VOID = 11;
-	const CAUSE_SUICIDE = 12;
-	const CAUSE_MAGIC = 13;
-	const CAUSE_CUSTOM = 14;
-
-
-	private $cause;
-	/** @var array */
-	private $modifiers;
-	private $originals;
+    const CAUSE_CONTACT = 0;
+    const CAUSE_ENTITY_ATTACK = 1;
+    const CAUSE_PROJECTILE = 2;
+    const CAUSE_SUFFOCATION = 3;
+    const CAUSE_FALL = 4;
+    const CAUSE_FIRE = 5;
+    const CAUSE_FIRE_TICK = 6;
+    const CAUSE_LAVA = 7;
+    const CAUSE_DROWNING = 8;
+    const CAUSE_BLOCK_EXPLOSION = 9;
+    const CAUSE_ENTITY_EXPLOSION = 10;
+    const CAUSE_VOID = 11;
+    const CAUSE_SUICIDE = 12;
+    const CAUSE_MAGIC = 13;
+    const CAUSE_CUSTOM = 14;
 
 
-	/**
-	 * @param Entity    $entity
-	 * @param int       $cause
-	 * @param int|int[] $damage
-	 *
-	 * @throws \Exception
-	 */
-	public function __construct(Entity $entity, $cause, $damage){
-		$this->entity = $entity;
-		$this->cause = $cause;
-		if(is_array($damage)){
-			$this->modifiers = $damage;
-		}else{
-			$this->modifiers = [
-				self::MODIFIER_BASE => $damage
-			];
-		}
+    private $cause;
+    /** @var array */
+    private $modifiers;
+    private $originals;
 
-		$this->originals = $this->modifiers;
 
-		if(!isset($this->modifiers[self::MODIFIER_BASE])){
-			throw new \Exception("BASE Damage modifier missing");
-		}
-	}
+    /**
+     * @param Entity    $entity
+     * @param int       $cause
+     * @param int|int[] $damage
+     *
+     * @throws \Exception
+     */
+    public function __construct(Entity $entity, $cause, $damage){
+        $this->entity = $entity;
+        $this->cause = $cause;
+        if(is_array($damage)){
+            $this->modifiers = $damage;
+        }else{
+            $this->modifiers = [
+                self::MODIFIER_BASE => $damage
+            ];
+        }
 
-	/**
-	 * @return int
-	 */
-	public function getCause(){
-		return $this->cause;
-	}
+        $this->originals = $this->modifiers;
 
-	/**
-	 * @param int $type
-	 *
-	 * @return int
-	 */
-	public function getOriginalDamage($type = self::MODIFIER_BASE){
-		if(isset($this->originals[$type])){
-			return $this->originals[$type];
-		}
+        if(!isset($this->modifiers[self::MODIFIER_BASE])){
+            throw new \Exception("BASE Damage modifier missing");
+        }
+    }
 
-		return 0;
-	}
+    /**
+     * @return int
+     */
+    public function getCause(){
+        return $this->cause;
+    }
 
-	/**
-	 * @param int $type
-	 *
-	 * @return int
-	 */
-	public function getDamage($type = self::MODIFIER_BASE){
-		if(isset($this->modifiers[$type])){
-			return $this->modifiers[$type];
-		}
+    /**
+     * @param int $type
+     *
+     * @return int
+     */
+    public function getOriginalDamage($type = self::MODIFIER_BASE){
+        if(isset($this->originals[$type])){
+            return $this->originals[$type];
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 * @param float $damage
-	 * @param int   $type
-	 *
-	 * @throws \UnexpectedValueException
-	 */
-	public function setDamage($damage, $type = self::MODIFIER_BASE){
-		if(!isset($this->modifiers[$type])){
-			throw new \UnexpectedValueException($type . " is not applicable to " . $this->getEntity());
-		}
-		$this->modifiers[$type] = $damage;
-	}
+    /**
+     * @param int $type
+     *
+     * @return int
+     */
+    public function getDamage($type = self::MODIFIER_BASE){
+        if(isset($this->modifiers[$type])){
+            return $this->modifiers[$type];
+        }
 
-	/**
-	 * @param int $type
-	 *
-	 * @return bool
-	 */
-	public function isApplicable($type){
-		return isset($this->modifiers[$type]);
-	}
+        return 0;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getFinalDamage(){
-		$damage = 0;
-		foreach($this->modifiers as $type => $d){
-			$damage += $d;
-		}
+    /**
+     * @param float $damage
+     * @param int   $type
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function setDamage($damage, $type = self::MODIFIER_BASE){
+        if(!isset($this->modifiers[$type])){
+            throw new \UnexpectedValueException($type . " is not applicable to " . $this->getEntity());
+        }
+        $this->modifiers[$type] = $damage;
+    }
 
-		return $damage;
-	}
+    /**
+     * @param int $type
+     *
+     * @return bool
+     */
+    public function isApplicable($type){
+        return isset($this->modifiers[$type]);
+    }
+
+    /**
+     * @return int
+     */
+    public function getFinalDamage(){
+        $damage = 0;
+        foreach($this->modifiers as $type => $d){
+            $damage += $d;
+        }
+
+        return $damage;
+    }
 
 }

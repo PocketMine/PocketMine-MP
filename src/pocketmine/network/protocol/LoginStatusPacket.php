@@ -23,19 +23,19 @@ namespace pocketmine\network\protocol;
 
 
 class LoginStatusPacket extends DataPacket{
-	public $status;
+    public $status;
 
-	public function pid(){
-		return Info::LOGIN_STATUS_PACKET;
-	}
+    public function pid(){
+        return Info::LOGIN_STATUS_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->status);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->status);
+    }
 
 }

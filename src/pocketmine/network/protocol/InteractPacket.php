@@ -23,25 +23,25 @@ namespace pocketmine\network\protocol;
 
 
 class InteractPacket extends DataPacket{
-	public $action;
-	public $eid;
-	public $target;
+    public $action;
+    public $eid;
+    public $target;
 
-	public function pid(){
-		return Info::INTERACT_PACKET;
-	}
+    public function pid(){
+        return Info::INTERACT_PACKET;
+    }
 
-	public function decode(){
-		$this->action = $this->getByte();
-		$this->eid = $this->getInt();
-		$this->target = $this->getInt();
-	}
+    public function decode(){
+        $this->action = $this->getByte();
+        $this->eid = $this->getInt();
+        $this->target = $this->getInt();
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putByte($this->action);
-		$this->putInt($this->eid);
-		$this->putInt($this->target);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putByte($this->action);
+        $this->putInt($this->eid);
+        $this->putInt($this->target);
+    }
 
 }

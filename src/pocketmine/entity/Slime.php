@@ -25,7 +25,7 @@ namespace pocketmine\entity;
 use pocketmine\nbt\tag\String;
 
 class Slime extends Living{
-	protected function initEntity(){
-		$this->namedtag->id = new String("id", "Slime");
-	}
+    protected function initEntity(){
+        $this->namedtag->id = new String("id", "Slime");
+    }
 }

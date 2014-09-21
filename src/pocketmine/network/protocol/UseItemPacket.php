@@ -23,42 +23,42 @@ namespace pocketmine\network\protocol;
 
 
 class UseItemPacket extends DataPacket{
-	public $x;
-	public $y;
-	public $z;
-	public $face;
-	public $item;
-	public $meta;
-	public $eid;
-	public $fx;
-	public $fy;
-	public $fz;
-	public $posX;
-	public $posY;
-	public $posZ;
+    public $x;
+    public $y;
+    public $z;
+    public $face;
+    public $item;
+    public $meta;
+    public $eid;
+    public $fx;
+    public $fy;
+    public $fz;
+    public $posX;
+    public $posY;
+    public $posZ;
 
-	public function pid(){
-		return Info::USE_ITEM_PACKET;
-	}
+    public function pid(){
+        return Info::USE_ITEM_PACKET;
+    }
 
-	public function decode(){
-		$this->x = $this->getInt();
-		$this->y = $this->getInt();
-		$this->z = $this->getInt();
-		$this->face = $this->getInt();
-		$this->item = $this->getShort();
-		$this->meta = $this->getShort();
-		$this->eid = $this->getInt();
-		$this->fx = $this->getFloat();
-		$this->fy = $this->getFloat();
-		$this->fz = $this->getFloat();
-		$this->posX = $this->getFloat();
-		$this->posY = $this->getFloat();
-		$this->posZ = $this->getFloat();
-	}
+    public function decode(){
+        $this->x = $this->getInt();
+        $this->y = $this->getInt();
+        $this->z = $this->getInt();
+        $this->face = $this->getInt();
+        $this->item = $this->getShort();
+        $this->meta = $this->getShort();
+        $this->eid = $this->getInt();
+        $this->fx = $this->getFloat();
+        $this->fy = $this->getFloat();
+        $this->fz = $this->getFloat();
+        $this->posX = $this->getFloat();
+        $this->posY = $this->getFloat();
+        $this->posZ = $this->getFloat();
+    }
 
-	public function encode(){
+    public function encode(){
 
-	}
+    }
 
 }

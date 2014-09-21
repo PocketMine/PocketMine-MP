@@ -27,22 +27,22 @@ use pocketmine\block\Block;
  * Class used for Items that can be Blocks
  */
 class ItemBlock extends Item{
-	public function __construct(Block $block, $meta = 0, $count = 1){
-		$this->block = clone $block;
-		parent::__construct($block->getID(), $block->getDamage(), $count, $block->getName());
-	}
+    public function __construct(Block $block, $meta = 0, $count = 1){
+        $this->block = clone $block;
+        parent::__construct($block->getID(), $block->getDamage(), $count, $block->getName());
+    }
 
-	public function setDamage($meta){
-		$this->meta = $meta !== null ? $meta & 0xf : null;
-		$this->block->setDamage($this->meta);
-	}
+    public function setDamage($meta){
+        $this->meta = $meta !== null ? $meta & 0xf : null;
+        $this->block->setDamage($this->meta);
+    }
 
-	public function __clone(){
-		$this->block = clone $this->block;
-	}
+    public function __clone(){
+        $this->block = clone $this->block;
+    }
 
-	public function getBlock(){
-		return $this->block;
-	}
+    public function getBlock(){
+        return $this->block;
+    }
 
 }

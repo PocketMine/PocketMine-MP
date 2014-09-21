@@ -26,95 +26,95 @@ use pocketmine\Thread;
 
 class GenerationThread extends Thread{
 
-	protected $loadPaths;
-	/** @var \ClassLoader */
-	protected $loader;
-	/** @var \ThreadedLogger */
-	protected $logger;
+    protected $loadPaths;
+    /** @var \ClassLoader */
+    protected $loader;
+    /** @var \ThreadedLogger */
+    protected $logger;
 
-	/** @var \Threaded */
-	protected $externalQueue;
-	/** @var \Threaded */
-	protected $internalQueue;
+    /** @var \Threaded */
+    protected $externalQueue;
+    /** @var \Threaded */
+    protected $internalQueue;
 
-	/**
-	 * @return \Threaded
-	 */
-	public function getInternalQueue(){
-		return $this->internalQueue;
-	}
+    /**
+     * @return \Threaded
+     */
+    public function getInternalQueue(){
+        return $this->internalQueue;
+    }
 
-	/**
-	 * @return \Threaded
-	 */
-	public function getExternalQueue(){
-		return $this->externalQueue;
-	}
+    /**
+     * @return \Threaded
+     */
+    public function getExternalQueue(){
+        return $this->externalQueue;
+    }
 
-	public function pushMainToThreadPacket($str){
-		$this->internalQueue[] = $str;
-		$this->synchronized(function(){
-			$this->notify();
-		});
-	}
+    public function pushMainToThreadPacket($str){
+        $this->internalQueue[] = $str;
+        $this->synchronized(function (){
+            $this->notify();
+        });
+    }
 
-	public function readMainToThreadPacket(){
-		return $this->internalQueue->shift();
-	}
+    public function readMainToThreadPacket(){
+        return $this->internalQueue->shift();
+    }
 
-	public function pushThreadToMainPacket($str){
-		$this->externalQueue[] = $str;
-	}
+    public function pushThreadToMainPacket($str){
+        $this->externalQueue[] = $str;
+    }
 
-	public function readThreadToMainPacket(){
-		return $this->externalQueue->shift();
-	}
+    public function readThreadToMainPacket(){
+        return $this->externalQueue->shift();
+    }
 
-	/**
-	 * @return \ThreadedLogger
-	 */
-	public function getLogger(){
-		return $this->logger;
-	}
+    /**
+     * @return \ThreadedLogger
+     */
+    public function getLogger(){
+        return $this->logger;
+    }
 
-	public function __construct(\ThreadedLogger $logger, \ClassLoader $loader){
-		$this->loader = $loader;
-		$this->logger = $logger;
-		$loadPaths = [];
-		$this->addDependency($loadPaths, new \ReflectionClass($this->loader));
-		$this->loadPaths = array_reverse($loadPaths);
+    public function __construct(\ThreadedLogger $logger, \ClassLoader $loader){
+        $this->loader = $loader;
+        $this->logger = $logger;
+        $loadPaths = [];
+        $this->addDependency($loadPaths, new \ReflectionClass($this->loader));
+        $this->loadPaths = array_reverse($loadPaths);
 
-		$this->externalQueue = new \Threaded();
-		$this->internalQueue = new \Threaded();
+        $this->externalQueue = new \Threaded();
+        $this->internalQueue = new \Threaded();
 
-		$this->start();
-	}
+        $this->start();
+    }
 
-	protected function addDependency(array &$loadPaths, \ReflectionClass $dep){
-		if($dep->getFileName() !== false){
-			$loadPaths[$dep->getName()] = $dep->getFileName();
-		}
+    protected function addDependency(array &$loadPaths, \ReflectionClass $dep){
+        if($dep->getFileName() !== false){
+            $loadPaths[$dep->getName()] = $dep->getFileName();
+        }
 
-		if($dep->getParentClass() instanceof \ReflectionClass){
-			$this->addDependency($loadPaths, $dep->getParentClass());
-		}
+        if($dep->getParentClass() instanceof \ReflectionClass){
+            $this->addDependency($loadPaths, $dep->getParentClass());
+        }
 
-		foreach($dep->getInterfaces() as $interface){
-			$this->addDependency($loadPaths, $interface);
-		}
-	}
+        foreach($dep->getInterfaces() as $interface){
+            $this->addDependency($loadPaths, $interface);
+        }
+    }
 
-	public function run(){
-		error_reporting(-1);
-		gc_enable();
-		//Load removed dependencies, can't use require_once()
-		foreach($this->loadPaths as $name => $path){
-			if(!class_exists($name, false) and !interface_exists($name, false)){
-				require($path);
-			}
-		}
-		$this->loader->register();
+    public function run(){
+        error_reporting(-1);
+        gc_enable();
+        //Load removed dependencies, can't use require_once()
+        foreach($this->loadPaths as $name => $path){
+            if(!class_exists($name, false) and !interface_exists($name, false)){
+                require($path);
+            }
+        }
+        $this->loader->register();
 
-		$generationManager = new GenerationManager($this, $this->getLogger(), $this->loader);
-	}
+        $generationManager = new GenerationManager($this, $this->getLogger(), $this->loader);
+    }
 }

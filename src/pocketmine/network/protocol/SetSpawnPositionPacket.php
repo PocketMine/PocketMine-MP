@@ -23,23 +23,23 @@ namespace pocketmine\network\protocol;
 
 
 class SetSpawnPositionPacket extends DataPacket{
-	public $x;
-	public $z;
-	public $y;
+    public $x;
+    public $z;
+    public $y;
 
-	public function pid(){
-		return Info::SET_SPAWN_POSITION_PACKET;
-	}
+    public function pid(){
+        return Info::SET_SPAWN_POSITION_PACKET;
+    }
 
-	public function decode(){
+    public function decode(){
 
-	}
+    }
 
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->x);
-		$this->putInt($this->z);
-		$this->putByte($this->y);
-	}
+    public function encode(){
+        $this->reset();
+        $this->putInt($this->x);
+        $this->putInt($this->z);
+        $this->putByte($this->y);
+    }
 
 }

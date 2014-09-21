@@ -59,198 +59,198 @@ use pocketmine\Server;
 
 class SimpleCommandMap implements CommandMap{
 
-	/**
-	 * @var Command[]
-	 */
-	protected $knownCommands = [];
+    /**
+     * @var Command[]
+     */
+    protected $knownCommands = [];
 
-	/** @var Server */
-	private $server;
+    /** @var Server */
+    private $server;
 
-	public function __construct(Server $server){
-		$this->server = $server;
-		$this->setDefaultCommands();
-	}
+    public function __construct(Server $server){
+        $this->server = $server;
+        $this->setDefaultCommands();
+    }
 
-	private function setDefaultCommands(){
-		$this->register("pocketmine", new VersionCommand("version"));
-		$this->register("pocketmine", new PluginsCommand("plugins"));
-		$this->register("pocketmine", new SeedCommand("seed"));
-		$this->register("pocketmine", new HelpCommand("help"));
-		$this->register("pocketmine", new StopCommand("stop"));
-		$this->register("pocketmine", new TellCommand("tell"));
-		$this->register("pocketmine", new DefaultGamemodeCommand("defaultgamemode"));
-		$this->register("pocketmine", new BanCommand("ban"));
-		$this->register("pocketmine", new BanIpCommand("ban-ip"));
-		$this->register("pocketmine", new BanListCommand("banlist"));
-		$this->register("pocketmine", new PardonCommand("pardon"));
-		$this->register("pocketmine", new PardonIpCommand("pardon-ip"));
-		$this->register("pocketmine", new SayCommand("say"));
-		$this->register("pocketmine", new MeCommand("me"));
-		$this->register("pocketmine", new ListCommand("list"));
-		$this->register("pocketmine", new DifficultyCommand("difficulty"));
-		$this->register("pocketmine", new KickCommand("kick"));
-		$this->register("pocketmine", new OpCommand("op"));
-		$this->register("pocketmine", new DeopCommand("deop"));
-		$this->register("pocketmine", new WhitelistCommand("whitelist"));
-		$this->register("pocketmine", new SaveOnCommand("save-on"));
-		$this->register("pocketmine", new SaveOffCommand("save-off"));
-		$this->register("pocketmine", new SaveCommand("save-all"));
-		$this->register("pocketmine", new GiveCommand("give"));
-		$this->register("pocketmine", new GamemodeCommand("gamemode"));
-		$this->register("pocketmine", new KillCommand("kill"));
-		$this->register("pocketmine", new SpawnpointCommand("spawnpoint"));
-		$this->register("pocketmine", new SetWorldSpawnCommand("setworldspawn"));
-		$this->register("pocketmine", new TeleportCommand("tp"));
-		$this->register("pocketmine", new TimeCommand("time"));
-		$this->register("pocketmine", new TimingsCommand("timings"));
-		$this->register("pocketmine", new ReloadCommand("reload"));
+    private function setDefaultCommands(){
+        $this->register("pocketmine", new VersionCommand("version"));
+        $this->register("pocketmine", new PluginsCommand("plugins"));
+        $this->register("pocketmine", new SeedCommand("seed"));
+        $this->register("pocketmine", new HelpCommand("help"));
+        $this->register("pocketmine", new StopCommand("stop"));
+        $this->register("pocketmine", new TellCommand("tell"));
+        $this->register("pocketmine", new DefaultGamemodeCommand("defaultgamemode"));
+        $this->register("pocketmine", new BanCommand("ban"));
+        $this->register("pocketmine", new BanIpCommand("ban-ip"));
+        $this->register("pocketmine", new BanListCommand("banlist"));
+        $this->register("pocketmine", new PardonCommand("pardon"));
+        $this->register("pocketmine", new PardonIpCommand("pardon-ip"));
+        $this->register("pocketmine", new SayCommand("say"));
+        $this->register("pocketmine", new MeCommand("me"));
+        $this->register("pocketmine", new ListCommand("list"));
+        $this->register("pocketmine", new DifficultyCommand("difficulty"));
+        $this->register("pocketmine", new KickCommand("kick"));
+        $this->register("pocketmine", new OpCommand("op"));
+        $this->register("pocketmine", new DeopCommand("deop"));
+        $this->register("pocketmine", new WhitelistCommand("whitelist"));
+        $this->register("pocketmine", new SaveOnCommand("save-on"));
+        $this->register("pocketmine", new SaveOffCommand("save-off"));
+        $this->register("pocketmine", new SaveCommand("save-all"));
+        $this->register("pocketmine", new GiveCommand("give"));
+        $this->register("pocketmine", new GamemodeCommand("gamemode"));
+        $this->register("pocketmine", new KillCommand("kill"));
+        $this->register("pocketmine", new SpawnpointCommand("spawnpoint"));
+        $this->register("pocketmine", new SetWorldSpawnCommand("setworldspawn"));
+        $this->register("pocketmine", new TeleportCommand("tp"));
+        $this->register("pocketmine", new TimeCommand("time"));
+        $this->register("pocketmine", new TimingsCommand("timings"));
+        $this->register("pocketmine", new ReloadCommand("reload"));
 
-		if($this->server->getProperty("debug.commands", false) === true){
-			$this->register("pocketmine", new StatusCommand("status"));
-		}
-	}
-
-
-	public function registerAll($fallbackPrefix, array $commands){
-		foreach($commands as $command){
-			$this->register($fallbackPrefix, $command);
-		}
-	}
-
-	public function register($fallbackPrefix, Command $command, $label = null){
-		if($label === null){
-			$label = $command->getName();
-		}
-		$label = strtolower(trim($label));
-		$fallbackPrefix = strtolower(trim($fallbackPrefix));
-
-		$registered = $this->registerAlias($command, false, $fallbackPrefix, $label);
-
-		$aliases = $command->getAliases();
-		foreach($aliases as $index => $alias){
-			if(!$this->registerAlias($command, true, $fallbackPrefix, $alias)){
-				unset($aliases[$index]);
-			}
-		}
-		$command->setAliases($aliases);
-
-		if(!$registered){
-			$command->setLabel($fallbackPrefix . ":" . $label);
-		}
-
-		$command->register($this);
-
-		return $registered;
-	}
-
-	private function registerAlias(Command $command, $isAlias, $fallbackPrefix, $label){
-		$this->knownCommands[$fallbackPrefix . ":" . $label] = $command;
-		if(($command instanceof VanillaCommand or $isAlias) and isset($this->knownCommands[$label])){
-			return false;
-		}
-
-		if(isset($this->knownCommands[$label]) and $this->knownCommands[$label]->getLabel() !== null and $this->knownCommands[$label]->getLabel() === $label){
-			return false;
-		}
-
-		if(!$isAlias){
-			$command->setLabel($label);
-		}
-
-		$this->knownCommands[$label] = $command;
-
-		return true;
-	}
-
-	public function dispatch(CommandSender $sender, $commandLine){
-		$args = explode(" ", $commandLine);
-
-		if(count($args) === 0){
-			return false;
-		}
-
-		$sentCommandLabel = strtolower(array_shift($args));
-		$target = $this->getCommand($sentCommandLabel);
-
-		if($target === null){
-			return false;
-		}
-
-		$target->timings->startTiming();
-		$target->execute($sender, $sentCommandLabel, $args);
-		$target->timings->stopTiming();
-
-		return true;
-	}
-
-	public function clearCommands(){
-		foreach($this->knownCommands as $command){
-			$command->unregister($this);
-		}
-		$this->knownCommands = [];
-		$this->setDefaultCommands();
-	}
-
-	public function getCommand($name){
-		if(isset($this->knownCommands[$name])){
-			return $this->knownCommands[$name];
-		}
-
-		return null;
-	}
-
-	/**
-	 * @return Command[]
-	 */
-	public function getCommands(){
-		return $this->knownCommands;
-	}
+        if($this->server->getProperty("debug.commands", false) === true){
+            $this->register("pocketmine", new StatusCommand("status"));
+        }
+    }
 
 
-	/**
-	 * @return void
-	 */
-	public function registerServerAliases(){
-		$values = $this->server->getCommandAliases();
+    public function registerAll($fallbackPrefix, array $commands){
+        foreach($commands as $command){
+            $this->register($fallbackPrefix, $command);
+        }
+    }
 
-		foreach($values as $alias => $commandStrings){
-			if(strpos($alias, ":") !== false or strpos($alias, " ") !== false){
-				$this->server->getLogger()->warning("Could not register alias " . $alias . " because it contains illegal characters");
-				continue;
-			}
+    public function register($fallbackPrefix, Command $command, $label = null){
+        if($label === null){
+            $label = $command->getName();
+        }
+        $label = strtolower(trim($label));
+        $fallbackPrefix = strtolower(trim($fallbackPrefix));
 
-			$targets = [];
+        $registered = $this->registerAlias($command, false, $fallbackPrefix, $label);
 
-			$bad = "";
-			foreach($commandStrings as $commandString){
-				$args = explode(" ", $commandString);
-				$command = $this->getCommand($args[0]);
+        $aliases = $command->getAliases();
+        foreach($aliases as $index => $alias){
+            if(!$this->registerAlias($command, true, $fallbackPrefix, $alias)){
+                unset($aliases[$index]);
+            }
+        }
+        $command->setAliases($aliases);
 
-				if($command === null){
-					if(strlen($bad) > 0){
-						$bad .= ", ";
-					}
-					$bad .= $commandString;
-				}else{
-					$targets[] = $commandString;
-				}
-			}
+        if(!$registered){
+            $command->setLabel($fallbackPrefix . ":" . $label);
+        }
 
-			if(strlen($bad) > 0){
-				$this->server->getLogger()->warning("Could not register alias " . $alias . " because it contains commands that do not exist: " . $bad);
-				continue;
-			}
+        $command->register($this);
 
-			//These registered commands have absolute priority
-			if(count($targets) > 0){
-				$this->knownCommands[strtolower($alias)] = new FormattedCommandAlias(strtolower($alias), $targets);
-			}else{
-				unset($this->knownCommands[strtolower($alias)]);
-			}
+        return $registered;
+    }
 
-		}
-	}
+    private function registerAlias(Command $command, $isAlias, $fallbackPrefix, $label){
+        $this->knownCommands[$fallbackPrefix . ":" . $label] = $command;
+        if(($command instanceof VanillaCommand or $isAlias) and isset($this->knownCommands[$label])){
+            return false;
+        }
+
+        if(isset($this->knownCommands[$label]) and $this->knownCommands[$label]->getLabel() !== null and $this->knownCommands[$label]->getLabel() === $label){
+            return false;
+        }
+
+        if(!$isAlias){
+            $command->setLabel($label);
+        }
+
+        $this->knownCommands[$label] = $command;
+
+        return true;
+    }
+
+    public function dispatch(CommandSender $sender, $commandLine){
+        $args = explode(" ", $commandLine);
+
+        if(count($args) === 0){
+            return false;
+        }
+
+        $sentCommandLabel = strtolower(array_shift($args));
+        $target = $this->getCommand($sentCommandLabel);
+
+        if($target === null){
+            return false;
+        }
+
+        $target->timings->startTiming();
+        $target->execute($sender, $sentCommandLabel, $args);
+        $target->timings->stopTiming();
+
+        return true;
+    }
+
+    public function clearCommands(){
+        foreach($this->knownCommands as $command){
+            $command->unregister($this);
+        }
+        $this->knownCommands = [];
+        $this->setDefaultCommands();
+    }
+
+    public function getCommand($name){
+        if(isset($this->knownCommands[$name])){
+            return $this->knownCommands[$name];
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Command[]
+     */
+    public function getCommands(){
+        return $this->knownCommands;
+    }
+
+
+    /**
+     * @return void
+     */
+    public function registerServerAliases(){
+        $values = $this->server->getCommandAliases();
+
+        foreach($values as $alias => $commandStrings){
+            if(strpos($alias, ":") !== false or strpos($alias, " ") !== false){
+                $this->server->getLogger()->warning("Could not register alias " . $alias . " because it contains illegal characters");
+                continue;
+            }
+
+            $targets = [];
+
+            $bad = "";
+            foreach($commandStrings as $commandString){
+                $args = explode(" ", $commandString);
+                $command = $this->getCommand($args[0]);
+
+                if($command === null){
+                    if(strlen($bad) > 0){
+                        $bad .= ", ";
+                    }
+                    $bad .= $commandString;
+                }else{
+                    $targets[] = $commandString;
+                }
+            }
+
+            if(strlen($bad) > 0){
+                $this->server->getLogger()->warning("Could not register alias " . $alias . " because it contains commands that do not exist: " . $bad);
+                continue;
+            }
+
+            //These registered commands have absolute priority
+            if(count($targets) > 0){
+                $this->knownCommands[strtolower($alias)] = new FormattedCommandAlias(strtolower($alias), $targets);
+            }else{
+                unset($this->knownCommands[strtolower($alias)]);
+            }
+
+        }
+    }
 
 
 }

@@ -25,7 +25,7 @@ namespace pocketmine\entity;
 use pocketmine\nbt\tag\String;
 
 class Egg extends Projectile{
-	protected function initEntity(){
-		$this->namedtag->id = new String("id", "Egg");
-	}
+    protected function initEntity(){
+        $this->namedtag->id = new String("id", "Egg");
+    }
 }

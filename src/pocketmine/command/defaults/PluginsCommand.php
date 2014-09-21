@@ -26,36 +26,36 @@ use pocketmine\utils\TextFormat;
 
 class PluginsCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Gets a list of plugins running on the server",
-			"/plugins",
-			["pl"]
-		);
-		$this->setPermission("pocketmine.command.plugins");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Gets a list of plugins running on the server",
+            "/plugins",
+            ["pl"]
+        );
+        $this->setPermission("pocketmine.command.plugins");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		$sender->sendMessage("Plugins " . $this->getPluginList($sender));
+        $sender->sendMessage("Plugins " . $this->getPluginList($sender));
 
-		return true;
-	}
+        return true;
+    }
 
-	private function getPluginList(CommandSender $sender){
-		$list = "";
-		foreach(($plugins = $sender->getServer()->getPluginManager()->getPlugins()) as $plugin){
-			if(strlen($list) > 0){
-				$list .= TextFormat::WHITE . ", ";
-			}
-			$list .= $plugin->isEnabled() ? TextFormat::GREEN : TextFormat::RED;
-			$list .= $plugin->getDescription()->getFullName();
-		}
+    private function getPluginList(CommandSender $sender){
+        $list = "";
+        foreach(($plugins = $sender->getServer()->getPluginManager()->getPlugins()) as $plugin){
+            if(strlen($list) > 0){
+                $list .= TextFormat::WHITE . ", ";
+            }
+            $list .= $plugin->isEnabled() ? TextFormat::GREEN : TextFormat::RED;
+            $list .= $plugin->getDescription()->getFullName();
+        }
 
-		return "(" . count($plugins) . "): $list";
-	}
+        return "(" . count($plugins) . "): $list";
+    }
 }

@@ -27,35 +27,35 @@ use pocketmine\utils\TextFormat;
 
 class DefaultGamemodeCommand extends VanillaCommand{
 
-	public function __construct($name){
-		parent::__construct(
-			$name,
-			"Set the default gamemode",
-			"/defaultgamemode <mode>"
-		);
-		$this->setPermission("pocketmine.command.defaultgamemode");
-	}
+    public function __construct($name){
+        parent::__construct(
+            $name,
+            "Set the default gamemode",
+            "/defaultgamemode <mode>"
+        );
+        $this->setPermission("pocketmine.command.defaultgamemode");
+    }
 
-	public function execute(CommandSender $sender, $currentAlias, array $args){
-		if(!$this->testPermission($sender)){
-			return true;
-		}
+    public function execute(CommandSender $sender, $currentAlias, array $args){
+        if(!$this->testPermission($sender)){
+            return true;
+        }
 
-		if(count($args) === 0){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        if(count($args) === 0){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
 
-			return false;
-		}
+            return false;
+        }
 
-		$gameMode = Server::getGamemodeFromString($args[0]);
+        $gameMode = Server::getGamemodeFromString($args[0]);
 
-		if($gameMode !== -1){
-			$sender->getServer()->setConfigInt("gamemode", $gameMode);
-			$sender->sendMessage("Default game mode set to " . strtolower(Server::getGamemodeString($gameMode)));
-		}else{
-			$sender->sendMessage("Unknown game mode");
-		}
+        if($gameMode !== -1){
+            $sender->getServer()->setConfigInt("gamemode", $gameMode);
+            $sender->sendMessage("Default game mode set to " . strtolower(Server::getGamemodeString($gameMode)));
+        }else{
+            $sender->sendMessage("Unknown game mode");
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

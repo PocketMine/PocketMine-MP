@@ -26,57 +26,57 @@ use pocketmine\utils\TextFormat;
 
 class PluginCommand extends Command implements PluginIdentifiableCommand{
 
-	/** @var Plugin */
-	private $owningPlugin;
+    /** @var Plugin */
+    private $owningPlugin;
 
-	/** @var CommandExecutor */
-	private $executor;
+    /** @var CommandExecutor */
+    private $executor;
 
-	/**
-	 * @param string $name
-	 * @param Plugin $owner
-	 */
-	public function __construct($name, Plugin $owner){
-		parent::__construct($name);
-		$this->owningPlugin = $owner;
-		$this->executor = $owner;
-		$this->usageMessage = "";
-	}
+    /**
+     * @param string $name
+     * @param Plugin $owner
+     */
+    public function __construct($name, Plugin $owner){
+        parent::__construct($name);
+        $this->owningPlugin = $owner;
+        $this->executor = $owner;
+        $this->usageMessage = "";
+    }
 
-	public function execute(CommandSender $sender, $commandLabel, array $args){
+    public function execute(CommandSender $sender, $commandLabel, array $args){
 
-		if(!$this->owningPlugin->isEnabled()){
-			return false;
-		}
+        if(!$this->owningPlugin->isEnabled()){
+            return false;
+        }
 
-		if(!$this->testPermission($sender)){
-			return false;
-		}
+        if(!$this->testPermission($sender)){
+            return false;
+        }
 
-		$success = $this->executor->onCommand($sender, $this, $commandLabel, $args);
+        $success = $this->executor->onCommand($sender, $this, $commandLabel, $args);
 
-		if(!$success and $this->usageMessage !== ""){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
-		}
+        if(!$success and $this->usageMessage !== ""){
+            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+        }
 
-		return $success;
-	}
+        return $success;
+    }
 
-	public function getExecutor(){
-		return $this->executor;
-	}
+    public function getExecutor(){
+        return $this->executor;
+    }
 
-	/**
-	 * @param CommandExecutor $executor
-	 */
-	public function setExecutor(CommandExecutor $executor){
-		$this->executor = ($executor != null) ? $executor : $this->owningPlugin;
-	}
+    /**
+     * @param CommandExecutor $executor
+     */
+    public function setExecutor(CommandExecutor $executor){
+        $this->executor = ($executor != null) ? $executor : $this->owningPlugin;
+    }
 
-	/**
-	 * @return Plugin
-	 */
-	public function getPlugin(){
-		return $this->owningPlugin;
-	}
+    /**
+     * @return Plugin
+     */
+    public function getPlugin(){
+        return $this->owningPlugin;
+    }
 }

@@ -35,219 +35,219 @@ use pocketmine\nbt\tag\Short;
 use pocketmine\network\protocol\ContainerSetDataPacket;
 
 class Furnace extends Tile implements InventoryHolder, Container{
-	/** @var FurnaceInventory */
-	protected $inventory;
+    /** @var FurnaceInventory */
+    protected $inventory;
 
-	public function __construct(FullChunk $chunk, Compound $nbt){
-		$nbt["id"] = Tile::FURNACE;
-		parent::__construct($chunk, $nbt);
-		$this->inventory = new FurnaceInventory($this);
+    public function __construct(FullChunk $chunk, Compound $nbt){
+        $nbt["id"] = Tile::FURNACE;
+        parent::__construct($chunk, $nbt);
+        $this->inventory = new FurnaceInventory($this);
 
-		if(!isset($this->namedtag->Items) or !($this->namedtag->Items instanceof Enum)){
-			$this->namedtag->Items = new Enum("Inventory", []);
-			$this->namedtag->Items->setTagType(NBT::TAG_Compound);
-		}
+        if(!isset($this->namedtag->Items) or !($this->namedtag->Items instanceof Enum)){
+            $this->namedtag->Items = new Enum("Inventory", []);
+            $this->namedtag->Items->setTagType(NBT::TAG_Compound);
+        }
 
-		for($i = 0; $i < $this->getSize(); ++$i){
-			$this->inventory->setItem($i, $this->getItem($i));
-		}
+        for($i = 0; $i < $this->getSize(); ++$i){
+            $this->inventory->setItem($i, $this->getItem($i));
+        }
 
-		if(!isset($this->namedtag->BurnTime) or $this->namedtag["BurnTime"] < 0){
-			$this->namedtag->BurnTime = new Short("BurnTime", 0);
-		}
-		if(!isset($this->namedtag->CookTime) or $this->namedtag["CookTime"] < 0 or ($this->namedtag["BurnTime"] === 0 and $this->namedtag["CookTime"] > 0)){
-			$this->namedtag->CookTime = new Short("CookTime", 0);
-		}
-		if(!isset($this->namedtag->MaxTime)){
-			$this->namedtag->MaxTime = new Short("BurnTime", $this->namedtag["BurnTime"]);
-			$this->namedtag->BurnTicks = new Short("BurnTicks", 0);
-		}
-		if($this->namedtag["BurnTime"] > 0){
-			$this->scheduleUpdate();
-		}
-	}
+        if(!isset($this->namedtag->BurnTime) or $this->namedtag["BurnTime"] < 0){
+            $this->namedtag->BurnTime = new Short("BurnTime", 0);
+        }
+        if(!isset($this->namedtag->CookTime) or $this->namedtag["CookTime"] < 0 or ($this->namedtag["BurnTime"] === 0 and $this->namedtag["CookTime"] > 0)){
+            $this->namedtag->CookTime = new Short("CookTime", 0);
+        }
+        if(!isset($this->namedtag->MaxTime)){
+            $this->namedtag->MaxTime = new Short("BurnTime", $this->namedtag["BurnTime"]);
+            $this->namedtag->BurnTicks = new Short("BurnTicks", 0);
+        }
+        if($this->namedtag["BurnTime"] > 0){
+            $this->scheduleUpdate();
+        }
+    }
 
-	public function close(){
-		if($this->closed === false){
-			foreach($this->getInventory()->getViewers() as $player){
-				$this->getInventory()->close($player);
-			}
-			parent::close();
-		}
-	}
+    public function close(){
+        if($this->closed === false){
+            foreach($this->getInventory()->getViewers() as $player){
+                $this->getInventory()->close($player);
+            }
+            parent::close();
+        }
+    }
 
-	public function saveNBT(){
-		$this->namedtag->Items = new Enum("Inventory", []);
-		$this->namedtag->Items->setTagType(NBT::TAG_Compound);
-		for($index = 0; $index < $this->getSize(); ++$index){
-			$this->setItem($index, $this->inventory->getItem($index));
-		}
-	}
+    public function saveNBT(){
+        $this->namedtag->Items = new Enum("Inventory", []);
+        $this->namedtag->Items->setTagType(NBT::TAG_Compound);
+        for($index = 0; $index < $this->getSize(); ++$index){
+            $this->setItem($index, $this->inventory->getItem($index));
+        }
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getSize(){
-		return 3;
-	}
+    /**
+     * @return int
+     */
+    public function getSize(){
+        return 3;
+    }
 
-	/**
-	 * @param $index
-	 *
-	 * @return int
-	 */
-	protected function getSlotIndex($index){
-		foreach($this->namedtag->Items as $i => $slot){
-			if($slot["Slot"] === $index){
-				return $i;
-			}
-		}
+    /**
+     * @param $index
+     *
+     * @return int
+     */
+    protected function getSlotIndex($index){
+        foreach($this->namedtag->Items as $i => $slot){
+            if($slot["Slot"] === $index){
+                return $i;
+            }
+        }
 
-		return -1;
-	}
+        return -1;
+    }
 
-	/**
-	 * This method should not be used by plugins, use the Inventory
-	 *
-	 * @param int $index
-	 *
-	 * @return Item
-	 */
-	public function getItem($index){
-		$i = $this->getSlotIndex($index);
-		if($i < 0){
-			return Item::get(Item::AIR, 0, 0);
-		}else{
-			return Item::get($this->namedtag->Items[$i]["id"], $this->namedtag->Items[$i]["Damage"], $this->namedtag->Items[$i]["Count"]);
-		}
-	}
+    /**
+     * This method should not be used by plugins, use the Inventory
+     *
+     * @param int $index
+     *
+     * @return Item
+     */
+    public function getItem($index){
+        $i = $this->getSlotIndex($index);
+        if($i < 0){
+            return Item::get(Item::AIR, 0, 0);
+        }else{
+            return Item::get($this->namedtag->Items[$i]["id"], $this->namedtag->Items[$i]["Damage"], $this->namedtag->Items[$i]["Count"]);
+        }
+    }
 
-	/**
-	 * This method should not be used by plugins, use the Inventory
-	 *
-	 * @param int  $index
-	 * @param Item $item
-	 *
-	 * @return bool
-	 */
-	public function setItem($index, Item $item){
-		$i = $this->getSlotIndex($index);
+    /**
+     * This method should not be used by plugins, use the Inventory
+     *
+     * @param int  $index
+     * @param Item $item
+     *
+     * @return bool
+     */
+    public function setItem($index, Item $item){
+        $i = $this->getSlotIndex($index);
 
-		$d = new Compound(false, [
-			new Byte("Count", $item->getCount()),
-			new Byte("Slot", $index),
-			new Short("id", $item->getID()),
-			new Short("Damage", $item->getDamage()),
-		]);
+        $d = new Compound(false, [
+            new Byte("Count", $item->getCount()),
+            new Byte("Slot", $index),
+            new Short("id", $item->getID()),
+            new Short("Damage", $item->getDamage()),
+        ]);
 
-		if($item->getID() === Item::AIR or $item->getCount() <= 0){
-			if($i >= 0){
-				unset($this->namedtag->Items[$i]);
-			}
-		}elseif($i < 0){
-			for($i = 0; $i <= $this->getSize(); ++$i){
-				if(!isset($this->namedtag->Items[$i])){
-					break;
-				}
-			}
-			$this->namedtag->Items[$i] = $d;
-		}else{
-			$this->namedtag->Items[$i] = $d;
-		}
+        if($item->getID() === Item::AIR or $item->getCount() <= 0){
+            if($i >= 0){
+                unset($this->namedtag->Items[$i]);
+            }
+        }elseif($i < 0){
+            for($i = 0; $i <= $this->getSize(); ++$i){
+                if(!isset($this->namedtag->Items[$i])){
+                    break;
+                }
+            }
+            $this->namedtag->Items[$i] = $d;
+        }else{
+            $this->namedtag->Items[$i] = $d;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * @return FurnaceInventory
-	 */
-	public function getInventory(){
-		return $this->inventory;
-	}
+    /**
+     * @return FurnaceInventory
+     */
+    public function getInventory(){
+        return $this->inventory;
+    }
 
-	public function onUpdate(){
-		if($this->closed === true){
-			return false;
-		}
+    public function onUpdate(){
+        if($this->closed === true){
+            return false;
+        }
 
-		$ret = false;
+        $ret = false;
 
-		$fuel = $this->inventory->getFuel();
-		$raw = $this->inventory->getSmelting();
-		$product = $this->inventory->getResult();
-		$smelt = $this->server->getCraftingManager()->matchFurnaceRecipe($raw);
-		$canSmelt = ($smelt instanceof FurnaceRecipe and $raw->getCount() > 0 and (($smelt->getResult()->equals($product, true) and $product->getCount() < $product->getMaxStackSize()) or $product->getID() === Item::AIR));
-		if($this->namedtag["BurnTime"] <= 0 and $canSmelt and $fuel->getFuelTime() !== false and $fuel->getCount() > 0){
-			$this->lastUpdate = microtime(true);
-			$time = floor($fuel->getFuelTime() * 20);
-			$this->namedtag->MaxTime = new Short("MaxTime", $time);
-			$this->namedtag->BurnTime = new Short("BurnTime", $time);
-			$this->namedtag->BurnTicks = new Short("BurnTicks", 0);
-			$fuel->setCount($fuel->getCount() - 1);
-			if($fuel->getCount() === 0){
-				$fuel = Item::get(Item::AIR, 0, 0);
-			}
-			$this->inventory->setFuel($fuel);
-			$current = $this->getLevel()->getBlock($this);
-			if($current->getID() === Item::FURNACE){
-				$this->getLevel()->setBlock($this, Block::get(Item::BURNING_FURNACE, $current->getDamage()), true);
-			}
-		}
-		if($this->namedtag["BurnTime"] > 0){
-			$ticks = (microtime(true) - $this->lastUpdate) * 20;
-			$this->namedtag->BurnTime = new Short("BurnTime", $this->namedtag["BurnTime"] - $ticks);
-			$this->namedtag->BurnTicks = new Short("BurnTicks", ceil(($this->namedtag["BurnTime"] / $this->namedtag["MaxTime"] * 200)));
+        $fuel = $this->inventory->getFuel();
+        $raw = $this->inventory->getSmelting();
+        $product = $this->inventory->getResult();
+        $smelt = $this->server->getCraftingManager()->matchFurnaceRecipe($raw);
+        $canSmelt = ($smelt instanceof FurnaceRecipe and $raw->getCount() > 0 and (($smelt->getResult()->equals($product, true) and $product->getCount() < $product->getMaxStackSize()) or $product->getID() === Item::AIR));
+        if($this->namedtag["BurnTime"] <= 0 and $canSmelt and $fuel->getFuelTime() !== false and $fuel->getCount() > 0){
+            $this->lastUpdate = microtime(true);
+            $time = floor($fuel->getFuelTime() * 20);
+            $this->namedtag->MaxTime = new Short("MaxTime", $time);
+            $this->namedtag->BurnTime = new Short("BurnTime", $time);
+            $this->namedtag->BurnTicks = new Short("BurnTicks", 0);
+            $fuel->setCount($fuel->getCount() - 1);
+            if($fuel->getCount() === 0){
+                $fuel = Item::get(Item::AIR, 0, 0);
+            }
+            $this->inventory->setFuel($fuel);
+            $current = $this->getLevel()->getBlock($this);
+            if($current->getID() === Item::FURNACE){
+                $this->getLevel()->setBlock($this, Block::get(Item::BURNING_FURNACE, $current->getDamage()), true);
+            }
+        }
+        if($this->namedtag["BurnTime"] > 0){
+            $ticks = (microtime(true) - $this->lastUpdate) * 20;
+            $this->namedtag->BurnTime = new Short("BurnTime", $this->namedtag["BurnTime"] - $ticks);
+            $this->namedtag->BurnTicks = new Short("BurnTicks", ceil(($this->namedtag["BurnTime"] / $this->namedtag["MaxTime"] * 200)));
 
-			if($smelt instanceof FurnaceRecipe and $canSmelt){
-				$this->namedtag->CookTime = new Short("CookTime", $this->namedtag["CookTime"] + $ticks);
-				if($this->namedtag["CookTime"] >= 200){ //10 seconds
-					$product = Item::get($smelt->getResult()->getID(), $smelt->getResult()->getDamage(), $product->getCount() + 1);
-					$this->inventory->setResult($product);
-					$raw->setCount($raw->getCount() - 1);
-					if($raw->getCount() === 0){
-						$raw = Item::get(Item::AIR, 0, 0);
-					}
-					$this->inventory->setSmelting($raw);
-					$this->namedtag->CookTime = new Short("CookTime", $this->namedtag["CookTime"] - 200);
-				}
-			}elseif($this->namedtag["BurnTime"] <= 0){
-				$this->namedtag->BurnTime = new Short("BurnTime", 0);
-				$this->namedtag->CookTime = new Short("CookTime", 0);
-				$this->namedtag->BurnTicks = new Short("BurnTicks", 0);
-			}else{
-				$this->namedtag->CookTime = new Short("CookTime", 0);
-			}
-			$ret = true;
-		}else{
-			$current = $this->getLevel()->getBlock($this);
-			if($current->getID() === Item::BURNING_FURNACE){
-				$this->getLevel()->setBlock($this, Block::get(Item::FURNACE, $current->getDamage()), true);
-			}
-			$this->namedtag->BurnTime = new Short("BurnTime", 0);
-			$this->namedtag->CookTime = new Short("CookTime", 0);
-			$this->namedtag->BurnTicks = new Short("BurnTicks", 0);
-		}
+            if($smelt instanceof FurnaceRecipe and $canSmelt){
+                $this->namedtag->CookTime = new Short("CookTime", $this->namedtag["CookTime"] + $ticks);
+                if($this->namedtag["CookTime"] >= 200){ //10 seconds
+                    $product = Item::get($smelt->getResult()->getID(), $smelt->getResult()->getDamage(), $product->getCount() + 1);
+                    $this->inventory->setResult($product);
+                    $raw->setCount($raw->getCount() - 1);
+                    if($raw->getCount() === 0){
+                        $raw = Item::get(Item::AIR, 0, 0);
+                    }
+                    $this->inventory->setSmelting($raw);
+                    $this->namedtag->CookTime = new Short("CookTime", $this->namedtag["CookTime"] - 200);
+                }
+            }elseif($this->namedtag["BurnTime"] <= 0){
+                $this->namedtag->BurnTime = new Short("BurnTime", 0);
+                $this->namedtag->CookTime = new Short("CookTime", 0);
+                $this->namedtag->BurnTicks = new Short("BurnTicks", 0);
+            }else{
+                $this->namedtag->CookTime = new Short("CookTime", 0);
+            }
+            $ret = true;
+        }else{
+            $current = $this->getLevel()->getBlock($this);
+            if($current->getID() === Item::BURNING_FURNACE){
+                $this->getLevel()->setBlock($this, Block::get(Item::FURNACE, $current->getDamage()), true);
+            }
+            $this->namedtag->BurnTime = new Short("BurnTime", 0);
+            $this->namedtag->CookTime = new Short("CookTime", 0);
+            $this->namedtag->BurnTicks = new Short("BurnTicks", 0);
+        }
 
-		foreach($this->getInventory()->getViewers() as $player){
-			$windowId = $player->getWindowId($this->getInventory());
-			if($windowId > 0){
-				$pk = new ContainerSetDataPacket;
-				$pk->windowid = $windowId;
-				$pk->property = 0; //Smelting
-				$pk->value = floor($this->namedtag["CookTime"]);
-				$player->dataPacket($pk);
+        foreach($this->getInventory()->getViewers() as $player){
+            $windowId = $player->getWindowId($this->getInventory());
+            if($windowId > 0){
+                $pk = new ContainerSetDataPacket;
+                $pk->windowid = $windowId;
+                $pk->property = 0; //Smelting
+                $pk->value = floor($this->namedtag["CookTime"]);
+                $player->dataPacket($pk);
 
-				$pk = new ContainerSetDataPacket;
-				$pk->windowid = $windowId;
-				$pk->property = 1; //Fire icon
-				$pk->value = $this->namedtag["BurnTicks"];
-				$player->dataPacket($pk);
-			}
+                $pk = new ContainerSetDataPacket;
+                $pk->windowid = $windowId;
+                $pk->property = 1; //Fire icon
+                $pk->value = $this->namedtag["BurnTicks"];
+                $player->dataPacket($pk);
+            }
 
-		}
+        }
 
-		$this->lastUpdate = microtime(true);
+        $this->lastUpdate = microtime(true);
 
-		return $ret;
-	}
+        return $ret;
+    }
 }
