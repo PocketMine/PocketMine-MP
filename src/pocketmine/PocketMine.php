@@ -169,15 +169,15 @@ namespace pocketmine {
 		}
 	}
 
-	function kill($pid){
+	function kill(){
 		switch(Utils::getOS()){
 			case "win":
-				exec("taskkill.exe /F /PID " . ((int) $pid) . " > NUL");
+				exec("taskkill.exe /F /PID " . ((int) getmypid()) . " > NUL");
 				break;
 			case "mac":
 			case "linux":
 			default:
-				exec("kill -9 " . ((int) $pid) . " > /dev/null 2>&1");
+				exec("kill -9 " . ((int) getmypid()) . " > /dev/null 2>&1");
 		}
 	}
 

@@ -57,7 +57,7 @@ class Installer{
 		echo "[*] " . $this->lang->language_has_been_selected . "\n";
 
 		if(!$this->showLicense()){
-			\pocketmine\kill(getmypid());
+			\pocketmine\kill();
 			exit(-1);
 		}
 
