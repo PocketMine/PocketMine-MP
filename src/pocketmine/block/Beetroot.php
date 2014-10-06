@@ -25,7 +25,9 @@ use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
-class Beetroot extends Flowable{
+class Beetroot extends Fertilisable{
+	const FERTILISE_ACTIVATION_LIMIT = 3;
+
 	public function __construct($meta = 0){
 		parent::__construct(self::BEETROOT_BLOCK, $meta, "Beetroot Block");
 		$this->isActivable = true;
@@ -49,8 +51,7 @@ class Beetroot extends Flowable{
 
 	public function onActivate(Item $item, Player $player = null){
 		if($item->getID() === Item::DYE and $item->getDamage() === 0x0F){ //Bonemeal
-			$this->meta = 0x07;
-			$this->getLevel()->setBlock($this, $this, true, true);
+			$this->useFertiliser();
 			$item->count--;
 
 			return true;
@@ -93,5 +94,13 @@ class Beetroot extends Flowable{
 		}
 
 		return $drops;
+	}
+
+	public function fertilise()
+	{
+		$this->meta = 0x07;
+		$this->getLevel()->setBlock($this, $this, true, true);
+
+		return true;
 	}
 }
