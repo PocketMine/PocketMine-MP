@@ -96,6 +96,11 @@ class Beetroot extends Fertilisable{
 		return $drops;
 	}
 
+	public function getFertiliseActivationLimit()
+	{
+		return static::FERTILISE_ACTIVATION_LIMIT;
+	}
+
 	public function fertilise()
 	{
 		$this->meta = 0x07;

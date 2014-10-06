@@ -31,26 +31,22 @@ abstract class Fertilisable extends Plant{
 
 	public function useFertiliser(){
 		$this->fertilisedCount++;
-		$this->checkFertiliseActivationLimit();
+		if($this->checkFertiliseActivationLimit())
+		{
+			$this->fertilise();
+		}
 
 		return true;
 	}
 
 	public function checkFertiliseActivationLimit(){
-		if(defined("static::FERTILISE_ACTIVATION_LIMIT")){ //Late static binding
-			if($this->fertilisedCount == static::FERTILISE_ACTIVATION_LIMIT){//Constant not defined warning... sure... right after I've used defined()
-				if(method_exists(get_called_class(), "fertilise")){//get_called_class() gets the Late Static Binding class name
-					static::fertilise();//Seriously PHPStorm? I just confirmed that the class exists! Squelch warning
-
-					return true;
-				}else{
-					throw new \Exception("Child block does not have the fertilise function");
-				}
-			}
+		if($this->fertilisedCount == $this->getFertiliseActivationLimit()){
+			return true;
 		}else{
-			throw new \Exception("Cannot check fertilise activation limit in child class");
+			return false;
 		}
-
-		return false;
 	}
+
+	abstract public function getFertiliseActivationLimit();
+	abstract public function fertilise();
 }
