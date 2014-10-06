@@ -25,7 +25,9 @@ use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
-class Beetroot extends Fertilisable{
+class Beetroot extends Plant{
+	use traits\Fertilisable;
+
 	const FERTILISE_ACTIVATION_LIMIT = 3;
 
 	public function __construct($meta = 0){

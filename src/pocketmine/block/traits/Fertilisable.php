@@ -19,10 +19,10 @@
  *
 */
 
-namespace pocketmine\block;
+namespace pocketmine\block\traits;
 
 
-abstract class Fertilisable extends Plant{
+trait Fertilisable{
 	protected $fertilisedCount = 0;
 
 	public function getFertilisedCount(){
