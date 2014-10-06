@@ -40,13 +40,13 @@ trait Fertilisable{
 	}
 
 	public function checkFertiliseActivationLimit(){
-		if($this->fertilisedCount == $this->getFertiliseActivationLimit()){
+		if($this->fertilisedCount == $this->getFertiliseActivationThreshold()){
 			return true;
 		}else{
 			return false;
 		}
 	}
 
-	abstract public function getFertiliseActivationLimit();
+	abstract public function getFertiliseActivationThreshold();
 	abstract public function fertilise();
 }

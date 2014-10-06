@@ -28,7 +28,7 @@ use pocketmine\Player;
 class Beetroot extends Plant{
 	use traits\Fertilisable;
 
-	const FERTILISE_ACTIVATION_LIMIT = 3;
+	const FERTILISE_ACTIVATION_THRESHOLD = 3;
 
 	public function __construct($meta = 0){
 		parent::__construct(self::BEETROOT_BLOCK, $meta, "Beetroot Block");
@@ -98,7 +98,7 @@ class Beetroot extends Plant{
 		return $drops;
 	}
 
-	public function getFertiliseActivationLimit()
+	public function getFertiliseActivationThreshold()
 	{
 		return static::FERTILISE_ACTIVATION_LIMIT;
 	}
