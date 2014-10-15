@@ -50,6 +50,9 @@ class Compound extends NamedTag implements \ArrayAccess{
 
 	public function offsetSet($offset, $value){
 		if($value instanceof Tag){
+			if($value instanceof NamedTag and $offset !== $value->getName()){
+				throw new \RuntimeException("Offset doesn't match tag name");
+			}
 			$this->{$offset} = $value;
 		}elseif(isset($this->{$offset}) and $this->{$offset} instanceof Tag){
 			$this->{$offset}->setValue($value);
@@ -81,5 +84,12 @@ class Compound extends NamedTag implements \ArrayAccess{
 			}
 		}
 		$nbt->writeTag(new End);
+	}
+
+	public function __set($offset, $value){
+		if($value instanceof NamedTag and $value->getName() !== $offset){
+			throw new \RuntimeException("Tag name doesn't match offset");
+		}
+		$this->{$offset} = $value;
 	}
 }
