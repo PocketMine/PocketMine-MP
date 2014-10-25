@@ -315,10 +315,26 @@ class Config{
 	}
 
 	/**
-	 * @param $k
+	 * @param string|int $k
+	 * @param bool $lowercase
+	 * @return bool whether the config is changed
 	 */
-	public function remove($k){
-		unset($this->config[$k]);
+	public function remove($k, $lowercase = false){
+		if($lowercase === true){
+			$k = strotlower($k);
+			$keys = array_keys($this->config);
+			$offset = array_search($k, array_map("strtolower", $this->config));
+			if($offset !== false){
+				unset($this->config[$keys[$offset]]);
+				return true;
+			}
+			return false;
+		}
+		if(isset($this->config[$k])){
+			unset($this->config[$k]);
+			return true;
+		}
+		return false;
 	}
 
 	/**
