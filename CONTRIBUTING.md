@@ -164,18 +164,18 @@ Secondly, after an RFC is in the correct format for presentation and voting, it 
 
 For example, if an RFC is finalised in 2 days, it must still wait another 5 days. If an RFC is past the week(12 days, for example) period but still not finalised, then it will stay in the sunrise period.
 
-After an RFC is finalised, it can no longer be edited. No more commits to that branch will be accepted(Maintainers, please do not disobey this rule. No exceptions.) If you wish to make changes to a finalised RFC, you must wait until it exits it's **sunset** period (not sunrise!), and publish a new RFC or Pull Request, whichever is more appropriate.
+After an RFC is finalised, it can no longer be edited. No more commits to that branch will be accepted(Maintainers, please do not disobey this rule. No exceptions.) If you wish to make changes to a finalised RFC, you must wait until it exits its **sunset** period (not sunrise!), and publish a new RFC or Pull Request, whichever is more appropriate.
 
 The reason for a sunrise period and finalisation is so that the votes know what they are voting for. Developers will have time to accept pull requests from others, and voters will know that what they vote for will be the final implementation.
 
-Thirdly, the RFC will be voted upon. The voting period of an RFC will start 1 day after it's finalisation(with authorisation from a PocketMine-MP Maintainer). No more votes will be accepted after the voting period finishes.
+Thirdly, the RFC will be voted upon. The voting period of an RFC will start 1 day after its finalisation(with authorisation from a PocketMine-MP Maintainer). No more votes will be accepted after the voting period finishes.
 
 Fourthly and lastly, the sunset period starts immediately after voting finishes. Depending on the outcome of the vote, the RFC may either be merged (any conflicts during the merge is to be solved by PocketMine-MP Maintainers) or ignored.
 
 If significant challenges are introduced while trying to implement the change, the sunset period may take longer than expected.
 
 ### Voting on an RFC
-An RFC will be open to vote after 1 day of it's finalisation. When voting on an RFC, please make note of the following things:
+An RFC will be open to vote after 1 day of its finalisation. When voting on an RFC, please make note of the following things:
 - You must either vote with a **Yes.** or a **No.** No vague answers please.
 - Your vote consisting of either **Yes.** or **No.** *MUST* come at the start of your comment. If you demonstrate your opinion mid-comment or at the end of your comment, your vote will not be counted. **This is a strict rule, and NO exceptions to this will be made.**
 - You may write a comment explaining your vote and decision. You may omit an explanation if you wish to. No one liners with a yes or no please. If you do this, your vote will not be counted.
