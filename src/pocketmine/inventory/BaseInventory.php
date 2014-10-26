@@ -126,9 +126,10 @@ abstract class BaseInventory implements Inventory{
 			return false;
 		}elseif($item->getID() === 0 or $item->getCount() <= 0){
 			$this->clear($index, $source);
+			return true;
 		}
 
-		$holder = $this->getHolder();
+		$holder = $this->getHolder();s
 		if($holder instanceof Entity){
 			Server::getInstance()->getPluginManager()->callEvent($ev = new EntityInventoryChangeEvent($holder, $this->getItem($index), $item, $index));
 			if($ev->isCancelled()){
