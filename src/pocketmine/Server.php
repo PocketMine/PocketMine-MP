@@ -296,7 +296,7 @@ class Server{
 	 * @return string
 	 */
 	public function getServerName(){
-		return $this->getConfigString("motd", "Unknown server");
+		return $this->getConfigString("server-name", "Unknown server");
 	}
 
 	/**
