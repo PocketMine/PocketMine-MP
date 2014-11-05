@@ -449,7 +449,7 @@ class Item{
 			self::$list[self::BOW] = Bow::class;;
 
 			for($i = 0; $i < 256; ++$i){
-				if(Block::$list[$i] !== null){
+				if(isset(Block::$list[$i])){
 					self::$list[$i] = Block::$list[$i];
 				}
 			}
