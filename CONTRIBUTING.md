@@ -41,7 +41,7 @@ It is mainly [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accept
 * Files MUST NOT have an ending `?>` tag.
 * Code MUST use namespaces.
 * Strings SHOULD use the double quote `"` except when the single quote is required.
-* Calls to top namespace functions SHOULD follow a backslash `\`.
+* Using top namespace functions and constants SHOULD follow a backslash `\`.
 * Argument lists MAY NOT be split across multiple lines, except long arrays.
 
 ```php
@@ -54,7 +54,7 @@ class ExampleClass{
 	public $examplePublicVariable = "defaultValue";
 	private $examplePrivateVariable;
 	
-	public function __construct($firstArgument, &$secondArgument = null){
+	public function __construct($firstArgument, &$secondArgument = \null){
 		if($firstArgument === "exampleValue"){ //Remember to use === instead == when possible
 			//do things
 		}elseif($firstArgument === "otherValue"){
