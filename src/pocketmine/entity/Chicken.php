@@ -21,7 +21,64 @@
 
 namespace pocketmine\entity;
 
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\item\Item as ItemItem;
+use pocketmine\network\protocol\AddMobPacket;
+use pocketmine\network\protocol\SetEntityMotionPacket;
+use pocketmine\Player;
 
 class Chicken extends Animal{
-
+	const NETWORK_ID = 10;
+	public $width = 1.0;
+	public $length = 0.8;
+	public $height = 0.8;
+	public function getName(){
+		return "Chicken";
+	}
+	public function spawnTo(Player $player){
+		$pk = new AddMobPacket();
+		$pk->eid = $this->getID();
+		$pk->type = Chicken::NETWORK_ID;
+		$pk->x = $this->x;
+		$pk->y = $this->y;
+		$pk->z = $this->z;
+		$pk->yaw = $this->yaw;
+		$pk->pitch = $this->pitch;
+		$pk->metadata = $this->getData();
+		$player->dataPacket($pk);
+		$pk = new SetEntityMotionPacket();
+		$pk->entities = [
+			[$this->getID(), $this->motionX, $this->motionY, $this->motionZ]
+		];
+		$player->dataPacket($pk);
+		parent::spawnTo($player);
+	}
+	public function getData(){ //TODO
+		$flags = 0;
+		$flags |= $this->fireTicks > 0 ? 1 : 0;
+		//$flags |= ($this->crouched === true ? 0b10:0) << 1;
+		//$flags |= ($this->inAction === true ? 0b10000:0);
+		$d = [
+			0 => ["type" => 0, "value" => $flags],
+			1 => ["type" => 1, "value" => $this->airTicks],
+			16 => ["type" => 0, "value" => 0],
+			17 => ["type" => 6, "value" => [0, 0, 0]],
+		];
+		return $d;
+	}
+	public function getDrops(){
+		$drops = [
+			ItemItem::get(ItemItem::FEATHER, 0, 1)
+		];
+		if($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player){
+			if(mt_rand(0, 199) < 5){
+				switch(0, 0)){
+					case 0:
+						$drops[] = ItemItem::get(ItemItem::RAW_CHICKEN, 0, 1);
+						break;
+				}
+			}
+		}
+		return $drops;
+	}
 }
