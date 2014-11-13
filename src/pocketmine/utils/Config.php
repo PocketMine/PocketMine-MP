@@ -316,8 +316,8 @@ class Config{
 
 	/**
 	 * @param string|int $k
-	 * @param bool $lowercase
-	 * @return bool whether the config is changed
+	 * @param bool $lowercase If true, search the Config for all cases case-insensitively
+	 * @return bool Whether the config has been changed
 	 */
 	public function remove($k, $lowercase = false){
 		if($lowercase === true){
@@ -329,8 +329,7 @@ class Config{
 				return true;
 			}
 			return false;
-		}
-		if(isset($this->config[$k])){
+		}elseif(isset($this->config[$k])){
 			unset($this->config[$k]);
 			return true;
 		}
