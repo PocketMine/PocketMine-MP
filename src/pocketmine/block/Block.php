@@ -493,7 +493,7 @@ class Block extends Position implements Metadatable{
 		//TODO: Skeleton
 		//TODO: Slime
 		[Item::SPAWN_EGG, Zombie::NETWORK_ID],
-		//TODO: PigZombie
+		[Item::SPAWN_EGG, PigZombie::NETWORK_ID],
 		//TODO: Replace with Entity constants
 
 
