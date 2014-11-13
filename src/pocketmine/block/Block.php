@@ -481,7 +481,7 @@ class Block extends Position implements Metadatable{
 		[Item::COMPASS, 0],
 		[Item::MINECART, 0],
 		[Item::SPAWN_EGG, Villager::NETWORK_ID],
-		//[Item::SPAWN_EGG, 10], //Chicken
+		[Item::SPAWN_EGG, CHICKEN::NETWORK_ID],
 		[Item::SPAWN_EGG, COW::NETWORK_ID],
 		//[Item::SPAWN_EGG, 12], //Pig
 		//[Item::SPAWN_EGG, 13], //Sheep
