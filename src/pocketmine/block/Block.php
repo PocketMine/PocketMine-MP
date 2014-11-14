@@ -481,8 +481,8 @@ class Block extends Position implements Metadatable{
 		[Item::COMPASS, 0],
 		[Item::MINECART, 0],
 		[Item::SPAWN_EGG, Villager::NETWORK_ID],
-		//[Item::SPAWN_EGG, 10], //Chicken
-		//[Item::SPAWN_EGG, 11], //Cow
+		[Item::SPAWN_EGG, CHICKEN::NETWORK_ID],
+		[Item::SPAWN_EGG, COW::NETWORK_ID],
 		//[Item::SPAWN_EGG, 12], //Pig
 		//[Item::SPAWN_EGG, 13], //Sheep
 		//TODO: Wolf
@@ -493,7 +493,7 @@ class Block extends Position implements Metadatable{
 		//TODO: Skeleton
 		//TODO: Slime
 		[Item::SPAWN_EGG, Zombie::NETWORK_ID],
-		//TODO: PigZombie
+		[Item::SPAWN_EGG, PigZombie::NETWORK_ID],
 		//TODO: Replace with Entity constants
 
 
