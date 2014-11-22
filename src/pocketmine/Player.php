@@ -551,7 +551,17 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			return $level->getSafeSpawn();
 		}
 	}
-
+	
+	
+	public function getInAirTicks(){
+		return $this->inAirTicks;
+	}
+	
+	public function setInAirTicks($ticks){
+		$this->inAirTicks = $ticks;
+	}
+	
+	
 	/**
 	 * @param int $identifier
 	 *
