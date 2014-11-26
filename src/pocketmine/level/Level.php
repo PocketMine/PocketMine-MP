@@ -885,10 +885,11 @@ class Level implements ChunkManager, Metadatable{
 	 *
 	 * @param Vector3 $pos
 	 * @param boolean $cached
+	 * @param boolean $cache
 	 *
 	 * @return Block
 	 */
-	public function getBlock(Vector3 $pos, $cached = true){
+	public function getBlock(Vector3 $pos, $cached = true, $cache = true){
 		$blockId = 0;
 		$meta = 0;
 		$index = "{$pos->x}:{$pos->y}:{$pos->z}";
@@ -904,9 +905,15 @@ class Level implements ChunkManager, Metadatable{
 			$air->y = $pos->y;
 			$air->z = $pos->z;
 			$air->level = $this;
+			if(!$cache){
+				return $cache;
+			}
 			return $this->blockCache[$index] = $air;
 		}
 
+		if(!$cache){
+			Block::get($blockId, $meta, $this->temporalPosition->setComponents($pos->x, $pos->y, $pos->z));
+		}
 		return $this->blockCache[$index] = Block::get($blockId, $meta, $this->temporalPosition->setComponents($pos->x, $pos->y, $pos->z));
 	}
 
