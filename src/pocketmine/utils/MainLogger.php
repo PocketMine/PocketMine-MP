@@ -138,7 +138,22 @@ class MainLogger extends \AttachableThreadedLogger{
 		$errfile = \pocketmine\cleanPath($errfile);
 		$this->log($type, get_class($e).": \"$errstr\" ($errno) in \"$errfile\" at line $errline");
 
-		foreach(($trace = @\pocketmine\getTrace($trace === null ? 4 : 0, $trace)) as $i => $line){
+		$j = 0;
+		foreach($e->getTrace() as $trace){
+			$params = "";
+			if(isset($trace["args"]) or isset($trace["params"])){
+				if(isset($trace["args"])){
+					$args = $trace["args"];
+				}else{
+					$args = $trace["params"];
+				}
+				foreach($args as $name => $value){
+					$params .= (is_object($value) ? get_class($value)." ".(method_exists($value, "__toString") ? $value->__toString():"object"):gettype($value)." ".@strval($value)).", ";
+				}
+			}
+			$this->debug("#" . ($j++) . " " . \pocketmine\cleanPath($trace["file"]) . "(" . $trace["line"] . "): " . (isset($trace["class"]) ? $trace["class"] . ($trace["type"] === "dynamic" or $trace["type"] === "->" ? "->":"::") : "") . $trace["function"] . "(" . substr($params, 0, -2) . ")");
+		}
+		foreach(($trace = @\pocketmine\getTrace($trace === null ? 4 : 0, $trace, $j)) as $i => $line){
 			$this->debug($line);
 		}
 	}
