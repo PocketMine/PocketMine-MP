@@ -310,7 +310,7 @@ namespace pocketmine {
 		}
 	}
 
-	function getTrace($start = 1, $trace = null){
+	function getTrace($start = 1, $trace = null, $j = 0){
 		if($trace === null){
 			if(function_exists("xdebug_get_function_stack")){
 				$trace = array_reverse(xdebug_get_function_stack());
@@ -321,7 +321,6 @@ namespace pocketmine {
 		}
 
 		$messages = [];
-		$j = 0;
 		for($i = (int) $start; isset($trace[$i]); ++$i, ++$j){
 			$params = "";
 			if(isset($trace[$i]["args"]) or isset($trace[$i]["params"])){
