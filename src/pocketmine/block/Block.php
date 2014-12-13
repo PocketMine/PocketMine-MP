@@ -538,6 +538,8 @@ class Block extends Position implements Metadatable{
 	/** @var \SplFixedArray */
 	public static $solid = null;
 	/** @var \SplFixedArray */
+	public static $hardness = null;
+	/** @var \SplFixedArray */
 	public static $transparent = null;
 
 	protected $id;
@@ -579,6 +581,7 @@ class Block extends Position implements Metadatable{
 			self::$light = new \SplFixedArray(256);
 			self::$lightFilter = new \SplFixedArray(256);
 			self::$solid = new \SplFixedArray(256);
+			self::$hardness = new \SplFixedArray(256);
 			self::$transparent = new \SplFixedArray(256);
 			self::$list[self::AIR] = Air::class;
 			self::$list[self::STONE] = Stone::class;
@@ -739,6 +742,7 @@ class Block extends Position implements Metadatable{
 
 					self::$solid[$id] = $block->isSolid();
 					self::$transparent[$id] = $block->isTransparent();
+					self::$hardness[$id] = $block->getHardness();
 					self::$light[$id] = $block->getLightLevel();
 
 					if($block->isSolid()){
@@ -756,6 +760,9 @@ class Block extends Position implements Metadatable{
 					}
 				}else{
 					self::$lightFilter[$id] = 1;
+					for($data = 0; $data < 16; ++$data){
+						self::$fullList[($id << 4) | $data] = new Block($id, $data);
+					}
 				}
 			}
 		}
@@ -1015,12 +1022,11 @@ class Block extends Position implements Metadatable{
 	 * @return Block
 	 */
 	public function getSide($side, $step = 1){
-		$v = parent::getSide($side, $step);
 		if($this->isValid()){
-			return $this->getLevel()->getBlock($v);
+			return $this->getLevel()->getBlock(Vector3::getSide($side, $step));
 		}
 
-		return Block::get(Item::AIR, 0, $v);
+		return Block::get(Item::AIR, 0, new Position($v->x, $v->y, $v->z, null));
 	}
 
 	/**
