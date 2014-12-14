@@ -21,6 +21,7 @@
 
 namespace pocketmine\level;
 
+use pocketmine\level\conversor\pmf\LevelFormat;
 use pocketmine\level\format\PocketChunkParser;
 use pocketmine\nbt\NBT;
 use pocketmine\utils\Config;
