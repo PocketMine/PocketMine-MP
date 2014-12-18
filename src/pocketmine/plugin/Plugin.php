@@ -26,7 +26,6 @@ namespace pocketmine\plugin;
 
 use pocketmine\command\CommandExecutor;
 
-
 /**
  * It is recommended to use PluginBase for the actual plugin
  *
@@ -52,6 +51,12 @@ interface Plugin extends CommandExecutor{
 	public function onDisable();
 
 	public function isDisabled();
+	/**
+	 * Called when the plugin throws/triggers an exception during execution of commands, events or scheduled tasks before the exception is logged.
+	 * @param PluginError $error
+	 * @return bool whether the exception is consumed. If the error is consumed (handled, like events cancelled), PocketMine will not log the exception.
+	 */
+	public function onError(PluginError $error);
 
 	/**
 	 * Gets the plugin's data folder to save files and configuration

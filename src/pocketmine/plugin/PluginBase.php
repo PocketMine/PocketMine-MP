@@ -97,6 +97,14 @@ abstract class PluginBase implements Plugin{
 		return $this->isEnabled === false;
 	}
 
+	/**
+	 * @param PluginError $error
+	 * @return bool
+	 */
+	public function onError(PluginError $error){
+		return false;
+	}
+
 	public final function getDataFolder(){
 		return $this->dataFolder;
 	}

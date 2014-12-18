@@ -25,6 +25,7 @@
 namespace pocketmine\scheduler;
 
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginScheduleError;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\PluginException;
@@ -226,29 +227,50 @@ class ServerScheduler{
 	public function mainThreadHeartbeat($currentTick){
 		$this->currentTick = $currentTick;
 		while($this->isReady($this->currentTick)){
-			/** @var TaskHandler $task */
-			$task = $this->queue->extract();
-			if($task->isCancelled()){
-				unset($this->tasks[$task->getTaskId()]);
+			/** @var TaskHandler $handler */
+			$handler = $this->queue->extract();
+			if($handler->isCancelled()){
+				unset($this->tasks[$handler->getTaskId()]);
 				continue;
 			}else{
-				$task->timings->startTiming();
+				$handler->timings->startTiming();
 				try{
-					$task->run($this->currentTick);
+					$handler->run($this->currentTick);
 				}catch(\Exception $e){
-					Server::getInstance()->getLogger()->critical("Could not execute task " . $task->getTaskName() . ": " . $e->getMessage());
-					if(($logger = Server::getInstance()->getLogger()) instanceof MainLogger){
-						$logger->logException($e);
+					$server = Server::getInstance();
+					$task = $handler->getTask();
+					if($task instanceof PluginTask){
+						$plugin = $task->getOwner();
+						try{
+							$consumed = $plugin->onError(new PluginScheduleError($e, $task));
+						}catch(\Exception $e2){
+							$consumed = false;
+						}
+					}
+
+					if(!isset($consumed) or !$consumed){
+						$server->getLogger()->critical("Could not execute task " . $handler->getTaskName() . ": " . $e->getMessage());
+						if(($logger = $server->getLogger()) instanceof MainLogger){
+							$logger->logException($e);
+						}
+
+						if(isset($plugin, $e2)){
+							$server->getLogger()->critical("Could not pass the exception above to {$plugin->getDescription()->getFullName()}: {$e2->getMessage()}");
+							if($logger instanceof MainLogger){
+								$logger->logException($e2);
+							}
+						}
 					}
 				}
-				$task->timings->stopTiming();
+
+				$handler->timings->stopTiming();
 			}
-			if($task->isRepeating()){
-				$task->setNextRun($this->currentTick + $task->getPeriod());
-				$this->queue->insert($task, $this->currentTick + $task->getPeriod());
+			if($handler->isRepeating()){
+				$handler->setNextRun($this->currentTick + $handler->getPeriod());
+				$this->queue->insert($handler, $this->currentTick + $handler->getPeriod());
 			}else{
-				$task->remove();
-				unset($this->tasks[$task->getTaskId()]);
+				$handler->remove();
+				unset($this->tasks[$handler->getTaskId()]);
 			}
 		}
 
