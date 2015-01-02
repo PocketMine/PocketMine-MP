@@ -668,9 +668,23 @@ class PluginManager{
 			try{
 				$registration->callEvent($event);
 			}catch(\Exception $e){
-				$this->server->getLogger()->critical("Could not pass event " . $event->getEventName() . " to " . $registration->getPlugin()->getDescription()->getFullName() . ": " . $e->getMessage() . " on " . get_class($registration->getListener()));
-				if(($logger = $this->server->getLogger()) instanceof MainLogger){
-					$logger->logException($e);
+				try{
+					$consumed = $registration->getPlugin()->onError(new PluginEventError($e, $event, $registration));
+				}catch(\Exception $e2){
+					$consumed = false;
+				}
+
+				if(!isset($consumed) or !$consumed){
+					$this->server->getLogger()->critical("Could not pass event " . $event->getEventName() . " to " . ($fullName = $registration->getPlugin()->getDescription()->getFullName()) . ": " . $e->getMessage() . " on " . get_class($registration->getListener()));
+					if(($logger = $this->server->getLogger()) instanceof MainLogger){
+						$logger->logException($e);
+					}
+					if(isset($e2)){
+						$this->server->getLogger()->critical("Could not pass the exception above to $fullName: {$e2->getMessage()}");
+						if($logger instanceof MainLogger){
+							$logger->logException($e2);
+						}
+					}
 				}
 			}
 		}

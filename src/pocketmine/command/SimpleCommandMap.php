@@ -55,6 +55,7 @@ use pocketmine\command\defaults\TimingsCommand;
 use pocketmine\command\defaults\VanillaCommand;
 use pocketmine\command\defaults\VersionCommand;
 use pocketmine\command\defaults\WhitelistCommand;
+use pocketmine\plugin\PluginCommandError;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
 
@@ -182,9 +183,26 @@ class SimpleCommandMap implements CommandMap{
 		try{
 			$target->execute($sender, $sentCommandLabel, $args);
 		}catch(\Exception $e){
-			$this->server->getLogger()->critical("Unhandled exception executing command '" . $commandLine . "' in " . $target . ": " . $e->getMessage());
-			if(($logger = $sender->getServer()->getLogger()) instanceof MainLogger){
-				$logger->logException($e);
+			if($target instanceof PluginIdentifiableCommand){
+				$plugin = $target->getPlugin();
+				try{
+					$consumed = $plugin->onError(new PluginCommandError($e, $sender, $target, $sentCommandLabel, $args));
+				}catch(\Exception $e2){
+					$consumed = false;
+				}
+			}
+
+			if(!isset($consumed) or $consumed !== true){
+				$this->server->getLogger()->critical("Unhandled exception executing command '" . $commandLine . "' in " . $target . ": " . $e->getMessage());
+				if(($logger = $sender->getServer()->getLogger()) instanceof MainLogger){
+					$logger->logException($e);
+				}
+				if(isset($plugin, $e2)){
+					$this->server->getLogger()->critical("Could not pass the exception above to {$plugin->getDescription()->getFullName()}: {$e2->getMessage()}");
+					if(($logger = $sender->getServer()->getLogger()) instanceof MainLogger){
+						$logger->logException($e2);
+					}
+				}
 			}
 		}
 		$target->timings->stopTiming();
