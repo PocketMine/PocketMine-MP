@@ -85,6 +85,14 @@ class Block extends Position implements Metadatable{
 	const DANDELION = 37;
 	const ROSE = 38;
 	const POPPY = 38;
+	const BLUE_ORCHID = 38;
+	const ALLIUM = 38;
+	const AZURE_BLUET = 38;
+	const RED_TULIP = 38;
+	const ORANGE_TULIP = 38;
+	const WHITE_TULIP = 38;
+	const PINK_TULIP = 38;
+	const OXEYE_DAISY = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
 	const GOLD_BLOCK = 41;
@@ -384,14 +392,14 @@ class Block extends Position implements Metadatable{
 		[Item::END_PORTAL, 0],
 		[Item::DANDELION, 0],
 		[Item::POPPY, 0],
-		//TODO: blue orchid
-		//TODO: Allium
-		//TODO: Azure Bluet
-		//TODO: Red Tulip
-		//TODO: Orange Tulip
-		//TODO: White Tulip
-		//TODO: Pink Tulip
-		//TODO: Oxeye Daisy
+		[Item::POPPY, 1],
+		[Item::POPPY, 2],
+		[Item::POPPY, 3],
+		[Item::POPPY, 4],
+		[Item::POPPY, 5],
+		[Item::POPPY, 6],
+		[Item::POPPY, 7],
+		[Item::POPPY, 8],
 		//TODO: Lilac
 		//TODO: Double Tallgrass
 		//TODO: Large Fern
