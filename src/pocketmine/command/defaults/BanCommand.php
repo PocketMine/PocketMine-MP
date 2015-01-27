@@ -32,7 +32,7 @@ class BanCommand extends VanillaCommand{
 		parent::__construct(
 			$name,
 			"Prevents the specified player from using this server",
-			"/ban <player> [reason...]"
+			"/ban <player> [reason...] [time in sec.]"
 		);
 		$this->setPermission("pocketmine.command.ban.player");
 	}
@@ -49,9 +49,10 @@ class BanCommand extends VanillaCommand{
 		}
 
 		$name = array_shift($args);
-		$reason = implode(" ", $args);
-
-		$sender->getServer()->getNameBans()->addBan($name, $reason, null, $sender->getName());
+		$reason = $args[0];
+		$time = $args[1];
+		$time = new \DateTime()->setTimestamp(time()+$time);
+		$sender->getServer()->getNameBans()->addBan($name, $reason, $time, $sender->getName());
 
 		if(($player = $sender->getServer()->getPlayerExact($name)) instanceof Player){
 			$player->kick("Banned by admin.");
