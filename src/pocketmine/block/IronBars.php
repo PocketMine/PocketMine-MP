@@ -21,6 +21,7 @@
 
 namespace pocketmine\block;
 
+use pocketmine\item\Item;
 
 class IronBars extends Thin{
 
