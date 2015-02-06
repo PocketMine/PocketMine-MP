@@ -22,6 +22,9 @@
 namespace pocketmine\utils;
 
 abstract class TextWrapper{
+	const ALIGN_LEFT = 0;
+	const ALIGN_CENTRE = 1;
+	const ALIGN_RIGHT = 2;
 
 	private static $characterWidths = [
 		4, 2, 5, 6, 6, 6, 6, 3, 5, 5, 5, 6, 2, 6, 2, 6,
@@ -78,5 +81,56 @@ abstract class TextWrapper{
 		}
 
 		return $result;
+	}
+
+	public static function align($lines, $mode){
+		switch($mode){
+			case self::ALIGN_LEFT:
+				return implode("\n", $lines);
+
+			case self::ALIGN_CENTRE:
+				$lengths = array_map(self::class . "::getLength", $lines);
+				$maxLength = max($lengths);
+				$output = "";
+				foreach($lines as $i => $line){
+					$padding = ($maxLength - $lengths[$i]) / 2;
+					$spaces = (int) ($padding / 4); // 4 is the length of a space
+					$output .= str_repeat(" ", $spaces);
+
+					$output .= $line;
+					$output .= "\n";
+				}
+				return substr($output, 0, -1);
+
+			case self::ALIGN_RIGHT:
+				$lengths = array_map(self::class . "::getLength", $lines);
+				$maxLength = max($lengths);
+				$output = "";
+				foreach($lines as $i => $line){
+					$padding = $maxLength - $lengths[$i];
+					$spaces = (int) ($padding / 4); // 4 is the length of a space
+					$output .= str_repeat(" ", $spaces);
+
+					$output .= $line;
+					$output .= "\n";
+				}
+				return substr($output, 0, -1);
+
+			default:
+				throw new \InvalidArgumentException("Unknown alignment mode $mode");
+		}
+	}
+
+	public static function getLength($line, $utfValue = 8){
+		$len = 0;
+		for($i = 0; $i < strlen($line); $i++){
+			if(isset(self::$allowedCharsArray[$char = $line{$i}])){
+				$len += self::$allowedCharsArray[$char];
+			}
+			else{
+				$len += $utfValue; // assumed value
+			}
+		}
+		return $len;
 	}
 }
