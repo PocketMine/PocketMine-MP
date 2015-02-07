@@ -29,6 +29,8 @@ if [ "$PHP_BINARY" == "" ]; then
 		PHP_BINARY=$(type -p php)
 	else
 		echo "Couldn't find a working PHP binary, please use the installer."
+		echo "Exiting in 10 seconds"
+		sleep 10
 		exit 1
 	fi
 fi
