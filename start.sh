@@ -29,6 +29,8 @@ if [ "$PHP_BINARY" == "" ]; then
 		PHP_BINARY=$(type -p php)
 	else
 		echo "Couldn't find a working PHP binary, please use the installer."
+		echo "Exiting in 10 seconds"
+		sleep 10
 		exit 1
 	fi
 fi
@@ -40,6 +42,8 @@ if [ "$POCKETMINE_FILE" == "" ]; then
 		POCKETMINE_FILE="./src/pocketmine/PocketMine.php"
 	else
 		echo "Couldn't find a valid PocketMine-MP installation"
+		echo "Exiting in 10 seconds"
+		sleep 10
 		exit 1
 	fi
 fi
