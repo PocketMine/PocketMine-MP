@@ -2022,7 +2022,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				Server::broadcastPacket($this->getViewers(), $pk);
 				break;
 			case ProtocolInfo::RESPAWN_PACKET:
-				if($this->spawned === false or $this->dead === false){
+				if($this->spawned === false or $this->dead === false or $this->isBanned()){
 					break;
 				}
 
