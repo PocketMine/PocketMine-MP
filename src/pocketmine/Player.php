@@ -2381,6 +2381,9 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 	 * @param string $message
 	 */
 	public function sendMessage($message){
+		if(is_array($message)) {
+			$message = implode("\n",$message);
+		}
 		if($this->removeFormat !== false){
 			$message = TextWrapper::wrap(TextFormat::clean($message));
 		}
