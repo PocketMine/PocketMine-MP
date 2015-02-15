@@ -55,7 +55,7 @@ class Torch extends Flowable{
 				0 => 0,
 			];
 
-			if($this->getSide($faces[$side])->isTransparent() === true and !($side === 0 and in_array($this->getSide(0)->getId(),array(self::FENCE,self::GLASS,self::STONE_WALL)))){
+			if($this->getSide($faces[$side])->isTransparent() === true and !($side === 0 and in_array($this->getSide(0)->getId(),[self::FENCE,self::GLASS,self::STONE_WALL]))){
 				$this->getLevel()->useBreakOn($this);
 
 				return Level::BLOCK_UPDATE_NORMAL;
@@ -78,7 +78,7 @@ class Torch extends Flowable{
 			$this->getLevel()->setBlock($block, $this, true, true);
 
 			return true;
-		}elseif($this->getSide(0)->isTransparent() === false or in_array($this->getSide(0)->getId(),array(self::FENCE,self::GLASS,self::STONE_WALL))){
+		}elseif($this->getSide(0)->isTransparent() === false or in_array($this->getSide(0)->getId(),[self::FENCE,self::GLASS,self::STONE_WALL])){
 			$this->meta = 0;
 			$this->getLevel()->setBlock($block, $this, true, true);
 
