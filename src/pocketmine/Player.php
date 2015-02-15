@@ -493,12 +493,12 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 	public function getNameTag(){
 		return $this->nameTag;
 	}
-
 	/**
 	 * @param string $name
+	 * @param int    $align default TextWrapper::ALIGN_LEFT
 	 */
-	public function setNameTag($name){
-		$this->nameTag = $name;
+	public function setNameTag($name, $align = TextWrapper::ALIGN_LEFT){
+		$this->nameTag = (($align === TextWrapper::ALIGN_LEFT) ? $name : TextWrapper::align(explode("\n", $name), $align));
 		$this->despawnFromAll();
 		if($this->spawned === true){
 			$this->spawnToAll();
