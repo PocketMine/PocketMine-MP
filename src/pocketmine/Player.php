@@ -1278,8 +1278,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 						if($this->inAirTicks < 100){
 							$this->setMotion(new Vector3(0, $expectedVelocity, 0));
 						}else{
-							$this->kick("Flying is not enabled on this server");
-							return false;
+							if($this->kick("Flying is not enabled on this server")) return false;
 						}
 					}
 				}
