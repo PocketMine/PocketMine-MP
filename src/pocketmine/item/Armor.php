@@ -23,7 +23,16 @@
 namespace pocketmine\item;
 
 abstract class Armor extends Item{
-
+	
+	const HELMET = 0;
+	const CHESTPLATE = 1;
+	const LEGGINGS = 2;
+	const BOOTS = 3;
+	
+	const CAP = self::HELMET;
+	const TUNIC = self::CHESTPLATE;
+	const PANTS = self::LEGGINGS;
+	
 	public function getMaxStackSize(){
 		return 1;
 	}
