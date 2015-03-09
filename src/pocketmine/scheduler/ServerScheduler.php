@@ -24,6 +24,7 @@
  */
 namespace pocketmine\scheduler;
 
+use pocketmine\event\plugin\PluginTaskErrorEvent;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
@@ -227,10 +228,16 @@ class ServerScheduler{
 				try{
 					$task->run($this->currentTick);
 				}catch(\Exception $e){
-					Server::getInstance()->getLogger()->critical("Could not execute task " . $task->getTaskName() . ": " . $e->getMessage());
-					$logger = Server::getInstance()->getLogger();
-					if($logger instanceof MainLogger){
-						$logger->logException($e);
+					$server = Server::getInstance();
+					$server->getLogger()->critical("Could not execute task " . $task->getTaskName() . ": " . $e->getMessage());
+					if($task instanceof PluginTask){
+						$server->getPluginManager()->callEvent($ev = new PluginTaskErrorEvent($task, $e));
+						$ev->log();
+					}else{
+						$logger = $server->getLogger();
+						if($logger instanceof MainLogger){
+							$logger->logException($e);
+						}
 					}
 				}
 				$task->timings->stopTiming();

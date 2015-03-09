@@ -55,6 +55,7 @@ use pocketmine\command\defaults\TimingsCommand;
 use pocketmine\command\defaults\VanillaCommand;
 use pocketmine\command\defaults\VersionCommand;
 use pocketmine\command\defaults\WhitelistCommand;
+use pocketmine\event\plugin\PluginCommandErrorEvent;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
 
@@ -183,9 +184,14 @@ class SimpleCommandMap implements CommandMap{
 			$target->execute($sender, $sentCommandLabel, $args);
 		}catch(\Exception $e){
 			$this->server->getLogger()->critical("Unhandled exception executing command '" . $commandLine . "' in " . $target . ": " . $e->getMessage());
-			$logger = $sender->getServer()->getLogger();
-			if($logger instanceof MainLogger){
-				$logger->logException($e);
+			if($target instanceof PluginIdentifiableCommand){
+				$sender->getServer()->getPluginManager()->callEvent($ev = new PluginCommandErrorEvent($e, $target, $sender, $sentCommandLabel, $args));
+				$ev->log();
+			}else{
+				$logger = $sender->getServer()->getLogger();
+				if($logger instanceof MainLogger){
+					$logger->logException($e);
+				}
 			}
 		}
 		$target->timings->stopTiming();
