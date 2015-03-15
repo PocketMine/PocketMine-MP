@@ -108,7 +108,7 @@ class FallingSand extends Entity{
 			$this->motionY *= 1 - $this->drag;
 			$this->motionZ *= $friction;
 
-			$pos = new Vector3(floor($this->x), round($this->y), floor($this->z));
+			$pos = new Vector3((int)$this->x, round($this->y), (int)$this->z);
 
 			if($this->onGround){
 				$this->kill();
