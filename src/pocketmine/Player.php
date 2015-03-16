@@ -2064,7 +2064,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				Server::broadcastPacket($this->getViewers(), $pk);
 				break;
 			case ProtocolInfo::RESPAWN_PACKET:
-				if($this->spawned === false or $this->dead === false){
+				if($this->spawned === false or $this->dead === false or $this->isBanned()){
 					break;
 				}
 
@@ -2646,6 +2646,11 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 		if($ev->getDeathMessage() != ""){
 			$this->server->broadcast($ev->getDeathMessage(), Server::BROADCAST_CHANNEL_USERS);
 		}
+
+		if($this->server->isHardcore()) {
+			$this->setBanned(true);
+		}
+
 	}
 
 	public function setHealth($amount){
