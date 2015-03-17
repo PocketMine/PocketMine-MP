@@ -109,13 +109,15 @@ abstract class BaseInventory implements Inventory{
 			$items = array_slice($items, 0, $this->size, true);
 		}
 
-		for($i = 0; $i < $this->size; ++$i){
+		for ($i = 0; $i < $this->size; ++$i){
 			if(!isset($items[$i])){
 				if(isset($this->slots[$i])){
 					$this->clear($i);
 				}
 			}else{
-				$this->setItem($i, $items[$i]);
+				if (!$this->setItem($i, $items[$i])){
+					$this->clear($i);
+				}
 			}
 		}
 	}
