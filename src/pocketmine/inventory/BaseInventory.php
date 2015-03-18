@@ -115,7 +115,7 @@ abstract class BaseInventory implements Inventory{
 					$this->clear($i);
 				}
 			}else{
-				if (!$this->setItem($i, $items[$i])){
+				if(!$this->setItem($i, $items[$i])){
 					$this->clear($i);
 				}
 			}

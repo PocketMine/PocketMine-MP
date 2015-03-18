@@ -78,6 +78,7 @@ class DoubleChestInventory extends ChestInventory implements InventoryHolder{
 			$items = array_slice($items, 0, $this->size, true);
 		}
 
+		parent::setContents($items);
 
 		for($i = 0; $i < $this->size; ++$i){
 			if(!isset($items[$i])){
