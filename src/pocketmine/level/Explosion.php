@@ -27,6 +27,7 @@ use pocketmine\event\entity\EntityDamageByBlockEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
+use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\item\Item;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Math;
@@ -50,6 +51,7 @@ class Explosion{
 	 * @var Block[]
 	 */
 	public $affectedBlocks = [];
+	public $updatedHashes = [];
 	public $stepLen = 0.3;
 	/** @var Entity|Block */
 	private $what;
@@ -206,6 +208,16 @@ class Explosion{
 				}
 			}
 			$this->level->setBlockIdAt($block->x, $block->y, $block->z, 0);
+			for($side = 0; $side < 6; ++$side){
+				$sideBlock = $block->getSide($side);
+				if($sideBlock instanceof Block and !isset($this->affectedBlocks[$index = Level::blockHash($sideBlock->x, $sideBlock->y, $sideBlock->z)]) and !in_array($index,$this->updatedHashes)){
+					$this->updatedHashes[] = $index;
+					$this->level->getServer()->getPluginManager()->callEvent($ev = new BlockUpdateEvent($sideBlock));
+					if(!$ev->isCancelled()){
+						$ev->getBlock()->onUpdate(Level::BLOCK_UPDATE_NORMAL);
+					}
+				}
+			}
 			$send[] = new Vector3($block->x - $source->x, $block->y - $source->y, $block->z - $source->z);
 		}
 		$pk = new ExplodePacket();
