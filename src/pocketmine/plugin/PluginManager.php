@@ -28,6 +28,9 @@ use pocketmine\event\Event;
 use pocketmine\event\EventPriority;
 use pocketmine\event\HandlerList;
 use pocketmine\event\Listener;
+use pocketmine\event\plugin\PluginDisableErrorEvent;
+use pocketmine\event\plugin\PluginEnableErrorEvent;
+use pocketmine\event\plugin\PluginEventErrorEvent;
 use pocketmine\event\Timings;
 use pocketmine\event\TimingsHandler;
 use pocketmine\permission\Permissible;
@@ -558,10 +561,8 @@ class PluginManager{
 				}
 				$plugin->getPluginLoader()->enablePlugin($plugin);
 			}catch(\Exception $e){
-				$logger = Server::getInstance()->getLogger();
-				if($logger instanceof MainLogger){
-					$logger->logException($e);
-				}
+				$this->callEvent($ev = new PluginEnableErrorEvent($plugin, $e));
+				$ev->log();
 				$this->disablePlugin($plugin);
 			}
 		}
@@ -632,10 +633,8 @@ class PluginManager{
 			try{
 				$plugin->getPluginLoader()->disablePlugin($plugin);
 			}catch(\Exception $e){
-				$logger = Server::getInstance()->getLogger();
-				if($logger instanceof MainLogger){
-					$logger->logException($e);
-				}
+				$this->callEvent($ev = new PluginDisableErrorEvent($plugin, $e));
+				$ev->log();
 			}
 
 			$this->server->getScheduler()->cancelTasks($plugin);
@@ -670,10 +669,20 @@ class PluginManager{
 				$registration->callEvent($event);
 			}catch(\Exception $e){
 				$this->server->getLogger()->critical("Could not pass event " . $event->getEventName() . " to " . $registration->getPlugin()->getDescription()->getFullName() . ": " . $e->getMessage() . " on " . get_class($registration->getListener()));
-				$logger = $this->server->getLogger();
-				if($logger instanceof MainLogger){
-					$logger->logException($e);
+				if($event instanceof PluginEventErrorEvent and $event->getEvent() instanceof PluginEventErrorEvent){ // RECURSION: handler of a PluginEventErrorEvent error event threw an error!
+					$logger = $this->server->getLogger();
+					if($logger instanceof MainLogger){
+						$logger->logException($e);
+					}
+					// log the older events too
+					$event->setLogger($logger);
+					/** @var PluginEventErrorEvent $subevent */
+					$subevent = $event->getEvent();
+					$subevent->setLogger($logger);
 				}
+				else{}
+				$this->callEvent($errEv = new PluginEventErrorEvent($registration, $e, $event));
+				$errEv->log();
 			}
 		}
 	}
