@@ -2578,100 +2578,102 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 		$cause = $this->getLastDamageCause();
 
-		switch($cause->getCause()){
-			case EntityDamageEvent::CAUSE_ENTITY_ATTACK:
-				if($cause instanceof EntityDamageByEntityEvent){
-					$e = $cause->getDamager();
-					if($e instanceof Player){
-						$message = "death.attack.player";
-						$params[] = $e->getName();
-						break;
-					}elseif($e instanceof Living){
-						$message = "death.attack.mob";
-						$params[] = $e->getName();
-						break;
+		if($cause != null){
+			switch($cause->getCause()){
+				case EntityDamageEvent::CAUSE_ENTITY_ATTACK:
+					if($cause instanceof EntityDamageByEntityEvent){
+						$e = $cause->getDamager();
+						if($e instanceof Player){
+							$message = "death.attack.player";
+							$params[] = $e->getName();
+							break;
+						}elseif($e instanceof Living){
+							$message = "death.attack.mob";
+							$params[] = $e->getName();
+							break;
+						}else{
+							$params[] = "Unknown";
+						}
+					}
+					break;
+				case EntityDamageEvent::CAUSE_PROJECTILE:
+					if($cause instanceof EntityDamageByEntityEvent){
+						$e = $cause->getDamager();
+						if($e instanceof Living){
+							$message = "death.attack.arrow";
+							$params[] = $e->getName();
+							break;
+						}else{
+							$params[] = "Unknown";
+						}
+					}
+					break;
+				case EntityDamageEvent::CAUSE_SUICIDE:
+					$message = "death.attack.generic";
+					break;
+				case EntityDamageEvent::CAUSE_VOID:
+					$message = "death.attack.outOfWorld";
+					break;
+				case EntityDamageEvent::CAUSE_FALL:
+					if($cause instanceof EntityDamageEvent){
+						if($cause->getFinalDamage() > 2){
+							$message = "death.fell.accident.generic";
+							break;
+						}
+					}
+					$message = "death.attack.fall";
+					break;
+			
+				case EntityDamageEvent::CAUSE_SUFFOCATION:
+					$message = "death.attack.inWall";
+					break;
+			
+				case EntityDamageEvent::CAUSE_LAVA:
+					$message = "death.attack.lava";
+					break;
+			
+				case EntityDamageEvent::CAUSE_FIRE:
+					$message = "death.attack.onFire";
+					break;
+			
+				case EntityDamageEvent::CAUSE_FIRE_TICK:
+					$message = "death.attack.inFire";
+					break;
+			
+				case EntityDamageEvent::CAUSE_DROWNING:
+					$message = "death.attack.drown";
+					break;
+			
+				case EntityDamageEvent::CAUSE_CONTACT:
+					if($cause instanceof EntityDamageByBlockEvent){
+						if($cause->getDamager()->getId() === Block::CACTUS){
+							$message = "death.attack.cactus";
+						}
+					}
+					break;
+			
+				case EntityDamageEvent::CAUSE_BLOCK_EXPLOSION:
+				case EntityDamageEvent::CAUSE_ENTITY_EXPLOSION:
+					if($cause instanceof EntityDamageByEntityEvent){
+						$e = $cause->getDamager();
+						if($e instanceof Living){
+							$message = "death.attack.explosion.player";
+							$params[] = $e->getName();
+						}
 					}else{
-						$params[] = "Unknown";
+						$message = "death.attack.explosion";
 					}
-				}
-				break;
-			case EntityDamageEvent::CAUSE_PROJECTILE:
-				if($cause instanceof EntityDamageByEntityEvent){
-					$e = $cause->getDamager();
-					if($e instanceof Living){
-						$message = "death.attack.arrow";
-						$params[] = $e->getName();
-						break;
-					}else{
-						$params[] = "Unknown";
-					}
-				}
-				break;
-			case EntityDamageEvent::CAUSE_SUICIDE:
-				$message = "death.attack.generic";
-				break;
-			case EntityDamageEvent::CAUSE_VOID:
-				$message = "death.attack.outOfWorld";
-				break;
-			case EntityDamageEvent::CAUSE_FALL:
-				if($cause instanceof EntityDamageEvent){
-					if($cause->getFinalDamage() > 2){
-						$message = "death.fell.accident.generic";
-						break;
-					}
-				}
-				$message = "death.attack.fall";
-				break;
-
-			case EntityDamageEvent::CAUSE_SUFFOCATION:
-				$message = "death.attack.inWall";
-				break;
-
-			case EntityDamageEvent::CAUSE_LAVA:
-				$message = "death.attack.lava";
-				break;
-
-			case EntityDamageEvent::CAUSE_FIRE:
-				$message = "death.attack.onFire";
-				break;
-
-			case EntityDamageEvent::CAUSE_FIRE_TICK:
-				$message = "death.attack.inFire";
-				break;
-
-			case EntityDamageEvent::CAUSE_DROWNING:
-				$message = "death.attack.drown";
-				break;
-
-			case EntityDamageEvent::CAUSE_CONTACT:
-				if($cause instanceof EntityDamageByBlockEvent){
-					if($cause->getDamager()->getId() === Block::CACTUS){
-						$message = "death.attack.cactus";
-					}
-				}
-				break;
-
-			case EntityDamageEvent::CAUSE_BLOCK_EXPLOSION:
-			case EntityDamageEvent::CAUSE_ENTITY_EXPLOSION:
-				if($cause instanceof EntityDamageByEntityEvent){
-					$e = $cause->getDamager();
-					if($e instanceof Living){
-						$message = "death.attack.explosion.player";
-						$params[] = $e->getName();
-					}
-				}else{
-					$message = "death.attack.explosion";
-				}
-				break;
-
-			case EntityDamageEvent::CAUSE_MAGIC:
-				$message = "death.attack.magic";
-				break;
-
-			case EntityDamageEvent::CAUSE_CUSTOM:
-
-			default:
-
+					break;
+			
+				case EntityDamageEvent::CAUSE_MAGIC:
+					$message = "death.attack.magic";
+					break;
+			
+				case EntityDamageEvent::CAUSE_CUSTOM:
+			
+				default:
+			
+			}
 		}
 
 		if($this->dead){
