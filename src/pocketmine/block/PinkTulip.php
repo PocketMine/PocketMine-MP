@@ -27,14 +27,14 @@ use pocketmine\Player;
 
 class PinkTulip extends Flowable{
 
-	protected $id = self::PINKTULIP;
+	protected $id = self::PINK_TULIP;
 
 	public function __construct(){
 
 	}
 
 	public function getName(){
-		return "PinkTulip";
+		return "Pink Tulip";
 	}
 
 

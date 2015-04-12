@@ -27,14 +27,14 @@ use pocketmine\Player;
 
 class AzureBluet extends Flowable{
 
-	protected $id = self::AZUREBLUET;
+	protected $id = self::AZURE_BLUET;
 
 	public function __construct(){
 
 	}
 
 	public function getName(){
-		return "AzureBluet";
+		return "Azure Bluet";
 	}
 
 
