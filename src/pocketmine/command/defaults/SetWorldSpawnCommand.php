@@ -23,6 +23,7 @@ namespace pocketmine\command\defaults;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\event\TranslationContainer;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -32,8 +33,8 @@ class SetWorldSpawnCommand extends VanillaCommand{
 	public function __construct($name){
 		parent::__construct(
 			$name,
-			"Sets a worlds's spawn point. If no coordinates are specified, the player's coordinates will be used.",
-			"/setworldspawn OR /setworldspawn <x> <y> <z>"
+			"%pocketmine.command.setworldspawn.description",
+			"%commands.setworldspawn.usage"
 		);
 		$this->setPermission("pocketmine.command.setworldspawn");
 	}
@@ -56,14 +57,14 @@ class SetWorldSpawnCommand extends VanillaCommand{
 			$level = $sender->getServer()->getDefaultLevel();
 			$pos = new Vector3($this->getInteger($sender, $args[0]), $this->getInteger($sender, $args[1]), $this->getInteger($sender, $args[2]));
 		}else{
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+			$sender->sendMessage(new TranslationContainer("commands.generic.usage", [$this->usageMessage]));
 
 			return true;
 		}
 
 		$level->setSpawnLocation($pos);
 
-		Command::broadcastCommandMessage($sender, "Set world " . $level->getName() . "'s spawnpoint to " . $pos->x . ", " . $pos->y . ", " . $pos->z);
+		Command::broadcastCommandMessage($sender, new TranslationContainer("commands.setworldspawn.success", [round($pos->x, 2), round($pos->y, 2), round($pos->z, 2)]));
 
 		return true;
 	}

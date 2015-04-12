@@ -274,7 +274,12 @@ class AxisAlignedBB{
 			$v6 = null;
 		}
 
-		$vector = $v1;
+		$vector = null;
+
+
+		if($v1 !== null and ($vector === null or $pos1->distanceSquared($v1) < $pos1->distanceSquared($vector))){
+			$vector = $v1;
+		}
 
 		if($v2 !== null and ($vector === null or $pos1->distanceSquared($v2) < $pos1->distanceSquared($vector))){
 			$vector = $v2;
@@ -317,5 +322,9 @@ class AxisAlignedBB{
 		}
 
 		return MovingObjectPosition::fromBlock(0, 0, 0, $f, $vector);
+	}
+
+	public function __toString(){
+		return "AxisAlignedBB({$this->minX}, {$this->minY}, {$this->minZ}, {$this->maxX}, {$this->maxY}, {$this->maxZ})";
 	}
 }

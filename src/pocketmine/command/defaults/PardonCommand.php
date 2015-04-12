@@ -23,6 +23,7 @@ namespace pocketmine\command\defaults;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\event\TranslationContainer;
 use pocketmine\utils\TextFormat;
 
 class PardonCommand extends VanillaCommand{
@@ -30,8 +31,8 @@ class PardonCommand extends VanillaCommand{
 	public function __construct($name){
 		parent::__construct(
 			$name,
-			"Allows the specified player to use this server",
-			"/pardon <player>"
+			"%pocketmine.command.unban.player.description",
+			"%commands.unban.usage"
 		);
 		$this->setPermission("pocketmine.command.unban.player");
 	}
@@ -42,14 +43,14 @@ class PardonCommand extends VanillaCommand{
 		}
 
 		if(count($args) !== 1){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+			$sender->sendMessage(new TranslationContainer("commands.generic.usage", [$this->usageMessage]));
 
 			return false;
 		}
 
 		$sender->getServer()->getNameBans()->remove($args[0]);
 
-		Command::broadcastCommandMessage($sender, "Pardoned " . $args[0]);
+		Command::broadcastCommandMessage($sender, new TranslationContainer("commands.unban.success", [$args[0]]));
 
 		return true;
 	}

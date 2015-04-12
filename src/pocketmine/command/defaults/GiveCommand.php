@@ -23,6 +23,7 @@ namespace pocketmine\command\defaults;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\event\TranslationContainer;
 use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -32,8 +33,8 @@ class GiveCommand extends VanillaCommand{
 	public function __construct($name){
 		parent::__construct(
 			$name,
-			"Gives the specified player a certain amount of items",
-			"/give <player> <item[:damage]> [amount]"
+			"%pocketmine.command.give.description",
+			"%pocketmine.command.give.usage"
 		);
 		$this->setPermission("pocketmine.command.give");
 	}
@@ -44,9 +45,9 @@ class GiveCommand extends VanillaCommand{
 		}
 
 		if(count($args) < 2){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+			$sender->sendMessage(new TranslationContainer("commands.generic.usage", [$this->usageMessage]));
 
-			return false;
+			return true;
 		}
 
 		$player = $sender->getServer()->getPlayer($args[0]);
@@ -59,13 +60,8 @@ class GiveCommand extends VanillaCommand{
 		}
 
 		if($player instanceof Player){
-			if(($player->getGamemode() & 0x01) === 0x01){
-				$sender->sendMessage(TextFormat::RED . "Player is in creative mode");
-
-				return true;
-			}
-			if($item->getId() == 0){
-				$sender->sendMessage(TextFormat::RED . "There is no item called " . $args[1] . ".");
+			if($item->getId() === 0){
+				$sender->sendMessage(new TranslationContainer(TextFormat::RED . "%commands.give.item.notFound", [$args[1]]));
 
 				return true;
 			}
@@ -73,13 +69,16 @@ class GiveCommand extends VanillaCommand{
 			//TODO: overflow
 			$player->getInventory()->addItem(clone $item);
 		}else{
-			$sender->sendMessage(TextFormat::RED . "Can't find player " . $args[0]);
+			$sender->sendMessage(new TranslationContainer(TextFormat::RED . "%commands.generic.player.notFound"));
 
 			return true;
 		}
 
-		Command::broadcastCommandMessage($sender, "Gave " . $player->getName() . " " . $item->getCount() . " of " . $item->getName() . " (" . $item->getId() . ":" . $item->getDamage() . ")");
-
+		Command::broadcastCommandMessage($sender, new TranslationContainer("%commands.give.success", [
+			$item->getName() . " (" . $item->getId() . ":" . $item->getDamage() . ")",
+			(string) $item->getCount(),
+			$player->getName()
+		]));
 		return true;
 	}
 }

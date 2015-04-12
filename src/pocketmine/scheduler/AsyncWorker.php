@@ -26,16 +26,10 @@ use pocketmine\Worker;
 class AsyncWorker extends Worker{
 
 	public function run(){
-		if(!interface_exists("ClassLoader", false)){
-			require(\pocketmine\PATH . "src/spl/ClassLoader.php");
-		}
-		if(!class_exists("BaseClassLoader", false)){
-			require(\pocketmine\PATH . "src/spl/BaseClassLoader.php");
-		}
-		$autoloader = new \BaseClassLoader();
-		$autoloader->addPath(\pocketmine\PATH . "src");
-		$autoloader->addPath(\pocketmine\PATH . "src" . DIRECTORY_SEPARATOR . "spl");
-		$autoloader->register(true);
+		$this->registerClassLoader();
+
+		global $store;
+		$store = [];
 	}
 
 	public function start($options = PTHREADS_INHERIT_NONE){

@@ -22,6 +22,7 @@
 namespace pocketmine\command\defaults;
 
 use pocketmine\command\CommandSender;
+use pocketmine\event\TranslationContainer;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -30,8 +31,8 @@ class TellCommand extends VanillaCommand{
 	public function __construct($name){
 		parent::__construct(
 			$name,
-			"Sends a private message to the given player",
-			"/tell <player> <message>",
+			"%pocketmine.command.tell.description",
+			"%commands.message.usage",
 			["w", "msg"]
 		);
 		$this->setPermission("pocketmine.command.tell");
@@ -43,7 +44,7 @@ class TellCommand extends VanillaCommand{
 		}
 
 		if(count($args) < 2){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+			$sender->sendMessage(new TranslationContainer("commands.generic.usage", [$this->usageMessage]));
 
 			return false;
 		}
@@ -52,11 +53,16 @@ class TellCommand extends VanillaCommand{
 
 		$player = $sender->getServer()->getPlayer($name);
 
+		if($player === $sender){
+			$sender->sendMessage(new TranslationContainer(TextFormat::RED . "%commands.message.sameTarget"));
+			return true;
+		}
+
 		if($player instanceof Player){
-			$sender->sendMessage("[me -> " . $player->getName() . "] " . implode(" ", $args));
-			$player->sendMessage("[" . $sender->getName() . " -> me] " . implode(" ", $args));
+			$sender->sendMessage("[".$this->getName()." -> " . $player->getDisplayName() . "] " . implode(" ", $args));
+			$player->sendMessage("[" . ($sender instanceof Player ? $sender->getDisplayName() : $sender->getName()) . " -> ".$this->getName()."] " . implode(" ", $args));
 		}else{
-			$sender->sendMessage("There's no player by that name online.");
+			$sender->sendMessage(new TranslationContainer("commands.generic.player.notFound"));
 		}
 
 		return true;

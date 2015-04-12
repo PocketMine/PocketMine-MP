@@ -192,6 +192,8 @@ class Item{
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
 
+	const REDSTONE_BLOCK = 152;
+
 	const QUARTZ_BLOCK = 155;
 	const QUARTZ_STAIRS = 156;
 	const DOUBLE_WOOD_SLAB = 157;
@@ -227,6 +229,8 @@ class Item{
 	const FENCE_GATE_JUNGLE = 185;
 	const FENCE_GATE_DARK_OAK = 186;
 	const FENCE_GATE_ACACIA = 187;
+
+	const GRASS_PATH = 198;
 
 	const PODZOL = 243;
 	const BEETROOT_BLOCK = 244;
@@ -316,7 +320,7 @@ class Item{
 	const WOODEN_DOOR = 324;
 	const BUCKET = 325;
 
-	const MINECART = 329;
+	const MINECART = 328;
 
 	const IRON_DOOR = 330;
 	const REDSTONE = 331;
@@ -339,8 +343,8 @@ class Item{
 
 	const CLOCK = 347;
 	const GLOWSTONE_DUST = 348;
-	//const RAW_FISH = 349;
-	//const COOKED_FISH = 350;
+	const RAW_FISH = 349;
+	const COOKED_FISH = 350;
 	const DYE = 351;
 	const BONE = 352;
 	const SUGAR = 353;
@@ -348,7 +352,7 @@ class Item{
 	const BED = 355;
 
 
-	//const COOKIE = 357;
+	const COOKIE = 357;
 
 
 	const SHEARS = 359;
@@ -431,6 +435,7 @@ class Item{
 			self::$list[self::LEATHER_CAP] = LeatherCap::class;
 			self::$list[self::LEATHER_TUNIC] = LeatherTunic::class;
 			self::$list[self::LEATHER_PANTS] = LeatherPants::class;
+			self::$list[self::LEATHER_BOOTS] = LeatherBoots::class;
 			self::$list[self::CHAIN_HELMET] = ChainHelmet::class;
 			self::$list[self::CHAIN_CHESTPLATE] = ChainChestplate::class;
 			self::$list[self::CHAIN_LEGGINGS] = ChainLeggings::class;
@@ -477,6 +482,9 @@ class Item{
 			self::$list[self::FLINT_STEEL] = FlintSteel::class;
 			self::$list[self::SHEARS] = Shears::class;
 			self::$list[self::BOW] = Bow::class;
+
+			self::$list[self::RAW_FISH] = Fish::class;
+			self::$list[self::COOKED_FISH] = CookedFish::class;
 
 			for($i = 0; $i < 256; ++$i){
 				if(Block::$list[$i] !== null){

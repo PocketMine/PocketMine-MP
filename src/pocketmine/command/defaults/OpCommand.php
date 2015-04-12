@@ -23,6 +23,7 @@ namespace pocketmine\command\defaults;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\event\TranslationContainer;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -31,8 +32,8 @@ class OpCommand extends VanillaCommand{
 	public function __construct($name){
 		parent::__construct(
 			$name,
-			"Gives the specified player operator status",
-			"/op <player>"
+			"%pocketmine.command.op.description",
+			"%commands.op.usage"
 		);
 		$this->setPermission("pocketmine.command.op.give");
 	}
@@ -43,7 +44,7 @@ class OpCommand extends VanillaCommand{
 		}
 
 		if(count($args) === 0){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+			$sender->sendMessage(new TranslationContainer("commands.generic.usage", [$this->usageMessage]));
 
 			return false;
 		}
@@ -51,12 +52,11 @@ class OpCommand extends VanillaCommand{
 		$name = array_shift($args);
 
 		$player = $sender->getServer()->getOfflinePlayer($name);
-		Command::broadcastCommandMessage($sender, "Opped " . $player->getName());
+		Command::broadcastCommandMessage($sender, new TranslationContainer("commands.op.success", [$player->getName()]));
 		if($player instanceof Player){
-			$player->sendMessage("You are now op!");
+			$player->sendMessage(TextFormat::GRAY . "You are now op!");
 		}
 		$player->setOp(true);
-
 		return true;
 	}
 }

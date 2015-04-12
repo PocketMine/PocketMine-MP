@@ -128,9 +128,8 @@ class Vector3{
 
 	public function floor(){
 		$x = (int) $this->x;
-		$y = (int) $this->y;
 		$z = (int) $this->z;
-		return new Vector3($this->x >= $x ? $x : $x - 1, $this->y >= $y ? $y : $y - 1, $this->z >= $z ? $z : $z - 1);
+		return new Vector3($this->x >= $x ? $x : $x - 1, (int) round($this->y), $this->z >= $z ? $z : $z - 1);
 	}
 
 	public function round(){
@@ -229,6 +228,10 @@ class Vector3{
 		);
 	}
 
+	public function equals(Vector3 $v){
+		return $this->x == $v->x and $this->y == $v->y and $this->z == $v->z;
+	}
+
 	/**
 	 * Returns a new vector with x value equal to the second parameter, along the line between this vector and the
 	 * passed in vector, or null if not possible.
@@ -243,7 +246,7 @@ class Vector3{
 		$yDiff = $v->y - $this->y;
 		$zDiff = $v->z - $this->z;
 
-		if(($xDiff ** 2) < 1){
+		if(($xDiff ** 2) < 0.0000001){
 			return null;
 		}
 
@@ -270,7 +273,7 @@ class Vector3{
 		$yDiff = $v->y - $this->y;
 		$zDiff = $v->z - $this->z;
 
-		if(($yDiff ** 2) < 1){
+		if(($yDiff ** 2) < 0.0000001){
 			return null;
 		}
 
@@ -297,7 +300,7 @@ class Vector3{
 		$yDiff = $v->y - $this->y;
 		$zDiff = $v->z - $this->z;
 
-		if(($zDiff ** 2) < 1){
+		if(($zDiff ** 2) < 0.0000001){
 			return null;
 		}
 

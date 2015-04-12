@@ -22,6 +22,7 @@
 namespace pocketmine\command\defaults;
 
 use pocketmine\command\CommandSender;
+use pocketmine\event\TranslationContainer;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
@@ -30,8 +31,8 @@ class DefaultGamemodeCommand extends VanillaCommand{
 	public function __construct($name){
 		parent::__construct(
 			$name,
-			"Set the default gamemode",
-			"/defaultgamemode <mode>"
+			"%pocketmine.command.defaultgamemode.description",
+			"%commands.defaultgamemode.usage"
 		);
 		$this->setPermission("pocketmine.command.defaultgamemode");
 	}
@@ -42,7 +43,7 @@ class DefaultGamemodeCommand extends VanillaCommand{
 		}
 
 		if(count($args) === 0){
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->usageMessage);
+			$sender->sendMessage(new TranslationContainer("commands.generic.usage", [$this->usageMessage]));
 
 			return false;
 		}
@@ -51,7 +52,7 @@ class DefaultGamemodeCommand extends VanillaCommand{
 
 		if($gameMode !== -1){
 			$sender->getServer()->setConfigInt("gamemode", $gameMode);
-			$sender->sendMessage("Default game mode set to " . strtolower(Server::getGamemodeString($gameMode)));
+			$sender->sendMessage(new TranslationContainer("commands.defaultgamemode.success", [Server::getGamemodeString($gameMode)]));
 		}else{
 			$sender->sendMessage("Unknown game mode");
 		}

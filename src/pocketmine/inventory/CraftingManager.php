@@ -94,13 +94,13 @@ class CraftingManager{
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::WOOD_SLAB, Planks::OAK, 6)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::OAK, 3)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::SPRUCE_WOOD_STAIRS, 0, 4)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::SPRUCE, 6)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::WOOD_SLAB, Planks::SPRUCE, 6)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::SPRUCE, 3)));
-		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::SPRUCE_WOOD_STAIRS, 0, 4)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::BIRCH, 6)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::BIRCH_WOOD_STAIRS, 0, 4)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::BIRCH, 6)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::WOOD_SLAB, Planks::BIRCH, 6)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::BIRCH, 3)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::JUNGLE_WOOD_STAIRS, 0, 4)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::JUNGLE, 6)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::WOOD_SLAB, Planks::JUNGLE, 6)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::JUNGLE, 3)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::ACACIA_WOOD_STAIRS, 0, 4)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::ACACIA, 6)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::WOOD_SLAB, Planks::ACACIA, 6)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::ACACIA, 3)));
-		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::DARK_OAK_WOOD_STAIRS, 0, 4)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::ACACIA, 6)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::DARK_OAK_WOOD_STAIRS, 0, 4)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::DARK_OAK, 6)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::WOOD_SLAB, Planks::DARK_OAK, 6)))->addIngredient(Item::get(Item::WOODEN_PLANK, Planks::DARK_OAK, 3)));
 
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::BUCKET, 0, 1)))->addIngredient(Item::get(Item::IRON_INGOT, 0, 3)));
@@ -128,7 +128,8 @@ class CraftingManager{
 		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::NETHER_BRICK, 0, 1), Item::get(Item::NETHERRACK, 0, 1)));
 		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::COOKED_PORKCHOP, 0, 1), Item::get(Item::RAW_PORKCHOP, 0, 1)));
 		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::BRICK, 0, 1), Item::get(Item::CLAY, 0, 1)));
-		//$this->registerRecipe(new FurnaceRecipe(Item::get(Item::COOKED_FISH, 0, 1), Item::get(Item::RAW_FISH, 0, 1)));
+		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::COOKED_FISH, 0, 1), Item::get(Item::RAW_FISH, 0, 1)));
+		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::COOKED_FISH, 1, 1), Item::get(Item::RAW_FISH, 1, 1)));
 		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::DYE, 2, 1), Item::get(Item::CACTUS, 0, 1)));
 		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::DYE, 1, 1), Item::get(Item::RED_MUSHROOM, 0, 1)));
 		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::STEAK, 0, 1), Item::get(Item::RAW_BEEF, 0, 1)));
@@ -272,7 +273,7 @@ class CraftingManager{
 			Item::IRON_BLOCK => Item::IRON_INGOT,
 			Item::DIAMOND_BLOCK => Item::DIAMOND,
 			Item::EMERALD_BLOCK => Item::EMERALD,
-			//Item::REDSTONE_BLOCK => Item::REDSTONE_DUST,
+			Item::REDSTONE_BLOCK => Item::REDSTONE_DUST,
 			Item::COAL_BLOCK => Item::COAL,
 			Item::HAY_BALE => Item::WHEAT,
 		];
