@@ -2461,7 +2461,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 	public function sendTranslation($message, array $parameters = []){
 		$pk = new TextPacket();
 		$pk->type = TextPacket::TYPE_TRANSLATION;
-		$pk->message = $this->server->getLanguage()->translateString($message, [], "pocketmine.");
+		$pk->message = $this->server->getLanguage()->translateString($message, $parameters, "pocketmine.");
 		foreach($parameters as $i => $p){
 			$parameters[$i] = $this->server->getLanguage()->translateString($p, [], "pocketmine.");
 		}
