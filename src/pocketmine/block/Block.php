@@ -86,6 +86,14 @@ class Block extends Position implements Metadatable{
 	const DANDELION = 37;
 	const ROSE = 38;
 	const POPPY = 38;
+	const BLUEORCHID = 38;-
+	const ALLIUM = 38;
+	const AZUREBLUET = 38;
+	const REDTULIP = 38;
+	const ORANGETULIP = 38;
+	const WHITETULIP = 38;
+	const PINKTULIP = 38;
+	const OXEYEDAISY = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
 	const GOLD_BLOCK = 41;
@@ -390,14 +398,14 @@ class Block extends Position implements Metadatable{
 		[Item::END_PORTAL, 0],
 		[Item::DANDELION, 0],
 		[Item::POPPY, 0],
-		//TODO: blue orchid
-		//TODO: Allium
-		//TODO: Azure Bluet
-		//TODO: Red Tulip
-		//TODO: Orange Tulip
-		//TODO: White Tulip
-		//TODO: Pink Tulip
-		//TODO: Oxeye Daisy
+		[Item::BLUEORCHID,1]
+		[Item::ALLIUM,2]
+		[Item::AZUREBLUET,3]
+		[Item::REDTULIP,4]
+		[Item::ORANGETULIP,5]
+		[Item::WHITETULIP,6]
+		[Item::PINKTULIP,7]
+		[Item::OXEYEDAISY,8]
 		//TODO: Lilac
 		//TODO: Double Tallgrass
 		//TODO: Large Fern
@@ -624,6 +632,14 @@ class Block extends Position implements Metadatable{
 			self::$list[self::WOOL] = Wool::class;
 			self::$list[self::DANDELION] = Dandelion::class;
 			self::$list[self::POPPY] = Poppy::class;
+			self::$list[self::BLUEORCHID] = BlueOrchid::class;
+			self::$list[self::ALLIUM] = Allium::class;
+			self::$list[self::AZUREBLUET] = AzureBluet::class;
+			self::$list[self::REDTULIP] = RedTulip::class;
+			self::$list[self::ORANGETULIP] = OrangeTulip::class;
+			self::$list[self::WHITETULIP] = WhiteTulip::class;
+			self::$list[self::PINKTULIP] = PinkTulip::class;
+			self::$list[self::OXEYEDAISY] = OxeyeDaisy::class;
 			self::$list[self::BROWN_MUSHROOM] = BrownMushroom::class;
 			self::$list[self::RED_MUSHROOM] = RedMushroom::class;
 			self::$list[self::GOLD_BLOCK] = Gold::class;
