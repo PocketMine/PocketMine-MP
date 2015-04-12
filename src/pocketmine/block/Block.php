@@ -398,14 +398,14 @@ class Block extends Position implements Metadatable{
 		[Item::END_PORTAL, 0],
 		[Item::DANDELION, 0],
 		[Item::POPPY, 0],
-		[Item::BLUEORCHID,1]
-		[Item::ALLIUM,2]
-		[Item::AZUREBLUET,3]
-		[Item::REDTULIP,4]
-		[Item::ORANGETULIP,5]
-		[Item::WHITETULIP,6]
-		[Item::PINKTULIP,7]
-		[Item::OXEYEDAISY,8]
+		[Item::BLUEORCHID, 1],
+		[Item::ALLIUM, 2],
+		[Item::AZUREBLUET, 3],
+		[Item::REDTULIP, 4],
+		[Item::ORANGETULIP, 5],
+		[Item::WHITETULIP, 6],
+		[Item::PINKTULIP, 7],
+		[Item::OXEYEDAISY, 8],
 		//TODO: Lilac
 		//TODO: Double Tallgrass
 		//TODO: Large Fern
