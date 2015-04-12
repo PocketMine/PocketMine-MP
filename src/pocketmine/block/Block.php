@@ -86,7 +86,7 @@ class Block extends Position implements Metadatable{
 	const DANDELION = 37;
 	const ROSE = 38;
 	const POPPY = 38;
-	const BLUEORCHID = 38;-
+	const BLUEORCHID = 38;
 	const ALLIUM = 38;
 	const AZUREBLUET = 38;
 	const REDTULIP = 38;
