@@ -25,16 +25,38 @@ use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
-class OrangeTulip extends Flowable{
+class Flowers extends Flowable{
+	const POPPY = 0;
+	const BLUE_ORCHID = 1;
+	const ALLIUM = 2;
+	const AZURE_BLUET = 3;
+	const RED_TULIP = 4;
+	const ORANGE_TULIP = 5;
+	const WHITE_TULIP = 6;
+	const PINK_TULIP = 7;
+	const OXEYE_DAISY = 8;
 
-	protected $id = self::ORANGE_TULIP;
+	protected $id = self::FLOWERS;
 
-	public function __construct(){
-
+	public function __construct(§meta = 0){
+		$this->meta = $meta;
+		
 	}
 
 	public function getName(){
-		return "Orange Tulip";
+		static $names = [
+			self::POPPY => "Poppy";
+			self::BLUE_ORCHID => "Blue Orchid";
+			self::ALLIUM => "Allium";
+			self::AZURE_BLUET => "Azure Bluet";
+			self::RED_TULIP => "Red Tulip";
+			self::ORANGE_TULIP => "Orange Tulip";
+			self::WHITE_TULIP => "White Tulip";
+			self::PINK_TULIP => "Pink Tulip";
+			self::OXEYE_DAISY => "Oxeye Daisy";
+			9 => "Unknown Flower"
+		];
+		return $names[$this->meta & 0x09];
 	}
 
 
