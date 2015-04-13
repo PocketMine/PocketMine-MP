@@ -45,16 +45,16 @@ class Flower extends Flowable{
 
 	public function getName(){
 		static $names = [
-			self::POPPY => "Poppy";
-			self::BLUE_ORCHID => "Blue Orchid";
-			self::ALLIUM => "Allium";
-			self::AZURE_BLUET => "Azure Bluet";
-			self::RED_TULIP => "Red Tulip";
-			self::ORANGE_TULIP => "Orange Tulip";
-			self::WHITE_TULIP => "White Tulip";
-			self::PINK_TULIP => "Pink Tulip";
-			self::OXEYE_DAISY => "Oxeye Daisy";
-			9 => "Unknown Flower"
+			self::POPPY => "Poppy",
+			self::BLUE_ORCHID => "Blue Orchid",
+			self::ALLIUM => "Allium",
+			self::AZURE_BLUET => "Azure Bluet",
+			self::RED_TULIP => "Red Tulip",
+			self::ORANGE_TULIP => "Orange Tulip",
+			self::WHITE_TULIP => "White Tulip",
+			self::PINK_TULIP => "Pink Tulip",
+			self::OXEYE_DAISY => "Oxeye Daisy",
+			9 => "Unknown Flower",
 		];
 		return $names[$this->meta & 0x09];
 	}
