@@ -25,7 +25,7 @@ use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
-class Flowers extends Flowable{
+class Flower extends Flowable{
 	const POPPY = 0;
 	const BLUE_ORCHID = 1;
 	const ALLIUM = 2;
@@ -36,7 +36,7 @@ class Flowers extends Flowable{
 	const PINK_TULIP = 7;
 	const OXEYE_DAISY = 8;
 
-	protected $id = self::FLOWERS;
+	protected $id = self::FLOWER;
 
 	public function __construct(§meta = 0){
 		$this->meta = $meta;

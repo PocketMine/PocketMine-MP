@@ -84,7 +84,7 @@ class Block extends Position implements Metadatable{
 	const DEAD_BUSH = 32;
 	const WOOL = 35;
 	const DANDELION = 37;
-	const FLOWERS = 38;
+	const FLOWER = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
 	const GOLD_BLOCK = 41;
@@ -388,15 +388,15 @@ class Block extends Position implements Metadatable{
 		[Item::FURNACE, 0],
 		[Item::END_PORTAL, 0],
 		[Item::DANDELION, 0],
-		[Item::FLOWERS, 0],
-		[Item::FLOWERS, 1],
-		[Item::FLOWERS, 2],
-		[Item::FLOWERS, 3],
-		[Item::FLOWERS, 4],
-		[Item::FLOWERS, 5],
-		[Item::FLOWERS, 6],
-		[Item::FLOWERS, 7],
-		[Item::FLOWERS, 8],
+		[Item::FLOWER, 0],
+		[Item::FLOWER, 1],
+		[Item::FLOWER, 2],
+		[Item::FLOWER, 3],
+		[Item::FLOWER, 4],
+		[Item::FLOWER, 5],
+		[Item::FLOWER, 6],
+		[Item::FLOWER, 7],
+		[Item::FLOWER, 8],
 		//TODO: Lilac
 		//TODO: Double Tallgrass
 		//TODO: Large Fern
@@ -622,7 +622,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::DEAD_BUSH] = DeadBush::class;
 			self::$list[self::WOOL] = Wool::class;
 			self::$list[self::DANDELION] = Dandelion::class;
-			self::$list[self::FLOWERS] = Flowers::class;
+			self::$list[self::FLOWER] = Flower::class;
 			self::$list[self::BROWN_MUSHROOM] = BrownMushroom::class;
 			self::$list[self::RED_MUSHROOM] = RedMushroom::class;
 			self::$list[self::GOLD_BLOCK] = Gold::class;
