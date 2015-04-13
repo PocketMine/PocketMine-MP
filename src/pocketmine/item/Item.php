@@ -75,8 +75,7 @@ class Item{
 	const DEAD_BUSH = 32;
 	const WOOL = 35;
 	const DANDELION = 37;
-	const ROSE = 38;
-	const POPPY = 38;
+	const RED_FLOWER = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
 	const GOLD_BLOCK = 41;
