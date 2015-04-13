@@ -36,7 +36,7 @@ class Flower extends Flowable{
 	const PINK_TULIP = 7;
 	const OXEYE_DAISY = 8;
 
-	protected $id = self::FLOWER;
+	protected $id = self::RED_FLOWER;
 
 	public function __construct(§meta = 0){
 		$this->meta = $meta;
