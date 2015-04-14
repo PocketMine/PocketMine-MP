@@ -387,7 +387,7 @@ abstract class TextFormat{
 	 * @return string
 	 */
 	public static function toANSI($string){
-		if(!\is_array($string)){
+		if(!is_array($string)){
 			$string = self::tokenize($string);
 		}
 		$newString = "";
