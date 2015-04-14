@@ -57,7 +57,7 @@ abstract class TextFormat{
 	 * @return array
 	 */
 	public static function tokenize($string){
-		return preg_split("/(§[0123456789abcdefklmnor])/", $string, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+		return \preg_split("/(§[0123456789abcdefklmnor])/", $string, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 	}
 
 	/**
@@ -68,11 +68,11 @@ abstract class TextFormat{
 	 *
 	 * @return mixed
 	 */
-	public static function clean($string, $removeFormat = true){
+	public static function clean($string, $removeFormat = \true){
 		if($removeFormat){
-			return preg_replace(["/§[0123456789abcdefklmnor]/", "/\x1b[\\(\\][[0-9;\\[\\(]+[Bm]/"], "", $string);
+			return \preg_replace(["/§[0123456789abcdefklmnor]/", "/\x1b[\\(\\][[0-9;\\[\\(]+[Bm]/"], "", $string);
 		}
-		return preg_replace("/\x1b[\\(\\][[0-9;\\[\\(]+[Bm]/", "", $string);
+		return \preg_replace("/\x1b[\\(\\][[0-9;\\[\\(]+[Bm]/", "", $string);
 	}
 
 	/**
@@ -83,17 +83,17 @@ abstract class TextFormat{
 	 * @return string
 	 */
 	public static function toJSON($string){
-		if(!is_array($string)){
+		if(!\is_array($string)){
 			$string = self::tokenize($string);
 		}
 		$newString = [];
 		$pointer =& $newString;
 		$color = "white";
-		$bold = false;
-		$italic = false;
-		$underlined = false;
-		$strikethrough = false;
-		$obfuscated = false;
+		$bold = \false;
+		$italic = \false;
+		$underlined = \false;
+		$strikethrough = \false;
+		$obfuscated = \false;
 		$index = 0;
 
 		foreach($string as $token){
@@ -106,52 +106,52 @@ abstract class TextFormat{
 				if($color !== "white"){
 					$pointer["color"] = $color;
 				}
-				if($bold !== false){
-					$pointer["bold"] = true;
+				if($bold !== \false){
+					$pointer["bold"] = \true;
 				}
-				if($italic !== false){
-					$pointer["italic"] = true;
+				if($italic !== \false){
+					$pointer["italic"] = \true;
 				}
-				if($underlined !== false){
-					$pointer["underlined"] = true;
+				if($underlined !== \false){
+					$pointer["underlined"] = \true;
 				}
-				if($strikethrough !== false){
-					$pointer["strikethrough"] = true;
+				if($strikethrough !== \false){
+					$pointer["strikethrough"] = \true;
 				}
-				if($obfuscated !== false){
-					$pointer["obfuscated"] = true;
+				if($obfuscated !== \false){
+					$pointer["obfuscated"] = \true;
 				}
 				++$index;
 			}
 			switch($token){
 				case TextFormat::BOLD:
-					if($bold === false){
-						$pointer["bold"] = true;
-						$bold = true;
+					if($bold === \false){
+						$pointer["bold"] = \true;
+						$bold = \true;
 					}
 					break;
 				case TextFormat::OBFUSCATED:
-					if($obfuscated === false){
-						$pointer["obfuscated"] = true;
-						$obfuscated = true;
+					if($obfuscated === \false){
+						$pointer["obfuscated"] = \true;
+						$obfuscated = \true;
 					}
 					break;
 				case TextFormat::ITALIC:
-					if($italic === false){
-						$pointer["italic"] = true;
-						$italic = true;
+					if($italic === \false){
+						$pointer["italic"] = \true;
+						$italic = \true;
 					}
 					break;
 				case TextFormat::UNDERLINE:
-					if($underlined === false){
-						$pointer["underlined"] = true;
-						$underlined = true;
+					if($underlined === \false){
+						$pointer["underlined"] = \true;
+						$underlined = \true;
 					}
 					break;
 				case TextFormat::STRIKETHROUGH:
-					if($strikethrough === false){
-						$pointer["strikethrough"] = true;
-						$strikethrough = true;
+					if($strikethrough === \false){
+						$pointer["strikethrough"] = \true;
+						$strikethrough = \true;
 					}
 					break;
 				case TextFormat::RESET:
@@ -159,25 +159,25 @@ abstract class TextFormat{
 						$pointer["color"] = "white";
 						$color = "white";
 					}
-					if($bold !== false){
-						$pointer["bold"] = false;
-						$bold = false;
+					if($bold !== \false){
+						$pointer["bold"] = \false;
+						$bold = \false;
 					}
-					if($italic !== false){
-						$pointer["italic"] = false;
-						$italic = false;
+					if($italic !== \false){
+						$pointer["italic"] = \false;
+						$italic = \false;
 					}
-					if($underlined !== false){
-						$pointer["underlined"] = false;
-						$underlined = false;
+					if($underlined !== \false){
+						$pointer["underlined"] = \false;
+						$underlined = \false;
 					}
-					if($strikethrough !== false){
-						$pointer["strikethrough"] = false;
-						$strikethrough = false;
+					if($strikethrough !== \false){
+						$pointer["strikethrough"] = \false;
+						$strikethrough = \false;
 					}
-					if($obfuscated !== false){
-						$pointer["obfuscated"] = false;
-						$obfuscated = false;
+					if($obfuscated !== \false){
+						$pointer["obfuscated"] = \false;
+						$obfuscated = \false;
 					}
 					break;
 
@@ -260,7 +260,7 @@ abstract class TextFormat{
 			}
 		}
 
-		return json_encode($newString, JSON_UNESCAPED_SLASHES);
+		return \json_encode($newString, JSON_UNESCAPED_SLASHES);
 	}
 
 	/**
@@ -271,7 +271,7 @@ abstract class TextFormat{
 	 * @return string
 	 */
 	public static function toHTML($string){
-		if(!is_array($string)){
+		if(!\is_array($string)){
 			$string = self::tokenize($string);
 		}
 		$newString = "";
@@ -299,7 +299,7 @@ abstract class TextFormat{
 					++$tokens;
 					break;
 				case TextFormat::RESET:
-					$newString .= str_repeat("</span>", $tokens);
+					$newString .= \str_repeat("</span>", $tokens);
 					$tokens = 0;
 					break;
 
@@ -374,7 +374,7 @@ abstract class TextFormat{
 			}
 		}
 
-		$newString .= str_repeat("</span>", $tokens);
+		$newString .= \str_repeat("</span>", $tokens);
 
 		return $newString;
 	}
@@ -387,80 +387,78 @@ abstract class TextFormat{
 	 * @return string
 	 */
 	public static function toANSI($string){
-		if(!is_array($string)){
+		if(!\is_array($string)){
 			$string = self::tokenize($string);
 		}
-
 		$newString = "";
 		foreach($string as $token){
 			switch($token){
 				case TextFormat::BOLD:
-					$newString .= Terminal::$FORMAT_BOLD;
 					break;
 				case TextFormat::OBFUSCATED:
-					$newString .= Terminal::$FORMAT_OBFUSCATED;
+					$newString .= "\x1b[8m";
 					break;
 				case TextFormat::ITALIC:
-					$newString .= Terminal::$FORMAT_ITALIC;
+					$newString .= "\x1b[3m";
 					break;
 				case TextFormat::UNDERLINE:
-					$newString .= Terminal::$FORMAT_UNDERLINE;
+					$newString .= "\x1b[4m";
 					break;
 				case TextFormat::STRIKETHROUGH:
-					$newString .= Terminal::$FORMAT_STRIKETHROUGH;
+					$newString .= "\x1b[9m";
 					break;
 				case TextFormat::RESET:
-					$newString .= Terminal::$FORMAT_RESET;
+					$newString .= "\x1b[0m";
 					break;
 
 				//Colors
 				case TextFormat::BLACK:
-					$newString .= Terminal::$COLOR_BLACK;
+					$newString .= "\x1b[0;30m";
 					break;
 				case TextFormat::DARK_BLUE:
-					$newString .= Terminal::$COLOR_DARK_BLUE;
+					$newString .= "\x1b[0;34m";
 					break;
 				case TextFormat::DARK_GREEN:
-					$newString .= Terminal::$COLOR_DARK_GREEN;
+					$newString .= "\x1b[0;32m";
 					break;
 				case TextFormat::DARK_AQUA:
-					$newString .= Terminal::$COLOR_DARK_AQUA;
+					$newString .= "\x1b[0;36m";
 					break;
 				case TextFormat::DARK_RED:
-					$newString .= Terminal::$COLOR_DARK_RED;
+					$newString .= "\x1b[0;31m";
 					break;
 				case TextFormat::DARK_PURPLE:
-					$newString .= Terminal::$COLOR_PURPLE;
+					$newString .= "\x1b[0;35m";
 					break;
 				case TextFormat::GOLD:
-					$newString .= Terminal::$COLOR_GOLD;
+					$newString .= "\x1b[0;33m";
 					break;
 				case TextFormat::GRAY:
-					$newString .= Terminal::$COLOR_GRAY;
+					$newString .= "\x1b[0;37m";
 					break;
 				case TextFormat::DARK_GRAY:
-					$newString .= Terminal::$COLOR_DARK_GRAY;
+					$newString .= "\x1b[30;1m";
 					break;
 				case TextFormat::BLUE:
-					$newString .= Terminal::$COLOR_BLUE;
+					$newString .= "\x1b[34;1m";
 					break;
 				case TextFormat::GREEN:
-					$newString .= Terminal::$COLOR_GREEN;
+					$newString .= "\x1b[32;1m";
 					break;
 				case TextFormat::AQUA:
-					$newString .= Terminal::$COLOR_AQUA;
+					$newString .= "\x1b[36;1m";
 					break;
 				case TextFormat::RED:
-					$newString .= Terminal::$COLOR_RED;
+					$newString .= "\x1b[31;1m";
 					break;
 				case TextFormat::LIGHT_PURPLE:
-					$newString .= Terminal::$COLOR_LIGHT_PURPLE;
+					$newString .= "\x1b[35;1m";
 					break;
 				case TextFormat::YELLOW:
-					$newString .= Terminal::$COLOR_YELLOW;
+					$newString .= "\x1b[33;1m";
 					break;
 				case TextFormat::WHITE:
-					$newString .= Terminal::$COLOR_WHITE;
+					$newString .= "\x1b[37;1m";
 					break;
 				default:
 					$newString .= $token;
