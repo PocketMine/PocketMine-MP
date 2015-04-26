@@ -1414,6 +1414,7 @@ abstract class Entity extends Location implements Metadatable{
 
 			foreach($this->hasSpawned as $player){
 				$player->addEntityMovement($this->getId(), $this->x, $this->y + $this->getEyeHeight(), $this->z, $this->yaw, $this->pitch, $this->yaw);
+				$this->spawnTo($player);
 			}
 
 			return true;
