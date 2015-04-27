@@ -19,32 +19,10 @@
  *
  */
 
-namespace pocketmine\event\server;
+namespace pocketmine\event\server\packet;
 
-use pocketmine\event;
-use pocketmine\event\Cancellable;
-use pocketmine\network\protocol\DataPacket;
-use pocketmine\Player;
+use pocketmine\event\server\ServerEvent;
 
-/**
- * @deprecated
- */
-class DataPacketSendEvent extends ServerEvent implements Cancellable{
-	public static $handlerList = null;
+abstract class PacketEvent extends ServerEvent{
 
-	private $packet;
-	private $player;
-
-	public function __construct(Player $player, DataPacket $packet){
-		$this->packet = $packet;
-		$this->player = $player;
-	}
-
-	public function getPacket(){
-		return $this->packet;
-	}
-
-	public function getPlayer(){
-		return $this->player;
-	}
 }

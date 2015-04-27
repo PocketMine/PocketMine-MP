@@ -2339,30 +2339,19 @@ class Server{
 		$this->network->resetStatistics();
 	}
 
-	/**
-	 * @param string $address
-	 * @param int    $port
-	 * @param string $payload
-	 *
-	 * TODO: move this to Network
-	 */
-	public function handlePacket($address, $port, $payload){
+	public function handleQueryPacket($payload, $address, $port){
 		try{
-			if(strlen($payload) > 2 and substr($payload, 0, 2) === "\xfe\xfd" and $this->queryHandler instanceof QueryHandler){
+			if($this->queryHandler !== null){
 				$this->queryHandler->handle($address, $port, $payload);
 			}
 		}catch(\Exception $e){
-			if(\pocketmine\DEBUG > 1){
-				if($this->logger instanceof MainLogger){
-					$this->logger->logException($e);
-				}
+			if(\pocketmine\DEBUG > 1 and $this->logger instanceof MainLogger){
+				$this->logger->logException($e);
 			}
 
 			$this->getNetwork()->blockAddress($address, 600);
 		}
-		//TODO: add raw packet events
 	}
-
 
 	/**
 	 * Tries to execute a server tick

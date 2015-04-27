@@ -24,12 +24,15 @@ namespace pocketmine\network\protocol;
 #include <rules/DataPacket.h>
 
 
+use pocketmine\math\Vector3;
+use pocketmine\Player;
+
 class StartGamePacket extends DataPacket{
 	public static $pool = [];
 	public static $next = 0;
 
 	public $seed;
-	public $generator;
+	public $generator; //0 old, 1 infinite, 2 flat
 	public $gamemode;
 	public $eid;
 	public $spawnX;
@@ -38,6 +41,22 @@ class StartGamePacket extends DataPacket{
 	public $x;
 	public $y;
 	public $z;
+
+	public static function create($entityId, $seed, $generator, $gamemode, Vector3 $pos, Vector3 $spawn){
+		$pk = new StartGamePacket();
+		$pk->seed = (int) $seed;
+		$pk->generator = (int) $generator;
+		$pk->gamemode = (int) $gamemode;
+		$pk->eid = $entityId;
+		$pk->spawnX = floor($spawn->x);
+		$pk->spawnY = floor($spawn->y);
+		$pk->spawnZ = floor($spawn->z);
+		$pk->x = $pos->x;
+		$pk->y = $pos->y;
+		$pk->z = $pos->z;
+
+		return $pk;
+	}
 
 	public function pid(){
 		return Info::START_GAME_PACKET;
@@ -59,6 +78,10 @@ class StartGamePacket extends DataPacket{
 		$this->putFloat($this->x);
 		$this->putFloat($this->y);
 		$this->putFloat($this->z);
+	}
+
+	public function getSendEvent(Player $player){
+		return new PlayStatusPacketSendEvent($this, $player);
 	}
 
 }

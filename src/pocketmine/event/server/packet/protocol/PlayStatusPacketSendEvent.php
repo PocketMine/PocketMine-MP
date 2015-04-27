@@ -19,32 +19,40 @@
  *
  */
 
-namespace pocketmine\event\server;
+namespace pocketmine\event\server\packet\protocol;
 
-use pocketmine\event;
-use pocketmine\event\Cancellable;
-use pocketmine\network\protocol\DataPacket;
+use pocketmine\network\protocol\PlayStatusPacket;
 use pocketmine\Player;
 
-/**
- * @deprecated
- */
-class DataPacketSendEvent extends ServerEvent implements Cancellable{
+class PlayStatusPacketSendEvent extends DataPacketEvent{
 	public static $handlerList = null;
 
+	/** @var PlayStatusPacket */
 	private $packet;
-	private $player;
 
-	public function __construct(Player $player, DataPacket $packet){
+	public function __construct(PlayStatusPacket $packet, Player $player){
+		parent::__construct($player);
 		$this->packet = $packet;
-		$this->player = $player;
 	}
 
+	/**
+	 * @return PlayStatusPacket
+	 */
 	public function getPacket(){
 		return $this->packet;
 	}
 
-	public function getPlayer(){
-		return $this->player;
+	/**
+	 * @return int
+	 */
+	public function getStatus(){
+		return $this->packet->status;
+	}
+
+	/**
+	 * @param int $status
+	 */
+	public function setStatus($status){
+		$this->packet->status = (int) $status;
 	}
 }

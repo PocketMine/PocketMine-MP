@@ -24,6 +24,8 @@ namespace pocketmine\network\protocol;
 #include <rules/DataPacket.h>
 
 
+use pocketmine\Player;
+
 class BatchPacket extends DataPacket{
 	public static $pool = [];
 	public static $next = 0;
@@ -43,6 +45,10 @@ class BatchPacket extends DataPacket{
 		$this->reset();
 		$this->putInt(strlen($this->payload));
 		$this->put($this->payload);
+	}
+
+	public function handle(Player $player){
+		$player->getServer()->getNetwork()->processBatch($this, $player);
 	}
 
 }

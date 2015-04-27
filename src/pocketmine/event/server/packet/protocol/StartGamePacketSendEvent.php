@@ -19,32 +19,54 @@
  *
  */
 
-namespace pocketmine\event\server;
+namespace pocketmine\event\server\packet\protocol;
 
-use pocketmine\event;
-use pocketmine\event\Cancellable;
-use pocketmine\network\protocol\DataPacket;
+use pocketmine\network\protocol\StartGamePacket;
 use pocketmine\Player;
 
-/**
- * @deprecated
- */
-class DataPacketSendEvent extends ServerEvent implements Cancellable{
+class StartGamePacketSendEvent extends DataPacketEvent{
 	public static $handlerList = null;
 
+	/** @var StartGamePacket */
 	private $packet;
-	private $player;
 
-	public function __construct(Player $player, DataPacket $packet){
+	public function __construct(StartGamePacket $packet, Player $player){
+		parent::__construct($player);
 		$this->packet = $packet;
-		$this->player = $player;
 	}
 
+	/**
+	 * @return StartGamePacket
+	 */
 	public function getPacket(){
 		return $this->packet;
 	}
 
-	public function getPlayer(){
-		return $this->player;
+	/**
+	 * @return int
+	 */
+	public function getEntityId(){
+		return $this->packet->eid;
+	}
+
+	/**
+	 * @param int $entityId
+	 */
+	public function setEntityId($entityId){
+		$this->packet->eid = $entityId;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getSeed(){
+		return $this->packet->seed;
+	}
+
+	/**
+	 * @param int $seed
+	 */
+	public function setSeed($seed){
+		$this->packet->seed = (int) $seed;
 	}
 }

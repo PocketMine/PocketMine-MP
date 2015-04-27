@@ -27,7 +27,9 @@ namespace pocketmine\network\protocol;
 use pocketmine\utils\Binary;
 #endif
 
+use pocketmine\Player;
 use pocketmine\item\Item;
+use pocketmine\event\server\packet\protocol\DataPacketEvent;
 
 
 abstract class DataPacket extends \stdClass{
@@ -193,5 +195,37 @@ abstract class DataPacket extends \stdClass{
 		$this->isEncoded = false;
 		$this->offset = 0;
 		return $this;
+	}
+
+	/**
+	 * @param Player $player
+	 *
+	 * @return DataPacketEvent
+	 */
+	public function getSendEvent(Player $player){
+		return null;
+	}
+
+	/**
+	 * @param Player $player
+	 *
+	 * @return DataPacketEvent
+	 */
+	public function getReceiveEvent(Player $player){
+		return null;
+	}
+
+	public function handle(Player $player){
+		$event = $this->getReceiveEvent($player);
+		if($event === null){
+			return;
+		}
+
+		$this->server->getPluginManager()->callEvent($event);
+		if($event->isCancelled()){
+			return;
+		}
+
+		$event->handle($player);
 	}
 }

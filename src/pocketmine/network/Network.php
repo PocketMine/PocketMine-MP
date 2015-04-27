@@ -24,6 +24,8 @@
  */
 namespace pocketmine\network;
 
+use pocketmine\event\server\packet\ExternalPacketReceiveEvent;
+use pocketmine\event\server\packet\ExternalPacketSendEvent;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\AddItemEntityPacket;
 use pocketmine\network\protocol\AddPaintingPacket;
@@ -207,6 +209,25 @@ class Network{
 		return $this->server;
 	}
 
+	/**
+	 * @param string $address
+	 * @param int    $port
+	 * @param string $payload
+	 */
+	public function handlePacket($address, $port, $payload){
+
+		$this->server->getPluginManager()->callEvent($ev = new ExternalPacketReceiveEvent($payload, $address, $port));
+		if($ev->isCancelled()){
+			return;
+		}
+
+		$payload = $ev->getPayload();
+
+		if(strlen($payload) > 2 and substr($payload, 0, 2) === "\xfe\xfd"){
+			$this->server->handleQueryPacket($payload, $address, $port);
+		}
+	}
+
 	public function processBatch(BatchPacket $packet, Player $p){
 		$str = zlib_decode($packet->payload, 1024 * 1024 * 64); //Max 64MB
 		$len = strlen($str);
@@ -258,6 +279,16 @@ class Network{
 	 * @param string $payload
 	 */
 	public function sendPacket($address, $port, $payload){
+
+		$this->server->getPluginManager()->callEvent($ev = new ExternalPacketSendEvent($payload, $address, $port));
+		if($ev->isCancelled()){
+			return;
+		}
+
+		$payload = $ev->getPayload();
+		$address = $ev->getAddress();
+		$port = $ev->getPort();
+
 		foreach($this->advancedInterfaces as $interface){
 			$interface->sendRawPacket($address, $port, $payload);
 		}

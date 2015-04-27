@@ -24,6 +24,9 @@ namespace pocketmine\network\protocol;
 #include <rules/DataPacket.h>
 
 
+use pocketmine\event\server\packet\protocol\PlayStatusPacketSendEvent;
+use pocketmine\Player;
+
 class PlayStatusPacket extends DataPacket{
 	
 	const LOGIN_SUCCESS = 0;
@@ -36,6 +39,17 @@ class PlayStatusPacket extends DataPacket{
 
 	public $status;
 
+	/**
+	 * @param int $status
+	 *
+	 * @return PlayStatusPacket
+	 */
+	public static function create($status){
+		$pk = new PlayStatusPacket();
+		$pk->status = (int) $status;
+		return $pk;
+	}
+
 	public function pid(){
 		return Info::PLAY_STATUS_PACKET;
 	}
@@ -47,6 +61,10 @@ class PlayStatusPacket extends DataPacket{
 	public function encode(){
 		$this->reset();
 		$this->putInt($this->status);
+	}
+
+	public function getSendEvent(Player $player){
+		return new PlayStatusPacketSendEvent($this, $player);
 	}
 
 }

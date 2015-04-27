@@ -23,6 +23,8 @@ namespace pocketmine\network\protocol;
 
 #include <rules/DataPacket.h>
 
+use pocketmine\event\server\packet\protocol\LoginPacketReceiveEvent;
+use pocketmine\Player;
 
 class LoginPacket extends DataPacket{
 	public static $pool = [];
@@ -56,4 +58,7 @@ class LoginPacket extends DataPacket{
 
 	}
 
+	public function getReceiveEvent(Player $player){
+		return new LoginPacketReceiveEvent($this, $player);
+	}
 }
