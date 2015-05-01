@@ -1749,8 +1749,8 @@ class Server{
 	}
 
 	/**
-	 * @param               $message
-	 * @param Player[]      $recipients
+	 * @param                    $message
+	 * @param Player[]|null      $recipients
 	 *
 	 * @return int
 	 */
@@ -1766,36 +1766,36 @@ class Server{
 	}
 
 	/**
-	 * @param               $message
-	 * @param Player[]      $recipients
+	 * @param                    $tip
+	 * @param Player[]|null      $recipients
 	 *
 	 * @return int
 	 */
-	public function broadcastTip($message, $recipients = null){
+	public function broadcastTip($tip, $recipients = null){
 		if(!is_array($recipients)){
-			return $this->broadcastTip($message, $this->getOnlinePlayers());
+			return $this->broadcastTip($tip, $this->getOnlinePlayers());
 		}
 
 		/** @var Player[] $recipients */
 		foreach($recipients as $recipient){
-			$recipient->sendTip($message);
+			$recipient->sendTip($tip);
 		}
 	}
 	
 	/**
-	 * @param               $message
-	 * @param Player[]      $recipients
+	 * @param                    $popup
+	 * @param Player[]|null      $recipients
 	 *
 	 * @return int
 	 */
-	public function broadcastPopup($message, $recipients = null){
+	public function broadcastPopup($popup, $recipients = null){
 		if(!is_array($recipients)){
-			return $this->broadcastPopup($message, $this->getOnlinePlayers());
+			return $this->broadcastPopup($popup, $this->getOnlinePlayers());
 		}
 		
 		/** @var Player[] $recipients */
 		foreach($recipients as $recipient){
-			$recipient->sendPopup($message);
+			$recipient->sendPopup($popup);
 		}
 	}
 
