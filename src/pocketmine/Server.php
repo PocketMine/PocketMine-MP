@@ -1766,6 +1766,40 @@ class Server{
 	}
 
 	/**
+	 * @param               $message
+	 * @param Player[]      $recipients
+	 *
+	 * @return int
+	 */
+	public function broadcastTip($message, $recipients = null){
+		if(!is_array($recipients)){
+			return $this->broadcastTip($message, $this->getOnlinePlayers());
+		}
+
+		/** @var Player[] $recipients */
+		foreach($recipients as $recipient){
+			$recipient->sendTip($message);
+		}
+	}
+	
+	/**
+	 * @param               $message
+	 * @param Player[]      $recipients
+	 *
+	 * @return int
+	 */
+	public function broadcastPopup($message, $recipients = null){
+		if(!is_array($recipients)){
+			return $this->broadcastPopup($message, $this->getOnlinePlayers());
+		}
+		
+		/** @var Player[] $recipients */
+		foreach($recipients as $recipient){
+			$recipient->sendPopup($message);
+		}
+	}
+
+	/**
 	 * @param string $message
 	 * @param string $permissions
 	 *
