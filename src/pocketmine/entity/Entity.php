@@ -573,10 +573,7 @@ abstract class Entity extends Location implements Metadatable{
 		}
 
 		if($amount <= 0){
-			$this->health = 0;
-			if(!$this->isAlive()){
-				$this->kill();
-			}
+			$this->kill();
 		}elseif($amount <= $this->getMaxHealth() or $amount < $this->health){
 			$this->health = (int) $amount;
 		}else{
@@ -1388,7 +1385,7 @@ abstract class Entity extends Location implements Metadatable{
 		if(!$this->isAlive()){
 			return;
 		}
-		$this->setHealth(0);
+		$this->health = 0;
 		$this->scheduleUpdate();
 	}
 
