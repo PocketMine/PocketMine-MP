@@ -719,7 +719,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			}
 
 			$this->noDamageTicks = 60;
-			
+
 			foreach($this->usedChunks as $index => $c){
 				Level::getXZ($index, $chunkX, $chunkZ);
 				foreach($this->level->getChunkEntities($chunkX, $chunkZ) as $entity){
@@ -1536,7 +1536,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 					return;
 				}
-				
+
 				if(strlen($packet->skin) < 64 * 32 * 4){
 					$this->close("", "disconnectionScreen.invalidSkin", false);
 					return;
@@ -2621,7 +2621,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 		}
 		$this->dataPacket($pk->setChannel(Network::CHANNEL_TEXT));
 	}
-	
+
 	public function sendPopup($message){
 		$pk = new TextPacket();
 		$pk->type = TextPacket::TYPE_POPUP;
@@ -2649,7 +2649,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 				$pk->message = $reason;
 				$this->directDataPacket($pk->setChannel(Network::CHANNEL_PRIORITY));
 			}
-			
+
 			$this->connected = false;
 			if($this->username != ""){
 				$this->server->getPluginManager()->callEvent($ev = new PlayerQuitEvent($this, $message));
@@ -2668,7 +2668,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 			foreach($this->windowIndex as $window){
 				$this->removeWindow($window);
 			}
-			
+
 			$this->interface->close($this, $notify ? $reason : "");
 
 			$chunkX = $chunkZ = null;
@@ -2972,6 +2972,21 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 
 	public function teleport(Vector3 $pos, $yaw = null, $pitch = null){
 		$oldPos = $this->getPosition();
+
+		// Removes Tile entities that seem to linger whenever you teleport...
+		if (($pos instanceof Position) and ($pos->getLevel() and $pos->getLevel() !== $oldPos->getLevel())) {
+			// We are moving to a different level, delete all tile entity blocks
+			foreach ($oldPos->getLevel()->getTiles() as $tile) {
+				$pk = new UpdateBlockPacket();
+				$pk->x = $tile->x;
+				$pk->y = $tile->y;
+				$pk->z = $tile->z;
+				$pk->block = 0;
+				$pk->meta = 0;
+				$this->dataPacket($pk);
+			}
+		}
+
 		if(parent::teleport($pos, $yaw, $pitch)){
 
 			foreach($this->windowIndex as $window){
