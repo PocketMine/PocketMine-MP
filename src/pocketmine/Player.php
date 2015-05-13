@@ -1526,7 +1526,7 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 						$pk->status = PlayStatusPacket::LOGIN_FAILED_SERVER;
 						$this->dataPacket($pk->setChannel(Network::CHANNEL_PRIORITY));
 					}
-					$this->close("", $message, false);
+					$this->close("", $message, false, $packet->protocol1);
 
 					return;
 				}
@@ -2641,10 +2641,10 @@ class Player extends Human implements CommandSender, InventoryHolder, IPlayer{
 	 * @param string $reason  Reason showed in console
 	 * @param bool $notify
 	 */
-	public function close($message = "", $reason = "generic reason", $notify = true){
+	public function close($message = "", $reason = "generic reason", $notify = true, $protocol = ProtocolInfo::CURRENT_PROTOCOL){
 
 		if($this->connected and !$this->closed){
-			if($notify and $reason != ""){
+			if($notify and $reason != "" and $protocol >= ProtocolInfo::CURRENT_PROTOCOL){
 				$pk = new DisconnectPacket;
 				$pk->message = $reason;
 				$this->directDataPacket($pk->setChannel(Network::CHANNEL_PRIORITY));
