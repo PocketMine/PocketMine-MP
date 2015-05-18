@@ -2276,7 +2276,13 @@ class Level implements ChunkManager, Metadatable{
 
 		$this->cancelUnloadChunkRequest($x, $z);
 
-		$chunk = $this->provider->getChunk($x, $z, $generate);
+	        if($this->provider != null && $this->provider != false){
+                
+                    $chunk = $this->provider->getChunk($x, $z, $generate);
+                
+                }
+                else $chunk = null;
+                
 		if($chunk === null){
 			if($generate){
 				throw new \InvalidStateException("Could not create new Chunk");
