@@ -78,6 +78,8 @@ class Item{
 	const DEAD_BUSH = 32;
 	const WOOL = 35;
 	const DANDELION = 37;
+	const ROSE = 38; //TODO: Remove Backwards Compatibility
+	const POPPY = 38; //TODO: Remove Backwards Compatibility
 	const RED_FLOWER = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
