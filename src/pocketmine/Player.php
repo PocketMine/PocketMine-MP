@@ -155,6 +155,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	/** @var Inventory[] */
 	protected $windowIndex = [];
 
+	protected $messageCounter = 2;
+
 	protected $sendIndex = 0;
 
 	protected $moveToSend = [];
@@ -351,7 +353,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	 * @return bool
 	 */
 	public function canSee(Player $player){
-		return !isset($this->hiddenPlayers[$player->getName()]);
+		return !isset($this->hiddenPlayers[$player->getUniqueId()]);
 	}
 
 	/**
@@ -361,7 +363,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		if($player === $this){
 			return;
 		}
-		$this->hiddenPlayers[$player->getName()] = $player;
+		$this->hiddenPlayers[$player->getUniqueId()] = $player;
 		$player->despawnFrom($this);
 	}
 
@@ -372,7 +374,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		if($player === $this){
 			return;
 		}
-		unset($this->hiddenPlayers[$player->getName()]);
+		unset($this->hiddenPlayers[$player->getUniqueId()]);
 		if($player->isOnline()){
 			$player->spawnTo($this);
 		}
@@ -639,7 +641,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$pk->chunkX = $x;
 		$pk->chunkZ = $z;
 		$pk->data = $payload;
-		$this->batchDataPacket($pk->setChannel(Network::CHANNEL_WORLD_CHUNKS));
+		$this->batchDataPacket($pk->setChannel($this->spawned ? Network::CHANNEL_WORLD_CHUNKS : Network::CHANNEL_PRIORITY));
 
 		if($this->spawned){
 			foreach($this->level->getChunkEntities($x, $z) as $entity){
@@ -667,6 +669,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 			++$count;
 
+			$this->usedChunks[$index] = false;
+			$this->level->registerChunkLoader($this, $X, $Z);
+
 			if(!$this->level->populateChunk($X, $Z)){
 				if($this->spawned and $this->teleportPosition === null){
 					continue;
@@ -676,9 +681,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			}
 
 			unset($this->loadQueue[$index]);
-			$this->usedChunks[$index] = false;
-
-			$this->level->registerChunkLoader($this, $X, $Z);
 			$this->level->requestChunk($X, $Z, $this, LevelProvider::ORDER_ZXY);
 		}
 
@@ -771,7 +773,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			for($Z = -$side; $Z <= $side; ++$Z){
 				$chunkX = $X + $centerX;
 				$chunkZ = $Z + $centerZ;
-				if(!isset($this->usedChunks[$index = Level::chunkHash($chunkX, $chunkZ)])){
+				if(!isset($this->usedChunks[$index = Level::chunkHash($chunkX, $chunkZ)]) or $this->usedChunks[$index] === false){
 					$newOrder[$index] = abs($X) + abs($Z);
 				}else{
 					$currentQueue[$index] = abs($X) + abs($Z);
@@ -1381,6 +1383,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			return true;
 		}
 
+		$this->messageCounter = 2;
+
 		$this->lastUpdate = $currentTick;
 
 		if(!$this->isAlive() and $this->spawned){
@@ -1398,7 +1402,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 			$this->entityBaseTick($tickDiff);
 
-			if(!$this->isSpectator()){
+			if(!$this->isSpectator() and $this->speed !== null){
 				if($this->onGround){
 					if($this->inAirTicks !== 0){
 						$this->startAirTicks = 5;
@@ -1711,6 +1715,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 				$this->orderChunks();
 				$this->sendNextChunk();
+
+				$this->server->onPlayerLogin($this);
+
 				break;
 			case ProtocolInfo::MOVE_PLAYER_PACKET:
 
@@ -2354,20 +2361,21 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				$this->craftingType = 0;
 				if($packet->type === TextPacket::TYPE_CHAT){
 					$packet->message = TextFormat::clean($packet->message, $this->removeFormat);
-					if(trim($packet->message) != "" and strlen($packet->message) <= 255){
-						$message = $packet->message;
-						$this->server->getPluginManager()->callEvent($ev = new PlayerCommandPreprocessEvent($this, $message));
-						if($ev->isCancelled()){
-							break;
-						}
-						if(substr($ev->getMessage(), 0, 1) === "/"){ //Command
-							Timings::$playerCommandTimer->startTiming();
-							$this->server->dispatchCommand($ev->getPlayer(), substr($ev->getMessage(), 1));
-							Timings::$playerCommandTimer->stopTiming();
-						}else{
-							$this->server->getPluginManager()->callEvent($ev = new PlayerChatEvent($this, $ev->getMessage()));
-							if(!$ev->isCancelled()){
-								$this->server->broadcastMessage($this->getServer()->getLanguage()->translateString($ev->getFormat(), [$ev->getPlayer()->getDisplayName(), $ev->getMessage()]), $ev->getRecipients());
+					foreach(explode("\n", $packet->message) as $message){
+						if(trim($message) != "" and strlen($message) <= 255 and $this->messageCounter-- > 0){
+							$this->server->getPluginManager()->callEvent($ev = new PlayerCommandPreprocessEvent($this, $message));
+							if($ev->isCancelled()){
+								break;
+							}
+							if(substr($ev->getMessage(), 0, 1) === "/"){ //Command
+								Timings::$playerCommandTimer->startTiming();
+								$this->server->dispatchCommand($ev->getPlayer(), substr($ev->getMessage(), 1));
+								Timings::$playerCommandTimer->stopTiming();
+							}else{
+								$this->server->getPluginManager()->callEvent($ev = new PlayerChatEvent($this, $ev->getMessage()));
+								if(!$ev->isCancelled()){
+									$this->server->broadcastMessage($this->getServer()->getLanguage()->translateString($ev->getFormat(), [$ev->getPlayer()->getDisplayName(), $ev->getMessage()]), $ev->getRecipients());
+								}
 							}
 						}
 					}
@@ -2732,14 +2740,14 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	public function close($message = "", $reason = "generic reason", $notify = true){
 
 		if($this->connected and !$this->closed){
-			if($notify and $reason != ""){
+			if($notify and strlen((string) $reason) > 0){
 				$pk = new DisconnectPacket;
 				$pk->message = $reason;
 				$this->directDataPacket($pk->setChannel(Network::CHANNEL_PRIORITY));
 			}
 			
 			$this->connected = false;
-			if($this->username != ""){
+			if(strlen($this->getName()) > 0){
 				$this->server->getPluginManager()->callEvent($ev = new PlayerQuitEvent($this, $message));
 				if($this->server->getAutoSave() and $this->loggedIn === true){
 					$this->save();
@@ -2804,7 +2812,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	/**
 	 * Handles player data saving
 	 */
-	public function save(){
+	public function save($async = false){
 		if($this->closed){
 			throw new \InvalidStateException("Tried to save closed player");
 		}
@@ -2827,7 +2835,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			$this->namedtag["lastPlayed"] = floor(microtime(true) * 1000);
 
 			if($this->username != "" and $this->namedtag instanceof Compound){
-				$this->server->saveOfflinePlayerData($this->username, $this->namedtag);
+				$this->server->saveOfflinePlayerData($this->username, $this->namedtag, $async);
 			}
 		}
 	}
@@ -3044,6 +3052,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			}
 
 			$this->sendPosition($this, null, null, 1, Network::CHANNEL_WORLD_CHUNKS);
+			$this->spawnToAll();
 			$this->forceMovement = $this->teleportPosition;
 			$this->teleportPosition = null;
 
@@ -3068,6 +3077,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 			if(!$this->checkTeleportPosition()){
 				$this->forceMovement = $oldPos;
+			}else{
+				$this->spawnToAll();
 			}
 
 

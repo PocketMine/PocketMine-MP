@@ -160,12 +160,14 @@ class Level implements ChunkManager, Metadatable{
 
 	/** @var ChunkLoader[] */
 	private $loaders = [];
+	/** @var int[] */
+	private $loaderCounter = [];
 	/** @var ChunkLoader[][] */
 	private $chunkLoaders = [];
 	/** @var Player[][] */
 	private $playerLoaders = [];
 
-	/** @var FullChunk[]|Chunk[] */
+	/** @var float[] */
 	private $unloadQueue;
 
 	private $time;
@@ -435,7 +437,7 @@ class Level implements ChunkManager, Metadatable{
 		$pk = $sound->encode();
 
 		if($players === null){
-			$players = $this->getUsingChunk($sound->x >> 4, $sound->z >> 4);
+			$players = $this->getChunkPlayers($sound->x >> 4, $sound->z >> 4);
 		}
 
 		if($pk !== null){
@@ -451,7 +453,7 @@ class Level implements ChunkManager, Metadatable{
 		$pk = $particle->encode();
 
 		if($players === null){
-			$players = $this->getUsingChunk($particle->x >> 4, $particle->z >> 4);
+			$players = $this->getChunkPlayers($particle->x >> 4, $particle->z >> 4);
 		}
 
 		if($pk !== null){
@@ -564,9 +566,10 @@ class Level implements ChunkManager, Metadatable{
 		}
 
 		if(!isset($this->loaders[$hash])){
-			$this->loaders[$hash] = 1;
+			$this->loaderCounter[$hash] = 1;
+			$this->loaders[$hash] = $loader;
 		}else{
-			++$this->loaders[$hash];
+			++$this->loaderCounter[$hash];
 		}
 
 		$this->cancelUnloadChunkRequest($chunkX, $chunkZ);
@@ -586,7 +589,8 @@ class Level implements ChunkManager, Metadatable{
 				$this->unloadChunkRequest($chunkX, $chunkZ, true);
 			}
 
-			if(--$this->loaders[$hash] === 0){
+			if(--$this->loaderCounter[$hash] === 0){
+				unset($this->loaderCounter[$hash]);
 				unset($this->loaders[$hash]);
 			}
 		}
@@ -800,13 +804,13 @@ class Level implements ChunkManager, Metadatable{
 			$chunkX = $loader->getX() >> 4;
 			$chunkZ = $loader->getZ() >> 4;
 
-			$index = Level::chunkHash($x, $z);
+			$index = Level::chunkHash($chunkX, $chunkZ);
 			$existingLoaders = max(0, isset($this->chunkTickList[$index]) ? $this->chunkTickList[$index] : 0);
 			$this->chunkTickList[$index] = $existingLoaders + 1;
 			for($chunk = 0; $chunk < $chunksPerLoader; ++$chunk){
 				$dx = mt_rand(-$randRange, $randRange);
 				$dz = mt_rand(-$randRange, $randRange);
-				$hash = Level::chunkHash($dx + $x, $dz + $z);
+				$hash = Level::chunkHash($dx + $chunkX, $dz + $chunkZ);
 				if(!isset($this->chunkTickList[$hash]) and isset($this->chunks[$hash])){
 					$this->chunkTickList[$hash] = -1;
 				}
@@ -978,13 +982,13 @@ class Level implements ChunkManager, Metadatable{
 	 * @return Block[]
 	 */
 	public function getCollisionBlocks(AxisAlignedBB $bb){
-		$minX = (int) $bb->minX;
-		$minY = (int) $bb->minY;
-		$minZ = (int) $bb->minZ;
-		$maxX = (int) ($bb->maxX + 1);
-		$maxY = (int) ($bb->maxY + 1);
-		$maxZ = (int) ($bb->maxZ + 1);
-
+		$minX = Math::floorFloat($bb->minX);
+		$minY = Math::floorFloat($bb->minY);
+		$minZ = Math::floorFloat($bb->minZ);
+		$maxX = Math::ceilFloat($bb->maxX);
+		$maxY = Math::ceilFloat($bb->maxY);
+		$maxZ = Math::ceilFloat($bb->maxZ);
+		
 		$collides = [];
 
 		$v = $this->temporalVector;
@@ -1026,12 +1030,12 @@ class Level implements ChunkManager, Metadatable{
 	 * @return AxisAlignedBB[]
 	 */
 	public function getCollisionCubes(Entity $entity, AxisAlignedBB $bb, $entities = true){
-		$minX = (int) $bb->minX;
-		$minY = (int) $bb->minY;
-		$minZ = (int) $bb->minZ;
-		$maxX = (int) ($bb->maxX + 1);
-		$maxY = (int) ($bb->maxY + 1);
-		$maxZ = (int) ($bb->maxZ + 1);
+		$minX = Math::floorFloat($bb->minX);
+		$minY = Math::floorFloat($bb->minY);
+		$minZ = Math::floorFloat($bb->minZ);
+		$maxX = Math::ceilFloat($bb->maxX);
+		$maxY = Math::ceilFloat($bb->maxY);
+		$maxZ = Math::ceilFloat($bb->maxZ);
 
 		$collides = [];
 		$v = $this->temporalVector;
@@ -1688,10 +1692,10 @@ class Level implements ChunkManager, Metadatable{
 	public function getNearbyEntities(AxisAlignedBB $bb, Entity $entity = null){
 		$nearby = [];
 
-		$minX = (int) (($bb->minX - 2) / 16);
-		$maxX = (int) (($bb->maxX + 2) / 16 + 1);
-		$minZ = (int) (($bb->minZ - 2) / 16);
-		$maxZ = (int) (($bb->maxZ + 2) / 16 + 1);
+		$minX = Math::floorFloat(($bb->minX - 2) / 16);
+		$maxX = Math::ceilFloat(($bb->maxX + 2) / 16 + 1);
+		$minZ = Math::floorFloat(($bb->minZ - 2) / 16);
+		$maxZ = Math::ceilFloat(($bb->maxZ + 2) / 16 + 1);
 
 		for($x = $minX; $x <= $maxX; ++$x){
 			for($z = $minZ; $z <= $maxZ; ++$z){
@@ -2220,9 +2224,6 @@ class Level implements ChunkManager, Metadatable{
 		}
 		if($entity instanceof Player){
 			$this->players[$entity->getId()] = $entity;
-		}else{
-			$entity->setDataProperty(Entity::DATA_NAMETAG, Entity::DATA_TYPE_STRING, (new \ReflectionObject($entity))->getShortName());
-			$entity->setDataProperty(Entity::DATA_SHOW_NAMETAG, Entity::DATA_TYPE_BYTE, 1);
 		}
 		$this->entities[$entity->getId()] = $entity;
 	}
@@ -2297,8 +2298,6 @@ class Level implements ChunkManager, Metadatable{
 			$this->timings->syncChunkLoadTimer->stopTiming();
 			return false;
 		}
-
-		$chunk->setChanged(false);
 
 		if($this->isChunkInUse($x, $z)){
 			foreach($this->getChunkLoaders($x, $z) as $loader){
@@ -2630,16 +2629,25 @@ class Level implements ChunkManager, Metadatable{
 		$this->timings->doChunkGC->stopTiming();
 	}
 
-	public function unloadChunks(){
+	public function unloadChunks($force = false){
 		if(count($this->unloadQueue) > 0){
-			$X = null;
-			$Z = null;
+			$maxUnload = 96;
+			$now = microtime(true);
 			foreach($this->unloadQueue as $index => $time){
 				Level::getXZ($index, $X, $Z);
+
+				if(!$force){
+					if($maxUnload <= 0){
+						break;
+					}elseif($time > ($now - 30)){
+						continue;
+					}
+				}
 
 				//If the chunk can't be unloaded, it stays on the queue
 				if($this->unloadChunk($X, $Z, true)){
 					unset($this->unloadQueue[$index]);
+					--$maxUnload;
 				}
 			}
 		}

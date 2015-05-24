@@ -27,6 +27,7 @@ use pocketmine\event\entity\EntityDamageByBlockEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
+use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\item\Item;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Math;
@@ -130,6 +131,8 @@ class Explosion{
 
 	public function explodeB(){
 		$send = [];
+		$updateBlocks = [];
+
 		$source = (new Vector3($this->source->x, $this->source->y, $this->source->z))->floor();
 		$yield = (1 / $this->size) * 100;
 
@@ -145,11 +148,11 @@ class Explosion{
 
 		$explosionSize = $this->size * 2;
 		$minX = Math::floorFloat($this->source->x - $explosionSize - 1);
-		$maxX = Math::floorFloat($this->source->x + $explosionSize + 1);
+		$maxX = Math::ceilFloat($this->source->x + $explosionSize + 1);
 		$minY = Math::floorFloat($this->source->y - $explosionSize - 1);
-		$maxY = Math::floorFloat($this->source->y + $explosionSize + 1);
+		$maxY = Math::ceilFloat($this->source->y + $explosionSize + 1);
 		$minZ = Math::floorFloat($this->source->z - $explosionSize - 1);
-		$maxZ = Math::floorFloat($this->source->z + $explosionSize + 1);
+		$maxZ = Math::ceilFloat($this->source->z + $explosionSize + 1);
 
 		$explosionBB = new AxisAlignedBB($minX, $minY, $minZ, $maxX, $maxY, $maxZ);
 
@@ -206,16 +209,31 @@ class Explosion{
 					$this->level->dropItem($block->add(0.5, 0.5, 0.5), Item::get(...$drop));
 				}
 			}
+
 			$this->level->setBlockIdAt($block->x, $block->y, $block->z, 0);
+
+			$pos = new Vector3($block->x, $block->y, $block->z);
+
+			for($side = 0; $side < 5; $side++){
+				$sideBlock = $pos->getSide($side);
+				if(!isset($this->affectedBlocks[$index = Level::blockHash($sideBlock->x, $sideBlock->y, $sideBlock->z)]) and !isset($updateBlocks[$index])){
+					$this->level->getServer()->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->level->getBlock($sideBlock)));
+					if(!$ev->isCancelled()){
+						$ev->getBlock()->onUpdate(Level::BLOCK_UPDATE_NORMAL);
+					}
+					$updateBlocks[$index] = true;
+				}
+			}
 			$send[] = new Vector3($block->x - $source->x, $block->y - $source->y, $block->z - $source->z);
 		}
+
 		$pk = new ExplodePacket();
 		$pk->x = $this->source->x;
 		$pk->y = $this->source->y;
 		$pk->z = $this->source->z;
 		$pk->radius = $this->size;
 		$pk->records = $send;
-		Server::broadcastPacket($this->level->getUsingChunk($source->x >> 4, $source->z >> 4), $pk->setChannel(Network::CHANNEL_BLOCKS));
+		Server::broadcastPacket($this->level->getChunkPlayers($source->x >> 4, $source->z >> 4), $pk->setChannel(Network::CHANNEL_BLOCKS));
 
 		return true;
 	}
