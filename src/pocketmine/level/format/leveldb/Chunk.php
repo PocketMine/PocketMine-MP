@@ -247,7 +247,7 @@ class Chunk extends BaseFullChunk{
 			if($provider instanceof LevelDB){
 				$nbt = new NBT(NBT::LITTLE_ENDIAN);
 
-				$entityData = $provider->getDatabase()->get(substr($data, 0, 8) . "\x32");
+				$entityData = $provider->getDatabase()->get(substr($data, 0, 8) . LevelDB::ENTRY_ENTITIES);
 				if($entityData !== false and strlen($entityData) > 0){
 					$nbt->read($entityData, true);
 					$entities = $nbt->getData();
@@ -255,7 +255,7 @@ class Chunk extends BaseFullChunk{
 						$entities = [$entities];
 					}
 				}
-				$tileData = $provider->getDatabase()->get(substr($data, 0, 8) . "\x31");
+				$tileData = $provider->getDatabase()->get(substr($data, 0, 8) . LevelDB::ENTRY_TILES);
 				if($tileData !== false and strlen($tileData) > 0){
 					$nbt->read($tileData, true);
 					$tiles = $nbt->getData();
@@ -271,6 +271,9 @@ class Chunk extends BaseFullChunk{
 			}
 			if($flags & 0x02){
 				$chunk->setPopulated();
+			}
+			if($flags & 0x04){
+				$chunk->setLightPopulated();
 			}
 			return $chunk;
 		}catch(\Exception $e){
@@ -293,31 +296,32 @@ class Chunk extends BaseFullChunk{
 			foreach($this->getEntities() as $entity){
 				if(!($entity instanceof Player) and !$entity->closed){
 					$entity->saveNBT();
-					$nbt->setData($entity->namedtag);
-					$entities[] = $nbt->write();
+					$entities[] = $entity->namedtag;
 				}
 			}
 
 			if(count($entities) > 0){
-				$provider->getDatabase()->put($chunkIndex . "\x32", implode($entities));
+				$nbt->setData($entities);
+				$provider->getDatabase()->put($chunkIndex . LevelDB::ENTRY_ENTITIES, $nbt->write());
 			}else{
-				$provider->getDatabase()->delete($chunkIndex . "\x32");
+				$provider->getDatabase()->delete($chunkIndex . LevelDB::ENTRY_ENTITIES);
 			}
 
 
 			$tiles = [];
+
 			foreach($this->getTiles() as $tile){
 				if(!$tile->closed){
 					$tile->saveNBT();
-					$nbt->setData($tile->namedtag);
-					$tiles[] = $nbt->write();
+					$tiles[] = $tile->namedtag;
 				}
 			}
 
 			if(count($tiles) > 0){
-				$provider->getDatabase()->put($chunkIndex . "\x31", implode($tiles));
+				$nbt->setData($tiles);
+				$provider->getDatabase()->put($chunkIndex . LevelDB::ENTRY_TILES, $nbt->write());
 			}else{
-				$provider->getDatabase()->delete($chunkIndex . "\x31");
+				$provider->getDatabase()->delete($chunkIndex . LevelDB::ENTRY_TILES);
 			}
 
 
@@ -333,7 +337,22 @@ class Chunk extends BaseFullChunk{
 			$this->getBlockLightArray() .
 			$heightmap .
 			$biomeColors . chr(
-				($this->isPopulated() ? 0x02 : 0) | ($this->isGenerated() ? 0x01 : 0)
+				($this->isLightPopulated() ? 0x04 : 0) | ($this->isPopulated() ? 0x02 : 0) | ($this->isGenerated() ? 0x01 : 0)
 			);
+	}
+
+	/**
+	 * @param int           $chunkX
+	 * @param int           $chunkZ
+	 * @param LevelProvider $provider
+	 *
+	 * @return Chunk
+	 */
+	public static function getEmptyChunk($chunkX, $chunkZ, LevelProvider $provider = null){
+		try{
+			return new Chunk($provider instanceof LevelProvider ? $provider : LevelDB::class, $chunkX, $chunkZ, str_repeat("\x00", 16384 * (2 + 1 + 1 + 1) + 256 + 1024));
+		}catch(\Exception $e){
+			return null;
+		}
 	}
 }

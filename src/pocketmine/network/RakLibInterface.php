@@ -75,16 +75,6 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 		$this->network = $network;
 	}
 
-	public function doTick(){
-		if(!$this->rakLib->isTerminated()){
-			$this->interface->sendTick();
-		}else{
-			$info = $this->rakLib->getTerminationInfo();
-			$this->network->unregisterInterface($this);
-			\ExceptionHandler::handler(E_ERROR, "RakLib Thread crashed [".$info["scope"]."]: " . (isset($info["message"]) ? $info["message"] : ""), $info["file"], $info["line"]);
-		}
-	}
-
 	public function process(){
 		$work = false;
 		if($this->interface->handlePacket()){
@@ -93,7 +83,11 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 			}
 		}
 
-		$this->doTick();
+		if($this->rakLib->isTerminated()){
+			$info = $this->rakLib->getTerminationInfo();
+			$this->network->unregisterInterface($this);
+			\ExceptionHandler::handler(E_ERROR, "RakLib Thread crashed [".$info["scope"]."]: " . (isset($info["message"]) ? $info["message"] : ""), $info["file"], $info["line"]);
+		}
 
 		return $work;
 	}
@@ -104,9 +98,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 			$this->identifiers->detach($player);
 			unset($this->players[$identifier]);
 			unset($this->identifiersACK[$identifier]);
-			if(!$player->closed){
-				$player->close($player->getLeaveMessage(), $reason);
-			}
+			$player->close($player->getLeaveMessage(), $reason);
 		}
 	}
 
@@ -180,7 +172,15 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 	}
 
 	public function setName($name){
-		$this->interface->sendOption("name", "MCPE;".addcslashes($name, ";").";".Info::CURRENT_PROTOCOL.";".\pocketmine\MINECRAFT_VERSION_NETWORK);
+		$info = $this->server->getQueryInformation();
+
+		$this->interface->sendOption("name",
+			"MCPE;".addcslashes($name, ";") .";".
+			Info::CURRENT_PROTOCOL.";".
+			\pocketmine\MINECRAFT_VERSION_NETWORK.";".
+			$info->getPlayerCount().";".
+			$info->getMaxPlayerCount()
+		);
 	}
 
 	public function setPortCheck($name){

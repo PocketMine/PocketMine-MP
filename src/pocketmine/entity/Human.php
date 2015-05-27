@@ -43,7 +43,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	const DATA_PLAYER_FLAGS = 16;
 	const DATA_PLAYER_BED_POSITION = 17;
 
-	protected $nameTag = "TESTIFICATE";
 	/** @var PlayerInventory */
 	protected $inventory;
 
@@ -72,20 +71,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		$this->isSlim = (bool) $isSlim;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function getNameTag(){
-		return $this->nameTag;
-	}
-
-	/**
-	 * @param string $name
-	 */
-	public function setNameTag($name){
-		$this->nameTag = $name;
-	}
-
 	public function getInventory(){
 		return $this->inventory;
 	}
@@ -102,7 +87,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 
 
 		if(isset($this->namedtag->NameTag)){
-			$this->nameTag = $this->namedtag["NameTag"];
+			$this->setNameTag($this->namedtag["NameTag"]);
 		}
 
 		if(isset($this->namedtag->Inventory) and $this->namedtag->Inventory instanceof Enum){
@@ -125,7 +110,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	}
 
 	public function getName(){
-		return $this->nameTag;
+		return $this->getNameTag();
 	}
 
 	public function getDrops(){
@@ -195,11 +180,12 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			}
 		}
 
-
-		$this->namedtag->Skin = new Compound("Skin", [
-			"Data" => new String("Data", $this->getSkinData()),
-			"Slim" => new Byte("Slim", $this->isSkinSlim() ? 1 : 0)
-		]);
+		if(strlen($this->getSkinData()) > 0){
+			$this->namedtag->Skin = new Compound("Skin", [
+				"Data" => new String("Data", $this->getSkinData()),
+				"Slim" => new Byte("Slim", $this->isSkinSlim() ? 1 : 0)
+			]);
+		}
 	}
 
 	public function spawnTo(Player $player){
@@ -212,7 +198,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 
 			$pk = new AddPlayerPacket();
 			$pk->clientID = $this->getId();
-			$pk->username = $this->nameTag;
+			$pk->username = $this->getName();
 			$pk->eid = $this->getId();
 			$pk->x = $this->x;
 			$pk->y = $this->y;

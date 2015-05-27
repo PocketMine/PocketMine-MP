@@ -55,6 +55,10 @@ abstract class Timings{
 	/** @var TimingsHandler */
 	public static $generationTimer;
 	/** @var TimingsHandler */
+	public static $populationTimer;
+	/** @var TimingsHandler */
+	public static $generationCallbackTimer;
+	/** @var TimingsHandler */
 	public static $permissibleCalculationTimer;
 	/** @var TimingsHandler */
 	public static $permissionDefaultTimer;
@@ -71,6 +75,8 @@ abstract class Timings{
 	/** @var TimingsHandler */
 	public static $timerEntityBaseTick;
 	/** @var TimingsHandler */
+	public static $timerLivingEntityBaseTick;
+	/** @var TimingsHandler */
 	public static $timerEntityAI;
 	/** @var TimingsHandler */
 	public static $timerEntityAICollision;
@@ -79,8 +85,6 @@ abstract class Timings{
 	/** @var TimingsHandler */
 	public static $timerEntityTickRest;
 
-	/** @var TimingsHandler */
-	public static $processQueueTimer;
 	/** @var TimingsHandler */
 	public static $schedulerSyncTimer;
 	/** @var TimingsHandler */
@@ -113,6 +117,8 @@ abstract class Timings{
 		self::$serverCommandTimer = new TimingsHandler("Server Command");
 		self::$worldSaveTimer = new TimingsHandler("World Save");
 		self::$generationTimer = new TimingsHandler("World Generation");
+		self::$populationTimer = new TimingsHandler("World Population");
+		self::$generationCallbackTimer = new TimingsHandler("World Generation Callback");
 		self::$permissibleCalculationTimer = new TimingsHandler("Permissible Calculation");
 		self::$permissionDefaultTimer = new TimingsHandler("Default Permission Calculation");
 
@@ -121,13 +127,13 @@ abstract class Timings{
 		self::$activatedEntityTimer = new TimingsHandler("** activatedTickEntity");
 		self::$tickTileEntityTimer = new TimingsHandler("** tickTileEntity");
 
-		self::$timerEntityBaseTick = new TimingsHandler("** livingEntityBaseTick");
+		self::$timerEntityBaseTick = new TimingsHandler("** entityBaseTick");
+		self::$timerLivingEntityBaseTick = new TimingsHandler("** livingEntityBaseTick");
 		self::$timerEntityAI = new TimingsHandler("** livingEntityAI");
 		self::$timerEntityAICollision = new TimingsHandler("** livingEntityAICollision");
 		self::$timerEntityAIMove = new TimingsHandler("** livingEntityAIMove");
 		self::$timerEntityTickRest = new TimingsHandler("** livingEntityTickRest");
 
-		self::$processQueueTimer = new TimingsHandler("processQueue");
 		self::$schedulerSyncTimer = new TimingsHandler("** Scheduler - Sync Tasks", PluginManager::$pluginParentTimer);
 		self::$schedulerAsyncTimer = new TimingsHandler("** Scheduler - Async Tasks");
 

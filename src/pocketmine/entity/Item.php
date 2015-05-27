@@ -83,7 +83,7 @@ class Item extends Entity{
 	}
 
 	public function onUpdate($currentTick){
-		if($this->closed !== false){
+		if($this->closed){
 			return false;
 		}
 
@@ -94,7 +94,7 @@ class Item extends Entity{
 
 		$hasUpdate = $this->entityBaseTick($tickDiff);
 
-		if(!$this->dead){
+		if($this->isAlive()){
 
 			if($this->pickupDelay > 0 and $this->pickupDelay < 32767){ //Infinite delay
 				$this->pickupDelay -= $tickDiff;
@@ -102,7 +102,8 @@ class Item extends Entity{
 
 			$this->motionY -= $this->gravity;
 
-			$this->checkObstruction($this->x, ($this->boundingBox->minY + $this->boundingBox->maxY) / 2, $this->z);
+			$this->checkObstruction($this->x, $this->y, $this->z);
+
 			$this->move($this->motionX, $this->motionY, $this->motionZ);
 
 			$friction = 1 - $this->drag;
@@ -115,11 +116,11 @@ class Item extends Entity{
 			$this->motionY *= 1 - $this->drag;
 			$this->motionZ *= $friction;
 
-			$this->updateMovement();
-
 			if($this->onGround){
 				$this->motionY *= -0.5;
 			}
+
+			$this->updateMovement();
 
 			if($this->age > 6000){
 				$this->server->getPluginManager()->callEvent($ev = new ItemDespawnEvent($this));
@@ -220,6 +221,8 @@ class Item extends Entity{
 		$pk->speedZ = $this->motionZ;
 		$pk->item = $this->getItem();
 		$player->dataPacket($pk->setChannel(Network::CHANNEL_ENTITY_SPAWNING));
+
+		$this->sendData($player);
 
 		parent::spawnTo($player);
 	}

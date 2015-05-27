@@ -105,6 +105,10 @@ class Anvil extends McRegion{
 		$this->chunks[Level::chunkHash($chunkX, $chunkZ)] = $chunk;
 	}
 
+	public function getEmptyChunk($chunkX, $chunkZ){
+		return Chunk::getEmptyChunk($chunkX, $chunkZ, $this);
+	}
+
 	public static function createChunkSection($Y){
 		return new ChunkSection(new Compound("", [
 			"Y" => new Byte("Y", $Y),
@@ -116,7 +120,7 @@ class Anvil extends McRegion{
 	}
 
 	public function isChunkGenerated($chunkX, $chunkZ){
-		if(($region = $this->getRegion($chunkX >> 5, $chunkZ >> 5)) instanceof RegionLoader){
+		if(($region = $this->getRegion($chunkX >> 5, $chunkZ >> 5)) !== null){
 			return $region->chunkExists($chunkX - $region->getX() * 32, $chunkZ - $region->getZ() * 32) and $this->getChunk($chunkX - $region->getX() * 32, $chunkZ - $region->getZ() * 32, true)->isGenerated();
 		}
 
