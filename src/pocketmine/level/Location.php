@@ -43,6 +43,10 @@ class Location extends Position{
 		$this->level = $level;
 	}
 
+	public static function fromObject(Vector3 $pos, $yaw = 0.0, $pitch = 0.0, Level $level = null){
+		return new Location($pos->x, $pos->y, $pos->z, $yaw, $pitch, ($level === null) ? (($pos instanceof Position) ? $pos->level : null) : $level);
+	}
+
 	public function getYaw(){
 		return $this->yaw;
 	}
