@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -136,6 +136,8 @@ abstract class Entity extends Location implements Metadatable{
 	public $motionX;
 	public $motionY;
 	public $motionZ;
+	/** @var Vector3 */
+	public $temporalVector;
 	public $lastMotionX;
 	public $lastMotionY;
 	public $lastMotionZ;
@@ -182,7 +184,7 @@ abstract class Entity extends Location implements Metadatable{
 	public $isCollidedVertically = false;
 
 	public $noDamageTicks;
-	private $justCreated;
+	protected $justCreated;
 	protected $fireProof;
 	private $invulnerable;
 
@@ -205,6 +207,8 @@ abstract class Entity extends Location implements Metadatable{
 
 		$this->timings = Timings::getEntityTimings($this);
 
+		$this->temporalVector = new Vector3();
+
 		if($this->eyeHeight === null){
 			$this->eyeHeight = $this->height / 2 + 0.1;
 		}
@@ -219,16 +223,15 @@ abstract class Entity extends Location implements Metadatable{
 
 		$this->boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 		$this->setPositionAndRotation(
-			new Vector3(
+			$this->temporalVector->setComponents(
 				$this->namedtag["Pos"][0],
 				$this->namedtag["Pos"][1],
 				$this->namedtag["Pos"][2]
 			),
 			$this->namedtag->Rotation[0],
-			$this->namedtag->Rotation[1],
-			true
+			$this->namedtag->Rotation[1]
 		);
-		$this->setMotion(new Vector3($this->namedtag["Motion"][0], $this->namedtag["Motion"][1], $this->namedtag["Motion"][2]));
+		$this->setMotion($this->temporalVector->setComponents($this->namedtag["Motion"][0], $this->namedtag["Motion"][1], $this->namedtag["Motion"][2]));
 
 		if(!isset($this->namedtag->FallDistance)){
 			$this->namedtag->FallDistance = new Float("FallDistance", 0);
@@ -617,7 +620,6 @@ abstract class Entity extends Location implements Metadatable{
 
 		if($amount <= 0){
 			if($this->isAlive()){
-				$this->health = 0;
 				$this->kill();
 			}
 		}elseif($amount <= $this->getMaxHealth() or $amount < $this->health){
@@ -875,7 +877,7 @@ abstract class Entity extends Location implements Metadatable{
 		$x = -$xz * sin(deg2rad($this->yaw));
 		$z = $xz * cos(deg2rad($this->yaw));
 
-		return (new Vector3($x, $y, $z))->normalize();
+		return $this->temporalVector->setComponents($x, $y, $z)->normalize();
 	}
 
 	public function getDirectionPlane(){
@@ -968,10 +970,8 @@ abstract class Entity extends Location implements Metadatable{
 		if($onGround === true){
 			if($this->fallDistance > 0){
 				if($this instanceof Living){
-					//TODO
+					$this->fall($this->fallDistance);
 				}
-
-				$this->fall($this->fallDistance);
 				$this->resetFallDistance();
 			}
 		}elseif($distanceThisTick < 0){
@@ -1008,6 +1008,10 @@ abstract class Entity extends Location implements Metadatable{
 	}
 
 	protected function switchLevel(Level $targetLevel){
+		if($this->closed){
+			return false;
+		}
+
 		if($this->isValid()){
 			$this->server->getPluginManager()->callEvent($ev = new EntityLevelChangeEvent($this, $this->level, $targetLevel));
 			if($ev->isCancelled()){
@@ -1044,7 +1048,7 @@ abstract class Entity extends Location implements Metadatable{
 	}
 
 	public function isInsideOfWater(){
-		$block = $this->level->getBlock(new Vector3(Math::floorFloat($this->x), Math::floorFloat($y = ($this->y + $this->getEyeHeight())), Math::floorFloat($this->z)));
+		$block = $this->level->getBlock($this->temporalVector->setComponents(Math::floorFloat($this->x), Math::floorFloat($y = ($this->y + $this->getEyeHeight())), Math::floorFloat($this->z)));
 
 		if($block instanceof Water){
 			$f = ($block->y + 1) - ($block->getFluidHeightPercent() - 0.1111111);
@@ -1055,7 +1059,7 @@ abstract class Entity extends Location implements Metadatable{
 	}
 
 	public function isInsideOfSolid(){
-		$block = $this->level->getBlock(new Vector3(Math::floorFloat($this->x), Math::floorFloat($y = ($this->y + $this->getEyeHeight())), Math::floorFloat($this->z)));
+		$block = $this->level->getBlock($this->temporalVector->setComponents(Math::floorFloat($this->x), Math::floorFloat($y = ($this->y + $this->getEyeHeight())), Math::floorFloat($this->z)));
 
 		$bb = $block->getBoundingBox();
 
@@ -1082,34 +1086,28 @@ abstract class Entity extends Location implements Metadatable{
 			$this->boundingBox = $newBB;
 		}
 
-		$pos = new Vector3(
-			($this->boundingBox->minX + $this->boundingBox->maxX) / 2,
-			$this->boundingBox->minY,
-			($this->boundingBox->minZ + $this->boundingBox->maxZ) / 2
-		);
+		$this->x = ($this->boundingBox->minX + $this->boundingBox->maxX) / 2;
+		$this->y = $this->boundingBox->minY - $this->ySize;
+		$this->z = ($this->boundingBox->minZ + $this->boundingBox->maxZ) / 2;
 
-		$result = true;
+		$this->checkChunks();
 
-		if(!$this->setPosition($pos)){
-			$this->boundingBox->setBB($axisalignedbb);
-			$result = false;
-		}else{
-			if(!$this->onGround or $dy != 0){
-				$bb = clone $this->boundingBox;
-				$bb->minY -= 0.75;
-				$this->onGround = false;
+		if(!$this->onGround or $dy != 0){
+			$bb = clone $this->boundingBox;
+			$bb->minY -= 0.75;
+			$this->onGround = false;
 
-				if(count($this->level->getCollisionBlocks($bb)) > 0){
-					$this->onGround = true;
-				}
+			if(count($this->level->getCollisionBlocks($bb)) > 0){
+				$this->onGround = true;
 			}
-			$this->isCollided = $this->onGround;
-			$this->updateFallState($dy, $this->onGround);
 		}
+		$this->isCollided = $this->onGround;
+		$this->updateFallState($dy, $this->onGround);
+
 
 		Timings::$entityMoveTimer->stopTiming();
 
-		return $result;
+		return true;
 	}
 
 	public function move($dx, $dy, $dz){
@@ -1120,7 +1118,7 @@ abstract class Entity extends Location implements Metadatable{
 
 		if($this->keepMovement){
 			$this->boundingBox->offset($dx, $dy, $dz);
-			$this->setPosition(new Vector3(($this->boundingBox->minX + $this->boundingBox->maxX) / 2, $this->boundingBox->minY, ($this->boundingBox->minZ + $this->boundingBox->maxZ) / 2));
+			$this->setPosition($this->temporalVector->setComponents(($this->boundingBox->minX + $this->boundingBox->maxX) / 2, $this->boundingBox->minY, ($this->boundingBox->minZ + $this->boundingBox->maxZ) / 2));
 			$this->onGround = $this instanceof Player ? true : false;
 			return true;
 		}else{
@@ -1239,56 +1237,49 @@ abstract class Entity extends Location implements Metadatable{
 
 			}
 
-			$pos = new Vector3(
-				($this->boundingBox->minX + $this->boundingBox->maxX) / 2,
-				$this->boundingBox->minY + $this->ySize,
-				($this->boundingBox->minZ + $this->boundingBox->maxZ) / 2
-			);
+			$this->x = ($this->boundingBox->minX + $this->boundingBox->maxX) / 2;
+			$this->y = $this->boundingBox->minY - $this->ySize;
+			$this->z = ($this->boundingBox->minZ + $this->boundingBox->maxZ) / 2;
 
-			$result = true;
+			$this->checkChunks();
 
-			if(!$this->setPosition($pos)){
-				$this->boundingBox->setBB($axisalignedbb);
-				$result = false;
-			}else{
-
-				if($this instanceof Player){
-					if(!$this->onGround or $movY != 0){
-						$bb = clone $this->boundingBox;
-						$bb->minY -= 1;
-						if(count($this->level->getCollisionBlocks($bb)) > 0){
-							$this->onGround = true;
-						}else{
-							$this->onGround = false;
-						}
+			if($this instanceof Player){
+				if(!$this->onGround or $movY != 0){
+					$bb = clone $this->boundingBox;
+					$bb->minY -= 1;
+					if(count($this->level->getCollisionBlocks($bb)) > 0){
+						$this->onGround = true;
+					}else{
+						$this->onGround = false;
 					}
-					$this->isCollided = $this->onGround;
-				}else{
-					$this->isCollidedVertically = $movY != $dy;
-					$this->isCollidedHorizontally = ($movX != $dx or $movZ != $dz);
-					$this->isCollided = ($this->isCollidedHorizontally or $this->isCollidedVertically);
-					$this->onGround = ($movY != $dy and $movY < 0);
 				}
-				$this->updateFallState($dy, $this->onGround);
-
-				if($movX != $dx){
-					$this->motionX = 0;
-				}
-
-				if($movY != $dy){
-					$this->motionY = 0;
-				}
-
-				if($movZ != $dz){
-					$this->motionZ = 0;
-				}
+				$this->isCollided = $this->onGround;
+			}else{
+				$this->isCollidedVertically = $movY != $dy;
+				$this->isCollidedHorizontally = ($movX != $dx or $movZ != $dz);
+				$this->isCollided = ($this->isCollidedHorizontally or $this->isCollidedVertically);
+				$this->onGround = ($movY != $dy and $movY < 0);
 			}
+			$this->updateFallState($dy, $this->onGround);
+
+			if($movX != $dx){
+				$this->motionX = 0;
+			}
+
+			if($movY != $dy){
+				$this->motionY = 0;
+			}
+
+			if($movZ != $dz){
+				$this->motionZ = 0;
+			}
+
 
 			//TODO: vehicle collision events (first we need to spawn them!)
 
 			Timings::$entityMoveTimer->stopTiming();
 
-			return $result;
+			return true;
 		}
 	}
 
@@ -1342,25 +1333,7 @@ abstract class Entity extends Location implements Metadatable{
 		$this->scheduleUpdate();
 	}
 
-	public function setPosition(Vector3 $pos){
-		if($this->closed){
-			return false;
-		}
-
-		if($pos instanceof Position and $pos->level !== null and $pos->level !== $this->level){
-			if($this->switchLevel($pos->getLevel()) === false){
-				return false;
-			}
-		}
-
-		$this->x = $pos->x;
-		$this->y = $pos->y;
-		$this->z = $pos->z;
-
-		$radius = $this->width / 2;
-		$this->boundingBox->setBounds($pos->x - $radius, $pos->y, $pos->z - $radius, $pos->x + $radius, $pos->y + $this->height, $pos->z + $radius);
-
-
+	protected function checkChunks(){
 		if($this->chunk === null or ($this->chunk->getX() !== ($this->x >> 4) or $this->chunk->getZ() !== ($this->z >> 4))){
 			if($this->chunk !== null){
 				$this->chunk->removeEntity($this);
@@ -1383,11 +1356,32 @@ abstract class Entity extends Location implements Metadatable{
 			}
 
 			if($this->chunk === null){
-				return true;
+				return;
 			}
 
 			$this->chunk->addEntity($this);
 		}
+	}
+
+	public function setPosition(Vector3 $pos){
+		if($this->closed){
+			return false;
+		}
+
+		if($pos instanceof Position and $pos->level !== null and $pos->level !== $this->level){
+			if($this->switchLevel($pos->getLevel()) === false){
+				return false;
+			}
+		}
+
+		$this->x = $pos->x;
+		$this->y = $pos->y;
+		$this->z = $pos->z;
+
+		$radius = $this->width / 2;
+		$this->boundingBox->setBounds($pos->x - $radius, $pos->y, $pos->z - $radius, $pos->x + $radius, $pos->y + $this->height, $pos->z + $radius);
+
+		$this->checkChunks();
 
 		return true;
 	}
@@ -1420,7 +1414,7 @@ abstract class Entity extends Location implements Metadatable{
 	}
 
 	public function kill(){
-		$this->setHealth(0);
+		$this->health = 0;
 		$this->scheduleUpdate();
 	}
 
@@ -1445,8 +1439,8 @@ abstract class Entity extends Location implements Metadatable{
 		$this->ySize = 0;
 		$pos = $ev->getTo();
 
-		$this->setMotion(new Vector3(0, 0, 0));
-		if($this->setPositionAndRotation($pos, $yaw === null ? $this->yaw : $yaw, $pitch === null ? $this->pitch : $pitch, true) !== false){
+		$this->setMotion($this->temporalVector->setComponents(0, 0, 0));
+		if($this->setPositionAndRotation($pos, $yaw === null ? $this->yaw : $yaw, $pitch === null ? $this->pitch : $pitch) !== false){
 			$this->resetFallDistance();
 			$this->onGround = true;
 
@@ -1469,6 +1463,13 @@ abstract class Entity extends Location implements Metadatable{
 
 	public function getId(){
 		return $this->id;
+	}
+
+	public function respawnToAll(){
+		foreach($this->hasSpawned as $key => $player){
+			unset($this->hasSpawned[$key]);
+			$this->spawnTo($player);
+		}
 	}
 
 	public function spawnToAll(){
@@ -1496,7 +1497,7 @@ abstract class Entity extends Location implements Metadatable{
 			if($this->chunk !== null){
 				$this->chunk->removeEntity($this);
 			}
-			if($this->level instanceof Level){
+			if($this->level !== null){
 				$this->level->removeEntity($this);
 			}
 		}

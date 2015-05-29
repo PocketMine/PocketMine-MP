@@ -70,6 +70,7 @@ use pocketmine\level\generator\GenerationTask;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\generator\GeneratorRegisterTask;
 use pocketmine\level\generator\GeneratorUnregisterTask;
+use pocketmine\level\generator\LightPopulationTask;
 use pocketmine\level\generator\PopulationTask;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Math;
@@ -1405,7 +1406,7 @@ class Level implements ChunkManager, Metadatable{
 			$item = Item::get(Item::AIR, 0, 0);
 		}
 
-		if($player instanceof Player){
+		if($player !== null){
 			$ev = new BlockBreakEvent($player, $target, $item, ($player->getGamemode() & 0x01) === 1 ? true : false);
 
 			if($player->isSurvival() and $item instanceof Item and !$target->isBreakable($item)){
@@ -1434,15 +1435,15 @@ class Level implements ChunkManager, Metadatable{
 			}
 
 			$player->lastBreak = PHP_INT_MAX;
-		}elseif($item instanceof Item and !$target->isBreakable($item)){
+		}elseif($item !== null and !$target->isBreakable($item)){
 			return false;
 		}
 
 		$level = $target->getLevel();
 
-		if($level instanceof Level){
+		if($level !== null){
 			$above = $level->getBlock(new Vector3($target->x, $target->y + 1, $target->z));
-			if($above instanceof Block){
+			if($above !== null){
 				if($above->getId() === Item::FIRE){
 					$level->setBlock($above, new Air(), true);
 				}
@@ -1466,7 +1467,7 @@ class Level implements ChunkManager, Metadatable{
 		$target->onBreak($item);
 		
 		$tile = $this->getTile($target);
-		if($tile instanceof Tile){
+		if($tile !== null){
 			if($tile instanceof InventoryHolder){
 				if($tile instanceof Chest){
 					$tile->unpair();
@@ -1480,14 +1481,14 @@ class Level implements ChunkManager, Metadatable{
 			$tile->close();
 		}
 
-		if($item instanceof Item){
+		if($item !== null){
 			$item->useOn($target);
 			if($item->isTool() and $item->getDamage() >= $item->getMaxDurability()){
 				$item = Item::get(Item::AIR, 0, 0);
 			}
 		}
 
-		if(!($player instanceof Player) or $player->isSurvival()){
+		if($player === null or $player->isSurvival()){
 			foreach($drops as $drop){
 				if($drop[2] > 0){
 					$this->dropItem($vector->add(0.5, 0.5, 0.5), Item::get(...$drop));
@@ -1523,7 +1524,7 @@ class Level implements ChunkManager, Metadatable{
 			return false;
 		}
 
-		if($player instanceof Player){
+		if($player !== null){
 			$ev = new PlayerInteractEvent($player, $item, $target, $face, $target->getId() === 0 ? PlayerInteractEvent::RIGHT_CLICK_AIR : PlayerInteractEvent::RIGHT_CLICK_BLOCK);
 			if(!$player->isOp() and ($distance = $this->server->getSpawnRadius()) > -1){
 				$t = new Vector2($target->x, $target->z);
@@ -1590,7 +1591,7 @@ class Level implements ChunkManager, Metadatable{
 		}
 
 
-		if($player instanceof Player){
+		if($player !== null){
 			$ev = new BlockPlaceEvent($player, $hand, $block, $target, $item);
 			if(!$player->isOp() and ($distance = $this->server->getSpawnRadius()) > -1){
 				$t = new Vector2($target->x, $target->z);
@@ -1620,8 +1621,8 @@ class Level implements ChunkManager, Metadatable{
 				"Text3" => new String("Text3", ""),
 				"Text4" => new String("Text4", "")
 			]));
-			if($player instanceof Player){
-				$tile->namedtag->Creator = new String("Creator", $player->getName());
+			if($player !== null){
+				$tile->namedtag->Creator = new String("Creator", $player->getUniqueId());
 			}
 		}
 		$item->setCount($item->getCount() - 1);
@@ -2041,18 +2042,28 @@ class Level implements ChunkManager, Metadatable{
 			return;
 		}
 		$index = Level::chunkHash($chunkX, $chunkZ);
-		if($unload){
-			if($this->isChunkLoaded($chunkX, $chunkZ) and ($oldChunk = $this->getChunk($chunkX, $chunkZ, false)) !== false){
-				foreach($this->getChunkLoaders($chunkX, $chunkZ) as $loader){
-					$loader->onChunkUnloaded($oldChunk);
-				}
-			}
+		$oldChunk = $this->getChunk($chunkX, $chunkZ, false);
+		if($unload and $oldChunk !== null){
+			$this->unloadChunk($chunkX, $chunkZ, false);
 
 			$this->provider->setChunk($chunkX, $chunkZ, $chunk);
 			$this->chunks[$index] = $chunk;
 		}else{
+			$oldEntities = $oldChunk !== null ? $oldChunk->getEntities() : [];
+			$oldTiles = $oldChunk !== null ? $oldChunk->getTiles() : [];
+
 			$this->provider->setChunk($chunkX, $chunkZ, $chunk);
 			$this->chunks[$index] = $chunk;
+
+			foreach($oldEntities as $entity){
+				$chunk->addEntity($entity);
+				$entity->chunk = $chunk;
+			}
+
+			foreach($oldTiles as $tile){
+				$chunk->addTile($tile);
+				$tile->chunk = $chunk;
+			}
 		}
 
 		unset($this->chunkCache[$index]);
@@ -2297,6 +2308,10 @@ class Level implements ChunkManager, Metadatable{
 			$this->unloadChunk($x, $z, false);
 			$this->timings->syncChunkLoadTimer->stopTiming();
 			return false;
+		}
+
+		if(!$chunk->isLightPopulated() and $chunk->isPopulated() and $this->getServer()->getProperty("chunk-ticking.light-updates", false)){
+			$this->getServer()->getScheduler()->scheduleAsyncTask(new LightPopulationTask($this, $chunk));
 		}
 
 		if($this->isChunkInUse($x, $z)){

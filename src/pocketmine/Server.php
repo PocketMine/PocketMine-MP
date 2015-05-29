@@ -45,6 +45,7 @@ use pocketmine\entity\Zombie;
 use pocketmine\event\HandlerList;
 use pocketmine\event\level\LevelInitEvent;
 use pocketmine\event\level\LevelLoadEvent;
+use pocketmine\event\server\QueryRegenerateEvent;
 use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\event\Timings;
 use pocketmine\event\TimingsHandler;
@@ -231,6 +232,9 @@ class Server{
 
 	/** @var QueryHandler */
 	private $queryHandler;
+
+	/** @var QueryRegenerateEvent */
+	private $queryRegenerateTask = null;
 
 	/** @var Config */
 	private $properties;
@@ -1656,7 +1660,6 @@ class Server{
 
 		$this->network = new Network($this);
 		$this->network->setName($this->getMotd());
-		$this->network->registerInterface(new RakLibInterface($this));
 
 
 		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.info", [
@@ -1693,6 +1696,10 @@ class Server{
 
 		set_exception_handler([$this, "exceptionHandler"]);
 		register_shutdown_function([$this, "crashDump"]);
+
+		$this->queryRegenerateTask = new QueryRegenerateEvent($this, 5);
+
+		$this->network->registerInterface(new RakLibInterface($this));
 
 		$this->pluginManager->loadPlugins($this->pluginPath);
 
@@ -2111,6 +2118,10 @@ class Server{
 
 	}
 
+	public function getQueryInformation(){
+		return $this->queryRegenerateTask;
+	}
+
 	/**
 	 * Starts the PocketMine-MP server and starts processing ticks and packets
 	 */
@@ -2123,7 +2134,7 @@ class Server{
 			$this->network->blockAddress($entry->getName(), -1);
 		}
 
-		if($this->getProperty("settings.send-usage", true) !== false){
+		if($this->getProperty("settings.send-usage", true)){
 			$this->sendUsageTicker = 6000;
 			$this->sendUsage(SendUsageTask::TYPE_OPEN);
 		}
@@ -2204,7 +2215,9 @@ class Server{
 		if($this->isRunning === false){
 			return;
 		}
-		$this->sendUsage(SendUsageTask::TYPE_CLOSE);
+		if($this->sendUsageTicker > 0){
+			$this->sendUsage(SendUsageTask::TYPE_CLOSE);
+		}
 		$this->hasStopped = false;
 
 		ini_set("error_reporting", 0);
@@ -2268,7 +2281,7 @@ class Server{
 		$this->nextTick = microtime(true);
 		while($this->isRunning){
 			$this->tick();
-			$next = $this->nextTick - 0.001;
+			$next = $this->nextTick - 0.0001;
 			if($next > microtime(true)){
 				try{
 					time_sleep_until($next);
@@ -2469,9 +2482,12 @@ class Server{
 			$this->maxTick = 20;
 			$this->maxUse = 0;
 
-			if($this->queryHandler !== null and ($this->tickCounter & 0b111111111) === 0){
+			if(($this->tickCounter & 0b111111111) === 0){
 				try{
-					$this->queryHandler->regenerateInfo();
+					$this->getPluginManager()->callEvent($this->queryRegenerateTask = new QueryRegenerateEvent($this, 5));
+					if($this->queryHandler !== null){
+						$this->queryHandler->regenerateInfo();
+					}
 				}catch(\Exception $e){
 					if($this->logger instanceof MainLogger){
 						$this->logger->logException($e);
@@ -2531,8 +2547,9 @@ class Server{
 
 		if(($this->nextTick - $tickTime) < -1){
 			$this->nextTick = $tickTime;
+		}else{
+			$this->nextTick += 0.05;
 		}
-		$this->nextTick += 0.05;
 
 		return true;
 	}
