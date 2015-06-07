@@ -191,7 +191,7 @@ abstract class PluginBase implements Plugin{
 	 *
 	 * @param string $filename
 	 *
-	 * @return string, or null
+	 * @return string|null
 	 */
 	public function getResourceContents($filename){
 		$fp = $this->getResource($filename);
