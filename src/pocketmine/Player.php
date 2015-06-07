@@ -567,7 +567,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 	public function setSkin($str, $isSlim = false){
 		parent::setSkin($str, $isSlim);
-		if($this->spawned === true){
+		if($this->spawned){
 			$this->respawnToAll();
 		}
 	}
@@ -2197,7 +2197,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 				$oldItem = clone $item;
 
-				if($this->canInteract($vector->add(0.5, 0.5, 0.5), 13) and $this->level->useBreakOn($vector, $item, $this) === true){
+				if($this->canInteract($vector->add(0.5, 0.5, 0.5), 13) and $this->level->useBreakOn($vector, $item, $this, true)){
 					if($this->isSurvival()){
 						if(!$item->equals($oldItem, true) or $item->getCount() !== $oldItem->getCount()){
 							$this->inventory->setItemInHand($item, $this);
