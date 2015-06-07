@@ -187,6 +187,23 @@ abstract class PluginBase implements Plugin{
 	}
 
 	/**
+	 * Gets the contents of an embedded resource on the plugin file.
+	 *
+	 * @param string $filename
+	 *
+	 * @return string, or null
+	 */
+	public function getResourceContents($filename){
+		$fp = $this->getResource($filename);
+		if($fp === null){
+			return null;
+		}
+		$contents = stream_get_contents($fp);
+		fclose($fp);
+		return $contents;
+	}
+
+	/**
 	 * @param string $filename
 	 * @param bool   $replace
 	 *
