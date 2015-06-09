@@ -19,33 +19,19 @@
  *
 */
 
-namespace pocketmine\level\generator\normal\biome;
+namespace pocketmine\utils;
 
-use pocketmine\block\Sapling;
-use pocketmine\level\generator\populator\TallGrass;
-use pocketmine\level\generator\populator\Tree;
+use pocketmine\Thread;
 
-class TaigaBiome extends SnowyBiome{
+class ServerKiller extends Thread{
 
-	public function __construct(){
-		parent::__construct();
-
-		$trees = new Tree(Sapling::SPRUCE);
-		$trees->setBaseAmount(10);
-		$this->addPopulator($trees);
-
-		$tallGrass = new TallGrass();
-		$tallGrass->setBaseAmount(1);
-
-		$this->addPopulator($tallGrass);
-
-		$this->setElevation(63, 81);
-
-		$this->temperature = 0.05;
-		$this->rainfall = 0.8;
+	public function run(){
+		sleep(15);
+		echo "\nTook to long to stop, server was killed forcefully!\n";
+		@\pocketmine\kill(getmypid());
 	}
 
-	public function getName(){
-		return "Taiga";
+	public function getThreadName(){
+		return "Server Killer";
 	}
 }

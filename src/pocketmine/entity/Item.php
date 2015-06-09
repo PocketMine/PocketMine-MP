@@ -75,9 +75,13 @@ class Item extends Entity{
 		$this->server->getPluginManager()->callEvent(new ItemSpawnEvent($this));
 	}
 
-
 	public function attack($damage, EntityDamageEvent $source){
-		if($source->getCause() === EntityDamageEvent::CAUSE_FIRE_TICK){
+		if(
+			$source->getCause() === EntityDamageEvent::CAUSE_VOID or
+			$source->getCause() === EntityDamageEvent::CAUSE_FIRE_TICK or
+			$source->getCause() === EntityDamageEvent::CAUSE_ENTITY_EXPLOSION or
+			$source->getCause() === EntityDamageEvent::CAUSE_BLOCK_EXPLOSION
+		){
 			parent::attack($damage, $source);
 		}
 	}
@@ -87,7 +91,11 @@ class Item extends Entity{
 			return false;
 		}
 
-		$tickDiff = max(1, $currentTick - $this->lastUpdate);
+		$tickDiff = $currentTick - $this->lastUpdate;
+		if($tickDiff <= 0 and !$this->justCreated){
+			return true;
+		}
+
 		$this->lastUpdate = $currentTick;
 
 		$this->timings->startTiming();
@@ -98,18 +106,23 @@ class Item extends Entity{
 
 			if($this->pickupDelay > 0 and $this->pickupDelay < 32767){ //Infinite delay
 				$this->pickupDelay -= $tickDiff;
+				if($this->pickupDelay < 0){
+					$this->pickupDelay = 0;
+				}
 			}
 
 			$this->motionY -= $this->gravity;
 
-			$this->checkObstruction($this->x, $this->y, $this->z);
+			if($this->checkObstruction($this->x, $this->y, $this->z)){
+				$hasUpdate = true;
+			}
 
 			$this->move($this->motionX, $this->motionY, $this->motionZ);
 
 			$friction = 1 - $this->drag;
 
-			if($this->onGround and ($this->motionX != 0 or $this->motionZ != 0)){
-				$friction = $this->getLevel()->getBlock(new Vector3($this->getFloorX(), $this->getFloorY() - 1, $this->getFloorZ()))->getFrictionFactor() * $friction;
+			if($this->onGround and (abs($this->motionX) > 0.00001 or abs($this->motionZ) > 0.00001)){
+				$friction = $this->getLevel()->getBlock($this->temporalVector->setComponents((int) floor($this->x), (int) floor($this->y - 1), (int) floor($this->z) - 1))->getFrictionFactor() * $friction;
 			}
 
 			$this->motionX *= $friction;
@@ -136,7 +149,7 @@ class Item extends Entity{
 
 		$this->timings->stopTiming();
 
-		return $hasUpdate or !$this->onGround or $this->motionX != 0 or $this->motionY != 0 or $this->motionZ != 0;
+		return $hasUpdate or !$this->onGround or abs($this->motionX) > 0.00001 or abs($this->motionY) > 0.00001 or abs($this->motionZ) > 0.00001;
 	}
 
 	public function saveNBT(){

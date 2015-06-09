@@ -86,8 +86,14 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		}
 
 
-		if(isset($this->namedtag->NameTag)){
-			$this->setNameTag($this->namedtag["NameTag"]);
+		if(!($this instanceof Player)){
+			if(isset($this->namedtag->NameTag)){
+				$this->setNameTag($this->namedtag["NameTag"]);
+			}
+
+			if(isset($this->namedtag->Skin) and $this->namedtag->Skin instanceof Compound){
+				$this->setSkin($this->namedtag->Skin["Data"], $this->namedtag->Skin["Slim"] > 0);
+			}
 		}
 
 		if(isset($this->namedtag->Inventory) and $this->namedtag->Inventory instanceof Enum){
@@ -102,10 +108,6 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			}
 		}
 
-		if(isset($this->namedtag->Skin) and $this->namedtag->Skin instanceof Compound){
-			$this->setSkin($this->namedtag->Skin["Data"], $this->namedtag->Skin["Slim"] > 0);
-		}
-
 		parent::initEntity();
 	}
 
@@ -115,7 +117,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 
 	public function getDrops(){
 		$drops = [];
-		if($this->inventory instanceof PlayerInventory){
+		if($this->inventory !== null){
 			foreach($this->inventory->getContents() as $item){
 				$drops[] = $item;
 			}
@@ -128,7 +130,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		parent::saveNBT();
 		$this->namedtag->Inventory = new Enum("Inventory", []);
 		$this->namedtag->Inventory->setTagType(NBT::TAG_Compound);
-		if($this->inventory instanceof PlayerInventory){
+		if($this->inventory !== null){
 			for($slot = 0; $slot < 9; ++$slot){
 				$hotbarSlot = $this->inventory->getHotbarSlotIndex($slot);
 				if($hotbarSlot !== -1){
@@ -189,8 +191,8 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	}
 
 	public function spawnTo(Player $player){
-		if($player !== $this and !isset($this->hasSpawned[$player->getId()])){
-			$this->hasSpawned[$player->getId()] = $player;
+		if($player !== $this and !isset($this->hasSpawned[$player->getLoaderId()])){
+			$this->hasSpawned[$player->getLoaderId()] = $player;
 
 			if(strlen($this->skin) < 64 * 32 * 4){
 				throw new \InvalidStateException((new \ReflectionClass($this))->getShortName() . " must have a valid skin set");
@@ -221,12 +223,12 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	}
 
 	public function despawnFrom(Player $player){
-		if(isset($this->hasSpawned[$player->getId()])){
+		if(isset($this->hasSpawned[$player->getLoaderId()])){
 			$pk = new RemovePlayerPacket();
 			$pk->eid = $this->getId();
 			$pk->clientID = $this->getId();
 			$player->dataPacket($pk->setChannel(Network::CHANNEL_ENTITY_SPAWNING));
-			unset($this->hasSpawned[$player->getId()]);
+			unset($this->hasSpawned[$player->getLoaderId()]);
 		}
 	}
 

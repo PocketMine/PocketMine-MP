@@ -175,7 +175,8 @@ class Block extends Position implements Metadatable{
 	const BRICK_STAIRS = 108;
 	const STONE_BRICK_STAIRS = 109;
 	const MYCELIUM = 110;
-
+	const WATER_LILY = 111;
+	const LILY_PAD = 111;
 	const NETHER_BRICKS = 112;
 	const NETHER_BRICK_BLOCK = 112;
 
@@ -268,7 +269,7 @@ class Block extends Position implements Metadatable{
 	protected $meta = 0;
 
 	/** @var AxisAlignedBB */
-	protected $boundingBox = null;
+	public $boundingBox = null;
 
 	/**
 	 * Backwards-compatibility with old way to define block properties
@@ -402,6 +403,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::STONE_BRICK_STAIRS] = StoneBrickStairs::class;
 
 			self::$list[self::MYCELIUM] = Mycelium::class;
+			self::$list[self::WATER_LILY] = WaterLily::class;
 			self::$list[self::NETHER_BRICKS] = NetherBrick::class;
 
 			self::$list[self::NETHER_BRICKS_STAIRS] = NetherBrickStairs::class;
@@ -671,6 +673,10 @@ class Block extends Position implements Metadatable{
 		return false;
 	}
 
+	public function canPassThrough(){
+		return false;
+	}
+
 	/**
 	 * @return string
 	 */
@@ -724,11 +730,11 @@ class Block extends Position implements Metadatable{
 	 * @return array
 	 */
 	public function getDrops(Item $item){
-		if(!isset(self::$list[$this->id])){ //Unknown blocks
+		if(!isset(self::$list[$this->getId()])){ //Unknown blocks
 			return [];
 		}else{
 			return [
-				[$this->id, $this->meta, 1],
+				[$this->getId(), $this->getDamage(), 1],
 			];
 		}
 	}
@@ -764,20 +770,20 @@ class Block extends Position implements Metadatable{
 	 * @return string
 	 */
 	public function __toString(){
-		return "Block[" . $this->getName() . "] (" . $this->id . ":" . $this->meta . ")";
+		return "Block[" . $this->getName() . "] (" . $this->getId() . ":" . $this->getDamage() . ")";
 	}
 
 	/**
 	 * Checks for collision against an AxisAlignedBB
 	 *
 	 * @param AxisAlignedBB $bb
-	 * @param Block[]       $list
+	 *
+	 * @return bool
 	 */
-	public function collidesWithBB(AxisAlignedBB $bb, &$list = []){
+	public function collidesWithBB(AxisAlignedBB $bb){
 		$bb2 = $this->getBoundingBox();
-		if($bb2 !== null and $bb->intersectsWith($bb2)){
-			$list[] = $bb2;
-		}
+
+		return $bb2 !== null and $bb->intersectsWith($bb2);
 	}
 
 	/**

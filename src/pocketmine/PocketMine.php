@@ -67,6 +67,7 @@ namespace {
 namespace pocketmine {
 	use pocketmine\utils\Binary;
 	use pocketmine\utils\MainLogger;
+	use pocketmine\utils\ServerKiller;
 	use pocketmine\utils\Terminal;
 	use pocketmine\utils\Utils;
 	use pocketmine\wizard\Installer;
@@ -74,8 +75,8 @@ namespace pocketmine {
 	const VERSION = "1.5dev";
 	const API_VERSION = "1.12.0";
 	const CODENAME = "活発(Kappatsu)フグ(Fugu)";
-	const MINECRAFT_VERSION = "v0.11.0 alpha build 13";
-	const MINECRAFT_VERSION_NETWORK = "0.11.0.13";
+	const MINECRAFT_VERSION = "v0.11.0 alpha";
+	const MINECRAFT_VERSION_NETWORK = "0.11.0";
 
 	/*
 	 * Startup code. Do not look at it, it may harm you.
@@ -468,6 +469,10 @@ namespace pocketmine {
 		$logger->debug("Stopping " . (new \ReflectionClass($thread))->getShortName() . " thread");
 		$thread->quit();
 	}
+
+	$killer = new ServerKiller();
+	$killer->start();
+	$killer->detach();
 
 	$logger->shutdown();
 	$logger->join();

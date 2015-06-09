@@ -88,6 +88,12 @@ class Chunk extends BaseFullChunk{
 		}
 
 		parent::__construct($level, $this->nbt["xPos"], $this->nbt["zPos"], $this->nbt->Blocks->getValue(), $this->nbt->Data->getValue(), $this->nbt->SkyLight->getValue(), $this->nbt->BlockLight->getValue(), $this->nbt->BiomeColors->getValue(), $this->nbt->HeightMap->getValue(), $this->nbt->Entities->getValue(), $this->nbt->TileEntities->getValue());
+
+		if(isset($this->nbt->Biomes)){
+			$this->checkOldBiomes($this->nbt->Biomes->getValue());
+			unset($this->nbt->Biomes);
+		}
+
 		unset($this->nbt->Blocks);
 		unset($this->nbt->Data);
 		unset($this->nbt->SkyLight);
@@ -238,7 +244,7 @@ class Chunk extends BaseFullChunk{
 	}
 
 	public function setLightPopulated($value = 1){
-		$this->nbt->LightPopulated = new Byte("LightPopulated", $value);
+		$this->nbt->LightPopulated = new Byte("LightPopulated", $value ? 1 : 0);
 		$this->hasChanged = true;
 	}
 
@@ -253,7 +259,7 @@ class Chunk extends BaseFullChunk{
 	 * @param int $value
 	 */
 	public function setPopulated($value = 1){
-		$this->nbt->TerrainPopulated = new Byte("TerrainPopulated", (int) $value);
+		$this->nbt->TerrainPopulated = new Byte("TerrainPopulated", $value ? 1 : 0);
 		$this->hasChanged = true;
 	}
 
@@ -428,7 +434,7 @@ class Chunk extends BaseFullChunk{
 
 			$chunk->data = str_repeat("\x00", 16384);
 			$chunk->blocks = $chunk->data . $chunk->data;
-			$chunk->skyLight = $chunk->data;
+			$chunk->skyLight = str_repeat("\xff", 16384);
 			$chunk->blockLight = $chunk->data;
 
 			$chunk->heightMap = array_fill(0, 256, 0);

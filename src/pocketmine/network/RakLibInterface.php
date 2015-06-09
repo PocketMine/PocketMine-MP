@@ -25,7 +25,6 @@ use pocketmine\event\player\PlayerCreationEvent;
 use pocketmine\network\protocol\DataPacket;
 use pocketmine\network\protocol\Info as ProtocolInfo;
 use pocketmine\network\protocol\Info;
-use pocketmine\network\protocol\UnknownPacket;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\MainLogger;
@@ -49,7 +48,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 	/** @var Player[] */
 	private $players = [];
 
-	/** @var \SplObjectStorage */
+	/** @var string[] */
 	private $identifiers;
 
 	/** @var int[] */
@@ -61,7 +60,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 	public function __construct(Server $server){
 
 		$this->server = $server;
-		$this->identifiers = new \SplObjectStorage();
+		$this->identifiers = [];
 
 		$this->rakLib = new RakLibServer($this->server->getLogger(), $this->server->getLoader(), $this->server->getPort(), $this->server->getIp() === "" ? "0.0.0.0" : $this->server->getIp());
 		$this->interface = new ServerHandler($this->rakLib, $this);
@@ -95,7 +94,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 	public function closeSession($identifier, $reason){
 		if(isset($this->players[$identifier])){
 			$player = $this->players[$identifier];
-			$this->identifiers->detach($player);
+			unset($this->identifiers[spl_object_hash($player)]);
 			unset($this->players[$identifier]);
 			unset($this->identifiersACK[$identifier]);
 			$player->close($player->getLeaveMessage(), $reason);
@@ -103,11 +102,11 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 	}
 
 	public function close(Player $player, $reason = "unknown reason"){
-		if(isset($this->identifiers[$player])){
-			unset($this->players[$this->identifiers[$player]]);
-			unset($this->identifiersACK[$this->identifiers[$player]]);
-			$this->interface->closeSession($this->identifiers[$player], $reason);
-			$this->identifiers->detach($player);
+		if(isset($this->identifiers[$h = spl_object_hash($player)])){
+			unset($this->players[$this->identifiers[$h]]);
+			unset($this->identifiersACK[$this->identifiers[$h]]);
+			$this->interface->closeSession($this->identifiers[$h], $reason);
+			unset($this->identifiers[$h]);
 		}
 	}
 
@@ -127,7 +126,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 		$player = new $class($this, $ev->getClientId(), $ev->getAddress(), $ev->getPort());
 		$this->players[$identifier] = $player;
 		$this->identifiersACK[$identifier] = 0;
-		$this->identifiers->attach($player, $identifier);
+		$this->identifiers[spl_object_hash($player)] = $identifier;
 		$this->server->addPlayer($identifier, $player);
 	}
 
@@ -136,8 +135,10 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 			try{
 				if($packet->buffer !== ""){
 					$pk = $this->getPacket($packet->buffer);
-					$pk->decode();
-					$this->players[$identifier]->handleDataPacket($pk);
+					if($pk !== null){
+						$pk->decode();
+						$this->players[$identifier]->handleDataPacket($pk);
+					}
 				}
 			}catch(\Exception $e){
 				if(\pocketmine\DEBUG > 1 and isset($pk)){
@@ -195,8 +196,8 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 	}
 
 	public function putPacket(Player $player, DataPacket $packet, $needACK = false, $immediate = false){
-		if(isset($this->identifiers[$player])){
-			$identifier = $this->identifiers[$player];
+		if(isset($this->identifiers[$h = spl_object_hash($player)])){
+			$identifier = $this->identifiers[$h];
 			$pk = null;
 			if(!$packet->isEncoded){
 				$packet->encode();
@@ -216,7 +217,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 				$pk = $packet->__encapsulatedPacket;
 			}
 
-			if(!$immediate and !$needACK and $packet->pid() !== ProtocolInfo::BATCH_PACKET
+			if(!$immediate and !$needACK and $packet::NETWORK_ID !== ProtocolInfo::BATCH_PACKET
 				and Network::$BATCH_THRESHOLD >= 0
 				and strlen($packet->buffer) >= Network::$BATCH_THRESHOLD){
 				$this->server->batchPackets([$player], [$packet], true, $packet->getChannel());
@@ -251,8 +252,7 @@ class RakLibInterface implements ServerInstance, AdvancedSourceInterface{
 		$pid = ord($buffer{0});
 
 		if(($data = $this->network->getPacket($pid)) === null){
-			$data = new UnknownPacket();
-			$data->packetID = $pid;
+			return null;
 		}
 		$data->setBuffer($buffer, 1);
 

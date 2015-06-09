@@ -31,6 +31,7 @@ use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Int;
 use pocketmine\nbt\tag\IntArray;
+use pocketmine\nbt\tag\Long;
 use pocketmine\Player;
 use pocketmine\utils\Binary;
 
@@ -92,6 +93,11 @@ class Chunk extends BaseChunk{
 		}
 
 		parent::__construct($level, (int) $this->nbt["xPos"], (int) $this->nbt["zPos"], $sections, $this->nbt->BiomeColors->getValue(), $this->nbt->HeightMap->getValue(), $this->nbt->Entities->getValue(), $this->nbt->TileEntities->getValue());
+
+		if(isset($this->nbt->Biomes)){
+			$this->checkOldBiomes($this->nbt->Biomes->getValue());
+			unset($this->nbt->Biomes);
+		}
 
 		unset($this->nbt->Sections);
 	}

@@ -92,6 +92,7 @@ use pocketmine\plugin\PharPluginLoader;
 use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginLoadOrder;
 use pocketmine\plugin\PluginManager;
+use pocketmine\plugin\ScriptPluginLoader;
 use pocketmine\scheduler\FileWriteTask;
 use pocketmine\scheduler\SendUsageTask;
 use pocketmine\scheduler\ServerScheduler;
@@ -206,7 +207,7 @@ class Server{
 	private $network;
 
 	private $networkCompressionAsync = true;
-	private $networkCompressionLevel = 7;
+	public $networkCompressionLevel = 7;
 
 	private $autoTickRate = true;
 	private $autoTickRateLimit = 20;
@@ -214,7 +215,7 @@ class Server{
 	private $baseTickRate = 1;
 
 	private $autoSaveTicker = 0;
-	private $autoSaveTicks = 0;
+	private $autoSaveTicks = 6000;
 
 	/** @var BaseLang */
 	private $baseLang;
@@ -238,6 +239,8 @@ class Server{
 
 	/** @var Config */
 	private $properties;
+
+	private $propertyCache = [];
 
 	/** @var Config */
 	private $config;
@@ -1015,6 +1018,9 @@ class Server{
 	 * @return bool
 	 */
 	public function unloadLevel(Level $level, $forceUnload = false){
+		if($level === $this->getDefaultLevel() and !$forceUnload){
+			throw new \InvalidStateException("The default level cannot be unloaded while running, please switch levels.");
+		}
 		if($level->unload($forceUnload) === true){
 			unset($this->levels[$level->getId()]);
 
@@ -1233,8 +1239,8 @@ class Server{
 
 		$order = [];
 
-		for($X = -4; $X <= 4; ++$X){
-			for($Z = -4; $Z <= 4; ++$Z){
+		for($X = -3; $X <= 3; ++$X){
+			for($Z = -3; $Z <= 3; ++$Z){
 				$distance = $X ** 2 + $Z ** 2;
 				$chunkX = $X + $centerX;
 				$chunkZ = $Z + $centerZ;
@@ -1247,7 +1253,7 @@ class Server{
 
 		foreach($order as $index => $distance){
 			Level::getXZ($index, $chunkX, $chunkZ);
-			$level->generateChunk($chunkX, $chunkZ, true);
+			$level->populateChunk($chunkX, $chunkZ, true);
 		}
 
 		return true;
@@ -1303,9 +1309,16 @@ class Server{
 	 * @return mixed
 	 */
 	public function getProperty($variable, $defaultValue = null){
-		$value = $this->config->getNested($variable);
+		if(!array_key_exists($variable, $this->propertyCache)){
+			$v = getopt("", ["$variable::"]);
+			if(isset($v[$variable])){
+				$this->propertyCache[$variable] = $v[$variable];
+			}else{
+				$this->propertyCache[$variable] = $this->properties->getNested($variable);
+			}
+		}
 
-		return $value === null ? $defaultValue : $value;
+		return $this->propertyCache[$variable] === null ? $defaultValue : $this->propertyCache[$variable];
 	}
 
 	/**
@@ -1408,7 +1421,7 @@ class Server{
 	public function addOp($name){
 		$this->operators->set(strtolower($name), true);
 
-		if(($player = $this->getPlayerExact($name)) instanceof Player){
+		if(($player = $this->getPlayerExact($name)) !== null){
 			$player->recalculatePermissions();
 		}
 		$this->operators->save(true);
@@ -1420,7 +1433,7 @@ class Server{
 	public function removeOp($name){
 		$this->operators->remove(strtolower($name));
 
-		if(($player = $this->getPlayerExact($name)) instanceof Player){
+		if(($player = $this->getPlayerExact($name)) !== null){
 			$player->recalculatePermissions();
 		}
 		$this->operators->save();
@@ -1632,7 +1645,7 @@ class Server{
 		$this->maxPlayers = $this->getConfigInt("max-players", 20);
 		$this->setAutoSave($this->getConfigBoolean("auto-save", true));
 
-		if($this->getConfigString("memory-limit", -1) !== false){
+		if($this->getConfigString("memory-limit", false) !== false){
 			$this->logger->notice("The memory-limit setting has been deprecated.");
 			$this->logger->notice("There are new memory settings on pocketmine.yml to tune memory and events.");
 			$this->logger->notice("You can also reduce the amount of threads and chunks loaded control the memory usage.");
@@ -1670,7 +1683,6 @@ class Server{
 		]));
 		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.license", [$this->getName()]));
 
-		PluginManager::$pluginParentTimer = new TimingsHandler("** Plugins");
 		Timings::init();
 
 		$this->consoleSender = new ConsoleCommandSender();
@@ -1693,6 +1705,7 @@ class Server{
 		$this->pluginManager->setUseTimings($this->getProperty("settings.enable-profiling", false));
 		$this->profilingTickRate = (float) $this->getProperty("settings.profile-report-trigger", 20);
 		$this->pluginManager->registerInterface(PharPluginLoader::class);
+		$this->pluginManager->registerInterface(ScriptPluginLoader::class);
 
 		set_exception_handler([$this, "exceptionHandler"]);
 		register_shutdown_function([$this, "crashDump"]);
@@ -1761,7 +1774,7 @@ class Server{
 			return;
 		}
 
-		if($this->getAutoSave() and $this->getProperty("ticks-per.autosave", 6000) > 0){
+		if($this->getProperty("ticks-per.autosave", 6000) > 0){
 			$this->autoSaveTicks = (int) $this->getProperty("ticks-per.autosave", 6000);
 		}
 
@@ -1896,6 +1909,7 @@ class Server{
 	 * @param int                 $channel
 	 */
 	public function batchPackets(array $players, array $packets, $forceSync = false, $channel = 0){
+		Timings::$playerNetworkTimer->startTiming();
 		$str = "";
 
 		foreach($packets as $p){
@@ -1922,6 +1936,8 @@ class Server{
 		}else{
 			$this->broadcastPacketsCallback(zlib_encode($str, ZLIB_ENCODING_DEFLATE, $this->networkCompressionLevel), $targets, $channel);
 		}
+
+		Timings::$playerNetworkTimer->stopTiming();
 	}
 
 	public function broadcastPacketsCallback($data, array $identifiers, $channel = 0){
@@ -2042,6 +2058,7 @@ class Server{
 		}
 
 		$this->pluginManager->registerInterface(PharPluginLoader::class);
+		$this->pluginManager->registerInterface(ScriptPluginLoader::class);
 		$this->pluginManager->loadPlugins($this->pluginPath);
 		$this->enablePlugins(PluginLoadOrder::STARTUP);
 		$this->enablePlugins(PluginLoadOrder::POSTWORLD);
@@ -2281,7 +2298,7 @@ class Server{
 		$this->nextTick = microtime(true);
 		while($this->isRunning){
 			$this->tick();
-			$next = $this->nextTick - 0.001;
+			$next = $this->nextTick - 0.0001;
 			if($next > microtime(true)){
 				try{
 					time_sleep_until($next);
@@ -2477,6 +2494,10 @@ class Server{
 
 		$this->checkTickUpdates($this->tickCounter, $tickTime);
 
+		foreach($this->players as $player){
+			$player->checkNetwork();
+		}
+
 		if(($this->tickCounter & 0b1111) === 0){
 			$this->titleTick();
 			$this->maxTick = 20;
@@ -2547,8 +2568,9 @@ class Server{
 
 		if(($this->nextTick - $tickTime) < -1){
 			$this->nextTick = $tickTime;
+		}else{
+			$this->nextTick += 0.05;
 		}
-		$this->nextTick += 0.05;
 
 		return true;
 	}
