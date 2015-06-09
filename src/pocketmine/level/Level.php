@@ -90,6 +90,8 @@ use pocketmine\nbt\tag\String;
 use pocketmine\network\Network;
 use pocketmine\network\protocol\DataPacket;
 use pocketmine\network\protocol\LevelEventPacket;
+use pocketmine\network\protocol\MoveEntityPacket;
+use pocketmine\network\protocol\SetEntityMotionPacket;
 use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\Player;
@@ -131,6 +133,9 @@ class Level implements ChunkManager, Metadatable{
 
 	/** @var Tile[] */
 	private $tiles = [];
+
+	private $motionToSend = [];
+	private $moveToSend = [];
 
 	/** @var Player[] */
 	private $players = [];
@@ -344,7 +349,7 @@ class Level implements ChunkManager, Metadatable{
 		$this->chunkGenerationQueueSize = (int) $this->server->getProperty("chunk-generation.queue-size", 8);
 		$this->chunkPopulationQueueSize = (int) $this->server->getProperty("chunk-generation.population-queue-size", 2);
 		$this->chunkTickList = [];
-		$this->clearChunksOnTick = (bool) $this->server->getProperty("chunk-ticking.clear-tick-list", false);
+		$this->clearChunksOnTick = (bool) $this->server->getProperty("chunk-ticking.clear-tick-list", true);
 		$this->cacheChunks = (bool) $this->server->getProperty("chunk-sending.cache-chunks", false);
 
 		$this->timings = new LevelTimings($this);
@@ -709,6 +714,22 @@ class Level implements ChunkManager, Metadatable{
 			$this->checkSleep();
 		}
 
+		foreach($this->moveToSend as $index => $entry){
+			Level::getXZ($index, $chunkX, $chunkZ);
+			$pk = new MoveEntityPacket();
+			$pk->entities = $entry;
+			Server::broadcastPacket($this->getChunkPlayers($chunkX, $chunkZ), $pk->setChannel(Network::CHANNEL_MOVEMENT));
+		}
+		$this->moveToSend = [];
+
+		foreach($this->motionToSend as $index => $entry){
+			Level::getXZ($index, $chunkX, $chunkZ);
+			$pk = new SetEntityMotionPacket();
+			$pk->entities = $entry;
+			Server::broadcastPacket($this->getChunkPlayers($chunkX, $chunkZ), $pk->setChannel(Network::CHANNEL_MOVEMENT));
+		}
+		$this->motionToSend = [];
+
 		$this->timings->doTick->stopTiming();
 	}
 
@@ -846,9 +867,6 @@ class Level implements ChunkManager, Metadatable{
 			}elseif($loaders <= 0){
 				unset($this->chunkTickList[$index]);
 			}
-
-
-
 
 			foreach($chunk->getEntities() as $entity){
 				$entity->scheduleUpdate();
@@ -1386,7 +1404,7 @@ class Level implements ChunkManager, Metadatable{
 	public function dropItem(Vector3 $source, Item $item, Vector3 $motion = null, $delay = 10){
 		$motion = $motion === null ? new Vector3(lcg_value() * 0.2 - 0.1, 0.2, lcg_value() * 0.2 - 0.1) : $motion;
 		if($item->getId() > 0 and $item->getCount() > 0){
-			$itemEntity = Entity::createEntity("Item", $this->getChunk($source->getX() >> 4, $source->getZ() >> 4), new Compound("", [
+			$itemEntity = Entity::createEntity("Item", $this->getChunk($source->getX() >> 4, $source->getZ() >> 4, true), new Compound("", [
 				"Pos" => new Enum("Pos", [
 					new Double("", $source->getX()),
 					new Double("", $source->getY()),
@@ -1702,7 +1720,7 @@ class Level implements ChunkManager, Metadatable{
 			for($x = $minX; $x <= $maxX; ++$x){
 				for($z = $minZ; $z <= $maxZ; ++$z){
 					foreach($this->getChunkEntities($x, $z) as $ent){
-						if(($entity === null or ($ent !== $entity and $ent->canCollideWith($entity))) and $ent->boundingBox->intersectsWith($bb)){
+						if(($entity === null or ($ent !== $entity and $entity->canCollideWith($ent))) and $ent->boundingBox->intersectsWith($bb)){
 							$nearby[] = $ent;
 						}
 					}
@@ -2731,5 +2749,19 @@ class Level implements ChunkManager, Metadatable{
 
 	public function removeMetadata($metadataKey, Plugin $plugin){
 		$this->server->getLevelMetadata()->removeMetadata($this, $metadataKey, $plugin);
+	}
+
+	public function addEntityMotion($chunkX, $chunkZ, $entityId, $x, $y, $z){
+		if(!isset($this->motionToSend[$index = Level::chunkHash($chunkX, $chunkZ)])){
+			$this->motionToSend[$index] = [];
+		}
+		$this->motionToSend[$index][$entityId] = [$entityId, $x, $y, $z];
+	}
+
+	public function addEntityMovement($chunkX, $chunkZ, $entityId, $x, $y, $z, $yaw, $pitch, $headYaw = null){
+		if(!isset($this->moveToSend[$index = Level::chunkHash($chunkX, $chunkZ)])){
+			$this->moveToSend[$index] = [];
+		}
+		$this->moveToSend[$index][$entityId] = [$entityId, $x, $y, $z, $yaw, $headYaw === null ? $yaw : $headYaw, $pitch];
 	}
 }

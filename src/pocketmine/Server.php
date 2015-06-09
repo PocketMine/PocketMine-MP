@@ -240,6 +240,8 @@ class Server{
 	/** @var Config */
 	private $properties;
 
+	private $propertyCache = [];
+
 	/** @var Config */
 	private $config;
 
@@ -1307,9 +1309,16 @@ class Server{
 	 * @return mixed
 	 */
 	public function getProperty($variable, $defaultValue = null){
-		$value = $this->config->getNested($variable);
+		if(!array_key_exists($variable, $this->propertyCache)){
+			$v = getopt("", ["$variable::"]);
+			if(isset($v[$variable])){
+				$this->propertyCache[$variable] = $v[$variable];
+			}else{
+				$this->propertyCache[$variable] = $this->properties->getNested($variable);
+			}
+		}
 
-		return $value === null ? $defaultValue : $value;
+		return $this->propertyCache[$variable] === null ? $defaultValue : $this->propertyCache[$variable];
 	}
 
 	/**
@@ -1636,7 +1645,7 @@ class Server{
 		$this->maxPlayers = $this->getConfigInt("max-players", 20);
 		$this->setAutoSave($this->getConfigBoolean("auto-save", true));
 
-		if($this->getConfigString("memory-limit", -1) !== false){
+		if($this->getConfigString("memory-limit", false) !== false){
 			$this->logger->notice("The memory-limit setting has been deprecated.");
 			$this->logger->notice("There are new memory settings on pocketmine.yml to tune memory and events.");
 			$this->logger->notice("You can also reduce the amount of threads and chunks loaded control the memory usage.");
