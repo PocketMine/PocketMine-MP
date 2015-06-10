@@ -1638,7 +1638,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 					break;
 				}
-				
+
 				if(strlen($packet->skin) !== 64 * 32 * 4 and strlen($packet->skin) !== 64 * 64 * 4){
 					$this->close("", "disconnectionScreen.invalidSkin");
 					break;
@@ -2825,7 +2825,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		}
 		$this->dataPacket($pk->setChannel(Network::CHANNEL_TEXT));
 	}
-	
+
 	public function sendPopup($message){
 		$pk = new TextPacket();
 		$pk->type = TextPacket::TYPE_POPUP;
@@ -2856,7 +2856,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				$pk->message = $reason;
 				$this->directDataPacket($pk->setChannel(Network::CHANNEL_PRIORITY));
 			}
-			
+
 			$this->connected = false;
 			if(strlen($this->getName()) > 0){
 				$this->server->getPluginManager()->callEvent($ev = new PlayerQuitEvent($this, $message, true));
@@ -3225,6 +3225,19 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		}
 
 		$oldPos = $this->getPosition();
+
+		if(($pos instanceof Position) && $pos->getLevel() !== $oldPos->getLevel()){
+			$pk = new UpdateBlockPacket();
+			// Workaround: removes tile entities that linger whenever you teleport
+			// to a different world
+			foreach($oldPos->getLevel()->getTiles() as $tile){
+				$pk->records[] = [$tile->x, $tile->z, $tile->y, 0, 0, UpdateBlockPacket::FLAG_NONE];
+			}
+			if(count($pk->records)){
+				$this->dataPacket($pk);
+			}
+		}
+
 		if(parent::teleport($pos, $yaw, $pitch)){
 
 			foreach($this->windowIndex as $window){
