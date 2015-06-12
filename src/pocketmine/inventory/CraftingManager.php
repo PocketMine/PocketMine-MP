@@ -158,9 +158,10 @@ class CraftingManager{
 		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::SANDSTONE, 2, 4)))->addIngredient(Item::get(Item::SANDSTONE, 0, 4)));
 		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::SANDSTONE, 1, 1)))->addIngredient(Item::get(Item::SLAB, 1, 2)));
 		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::SLAB, 1, 6)))->addIngredient(Item::get(Item::SANDSTONE, 0, 3)));
-		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::STONE_BRICK_STAIRS, 0, 4)))->addIngredient(Item::get(Item::STONE_BRICK, 0, 6)));
-		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::STONE_BRICK, 0, 4)))->addIngredient(Item::get(Item::STONE, 0, 4)));
-		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::SLAB, 5, 6)))->addIngredient(Item::get(Item::STONE_BRICK, 0, 3)));
+		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::STONE_BRICK_STAIRS, 0, 4)))->addIngredient(Item::get(Item::STONE_BRICK, null, 6)));
+		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::STONE_BRICK, 0, 4)))->addIngredient(Item::get(Item::STONE, null, 4)));
+		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::STONE_BRICK, 3, 1)))->addIngredient(Item::get(Item::SLAB, 5, 2)));
+		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::SLAB, 5, 6)))->addIngredient(Item::get(Item::STONE_BRICK, null, 3)));
 		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::SLAB, 0, 6)))->addIngredient(Item::get(Item::STONE, null, 3)));
 		$this->registerRecipe((new StonecutterShapelessRecipe(Item::get(Item::COBBLESTONE_STAIRS, 0, 4)))->addIngredient(Item::get(Item::COBBLESTONE, 0, 6)));
 
