@@ -598,17 +598,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	protected function switchLevel(Level $targetLevel){
 		$oldLevel = $this->level;
 		if(parent::switchLevel($targetLevel)){
-			//TODO HACK: removes tile entities that linger whenever you teleport
-			// to a different world
-			$pk = new UpdateBlockPacket();
-			foreach($oldLevel->getTiles() as $tile){
-				$pk->records[] = [$tile->x, $tile->z, $tile->y, 0, 0, UpdateBlockPacket::FLAG_NONE];
-			}
-			if(count($pk->records)){
-				$this->dataPacket($pk);
-			}
-			//----
-
 			foreach($this->usedChunks as $index => $d){
 				Level::getXZ($index, $X, $Z);
 				$this->unloadChunk($X, $Z, $oldLevel);
@@ -631,6 +620,16 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 					$entity->despawnFrom($this);
 				}
 			}
+			//TODO HACK: removes tile entities that linger whenever you teleport
+			// to a different world
+			$pk = new UpdateBlockPacket();
+			foreach($level->getChunkTiles($x, $z) as $tile){
+				$pk->records[] = [$tile->x, $tile->z, $tile->y, 0, 0, UpdateBlockPacket::FLAG_NONE];
+			}
+			if(count($pk->records)){
+				$this->dataPacket($pk);
+			}
+			//----
 
 			unset($this->usedChunks[$index]);
 		}
