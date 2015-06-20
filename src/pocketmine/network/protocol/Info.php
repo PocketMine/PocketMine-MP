@@ -24,7 +24,12 @@
  */
 namespace pocketmine\network\protocol;
 
-
+/**
+ * You can regenerate this file using this script:
+ * https://gist.github.com/shoghicp/5d6b6bd6f11e6de1b70a
+ * It emulates an enum from the first packet id defined, supports comments.
+ * Useful when packets are added/removed not at the end and you have to shift the list
+ */
 interface Info{
 
 	/**
@@ -34,37 +39,26 @@ interface Info{
 
 	const LOGIN_PACKET = 0x82;
 	const PLAY_STATUS_PACKET = 0x83;
-
 	const DISCONNECT_PACKET = 0x84;
-
 	const TEXT_PACKET = 0x85;
 	const SET_TIME_PACKET = 0x86;
-
 	const START_GAME_PACKET = 0x87;
-
 	const ADD_PLAYER_PACKET = 0x88;
 	const REMOVE_PLAYER_PACKET = 0x89;
-
 	const ADD_ENTITY_PACKET = 0x8a;
 	const REMOVE_ENTITY_PACKET = 0x8b;
 	const ADD_ITEM_ENTITY_PACKET = 0x8c;
 	const TAKE_ITEM_ENTITY_PACKET = 0x8d;
-
 	const MOVE_ENTITY_PACKET = 0x8e;
 	const MOVE_PLAYER_PACKET = 0x8f;
-
 	const REMOVE_BLOCK_PACKET = 0x90;
 	const UPDATE_BLOCK_PACKET = 0x91;
-
 	const ADD_PAINTING_PACKET = 0x92;
-
 	const EXPLODE_PACKET = 0x93;
-
 	const LEVEL_EVENT_PACKET = 0x94;
 	const TILE_EVENT_PACKET = 0x95;
 	const ENTITY_EVENT_PACKET = 0x96;
 	const MOB_EFFECT_PACKET = 0x97;
-
 	const PLAYER_EQUIPMENT_PACKET = 0x98;
 	const PLAYER_ARMOR_EQUIPMENT_PACKET = 0x99;
 	const INTERACT_PACKET = 0x9a;
@@ -87,9 +81,13 @@ interface Info{
 	//const CONTAINER_ACK_PACKET = 0xab;
 	const ADVENTURE_SETTINGS_PACKET = 0xac;
 	const TILE_ENTITY_DATA_PACKET = 0xad;
-	//const PLAYER_INPUT_PACKET = 0xae;
+	const PLAYER_INPUT_PACKET = 0xae;
 	const FULL_CHUNK_DATA_PACKET = 0xaf;
 	const SET_DIFFICULTY_PACKET = 0xb0;
 	const BATCH_PACKET = 0xb1;
 
 }
+
+
+
+

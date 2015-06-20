@@ -121,8 +121,10 @@ abstract class Entity extends Location implements Metadatable{
 		self::DATA_NO_AI => [self::DATA_TYPE_BYTE, 0],
 	];
 
-	public $passenger = null;
-	public $vehicle = null;
+	/** @var Entity[] */
+	protected $riders = [];
+	/** @var Entity */
+	protected $vehicle = null;
 
 	/** @var Chunk */
 	public $chunk;
@@ -300,6 +302,22 @@ abstract class Entity extends Location implements Metadatable{
 	 */
 	public function setNameTagVisible($value = true){
 		$this->setDataProperty(self::DATA_SHOW_NAMETAG, self::DATA_TYPE_BYTE, $value ? 1 : 0);
+	}
+
+	public function getRiders(){
+		return $this->riders;
+	}
+
+	public function isRiding(){
+		return $this->vehicle !== null;
+	}
+
+	public function getVehicle(){
+		return $this->vehicle;
+	}
+
+	public function isRider(Entity $entity){
+		return isset($this->riders[$entity->getId()]);
 	}
 
 	/**

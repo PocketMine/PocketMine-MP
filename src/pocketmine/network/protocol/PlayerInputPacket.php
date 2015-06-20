@@ -24,27 +24,25 @@ namespace pocketmine\network\protocol;
 #include <rules/DataPacket.h>
 
 
-class SetEntityLinkPacket extends DataPacket{
-	const NETWORK_ID = Info::SET_ENTITY_LINK_PACKET;
+class PlayerInputPacket extends DataPacket{
+	const NETWORK_ID = Info::PLAYER_INPUT_PACKET;
 
-	const TYPE_REMOVE = 0;
-	const TYPE_RIDE = 1;
-	const TYPE_PASSENGER = 2;
+	public $motX;
+	public $motY;
 
-
-	public $vehicle;
-	public $passenger;
-	public $type;
+	public $jumping;
+	public $sneaking;
 
 	public function decode(){
-
+		$this->motX = $this->getFloat();
+		$this->motY = $this->getFloat();
+		$flags = $this->getByte();
+		$this->jumping = (($flags & 0x80) > 0);
+		$this->sneaking = (($flags & 0x40) > 0);
 	}
 
 	public function encode(){
-		$this->reset();
-		$this->putLong($this->from);
-		$this->putLong($this->to);
-		$this->putByte($this->type);
+
 	}
 
 }

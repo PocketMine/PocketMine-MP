@@ -719,7 +719,7 @@ class Level implements ChunkManager, Metadatable{
 					unset($this->chunkCache[$index]);
 					Level::getXZ($index, $chunkX, $chunkZ);
 					if(count($blocks) > 512){
-						$chunk = $this->getChunk($chunkX, $chunkZ);
+						$chunk = $this->getChunk($chunkX, $chunkZ, true);
 						foreach($this->getChunkPlayers($chunkX, $chunkZ) as $p){
 							$p->onChunkChanged($chunk);
 						}
@@ -1223,7 +1223,7 @@ class Level implements ChunkManager, Metadatable{
 	public function getFullLight(Vector3 $pos){
 		$chunk = $this->getChunk($pos->x >> 4, $pos->z >> 4, false);
 		$level = 0;
-		if($chunk instanceof FullChunk){
+		if($chunk !== null){
 			$level = $chunk->getBlockSkyLight($pos->x & 0x0f, $pos->y & 0x7f, $pos->z & 0x0f);
 			//TODO: decrease light level by time of day
 			if($level < 15){
@@ -1242,7 +1242,7 @@ class Level implements ChunkManager, Metadatable{
 	 * @return int bitmap, (id << 4) | data
 	 */
 	public function getFullBlock($x, $y, $z){
-		return $this->getChunk($x >> 4, $z >> 4, false)->getFullBlock($x & 0x0f, $y & 0x7f, $z & 0x0f);
+		return $this->getChunk($x >> 4, $z >> 4, true)->getFullBlock($x & 0x0f, $y & 0x7f, $z & 0x0f);
 	}
 
 	/**
@@ -1711,7 +1711,7 @@ class Level implements ChunkManager, Metadatable{
 		}
 
 		if($hand->getId() === Item::SIGN_POST or $hand->getId() === Item::WALL_SIGN){
-			$tile = Tile::createTile("Sign", $this->getChunk($block->x >> 4, $block->z >> 4), new Compound("", [
+			$tile = Tile::createTile("Sign", $this->getChunk($block->x >> 4, $block->z >> 4, true), new Compound("", [
 				"id" => new String("id", Tile::SIGN),
 				"x" => new Int("x", $block->x),
 				"y" => new Int("y", $block->y),
