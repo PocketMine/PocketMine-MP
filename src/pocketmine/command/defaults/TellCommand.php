@@ -33,7 +33,7 @@ class TellCommand extends VanillaCommand{
 			$name,
 			"%pocketmine.command.tell.description",
 			"%commands.message.usage",
-			["w", "msg"]
+			["w", "msg", "m"]
 		);
 		$this->setPermission("pocketmine.command.tell");
 	}
@@ -48,6 +48,13 @@ class TellCommand extends VanillaCommand{
 
 			return false;
 		}
+
+                if($args[0] == "CONSOLE"){
+                 $name = strtolower(array_shift($args));
+
+		$player = $sender->getServer()->getPlayer($name);
+                         $this->getLogger()->info("[" .$sender->getName(). " -> ".$player->getDisplayName."] ".implode(" ", $args));
+                }
 
 		$name = strtolower(array_shift($args));
 
