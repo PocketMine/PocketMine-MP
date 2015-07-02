@@ -746,6 +746,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$pk->z = $pos->z;
 		$this->dataPacket($pk->setChannel(Network::CHANNEL_WORLD_CHUNKS));
 
+		$this->level = $pos->level;
+
 		$pk = new PlayStatusPacket();
 		$pk->status = PlayStatusPacket::PLAYER_SPAWN;
 		$this->dataPacket($pk->setChannel(Network::CHANNEL_WORLD_CHUNKS));
