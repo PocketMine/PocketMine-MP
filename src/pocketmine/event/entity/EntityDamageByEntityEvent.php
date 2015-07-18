@@ -46,12 +46,12 @@ class EntityDamageByEntityEvent extends EntityDamageEvent{
 	}
 
 	protected function addAttackerModifiers(Entity $damager){
-		if($damager->hasEffect(Effect::STRENGTH)){
-			$this->setDamage($this->getDamage(self::MODIFIER_BASE) * 0.3 * ($damager->getEffect(Effect::STRENGTH)->getAmplifier() + 1), self::MODIFIER_STRENGTH);
+		if($damager->hasEffect(Effect::STRENGTH)){ // only melee attacks should be affected, according to http://minecraft.gamepedia.com/Status_effect#Strength
+			$this->setMultiplier(1.3 * ($damager->getEffect(Effect::STRENGTH)->getAmplifier() + 1), self::MULTIPLIER_STRENGTH); // strength II is 260% instead of 160% according to http://minecraft.gamepedia.com/Status_effect#Strength
 		}
 
-		if($damager->hasEffect(Effect::WEAKNESS)){
-			$this->setDamage(-($this->getDamage(self::MODIFIER_BASE) * 0.2 * ($damager->getEffect(Effect::WEAKNESS)->getAmplifier() + 1)), self::MODIFIER_WEAKNESS);
+		if($damager->hasEffect(Effect::WEAKNESS) and $this->getCause() === self::CAUSE_ENTITY_ATTACK){ // only melee attacks should be affected, according to http://minecraft.gamepedia.com/Status_effect#Weakness
+			$this->setMultiplier(1 - 0.2 * ($damager->getEffect(Effect::WEAKNESS)->getAmplifier() + 1), self::MULTIPLIER_WEAKNESS);
 		}
 	}
 

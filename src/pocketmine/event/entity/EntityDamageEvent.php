@@ -29,10 +29,20 @@ class EntityDamageEvent extends EntityEvent implements Cancellable{
 	public static $handlerList = null;
 
 	const MODIFIER_BASE = 0;
+	/** @deprecated */
 	const MODIFIER_ARMOR = 1;
+	/** @deprecated */
 	const MODIFIER_STRENGTH = 2;
+	/** @deprecated */
 	const MODIFIER_WEAKNESS = 3;
+	/** @deprecated */
 	const MODIFIER_RESISTANCE = 4;
+
+	const MULTIPLIER_BASE = 0;
+	const MULTIPLIER_ARMOR = 1;
+	const MULTIPLIER_STRENGTH = 2;
+	const MULTIPLIER_WEAKNESS = 3;
+	const MULTIPLIER_RESISTANCE = 4;
 
 	const CAUSE_CONTACT = 0;
 	const CAUSE_ENTITY_ATTACK = 1;
@@ -55,6 +65,8 @@ class EntityDamageEvent extends EntityEvent implements Cancellable{
 	/** @var array */
 	private $modifiers;
 	private $originals;
+	/** @var float[] */
+	private $multipliers = [self::MULTIPLIER_BASE => 1.0];
 
 
 	/**
@@ -82,7 +94,7 @@ class EntityDamageEvent extends EntityEvent implements Cancellable{
 		}
 
 		if($entity->hasEffect(Effect::DAMAGE_RESISTANCE)){
-			$this->setDamage(-($this->getDamage(self::MODIFIER_BASE) * 0.20 * ($entity->getEffect(Effect::DAMAGE_RESISTANCE)->getAmplifier() + 1)), self::MODIFIER_RESISTANCE);
+			$this->setMultiplier(1 - 0.20 * ($entity->getEffect(Effect::DAMAGE_RESISTANCE)->getAmplifier() + 1), self::MULTIPLIER_RESISTANCE);
 		}
 	}
 
@@ -139,12 +151,40 @@ class EntityDamageEvent extends EntityEvent implements Cancellable{
 	}
 
 	/**
+	 * @param int $type default {@link #MULTIPLIER_BASE}
+	 * @param float|mixed $default
+	 *
+	 * @return float|mixed
+	 */
+	public function getMultiplier($type = self::MULTIPLIER_BASE, $default = 1.0){
+		return isset($this->multipliers[$type]) ? $type : $default;
+	}
+
+	/**
+	 * @param float $multiplier
+	 * @param int $type default {@link #MULTIPLIER_BASE}
+	 *
+	 * @return $this
+	 */
+	public function setMultiplier($multiplier, $type = self::MULTIPLIER_BASE){
+		if(!isset($this->multipliers[$type])){
+			$this->multipliers[$type] = $multiplier; // or should I throw an exception?
+		}else{
+			$this->multipliers[$type] *= $multiplier;
+		}
+		return $this;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getFinalDamage(){
 		$damage = 0;
-		foreach($this->modifiers as $type => $d){
+		foreach($this->modifiers as $d){
 			$damage += $d;
+		}
+		foreach($this->multipliers as $m){
+			$damage *= $m;
 		}
 
 		return $damage;
