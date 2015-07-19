@@ -76,10 +76,41 @@ class Stone extends Solid{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= Tool::TIER_WOODEN){
-			return [
-				[Item::COBBLESTONE, 0, 1],
-			];
+		if($item->isPickaxe() >= 1){
+			switch($this->meta){
+				case Stone::NORMAL:
+					return [
+						[Item::COBBLESTONE, 0, 1],
+					];
+				case Stone::GRANITE:
+					return [
+						[Item::STONE, 1, 1],
+					];
+				case Stone::POLISHED_GRANITE:
+					return [
+						[Item::STONE, 2, 1],
+					];
+				case Stone::DIORITE:
+					return [
+						[Item::STONE, 3, 1],
+					];
+				case Stone::POLISHED_DIORITE:
+					return [
+						[Item::STONE, 4, 1],
+					];
+				case Stone::ANDESITE:
+					return [
+						[Item::STONE, 5, 1],
+					];
+				case Stone::POLISHED_ANDESITE:
+					return [
+						[Item::STONE, 6, 1],
+					];
+				default:
+					return [
+						[Item::COBBLESTONE, 0, 1],
+					];
+			}
 		}else{
 			return [];
 		}
