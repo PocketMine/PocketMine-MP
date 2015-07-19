@@ -76,7 +76,7 @@ class Stone extends Solid{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= 1){
+		if($item->isPickaxe() >= Tool::TIER_WOODEN){
 			switch($this->meta){
 				case Stone::NORMAL:
 					return [
