@@ -141,7 +141,7 @@ class Chunk extends BaseFullChunk{
 		}
 	}
 
-	public function getBlock($x, $y, $z, &$blockId, &$meta = null){
+	public function getBlock($x, $y, $z, $blockId, $meta = null){
 		$full = $this->getFullBlock($x, $y, $z);
 		$blockId = $full >> 4;
 		$meta = $full & 0x0f;
