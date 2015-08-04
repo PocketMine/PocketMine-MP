@@ -237,8 +237,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			$pk->speedZ = $this->motionZ;
 			$pk->yaw = $this->yaw;
 			$pk->pitch = $this->pitch;
-			$item = $this->getInventory()->getItemInHand();
-			$pk->item = $item->getId();
+			$pk->item = $this->getInventory()->getItemInHand();
 			$pk->meta = $item->getDamage();
 			$pk->skin = $this->skin;
 			$pk->slim = $this->isSlim;
