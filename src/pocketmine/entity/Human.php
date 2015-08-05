@@ -238,7 +238,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			$pk->yaw = $this->yaw;
 			$pk->pitch = $this->pitch;
 			$item = $this->getInventory()->getItemInHand();
-			$pk->item = $item->getId();
+			$pk->item = $item;
 			$pk->meta = $item->getDamage();
 			$pk->skin = $this->skin;
 			$pk->slim = $this->isSlim;
@@ -257,8 +257,8 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		if(isset($this->hasSpawned[$player->getLoaderId()])){
 
 			$pk = new RemovePlayerPacket();
-			$pk->eid = $this->getUniqueId();
-			$pk->clientID = $this->getId();
+			$pk->eid = $this->getId();
+			$pk->clientID = $this->getUniqueId();
 			$player->dataPacket($pk->setChannel(Network::CHANNEL_ENTITY_SPAWNING));
 			unset($this->hasSpawned[$player->getLoaderId()]);
 		}
