@@ -56,9 +56,9 @@ class Ice extends Transparent{
 	
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_RANDOM){
-			if($this->getLevel()->getBlockLightAt($this->x, $this->y, $this->z)>= 12){
-			$this->getLevel()->setBlock($this, new Water(), true);
-			return Level::BLOCK_UPDATE_NORMAL;
+			if($this->getLevel()->getBlockLightAt($this->x, $this->y, $this->z) >= 12){
+				$this->getLevel()->setBlock($this, new Water(), true);
+				return Level::BLOCK_UPDATE_NORMAL;
 			}
 		}
 		return false;
