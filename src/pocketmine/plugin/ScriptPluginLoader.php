@@ -106,6 +106,15 @@ class ScriptPluginLoader implements PluginLoader{
 			}
 		}
 		if($insideHeader){
+			/*
+			 * We go through the description and make sure that array
+			 * tags are indeed arrays...
+			 */
+			foreach(["depend", "softdepend", "loadbefore", "api", "authors"] as $key){
+				if(isset($data[$key])) {
+					$data[$key] = preg_split("/\s*,\s*/", $data[$key]);
+				}
+			}
 			return new PluginDescription($data);
 		}
 
