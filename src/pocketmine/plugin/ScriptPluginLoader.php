@@ -25,6 +25,8 @@ use pocketmine\event\plugin\PluginDisableEvent;
 use pocketmine\event\plugin\PluginEnableEvent;
 use pocketmine\Server;
 use pocketmine\utils\PluginException;
+use pocketmine\utils\Config;
+
 
 /**
  * Simple script loader, not for plugin development
@@ -86,27 +88,23 @@ class ScriptPluginLoader implements PluginLoader{
 	public function getPluginDescription($file){
 		$content = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-		$data = [];
-
 		$insideHeader = false;
+		$yaml = "";
 		foreach($content as $line){
 			if(!$insideHeader and strpos($line, "/**") !== false){
 				$insideHeader = true;
 			}
-
-			if(preg_match("/^[ \t]+\\*[ \t]+@([a-zA-Z]+)[ \t]+(.*)$/", $line, $matches) > 0){
-				$key = $matches[1];
-				$content = trim($matches[2]);
-
-				$data[$key] = $content;
-			}
-
-			if($insideHeader and strpos($line, "**/") !== false){
-				break;
+			if($insideHeader){
+				if(strpos($line, "**/") !== false){
+					break;
+				}
+				if(preg_match("/^[ \t]+\\*([ ]+)@([a-zA-Z]+)[ \t]+(.*)$/", $line, $matches) > 0){
+					$yaml .= $matches[1] . $matches[2] . ": " . $matches[3] . "\n";
+				}
 			}
 		}
 		if($insideHeader){
-			return new PluginDescription($data);
+			return new PluginDescription(yaml_parse(Config::fixYAMLIndexes($yaml)));
 		}
 
 		return null;
