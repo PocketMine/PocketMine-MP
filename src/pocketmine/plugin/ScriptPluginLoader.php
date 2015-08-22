@@ -97,7 +97,10 @@ class ScriptPluginLoader implements PluginLoader{
 			if(preg_match("/^[ \t]+\\*[ \t]+@([a-zA-Z]+)[ \t]+(.*)$/", $line, $matches) > 0){
 				$key = $matches[1];
 				$content = trim($matches[2]);
-
+				// Check if the user intended this to be an array...
+				if($content{0} === "[" and substr($content, -1) === "]"){
+					$content = preg_split("/\\s*,\\s*/", trim(substr($content, 1, strlen($content) - 2)));
+				}
 				$data[$key] = $content;
 			}
 
