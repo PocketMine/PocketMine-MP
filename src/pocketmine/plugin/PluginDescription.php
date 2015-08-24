@@ -45,6 +45,17 @@ class PluginDescription{
 	private $permissions = [];
 
 	/**
+	 * @param string|array $str
+	 */
+	static private function forceArray($str){
+		if(is_array($str)){
+			return $str;
+		}
+		return preg_split("/\\s*,\\s*/", $str);
+	}
+
+
+	/**
 	 * @param string|array $yamlString
 	 */
 	public function __construct($yamlString){
@@ -64,7 +75,8 @@ class PluginDescription{
 		$this->name = str_replace(" ", "_", $this->name);
 		$this->version = $plugin["version"];
 		$this->main = $plugin["main"];
-		$this->api = !is_array($plugin["api"]) ? [$plugin["api"]] : $plugin["api"];
+		$this->api = self::forceArray($plugin["api"]);
+
 		if(stripos($this->main, "pocketmine\\") === 0){
 			throw new PluginException("Invalid PluginDescription main, cannot start within the PocketMine namespace");
 		}
@@ -74,13 +86,13 @@ class PluginDescription{
 		}
 
 		if(isset($plugin["depend"])){
-			$this->depend = (array) $plugin["depend"];
+			$this->depend = self::forceArray($plugin["depend"]);
 		}
 		if(isset($plugin["softdepend"])){
-			$this->softDepend = (array) $plugin["softdepend"];
+			$this->softDepend = self::forceArray($plugin["softdepend"]);
 		}
 		if(isset($plugin["loadbefore"])){
-			$this->loadBefore = (array) $plugin["loadbefore"];
+			$this->loadBefore = self::forceArray($plugin["loadbefore"]);
 		}
 
 		if(isset($plugin["website"])){
@@ -105,7 +117,7 @@ class PluginDescription{
 			$this->authors[] = $plugin["author"];
 		}
 		if(isset($plugin["authors"])){
-			foreach($plugin["authors"] as $author){
+			foreach(self::forceArray($plugin["authors"]) as $author){
 				$this->authors[] = $author;
 			}
 		}
