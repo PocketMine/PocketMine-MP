@@ -34,7 +34,7 @@ class GlowingRedstoneOre extends Solid{
 	}
 
 	public function getHardness(){
-		return 15;
+		return 3;
 	}
 
 	public function getName(){
@@ -60,7 +60,7 @@ class GlowingRedstoneOre extends Solid{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= 4){
+		if($item->isPickaxe() >= 2){
 			return [
 				[Item::REDSTONE_DUST, 0, mt_rand(4, 5)],
 			];
