@@ -2444,7 +2444,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 							if(is_array($amount)){
 								$amount = isset($amount[$slot->getDamage()]) ? $amount[$slot->getDamage()] : 0;
 							}
-                            $ev = new EntityRegainHealthEvent($this, $amount, EntityRegainHealthEvent::CAUSE_EATING);
+                            				$this->server->getPluginManager()->callEvent($ev = new EntityRegainHealthEvent($this, $amount, EntityRegainHealthEvent::CAUSE_EATING));
 							$this->heal($ev->getAmount(), $ev);
 
 							--$slot->count;
