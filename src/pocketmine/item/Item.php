@@ -215,6 +215,7 @@ class Item{
 	const ENCHANTING_TABLE = 116;
 	const ENCHANT_TABLE = 116;
 	const ENCHANTMENT_TABLE = 116;
+	const BREWING_STAND = 117;
 
 	const END_PORTAL = 120;
 	const END_STONE = 121;
@@ -414,19 +415,35 @@ class Item{
 	const RAW_CHICKEN = 365;
 	const COOKED_CHICKEN = 366;
 
+	const BLAZE_ROD = 369;
+	const GHAST_TEAR = 370;
 	const GOLD_NUGGET = 371;
 	const GOLDEN_NUGGET = 371;
-
+	const NETHER_WART = 372;
+	const POTION = 373;
+	const GLASS_BOTTLE = 374;
+	const SPIDER_EYE = 375;
+	const FERMENTED_SPIDER_EYE = 376;
+	const BLAZE_POWDER = 377;
+	const MAGMA_CREAM = 378;
+	const BREWING_STAND = 379;
+	const CAULDRON = 380;
+	
+	const SPECKLED_MELON = 382;
 	const SPAWN_EGG = 383;
+	const EXPERIENCE_BOTTLE = 384;
 
 	const EMERALD = 388;
 
+	const FLOWER_POT = 390;
 	const CARROT = 391;
 	const CARROTS = 391;
 	const POTATO = 392;
 	const POTATOES = 392;
 	const BAKED_POTATO = 393;
 	const BAKED_POTATOES = 393;
+	
+	const SKULL = 397;
 
 	const PUMPKIN_PIE = 400;
 
