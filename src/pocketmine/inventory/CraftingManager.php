@@ -160,6 +160,15 @@ class CraftingManager{
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::PAPER, 0, 1)))->addIngredient(Item::get(Item::SUGARCANE, 0, 3)));
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::SIGN, 0, 3)))->addIngredient(Item::get(Item::STICK, 0, 1))->addIngredient(Item::get(Item::WOODEN_PLANKS, null, 6))); //TODO: check if it gives one sign or three
 		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::IRON_BARS, 0, 16)))->addIngredient(Item::get(Item::IRON_INGOT, 0, 6)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::ENCHANT_TABLE, 0, 1)))->addIngredient(Item::get(Item::OBSIDIAN, 0, 4))->addIngredient(Item::get(Item::DIAMOND, 0, 2))->addIngredient(Item::get(Item::BOOK, 0, 1)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::CAULDRON, 0, 1)))->addIngredient(Item::get(Item::IRON_INGOT, 0, 7)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::BREWING_STAND, 0, 1)))->addIngredient(Item::get(Item::COBBLESTONE, 0, 3))->addIngredient(Item::get(Item::BLAZE_ROD, 0, 1)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::ANVIL, 0, 1)))->addIngredient(Item::get(Item::IRON_INGOT, 0, 4))->addIngredient(Item::get(Item::IRON_BLOCK, 0, 3)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::GLASS_BOTTLE, 0, 1)))->addIngredient(Item::get(Item::GLASS, 0, 3)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::SPECKLED_MELON, 0, 1)))->addIngredient(Item::get(Item::GOLD_NUGGET, 0, 8))->addIngredient(Item::get(Item::MELON, 0, 1)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::BLAZE_POWDER, 0, 2)))->addIngredient(Item::get(Item::BLAZE_ROD, 0, 1)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::FERMENTED_SPIDER_EYE, 0, 1)))->addIngredient(Item::get(Item::SPIDER_EYE, 0, 1))->addIngredient(Item::get(Item::SUGAR, 0, 1))->addIngredient(Item::get(Item::BROWN_MUSHROOM, 0, 1)));
+		$this->registerRecipe((new BigShapelessRecipe(Item::get(Item::MAGMA_CREAM, 0, 1)))->addIngredient(Item::get(Item::SLIMEBALL, 0, 1))->addIngredient(Item::get(Item::BLAZE_POWDER, 0, 1)));
 	}
 
 	protected function registerFurnace(){
