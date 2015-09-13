@@ -194,6 +194,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	protected $port;
 	protected $username;
 	protected $iusername;
+	/** @var bool */
+	protected $playedBefore;
 	protected $displayName;
 	protected $startAction = -1;
 	/** @var Vector3 */
@@ -294,7 +296,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	}
 
 	public function hasPlayedBefore(){
-		return $this->namedtag instanceof Compound;
+		return $this->playedBefore;
 	}
 
 	public function setAllowFlight($value){
@@ -1713,6 +1715,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 					}
 				}
 
+				$noExtPath = $this->server->getDataPath() . "players/$this->username";
+				$this->playedBefore = file_exists($noExtPath . ".dat") or file_Exists($noExtPath . ".yml");
 				$nbt = $this->server->getOfflinePlayerData($this->username);
 				if(!isset($nbt->NameTag)){
 					$nbt->NameTag = new String("NameTag", $this->username);
