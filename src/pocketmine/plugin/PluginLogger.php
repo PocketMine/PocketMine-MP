@@ -93,4 +93,6 @@ class PluginLogger implements \AttachableLogger{
 			$attachment->log($level, $message);
 		}
 	}
+
+        public function __destruct() { }
 }
