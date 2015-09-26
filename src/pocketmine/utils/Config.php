@@ -259,7 +259,18 @@ class Config{
 	 * @param $value
 	 */
 	public function setNested($key, $value){
-		$vars = explode(".", $key);
+		$vars = [];
+		$current = "";
+		foreach(explode(".", $key) as $var){
+			if(substr($var, -1) === "\\"){
+				$current .= $var . ".";
+			}else{
+				$var = $current . $var;
+				$current = "";
+				$vars[] = $var;
+			}
+		}
+		
 		$base = array_shift($vars);
 
 		if(!isset($this->config[$base])){
@@ -291,7 +302,18 @@ class Config{
 			return $this->nestedCache[$key];
 		}
 
-		$vars = explode(".", $key);
+		$vars = [];
+		$current = "";
+		foreach(explode(".", $key) as $var){
+			if(substr($var, -1) === "\\"){
+				$current .= $var . ".";
+			}else{
+				$var = $current . $var;
+				$current = "";
+				$vars[] = $var;
+			}
+		}
+		
 		$base = array_shift($vars);
 		if(isset($this->config[$base])){
 			$base = $this->config[$base];
