@@ -209,18 +209,21 @@ class Effect{
 			case Effect::POISON:
 				if($entity->getHealth() > 1){
 					$ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_MAGIC, 1);
+					Server::getInstance()->getPluginManager()->callEvent($ev);
 					$entity->attack($ev->getFinalDamage(), $ev);
 				}
 				break;
 
 			case Effect::WITHER:
 				$ev = new EntityDamageEvent($entity, EntityDamageEvent::CAUSE_MAGIC, 1);
+				Server::getInstance()->getPluginManager()->callEvent($ev);
 				$entity->attack($ev->getFinalDamage(), $ev);
 				break;
 
 			case Effect::REGENERATION:
 				if($entity->getHealth() < $entity->getMaxHealth()){
 					$ev = new EntityRegainHealthEvent($entity, 1, EntityRegainHealthEvent::CAUSE_MAGIC);
+					Server::getInstance()->getPluginManager()->callEvent($ev);
 					$entity->heal($ev->getAmount(), $ev);
 				}
 				break;
