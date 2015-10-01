@@ -24,24 +24,24 @@ namespace pocketmine\nbt\tag;
 
 abstract class NamedTag extends Tag{
 
-	protected $name;
+	protected $__name;
 
 	/**
 	 * @param string                                                      $name
-	 * @param bool|float|double|int|byte|short|array|Compound|Enum|string $value
+	 * @param bool|float|double|int|ByteTag|ShortTag|array|CompoundTag|ListTag|string $value
 	 */
 	public function __construct($name = "", $value = null){
-		$this->name = ($name === null or $name === false) ? "" : $name;
+		$this->__name = ($name === null or $name === false) ? "" : $name;
 		if($value !== null){
 			$this->value = $value;
 		}
 	}
 
 	public function getName(){
-		return $this->name;
+		return $this->__name;
 	}
 
 	public function setName($name){
-		$this->name = $name;
+		$this->__name = $name;
 	}
 }

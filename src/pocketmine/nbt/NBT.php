@@ -24,19 +24,20 @@
  */
 namespace pocketmine\nbt;
 
-use pocketmine\nbt\tag\Byte;
-use pocketmine\nbt\tag\ByteArray;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Double;
-use pocketmine\nbt\tag\End;
-use pocketmine\nbt\tag\Enum;
-use pocketmine\nbt\tag\Float;
-use pocketmine\nbt\tag\Int;
-use pocketmine\nbt\tag\IntArray;
-use pocketmine\nbt\tag\Long;
+use pocketmine\item\Item;
+use pocketmine\nbt\tag\ByteTag;
+use pocketmine\nbt\tag\ByteArrayTag;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\DoubleTag;
+use pocketmine\nbt\tag\EndTag;
+use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\FloatTag;
+use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\IntArrayTag;
+use pocketmine\nbt\tag\LongTag;
 use pocketmine\nbt\tag\NamedTAG;
-use pocketmine\nbt\tag\Short;
-use pocketmine\nbt\tag\String;
+use pocketmine\nbt\tag\ShortTag;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\nbt\tag\Tag;
 use pocketmine\utils\Utils;
 
@@ -64,7 +65,7 @@ class NBT{
 	const TAG_Double = 6;
 	const TAG_ByteArray = 7;
 	const TAG_String = 8;
-	const TAG_Enum = 9;
+	const TAG_List = 9;
 	const TAG_Compound = 10;
 	const TAG_IntArray = 11;
 
@@ -72,6 +73,364 @@ class NBT{
 	private $offset;
 	public $endianness;
 	private $data;
+
+
+	/**
+	 * @param Item $item
+	 * @param int  $slot
+	 * @return CompoundTag
+	 */
+	public static function putItemHelper(Item $item, $slot = null){
+		$tag = new CompoundTag(null, [
+			"id" => new ShortTag("id", $item->getId()),
+			"Count" => new ByteTag("Count", $item->getCount()),
+			"Damage" => new ShortTag("Damage", $item->getDamage())
+		]);
+
+		if($slot !== null){
+			$tag->Slot = new ByteTag("Slot", (int) $slot);
+		}
+
+		if($item->hasCompoundTag()){
+			$tag->tag = clone $item->getNamedTag();
+			$tag->tag->setName("tag");
+		}
+
+		return $tag;
+	}
+
+	/**
+	 * @param CompoundTag $tag
+	 * @return Item
+	 */
+	public static function getItemHelper(CompoundTag $tag){
+		if(!isset($tag->id) or !isset($tag->Count)){
+			return Item::get(0);
+		}
+
+		$item = Item::get($tag->id->getValue(), !isset($tag->Damage) ? 0 : $tag->Damage->getValue(), $tag->Count->getValue());
+		
+		if(isset($tag->tag) and $tag->tag instanceof CompoundTag){
+			$item->setNamedTag($tag->tag);
+		}
+
+		return $item;
+	}
+
+	public static function matchList(ListTag $tag1, ListTag $tag2){
+		if($tag1->getName() !== $tag2->getName() or $tag1->getCount() !== $tag2->getCount()){
+			return false;
+		}
+
+		foreach($tag1 as $k => $v){
+			if(!($v instanceof Tag)){
+				continue;
+			}
+
+			if(!isset($tag2->{$k}) or !($tag2->{$k} instanceof $v)){
+				return false;
+			}
+
+			if($v instanceof CompoundTag){
+				if(!self::matchTree($v, $tag2->{$k})){
+					return false;
+				}
+			}elseif($v instanceof ListTag){
+				if(!self::matchList($v, $tag2->{$k})){
+					return false;
+				}
+			}else{
+				if($v->getValue() !== $tag2->{$k}->getValue()){
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public static function matchTree(CompoundTag $tag1, CompoundTag $tag2){
+		if($tag1->getName() !== $tag2->getName() or $tag1->getCount() !== $tag2->getCount()){
+			return false;
+		}
+
+		foreach($tag1 as $k => $v){
+			if(!($v instanceof Tag)){
+				continue;
+			}
+
+			if(!isset($tag2->{$k}) or !($tag2->{$k} instanceof $v)){
+				return false;
+			}
+
+			if($v instanceof CompoundTag){
+				if(!self::matchTree($v, $tag2->{$k})){
+					return false;
+				}
+			}elseif($v instanceof ListTag){
+				if(!self::matchList($v, $tag2->{$k})){
+					return false;
+				}
+			}else{
+				if($v->getValue() !== $tag2->{$k}->getValue()){
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public static function parseJSON($data, &$offset = 0){
+		$len = strlen($data);
+		for(; $offset < $len; ++$offset){
+			$c = $data{$offset};
+			if($c === "{"){
+				++$offset;
+				$data = self::parseCompound($data, $offset);
+				return new CompoundTag("", $data);
+			}elseif($c !== " " and $c !== "\r" and $c !== "\n" and $c !== "\t"){
+				throw new \Exception("Syntax error: unexpected '$c' at offset $offset");
+			}
+		}
+
+		return null;
+	}
+
+	private static function parseList($str, &$offset = 0){
+		$len = strlen($str);
+
+
+		$key = 0;
+		$value = null;
+
+		$data = [];
+
+		for(; $offset < $len; ++$offset){
+			if($str{$offset - 1} === "]"){
+				break;
+			}elseif($str{$offset} === "]"){
+				++$offset;
+				break;
+			}
+
+			$value = self::readValue($str, $offset, $type);
+
+			switch($type){
+				case NBT::TAG_Byte:
+					$data[$key] = new ByteTag($key, $value);
+					break;
+				case NBT::TAG_Short:
+					$data[$key] = new ShortTag($key, $value);
+					break;
+				case NBT::TAG_Int:
+					$data[$key] = new IntTag($key, $value);
+					break;
+				case NBT::TAG_Long:
+					$data[$key] = new LongTag($key, $value);
+					break;
+				case NBT::TAG_Float:
+					$data[$key] = new FloatTag($key, $value);
+					break;
+				case NBT::TAG_Double:
+					$data[$key] = new DoubleTag($key, $value);
+					break;
+				case NBT::TAG_ByteArray:
+					$data[$key] = new ByteArrayTag($key, $value);
+					break;
+				case NBT::TAG_String:
+					$data[$key] = new ByteTag($key, $value);
+					break;
+				case NBT::TAG_List:
+					$data[$key] = new ListTag($key, $value);
+					break;
+				case NBT::TAG_Compound:
+					$data[$key] = new CompoundTag($key, $value);
+					break;
+				case NBT::TAG_IntArray:
+					$data[$key] = new IntArrayTag($key, $value);
+					break;
+			}
+
+			$key++;
+		}
+
+		return $data;
+	}
+
+	private static function parseCompound($str, &$offset = 0){
+		$len = strlen($str);
+
+		$data = [];
+
+		for(; $offset < $len; ++$offset){
+			if($str{$offset - 1} === "}"){
+				break;
+			}elseif($str{$offset} === "}"){
+				++$offset;
+				break;
+			}
+
+			$key = self::readKey($str, $offset);
+			$value = self::readValue($str, $offset, $type);
+
+			switch($type){
+				case NBT::TAG_Byte:
+					$data[$key] = new ByteTag($key, $value);
+					break;
+				case NBT::TAG_Short:
+					$data[$key] = new ShortTag($key, $value);
+					break;
+				case NBT::TAG_Int:
+					$data[$key] = new IntTag($key, $value);
+					break;
+				case NBT::TAG_Long:
+					$data[$key] = new LongTag($key, $value);
+					break;
+				case NBT::TAG_Float:
+					$data[$key] = new FloatTag($key, $value);
+					break;
+				case NBT::TAG_Double:
+					$data[$key] = new DoubleTag($key, $value);
+					break;
+				case NBT::TAG_ByteArray:
+					$data[$key] = new ByteArrayTag($key, $value);
+					break;
+				case NBT::TAG_String:
+					$data[$key] = new StringTag($key, $value);
+					break;
+				case NBT::TAG_List:
+					$data[$key] = new ListTag($key, $value);
+					break;
+				case NBT::TAG_Compound:
+					$data[$key] = new CompoundTag($key, $value);
+					break;
+				case NBT::TAG_IntArray:
+					$data[$key] = new IntArrayTag($key, $value);
+					break;
+			}
+		}
+
+		return $data;
+	}
+
+	private static function readValue($data, &$offset, &$type = null){
+		$value = "";
+		$type = null;
+		$inQuotes = false;
+
+		$len = strlen($data);
+		for(; $offset < $len; ++$offset){
+			$c = $data{$offset};
+
+			if(!$inQuotes and ($c === " " or $c === "\r" or $c === "\n" or $c === "\t" or $c === "," or $c === "}" or $c === "]")){
+				if($c === "," or $c === "}" or $c === "]"){
+					break;
+				}
+			}elseif($c === '"'){
+				$inQuotes = !$inQuotes;
+				if($type === null){
+					$type = self::TAG_String;
+				}elseif($inQuotes){
+					throw new \Exception("Syntax error: invalid quote at offset $offset");
+				}
+			}elseif($c === "\\"){
+				$value .= isset($data{$offset + 1}) ? $data{$offset + 1} : "";
+				++$offset;
+			}elseif($c === "{" and !$inQuotes){
+				if($value !== ""){
+					throw new \Exception("Syntax error: invalid compound start at offset $offset");
+				}
+				++$offset;
+				$value = self::parseCompound($data, $offset);
+				$type = self::TAG_Compound;
+				break;
+			}elseif($c === "[" and !$inQuotes){
+				if($value !== ""){
+					throw new \Exception("Syntax error: invalid list start at offset $offset");
+				}
+				++$offset;
+				$value = self::parseList($data, $offset);
+				$type = self::TAG_List;
+				break;
+			}else{
+				$value .= $c;
+			}
+		}
+
+		if($value === ""){
+			throw new \Exception("Syntax error: invalid empty value at offset $offset");
+		}
+
+		if($type === null and strlen($value) > 0){
+			$value = trim($value);
+			$last = strtolower(substr($value, -1));
+			$part = substr($value, 0, -1);
+
+			if($last !== "b" and $last !== "s" and $last !== "l" and $last !== "f" and $last !== "d"){
+				$part = $value;
+				$last = null;
+			}
+
+			if($last !== "f" and $last !== "d" and ((string) ((int) $part)) === $part){
+				if($last === "b"){
+					$type = self::TAG_Byte;
+				}elseif($last === "s"){
+					$type = self::TAG_Short;
+				}elseif($last === "l"){
+					$type = self::TAG_Long;
+				}else{
+					$type = self::TAG_Int;
+				}
+				$value = (int) $part;
+			}elseif(is_numeric($part)){
+				if($last === "f" or $last === "d" or strpos($part, ".") !== false){
+					if($last === "f"){
+						$type = self::TAG_Float;
+					}elseif($last === "d"){
+						$type = self::TAG_Double;
+					}else{
+						$type = self::TAG_Float;
+					}
+					$value = (float) $part;
+				}else{
+					if($last === "l"){
+						$type = self::TAG_Long;
+					}else{
+						$type = self::TAG_Int;
+					}
+
+					$value = $part;
+				}
+			}else{
+				$type = self::TAG_String;
+			}
+		}
+
+		return $value;
+	}
+
+	private static function readKey($data, &$offset){
+		$key = "";
+
+		$len = strlen($data);
+		for(; $offset < $len; ++$offset){
+			$c = $data{$offset};
+
+			if($c === ":"){
+				++$offset;
+				break;
+			}elseif($c !== " " and $c !== "\r" and $c !== "\n" and $c !== "\t"){
+				$key .= $c;
+			}
+		}
+
+		if($key === ""){
+			throw new \Exception("Syntax error: invalid empty key at offset $offset");
+		}
+
+		return $key;
+	}
 
 	public function get($len){
 		if($len < 0){
@@ -119,7 +478,9 @@ class NBT{
 	 */
 	public function write(){
 		$this->offset = 0;
-		if($this->data instanceof Compound){
+		$this->buffer = "";
+
+		if($this->data instanceof CompoundTag){
 			$this->writeTag($this->data);
 
 			return $this->buffer;
@@ -144,53 +505,53 @@ class NBT{
 	public function readTag(){
 		switch($this->getByte()){
 			case NBT::TAG_Byte:
-				$tag = new Byte($this->getString());
+				$tag = new ByteTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_Short:
-				$tag = new Short($this->getString());
+				$tag = new ShortTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_Int:
-				$tag = new Int($this->getString());
+				$tag = new IntTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_Long:
-				$tag = new Long($this->getString());
+				$tag = new LongTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_Float:
-				$tag = new Float($this->getString());
+				$tag = new FloatTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_Double:
-				$tag = new Double($this->getString());
+				$tag = new DoubleTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_ByteArray:
-				$tag = new ByteArray($this->getString());
+				$tag = new ByteArrayTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_String:
-				$tag = new String($this->getString());
+				$tag = new StringTag($this->getString());
 				$tag->read($this);
 				break;
-			case NBT::TAG_Enum:
-				$tag = new Enum($this->getString());
+			case NBT::TAG_List:
+				$tag = new ListTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_Compound:
-				$tag = new Compound($this->getString());
+				$tag = new CompoundTag($this->getString());
 				$tag->read($this);
 				break;
 			case NBT::TAG_IntArray:
-				$tag = new IntArray($this->getString());
+				$tag = new IntArrayTag($this->getString());
 				$tag->read($this);
 				break;
 
 			case NBT::TAG_End: //No named tag
 			default:
-				$tag = new End;
+				$tag = new EndTag;
 				break;
 		}
 		return $tag;
@@ -263,22 +624,36 @@ class NBT{
 
 	public function getArray(){
 		$data = [];
-		$this->toArray($data, $this->data);
+		self::toArray($data, $this->data);
 	}
 
-	private function toArray(array &$data, Tag $tag){
-		/** @var Compound[]|Enum[]|IntArray[] $tag */
+	private static function toArray(array &$data, Tag $tag){
+		/** @var CompoundTag[]|ListTag[]|IntArrayTag[] $tag */
 		foreach($tag as $key => $value){
-			if($value instanceof Compound or $value instanceof Enum or $value instanceof IntArray){
+			if($value instanceof CompoundTag or $value instanceof ListTag or $value instanceof IntArrayTag){
 				$data[$key] = [];
-				$this->toArray($data[$key], $value);
+				self::toArray($data[$key], $value);
 			}else{
 				$data[$key] = $value->getValue();
 			}
 		}
 	}
 
-	private function fromArray(Tag $tag, array $data){
+	public static function fromArrayGuesser($key, $value){
+		if(is_int($value)){
+			return new IntTag($key, $value);
+		}elseif(is_float($value)){
+			return new FloatTag($key, $value);
+		}elseif(is_string($value)){
+			return new StringTag($key, $value);
+		}elseif(is_bool($value)){
+			return new ByteTag($key, $value ? 1 : 0);
+		}
+
+		return null;
+	}
+
+	private static function fromArray(Tag $tag, array $data, callable $guesser){
 		foreach($data as $key => $value){
 			if(is_array($value)){
 				$isNumeric = true;
@@ -291,38 +666,31 @@ class NBT{
 						$isIntArray = false;
 					}
 				}
-				$tag{$key} = $isNumeric ? ($isIntArray ? new IntArray($key, []) : new Enum($key, [])) : new Compound($key, []);
-				$this->fromArray($tag->{$key}, $value);
-			}elseif(is_int($value)){
-				$tag{$key} = new Int($key, $value);
-			}elseif(is_float($value)){
-				$tag{$key} = new Float($key, $value);
-			}elseif(is_string($value)){
-				if(Utils::printable($value) !== $value){
-					$tag{$key} = new ByteArray($key, $value);
-				}else{
-					$tag{$key} = new String($key, $value);
+				$tag{$key} = $isNumeric ? ($isIntArray ? new IntArrayTag($key, []) : new ListTag($key, [])) : new CompoundTag($key, []);
+				self::fromArray($tag->{$key}, $value, $guesser);
+			}else{
+				$v = call_user_func($guesser, $key, $value);
+				if($v instanceof Tag){
+					$tag{$key} = $v;
 				}
-			}elseif(is_bool($value)){
-				$tag{$key} = new Byte($key, $value ? 1 : 0);
 			}
 		}
 	}
 
-	public function setArray(array $data){
-		$this->data = new Compound("", []);
-		$this->fromArray($this->data, $data);
+	public function setArray(array $data, callable $guesser = null){
+		$this->data = new CompoundTag("", []);
+		self::fromArray($this->data, $data, $guesser === null ? [self::class, "fromArrayGuesser"] : $guesser);
 	}
 
 	/**
-	 * @return Compound|array
+	 * @return CompoundTag|array
 	 */
 	public function getData(){
 		return $this->data;
 	}
 
 	/**
-	 * @param Compound|array $data
+	 * @param CompoundTag|array $data
 	 */
 	public function setData($data){
 		$this->data = $data;

@@ -25,9 +25,8 @@
 namespace pocketmine\block;
 
 use pocketmine\entity\Entity;
-use pocketmine\entity\Squid;
-use pocketmine\entity\Villager;
-use pocketmine\entity\Zombie;
+
+
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
 use pocketmine\level\Level;
@@ -185,6 +184,10 @@ class Block extends Position implements Metadatable{
 
 	const NETHER_BRICKS_STAIRS = 114;
 
+	const ENCHANTING_TABLE = 116;
+	const ENCHANT_TABLE = 116;
+	const ENCHANTMENT_TABLE = 116;
+
 	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
 
@@ -205,6 +208,8 @@ class Block extends Position implements Metadatable{
 
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
+
+	const ANVIL = 145;
 
 	const REDSTONE_BLOCK = 152;
 
@@ -273,32 +278,6 @@ class Block extends Position implements Metadatable{
 
 	/** @var AxisAlignedBB */
 	public $boundingBox = null;
-
-	/**
-	 * Backwards-compatibility with old way to define block properties
-	 *
-	 * @deprecated
-	 *
-	 * @param string $key
-	 *
-	 * @return mixed
-	 */
-	public function __get($key){
-		static $map = [
-			"hardness" => "getHardness",
-			"lightLevel" => "getLightLevel",
-			"frictionFactor" => "getFrictionFactor",
-			"name" => "getName",
-			"isPlaceable" => "canBePlaced",
-			"isReplaceable" => "canBeReplaced",
-			"isTransparent" => "isTransparent",
-			"isSolid" => "isSolid",
-			"isFlowable" => "canBeFlowedInto",
-			"isActivable" => "canBeActivated",
-			"hasEntityCollision" => "hasEntityCollision"
-		];
-		return isset($map[$key]) ? $this->{$map[$key]}() : null;
-	}
 
 	public static function init(){
 		if(self::$list === null){
@@ -411,6 +390,8 @@ class Block extends Position implements Metadatable{
 
 			self::$list[self::NETHER_BRICKS_STAIRS] = NetherBrickStairs::class;
 
+			self::$list[self::ENCHANTING_TABLE] = EnchantingTable::class;
+
 			self::$list[self::END_PORTAL_FRAME] = EndPortalFrame::class;
 			self::$list[self::END_STONE] = EndStone::class;
 			self::$list[self::SANDSTONE_STAIRS] = SandstoneStairs::class;
@@ -424,6 +405,7 @@ class Block extends Position implements Metadatable{
 
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
+			self::$list[self::ANVIL] = Anvil::class;
 
 			self::$list[self::REDSTONE_BLOCK] = Redstone::class;
 
@@ -786,6 +768,10 @@ class Block extends Position implements Metadatable{
 			}
 		}else{
 			$base *= 3.33;
+		}
+
+		if($item->isSword()){
+			$base *= 0.5;
 		}
 
 		return $base;

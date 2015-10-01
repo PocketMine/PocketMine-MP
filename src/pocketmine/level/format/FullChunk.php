@@ -50,20 +50,6 @@ interface FullChunk{
 	 */
 	public function setProvider(LevelProvider $provider);
 
-
-	/**
-	 * Modifies $blockId and $meta
-	 *
-	 * @deprecated
-	 *
-	 * @param int $x 0-15
-	 * @param int $y 0-127
-	 * @param int $z 0-15
-	 * @param int &$blockId
-	 * @param int &$meta
-	 */
-	public function getBlock($x, $y, $z, &$blockId, &$meta = null);
-
 	/**
 	 * Gets block and meta in one go
 	 *
@@ -118,6 +104,23 @@ interface FullChunk{
 	 * @param int $data 0-15
 	 */
 	public function setBlockData($x, $y, $z, $data);
+
+	/**
+	 * @param int $x 0-15
+	 * @param int $y 0-127
+	 * @param int $z 0-15
+	 *
+	 * @return int (16-bit)
+	 */
+	public function getBlockExtraData($x, $y, $z);
+
+	/**
+	 * @param int $x    0-15
+	 * @param int $y    0-127
+	 * @param int $z    0-15
+	 * @param int $data (16-bit)
+	 */
+	public function setBlockExtraData($x, $y, $z, $data);
 
 	/**
 	 * @param int $x 0-15
@@ -311,6 +314,8 @@ interface FullChunk{
 	public function getBlockIdArray();
 
 	public function getBlockDataArray();
+
+	public function getBlockExtraDataArray();
 
 	public function getBlockSkyLightArray();
 
