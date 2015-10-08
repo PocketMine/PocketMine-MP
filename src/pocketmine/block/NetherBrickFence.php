@@ -62,9 +62,7 @@ class NetherBrickFence extends Transparent {
 
 	public function getDrops(Item $item){
 		if($item->isPickaxe()){
-			return [
-				[Item::FENCE, Fence::FENCE_NETHER_BRICK, 1],
-			];
+			return parent::getDrops($item);
 		}else{
 			return [];
 		}
