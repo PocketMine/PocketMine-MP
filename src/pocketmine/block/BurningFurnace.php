@@ -77,6 +77,17 @@ class BurningFurnace extends Solid{
 			new Int("z", $this->z)
 		]);
 		$nbt->Items->setTagType(NBT::TAG_Compound);
+
+		if($item->hasCustomName()){
+			$nbt->CustomName = new String("CustomName", $item->getCustomName());
+		}
+
+		if($item->hasCustomBlockData()){
+			foreach($item->getCustomBlockData() as $key => $v){
+				$nbt->{$key} = $v;
+			}
+		}
+
 		Tile::createTile("Furnace", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
 
 		return true;
@@ -104,6 +115,12 @@ class BurningFurnace extends Solid{
 				]);
 				$nbt->Items->setTagType(NBT::TAG_Compound);
 				$furnace = Tile::createTile("Furnace", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+			}
+
+			if(isset($furnace->namedtag->Lock) and $furnace->namedtag->Lock instanceof String){
+				if($furnace->namedtag->Lock->getValue() !== $item->getCustomName()){
+					return true;
+				}
 			}
 
 			if($player->isCreative()){
