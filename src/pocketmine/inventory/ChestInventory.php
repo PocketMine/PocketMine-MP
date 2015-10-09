@@ -25,7 +25,7 @@ use pocketmine\level\Level;
 use pocketmine\network\Network;
 use pocketmine\network\protocol\TileEventPacket;
 use pocketmine\Player;
-use pocketmine\Server;
+
 use pocketmine\tile\Chest;
 
 class ChestInventory extends ContainerInventory{
@@ -51,7 +51,7 @@ class ChestInventory extends ContainerInventory{
 			$pk->case1 = 1;
 			$pk->case2 = 2;
 			if(($level = $this->getHolder()->getLevel()) instanceof Level){
-				$level->addChunkPacket($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4, $pk->setChannel(Network::CHANNEL_WORLD_EVENTS));
+				$level->addChunkPacket($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4, $pk);
 			}
 		}
 	}
@@ -65,7 +65,7 @@ class ChestInventory extends ContainerInventory{
 			$pk->case1 = 1;
 			$pk->case2 = 0;
 			if(($level = $this->getHolder()->getLevel()) instanceof Level){
-				$level->addChunkPacket($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4, $pk->setChannel(Network::CHANNEL_WORLD_EVENTS));
+				$level->addChunkPacket($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4, $pk);
 			}
 		}
 		parent::onClose($who);
