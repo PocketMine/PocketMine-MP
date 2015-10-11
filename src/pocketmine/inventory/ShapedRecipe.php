@@ -60,6 +60,13 @@ class ShapedRecipe implements Recipe{
 
 		$this->output = clone $result;
 	}
+	
+	/**
+	 * @return Item
+	 */
+	public function getResult(){
+		return clone $this->output;
+	}
 
 	/**
 	 * @param string $key
