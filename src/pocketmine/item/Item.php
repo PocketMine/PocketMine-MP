@@ -199,6 +199,7 @@ class Item{
 	const POTATO_BLOCK = 142;
 
 	const REDSTONE_BLOCK = 152;
+	const REDSTONE = 331;
 
 	const QUARTZ_BLOCK = 155;
 	const QUARTZ_STAIRS = 156;
@@ -619,7 +620,6 @@ class Item{
 		self::addCreativeItem(Item::get(Item::GLASS, 0));
 		self::addCreativeItem(Item::get(Item::GLOWSTONE_BLOCK, 0));
 		self::addCreativeItem(Item::get(Item::VINES, 0));
-		self::addCreativeItem(Item::get(Item::NETHER_REACTOR, 0));
 		self::addCreativeItem(Item::get(Item::LADDER, 0));
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
@@ -725,14 +725,15 @@ class Item{
 		self::addCreativeItem(Item::get(Item::CARPET, 8));
 
 		//Tools
-		//TODO self::addCreativeItem(Item::get(Item::RAILS, 0));
-		//TODO self::addCreativeItem(Item::get(Item::POWERED_RAILS, 0));
+		self::addCreativeItem(Item::get(Item::RAILS, 0));
+		self::addCreativeItem(Item::get(Item::POWERED_RAILS, 0));
 		self::addCreativeItem(Item::get(Item::TORCH, 0));
 		self::addCreativeItem(Item::get(Item::BUCKET, 0));
 		self::addCreativeItem(Item::get(Item::BUCKET, 1));
 		self::addCreativeItem(Item::get(Item::BUCKET, 8));
 		self::addCreativeItem(Item::get(Item::BUCKET, 10));
 		self::addCreativeItem(Item::get(Item::TNT, 0));
+		self::addCreativeItem(Item::get(Item::REDSTONE, 0));
 		self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
 		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
 		self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
