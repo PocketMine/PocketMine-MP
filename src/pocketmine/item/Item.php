@@ -177,6 +177,7 @@ class Item{
 
 	const NETHER_BRICKS_STAIRS = 114;
 
+        const BREWING_STAND = 117;
 	const END_PORTAL = 120;
 	const END_STONE = 121;
 
@@ -619,7 +620,6 @@ class Item{
 		self::addCreativeItem(Item::get(Item::GLASS, 0));
 		self::addCreativeItem(Item::get(Item::GLOWSTONE_BLOCK, 0));
 		self::addCreativeItem(Item::get(Item::VINES, 0));
-		self::addCreativeItem(Item::get(Item::NETHER_REACTOR, 0));
 		self::addCreativeItem(Item::get(Item::LADDER, 0));
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
@@ -646,6 +646,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::CHEST, 0));
 		self::addCreativeItem(Item::get(Item::FURNACE, 0));
 		self::addCreativeItem(Item::get(Item::END_PORTAL, 0));
+		self::addCreativeItem(Item::get(Item::BREWING_STAND, 0));
 		self::addCreativeItem(Item::get(Item::DANDELION, 0));
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_POPPY));
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_BLUE_ORCHID));
