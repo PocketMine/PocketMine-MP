@@ -733,6 +733,12 @@ class Item{
 		self::addCreativeItem(Item::get(Item::BUCKET, 8));
 		self::addCreativeItem(Item::get(Item::BUCKET, 10));
 		self::addCreativeItem(Item::get(Item::TNT, 0));
+		self::addCreativeItem(Item::get(Item::REDSTONE, 0));
+	        self::addCreativeItem(Item::get(Item::WOODEN_SWORD
+	        self::addCreativeItem(Item::get(Item::WOODEN_HOE
+		self::addCreativeItem(Item::get(Item:::WOODEN_SHOVEL
+		self::addCreativeItem(Item::get(Item:::WOODEN_PICKAXE
+		self::addCreativeItem(Item::get(Item::WOODEN_AXE
 		self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
 		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
 		self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
