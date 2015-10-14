@@ -184,7 +184,8 @@ class Block extends Position implements Metadatable{
 	const NETHER_BRICK_BLOCK = 112;
 
 	const NETHER_BRICKS_STAIRS = 114;
-
+	
+        const BREWING_STAND = 117; 
 	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
 
@@ -411,6 +412,7 @@ class Block extends Position implements Metadatable{
 
 			self::$list[self::NETHER_BRICKS_STAIRS] = NetherBrickStairs::class;
 
+                        self::$list[self::BREWING_STAND] = BrewingStand::class;
 			self::$list[self::END_PORTAL_FRAME] = EndPortalFrame::class;
 			self::$list[self::END_STONE] = EndStone::class;
 			self::$list[self::SANDSTONE_STAIRS] = SandstoneStairs::class;
@@ -457,7 +459,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::BEETROOT_BLOCK] = Beetroot::class;
 			self::$list[self::STONECUTTER] = Stonecutter::class;
 			self::$list[self::GLOWING_OBSIDIAN] = GlowingObsidian::class;
-			self::$list[self::NETHER_REACTOR] = NetherReactor::class;
+			
 
 			foreach(self::$list as $id => $class){
 				if($class !== null){
