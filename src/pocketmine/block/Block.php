@@ -185,7 +185,7 @@ class Block extends Position implements Metadatable{
 
 	const NETHER_BRICKS_STAIRS = 114;
 	
-        const BREWING_STAND Brewing = 117; 
+        const BREWING_STAND = 117; 
 	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
 
