@@ -445,8 +445,12 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	 * @return bool
 	 */
 	public function hasPermission($name){
-		return $this->perm->hasPermission($name);
-	}
+    if(is_null($this->perm)) {
+        $this->server->getLogger()->warning("Failed to read permission " . $name ." because Player has gone - assuming false");
+        return false;
+    }
+    return $this->perm->hasPermission($name);
+}
 
 	/**
 	 * @param Plugin $plugin
