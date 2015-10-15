@@ -31,6 +31,12 @@ class WallSign extends SignPost{
 	}
 
 	public function onUpdate($type){
+		if($type === Level::BLOCK_UPDATE_NORMAL){
+			if($this->getSide($this->meta)->getId() === self::AIR){
+				$this->getLevel()->useBreakOn($this);
+				return Level::BLOCK_UPDATE_NORMAL;
+			}
+		}
 		return false;
 	}
 }
