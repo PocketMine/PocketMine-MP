@@ -1769,7 +1769,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				if($this->isCreative()){
 					$this->inventory->setHeldItemSlot(0);
 				}else{
-					$this->inventory->setHeldItemSlot($this->inventory->getHeldItemSlot());
+					$this->inventory->setHeldItemSlot($this->inventory->getHeldItemSlot() === null ? $this->inventory->getItem(0) : $this->inventory->getHeldItemSlot());
 				}
 
 				$pk = new PlayStatusPacket();
