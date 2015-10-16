@@ -1,5 +1,4 @@
 <?php
-
 /*
  *
  *  ____            _        _   __  __ _                  __  __ ____
@@ -18,25 +17,19 @@
  *
  *
 */
-
 namespace pocketmine;
-
 class ThreadManager extends \Threaded{
-
 	/** @var ThreadManager */
 	private static $instance = null;
-
 	public static function init(){
 		self::$instance = new ThreadManager();
 	}
-
 	/**
 	 * @return ThreadManager
 	 */
 	public static function getInstance(){
 		return self::$instance;
 	}
-
 	/**
 	 * @param Worker|Thread $thread
 	 */
@@ -45,7 +38,6 @@ class ThreadManager extends \Threaded{
 			$this->{spl_object_hash($thread)} = $thread;
 		}
 	}
-
 	/**
 	 * @param Worker|Thread $thread
 	 */
@@ -54,7 +46,6 @@ class ThreadManager extends \Threaded{
 			unset($this->{spl_object_hash($thread)});
 		}
 	}
-
 	/**
 	 * @return Worker[]|Thread[]
 	 */
@@ -63,7 +54,6 @@ class ThreadManager extends \Threaded{
 		foreach($this as $key => $thread){
 			$array[$key] = $thread;
 		}
-
 		return $array;
 	}
 }
