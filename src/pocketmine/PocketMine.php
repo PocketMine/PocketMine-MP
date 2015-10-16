@@ -72,11 +72,11 @@ namespace pocketmine {
 	use pocketmine\utils\Utils;
 	use pocketmine\wizard\Installer;
 
-	const VERSION = "1.5dev";
+	const VERSION = '1.5.1-hybrid';
 	const API_VERSION = "1.12.0";
-	const CODENAME = "活発(Kappatsu)フグ(Fugu)";
-	const MINECRAFT_VERSION = "v0.11.0 alpha";
-	const MINECRAFT_VERSION_NETWORK = "0.11.0";
+	const CODENAME = "刀 (Katana)";
+	const MINECRAFT_VERSION = "v0.12.1 alpha";
+	const MINECRAFT_VERSION_NETWORK = "0.12.1";
 
 	/*
 	 * Startup code. Do not look at it, it may harm you.
@@ -88,7 +88,7 @@ namespace pocketmine {
 	if(\Phar::running(true) !== ""){
 		@define("pocketmine\\PATH", \Phar::running(true) . "/");
 	}else{
-		@define("pocketmine\\PATH", \getcwd() . DIRECTORY_SEPARATOR);
+		@define("pocketmine\\PATH", getcwd() . DIRECTORY_SEPARATOR);
 	}
 
 	if(!extension_loaded("pthreads")){
@@ -106,6 +106,7 @@ namespace pocketmine {
 
 	$autoloader = new CompatibleClassLoader();
 	$autoloader->addPath(\pocketmine\PATH . "src");
+	require_once(\pocketmine\PATH . "src/pocketmine/utils/Utils.php");
 	$autoloader->addPath(\pocketmine\PATH . "src" . DIRECTORY_SEPARATOR . "spl");
 	$autoloader->register(true);
 
@@ -124,8 +125,8 @@ namespace pocketmine {
 
 	$opts = getopt("", ["data:", "plugins:", "no-wizard", "enable-profiler"]);
 
-	define("pocketmine\\DATA", isset($opts["data"]) ? $opts["data"] . DIRECTORY_SEPARATOR : \getcwd() . DIRECTORY_SEPARATOR);
-	define("pocketmine\\PLUGIN_PATH", isset($opts["plugins"]) ? $opts["plugins"] . DIRECTORY_SEPARATOR : \getcwd() . DIRECTORY_SEPARATOR . "plugins" . DIRECTORY_SEPARATOR);
+	define("pocketmine\\DATA", isset($opts["data"]) ? $opts["data"] . DIRECTORY_SEPARATOR : getcwd() . DIRECTORY_SEPARATOR);
+	define("pocketmine\\PLUGIN_PATH", isset($opts["plugins"]) ? $opts["plugins"] . DIRECTORY_SEPARATOR : getcwd() . DIRECTORY_SEPARATOR . "plugins" . DIRECTORY_SEPARATOR);
 
 	Terminal::init();
 
@@ -355,10 +356,10 @@ namespace pocketmine {
 					$args = $trace[$i]["params"];
 				}
 				foreach($args as $name => $value){
-					$params .= (is_object($value) ? get_class($value) . " " . (method_exists($value, "__toString") ? $value->__toString() : "object") : gettype($value) . " " . (is_array($value) ? "Array()" : @strval($value))) . ", ";
+					$params .= (is_object($value) ? get_class($value) . " " . (method_exists($value, "__toString") ? $value->__toString() : "object") : gettype($value) . " " . (is_array($value) ? "Array()" : Utils::printable(@strval($value)))) . ", ";
 				}
 			}
-			$messages[] = "#$j " . (isset($trace[$i]["file"]) ? cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . substr($params, 0, -2) . ")";
+			$messages[] = "#$j " . (isset($trace[$i]["file"]) ? cleanPath($trace[$i]["file"]) : "") . "(" . (isset($trace[$i]["line"]) ? $trace[$i]["line"] : "") . "): " . (isset($trace[$i]["class"]) ? $trace[$i]["class"] . (($trace[$i]["type"] === "dynamic" or $trace[$i]["type"] === "->") ? "->" : "::") : "") . $trace[$i]["function"] . "(" . Utils::printable(substr($params, 0, -2)) . ")";
 		}
 
 		return $messages;
@@ -457,7 +458,7 @@ namespace pocketmine {
 	}
 
 	if(\Phar::running(true) === ""){
-		$logger->warning("Non-packaged PocketMine-MP installation detected, do not use on production.");
+		$logger->warning("Non-packaged PocketMine-Steadfast installation detected, do not use on production.");
 	}
 
 	ThreadManager::init();
