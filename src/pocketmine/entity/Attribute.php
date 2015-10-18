@@ -64,7 +64,7 @@ class Attribute{
 	 */
 	public static function addAttribute($id, $name, $minValue, $maxValue, $defaultValue, $shouldSend = false){
 		if($minValue > $maxValue or $defaultValue > $maxValue or $defaultValue < $minValue){
-			throw new \InvalidArgumentException("Invalid ranges: min value: $minValue, max value: $maxValue, $defaultValue: $defaultValue");
+			throw new \InvalidArgumentException("Invalid ranges: min value: $minValue, max value: $maxValue, defaultValue: $defaultValue");
 		}
 
 		return self::$attributes[(int) $id] = new Attribute($id, $name, $minValue, $maxValue, $defaultValue, $shouldSend);
