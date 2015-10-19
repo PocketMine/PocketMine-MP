@@ -824,9 +824,31 @@ class Item{
 		self::addCreativeItem(Item::get(Item::BUCKET, 8));
 		self::addCreativeItem(Item::get(Item::BUCKET, 10));
 		self::addCreativeItem(Item::get(Item::TNT, 0));
-		self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
-		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
-		self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
+		self::addCreativeItem(Item::get(Item::WOODEN_SWORD, 0));
+		self::addCreativeItem(Item::get(Item::WOODEN_HOE, 0));
+		self::addCreativeItem(Item::get(Item::WOODEN_SHOVEL, 0));
+		self::addCreativeItem(Item::get(Item::WOODEN_PICKAXE, 0));
+		self::addCreativeItem(Item::get(Item::WOODEN_AXE, 0))
+		self::addCreativeItem(Item::get(Item::STONE_SWORD, 0))
+		self::addCreativeItem(Item::get(Item::STONE_HOE, 0))
+		self::addCreativeItem(Item::get(Item::STONE_SHOVEL, 0))
+		self::addCreativeItem(Item::get(Item::STONE_PICKAXE, 0))
+	        self::addCreativeItem(Item::get(Item::STONE_AXE, 0))
+	        self::addCreativeItem(Item::get(Item::IRON_SWORD, 0))
+	        self::addCreativeItem(Item::get(Item::IRON_HOE, 0))
+	        self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0))
+	        self::addCreativeItem(Item::get(Item::IRON_PICKAXE, 0))
+	        self::addCreativeItem(Item::get(Item::IRON_AXE, 0))
+	        self::addCreativeItem(Item::get(Item::DIAMOND_SWORD, 0)) 
+	        self::addCreativeItem(Item::get(Item::DIAMOND_HOE, 0))
+	        self::addCreativeItem(Item::get(Item::DIAMOND_SHOVEL, 0))
+	        self::addCreativeItem(Item::get(Item::DIAMOND_PICKAXE, 0))
+	        self::addCreativeItem(Item::get(Item::DIAMOND_AXE, 0))
+	        self::addCreativeItem(Item::get(Item::GOLD_SWORD, 0))
+	        self::addCreativeItem(Item::get(Item::GOLD_HOE, 0))
+	        self::addCreativeItem(Item::get(Item::GOLD_SHOVEL, 0))
+	        self::addCreativeItem(Item::get(Item::GOLD_PICKAXE, 0))
+	        self::addCreativeItem(Item::get(Item::GOLD_AXE, 0))
 		self::addCreativeItem(Item::get(Item::BOW, 0));
 		self::addCreativeItem(Item::get(Item::SHEARS, 0));
 		self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
