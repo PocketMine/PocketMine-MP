@@ -704,11 +704,11 @@ class Item{
 		self::addCreativeItem(Item::get(Item::GLASS, 0));
 		self::addCreativeItem(Item::get(Item::GLOWSTONE_BLOCK, 0));
 		self::addCreativeItem(Item::get(Item::VINES, 0));
-		self::addCreativeItem(Item::get(Item::NETHER_REACTOR, 0));
 		self::addCreativeItem(Item::get(Item::LADDER, 0));
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
 		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 0));
+		self::addCreativeItem(Item::get(Item::IRON_DOOR, 0));
 		self::addCreativeItem(Item::get(Item::TRAPDOOR, 0));
 		self::addCreativeItem(Item::get(Item::FENCE, Fence::FENCE_OAK));
 		self::addCreativeItem(Item::get(Item::FENCE, Fence::FENCE_SPRUCE));
@@ -731,7 +731,12 @@ class Item{
 		self::addCreativeItem(Item::get(Item::STONECUTTER, 0));
 		self::addCreativeItem(Item::get(Item::CHEST, 0));
 		self::addCreativeItem(Item::get(Item::FURNACE, 0));
+		self::addCreativeItem(Item::get(Item::BREWING_STAND, 0));
 		self::addCreativeItem(Item::get(Item::END_PORTAL, 0));
+		self::addCreativeItem(Item::get(Item::ANVIL, 0));
+		self::addCreativeItem(Item::get(Item::ANVIL, 4));
+		self::addCreativeItem(Item::get(Item::ANVIL, 8));
+		
 		self::addCreativeItem(Item::get(Item::DANDELION, 0));
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_POPPY));
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_BLUE_ORCHID));
@@ -742,11 +747,12 @@ class Item{
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_WHITE_TULIP));
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_PINK_TULIP));
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_OXEYE_DAISY));
-		//TODO: Lilac
-		//TODO: Double Tallgrass
-		//TODO: Large Fern
-		//TODO: Rose Bush
-		//TODO: Peony
+		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_SUNFLOWER));
+		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_LILAC));
+		self::addCreativeItem(Item::get(Item::DOUBLETALLGRASS, 0));
+		self::addCreativeItem(Item::get(Item::LARGE_FERN, 0));
+		self::addCreativeItem(Item::get(Item::ROSE_BUSH, 0));
+		self::addCreativeItem(Item::get(Item::PEONY, 0));
 		self::addCreativeItem(Item::get(Item::BROWN_MUSHROOM, 0));
 		self::addCreativeItem(Item::get(Item::RED_MUSHROOM, 0));
 		//TODO: Mushroom block (brown, cover)
@@ -759,8 +765,9 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LIT_PUMPKIN, 0));
 		self::addCreativeItem(Item::get(Item::COBWEB, 0));
 		self::addCreativeItem(Item::get(Item::HAY_BALE, 0));
-		self::addCreativeItem(Item::get(Item::TALL_GRASS, 1));
-		self::addCreativeItem(Item::get(Item::TALL_GRASS, 2));
+		self::addCreativeItem(Item::get(Item::GRASS, 1));
+		self::addCreativeItem(Item::get(Item::GRASS, 2));
+		self::addCreativeItem(Item::get(Item::FERN, 0));
 		self::addCreativeItem(Item::get(Item::DEAD_BUSH, 0));
 		self::addCreativeItem(Item::get(Item::SAPLING, 0));
 		self::addCreativeItem(Item::get(Item::SAPLING, 1));
@@ -775,8 +782,15 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LEAVES2, 0));
 		self::addCreativeItem(Item::get(Item::LEAVES2, 1));
 		self::addCreativeItem(Item::get(Item::CAKE, 0));
+		self::addCreativeItem(Item::get(Item::SKELETON_SKULL, 0));
+		self::addCreativeItem(Item::get(Item::WITHER_SKELETON_SKUL, 0));
+		self::addCreativeItem(Item::get(Item::ZOMBIE_HEAD, 0));
+		self::addCreativeItem(Item::get(Item::HEAD, 0));
+		Self::addCreativeItem(Item::get(Item::CREEPER_HEAD, 0));
 		self::addCreativeItem(Item::get(Item::SIGN, 0));
+		self::addCreativeItem(Item::get(Item::FLOWER_POT, 0));
 		self::addCreativeItem(Item::get(Item::MONSTER_SPAWNER, 0));
+		self::addCreativeItem(Item::get(Item::ENCHANTMENT_TABLE, 0));
 		self::addCreativeItem(Item::get(Item::WOOL, 0));
 		self::addCreativeItem(Item::get(Item::WOOL, 7));
 		self::addCreativeItem(Item::get(Item::WOOL, 6));
@@ -809,12 +823,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::CARPET, 10));
 		self::addCreativeItem(Item::get(Item::CARPET, 9));
 		self::addCreativeItem(Item::get(Item::CARPET, 8));
-
-
-		self::addCreativeItem(Item::get(Item::ANVIL, 0));
-		self::addCreativeItem(Item::get(Item::ANVIL, 4));
-		self::addCreativeItem(Item::get(Item::ANVIL, 8));
-
+		
 		//Tools
 		//TODO self::addCreativeItem(Item::get(Item::RAILS, 0));
 		//TODO self::addCreativeItem(Item::get(Item::POWERED_RAILS, 0));
