@@ -57,7 +57,7 @@ class BrewingStand extends Transparent{
 			}
 		}
 
-		Tile::createTile(Tile::BREWING_STAND_BLOCK, $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+		Tile::createTile(Tile::BREWING_STAND, $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
 
 		return true;
 	}

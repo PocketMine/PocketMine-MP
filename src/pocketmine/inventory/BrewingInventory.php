@@ -36,10 +36,4 @@ class BrewingInventory extends ContainerInventory{
 	public function getHolder(){
 		return $this->holder;
 	}
-
-	public function onSlotChange($index, $before){
-		parent::onSlotChange($index, $before);
-
-		$this->getHolder()->scheduleUpdate();
-	}
 }
