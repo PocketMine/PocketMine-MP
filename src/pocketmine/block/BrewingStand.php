@@ -41,7 +41,7 @@ class BrewingStand extends Transparent{
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$this->getLevel()->setBlock($block, $this, true, true);
 		$nbt = new Compound("", [
-			new String("id", Tile::BREWING_STAND_BLOCK),
+			new String("id", Tile::BREWING_STAND),
 			new Int("x", $this->x),
 			new Int("y", $this->y),
 			new Int("z", $this->z)
