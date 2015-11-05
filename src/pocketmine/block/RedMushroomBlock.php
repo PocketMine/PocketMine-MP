@@ -19,32 +19,36 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\block;
 
+use pocketmine\item\Item;
+use pocketmine\item\Tool;
 
-class Wolf extends Animal implements Tameable{
+class RedMushroomBlock extends Solid{
 
-	const NETWORK_ID = 14;
+	protected $id = self::RED_MUSHROOM_BLOCK;
+
+	public function __construct(){
+
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_AXE;
+	}
 
 	public function getName(){
-		return "Wolf";
+		return "Red Mushroom Block";
 	}
-	
-	public function spawnTo(Player $player){
-		$pk = new AddEntityPacket();
-		$pk->eid = $this->getId();
-		$pk->type = Wolf::NETWORK_ID;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->speedX = $this->motionX;
-		$pk->speedY = $this->motionY;
-		$pk->speedZ = $this->motionZ;
-		$pk->yaw = $this->yaw;
-		$pk->pitch = $this->pitch;
-		$pk->metadata = $this->dataProperties;
-		$player->dataPacket($pk);
 
-		parent::spawnTo($player);
+	public function getHardness(){
+		return 0.1;
+	}
+
+	public function getDrops(Item $item){
+		$drops = [];
+		if(mt_rand(1, 20) === 1){ //Red Mushrooms
+			$drops[] = [Item::RED_MUSHROOM, $this->meta & 0x03, 1];
+		}
+		return $drops;
 	}
 }

@@ -63,9 +63,9 @@ class Block extends Position implements Metadatable{
 	const GOLD_ORE = 14;
 	const IRON_ORE = 15;
 	const COAL_ORE = 16;
+	const LOG = 17;
 	const WOOD = 17;
 	const TRUNK = 17;
-	const LOG = 17;
 	const LEAVES = 18;
 	const LEAVE = 18;
 	const SPONGE = 19;
@@ -76,6 +76,8 @@ class Block extends Position implements Metadatable{
 	const SANDSTONE = 24;
 
 	const BED_BLOCK = 26;
+	
+	const POWERED_RAIL = 27;
 
 
 	const COBWEB = 30;
@@ -84,8 +86,8 @@ class Block extends Position implements Metadatable{
 	const DEAD_BUSH = 32;
 	const WOOL = 35;
 	const DANDELION = 37;
-	const ROSE = 38;
 	const POPPY = 38;
+	const ROSE = 38;
 	const RED_FLOWER = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
@@ -125,6 +127,7 @@ class Block extends Position implements Metadatable{
 	const WOODEN_DOOR_BLOCK = 64;
 	const WOOD_DOOR_BLOCK = 64;
 	const LADDER = 65;
+	const RAIL = 66;
 
 	const COBBLE_STAIRS = 67;
 	const COBBLESTONE_STAIRS = 67;
@@ -158,11 +161,12 @@ class Block extends Position implements Metadatable{
 	const CAKE_BLOCK = 92;
 
 	const TRAPDOOR = 96;
-	const WOODEN_TRAPDOOR = 96;
-	const WOOD_TRAPDOOR = 96;
 
 	const STONE_BRICKS = 98;
 	const STONE_BRICK = 98;
+	
+	const BROWN_MUSHROOM_BLOCK = 99;
+	const RED_MUSHROOM_BLOCK = 100;
 
 	const IRON_BAR = 101;
 	const IRON_BARS = 101;
@@ -187,7 +191,9 @@ class Block extends Position implements Metadatable{
 	const ENCHANTING_TABLE = 116;
 	const ENCHANT_TABLE = 116;
 	const ENCHANTMENT_TABLE = 116;
+	const BREWING_STAND_BLOCK = 117;
 
+	const END_PORTAL = 120;
 	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
 
@@ -206,13 +212,20 @@ class Block extends Position implements Metadatable{
 	const STONE_WALL = 139;
 	const COBBLESTONE_WALL = 139;
 
+	const FLOWER_POT_BLOCK = 140;
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
+	
+	const SKULL_BLOCK = 143;
+	const HEAD_BLOCK = 143;
+	const MOB_HEAD_BLOCK = 143;
 
 	const ANVIL = 145;
 
 	const REDSTONE_BLOCK = 152;
-
+	
+	const NETHER_QUARTZ_ORE = 153;
+	const QUARTZ_ORE = 153;
 	const QUARTZ_BLOCK = 155;
 	const QUARTZ_STAIRS = 156;
 	const DOUBLE_WOOD_SLAB = 157;
@@ -240,6 +253,7 @@ class Block extends Position implements Metadatable{
 	const CARPET = 171;
 	const HARDENED_CLAY = 172;
 	const COAL_BLOCK = 173;
+	const PACKED_ICE = 174;
 
 	const DOUBLE_PLANT = 175;
 
@@ -339,6 +353,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::LAPIS_BLOCK] = Lapis::class;
 			self::$list[self::SANDSTONE] = Sandstone::class;
 			self::$list[self::BED_BLOCK] = Bed::class;
+			self::$list[self::POWERED_RAIL] = PoweredRail::class;
 			self::$list[self::COBWEB] = Cobweb::class;
 			self::$list[self::TALL_GRASS] = TallGrass::class;
 			self::$list[self::DEAD_BUSH] = DeadBush::class;
@@ -372,6 +387,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::SIGN_POST] = SignPost::class;
 			self::$list[self::WOOD_DOOR_BLOCK] = WoodDoor::class;
 			self::$list[self::LADDER] = Ladder::class;
+			self::$list[self::RAIL] = Rail::class;
 
 			self::$list[self::COBBLESTONE_STAIRS] = CobblestoneStairs::class;
 			self::$list[self::WALL_SIGN] = WallSign::class;
@@ -399,6 +415,9 @@ class Block extends Position implements Metadatable{
 			self::$list[self::TRAPDOOR] = Trapdoor::class;
 
 			self::$list[self::STONE_BRICKS] = StoneBricks::class;
+			
+			self::$list[self::RED_MUSHROOM_BLOCK] = RedMushroomBlock::class;
+			self::$list[self::BROWN_MUSHROOM_BLOCK] = BrownMushroomBlock::class;
 
 			self::$list[self::IRON_BARS] = IronBars::class;
 			self::$list[self::GLASS_PANE] = GlassPane::class;
@@ -417,6 +436,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::NETHER_BRICKS_STAIRS] = NetherBrickStairs::class;
 
 			self::$list[self::ENCHANTING_TABLE] = EnchantingTable::class;
+			self::$list[self::BREWING_STAND_BLOCK] = BrewingStand::class;
 
 			self::$list[self::END_PORTAL_FRAME] = EndPortalFrame::class;
 			self::$list[self::END_STONE] = EndStone::class;
@@ -431,6 +451,7 @@ class Block extends Position implements Metadatable{
 
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
+		//	self::$list[self::SKULL_BLOCK] = SkullBlock::class;
 			self::$list[self::ANVIL] = Anvil::class;
 
 			self::$list[self::REDSTONE_BLOCK] = Redstone::class;
@@ -450,6 +471,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::CARPET] = Carpet::class;
 			self::$list[self::HARDENED_CLAY] = HardenedClay::class;
 			self::$list[self::COAL_BLOCK] = Coal::class;
+			self::$list[self::PACKED_ICE] = PackedIce::class;
 
 			self::$list[self::DOUBLE_PLANT] = DoublePlant::class;
 
