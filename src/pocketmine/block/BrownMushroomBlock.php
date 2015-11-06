@@ -28,8 +28,8 @@ class BrownMushroomBlock extends Solid{
 
 	protected $id = self::BROWN_MUSHROOM_BLOCK;
 
-	public function __construct(){
-
+	public function __construct($meta = 15){
+		$this->meta = $meta;
 	}
 
 	public function getToolType(){
@@ -44,6 +44,12 @@ class BrownMushroomBlock extends Solid{
 		return 0.1;
 	}
 
+	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+		$this->getLevel()->setBlock($block, $this, true, true);
+
+		return true;
+	}
+	
 	public function getDrops(Item $item){
 		$drops = [];
 		if(mt_rand(1, 20) === 1){ //Brown Mushrooms
