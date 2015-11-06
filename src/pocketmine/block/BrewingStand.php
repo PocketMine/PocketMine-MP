@@ -86,4 +86,19 @@ class BrewingStand extends Transparent{
 
 		return true;
 	}
+
+	public function getDrops(Item $item){
+		$drops = [];
+		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+			$drops[] = [Item::BREWING_STAND, 0, 1];
+		}
+
+		return $drops;
+	}
+	
+	public function onBreak(Item $item){
+		$this->getLevel()->setBlock($this, new Air(), true, true);
+
+		return true;
+	}
 }

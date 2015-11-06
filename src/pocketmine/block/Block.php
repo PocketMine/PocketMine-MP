@@ -451,7 +451,7 @@ class Block extends Position implements Metadatable{
 
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
-		//	self::$list[self::SKULL_BLOCK] = SkullBlock::class;
+			self::$list[self::SKULL_BLOCK] = SkullBlock::class;
 			self::$list[self::ANVIL] = Anvil::class;
 
 			self::$list[self::REDSTONE_BLOCK] = Redstone::class;

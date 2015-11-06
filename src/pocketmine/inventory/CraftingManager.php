@@ -219,11 +219,11 @@ class CraftingManager{
 			"S S"
 		))->setIngredient("S", Item::get(Item::STICK, 0, 7)));
 
-		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::NETHER_REACTOR, 0, 1),
+/* 		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::NETHER_REACTOR, 0, 1),
 			"IDI",
 			"IDI",
 			"IDI"
-		))->setIngredient("D", Item::get(Item::DIAMOND, 0, 3))->setIngredient("I", Item::get(Item::IRON_INGOT, 0, 6)));
+		))->setIngredient("D", Item::get(Item::DIAMOND, 0, 3))->setIngredient("I", Item::get(Item::IRON_INGOT, 0, 6))); */
 
 		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::TRAPDOOR, 0, 2),
 			"PPP",
@@ -362,6 +362,11 @@ class CraftingManager{
 			"III",
 			"III"
 		))->setIngredient("I", Item::get(Item::IRON_INGOT, 0, 9)));
+		
+		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::BREWING_STAND, 0, 1),
+			" B",
+			"CCC"
+		))->setIngredient("B", Item::get(Item::BLAZE_ROD, 0, 1))->setIngredient("C", Item::get(Item::COBBLESTONE, 0, 3)));
 	}
 
 	protected function registerFurnace(){
@@ -387,6 +392,14 @@ class CraftingManager{
 		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::HARDENED_CLAY, 0, 1), Item::get(Item::CLAY_BLOCK, 0, 1)));
 	}
 
+	protected function registerBrewingStand(){
+		$this->registerRecipe(new BrewingRecipe(Item::get(Item::POTION, 4, 1), Item::get(Item::NETHER_WART, 0, 1), Item::get(Item::POTION, 0, 1))); //Akward Potion
+		$this->registerRecipe(new BrewingRecipe(Item::get(Item::POTION, 14, 1), Item::get(Item::SUGAR, 0, 1), Item::get(Item::POTION, 4, 1))); //Swiftness
+		$this->registerRecipe(new BrewingRecipe(Item::get(Item::POTION, 15, 1), Item::get(Item::REDSTONE, 0, 1), Item::get(Item::POTION, 14, 1))); //Swiftness Extended
+		$this->registerRecipe(new BrewingRecipe(Item::get(Item::POTION, 14, 1), Item::get(Item::GLOWSTONE_DUST, 0, 1), Item::get(Item::POTION, 14, 1))); //Swiftness II
+
+	}
+	
 	protected function registerStonecutter(){	
 		$shapes = [
 			"slab" => [
@@ -752,6 +765,13 @@ class CraftingManager{
 	public function getFurnaceRecipes(){
 		return $this->furnaceRecipes;
 	}
+	
+	/**
+	 * @return FurnaceRecipe[]
+	 */
+	public function getBrewingRecipes(){
+		return $this->brewingRecipes;
+	}	
 
 	/**
 	 * @param Item $input
@@ -813,6 +833,14 @@ class CraftingManager{
 		$this->furnaceRecipes[$input->getId() . ":" . ($input->getDamage() === null ? "?" : $input->getDamage())] = $recipe;
 	}
 
+	/**
+	 * @param BrewingRecipe $recipe
+	 */
+	public function registerBrewingRecipe(BrewingRecipe $recipe){
+		$input = $recipe->getInput();
+		$this->brewingRecipes[$input->getId() . ":" . ($input->getDamage() === null ? "?" : $input->getDamage())] = $recipe;
+	}
+	
 	/**
 	 * @param ShapelessRecipe $recipe
 	 * @return bool
@@ -883,6 +911,8 @@ class CraftingManager{
 			$this->registerShapelessRecipe($recipe);
 		}elseif($recipe instanceof FurnaceRecipe){
 			$this->registerFurnaceRecipe($recipe);
+		}elseif($recipe instanceof BrewingRecipe){
+			$this->registerBrewingRecipe($recipe);
 		}
 	}
 
