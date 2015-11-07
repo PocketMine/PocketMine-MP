@@ -27,4 +27,14 @@ class NetherWart extends NetherCrops{
 	public function getName(){
 		return "Nether Wart";
 	}
-	
+        public function getDrops(Item $item){
+            $drops = [];
+            if($this->meta >= 0x07){
+                $drops[] = [Item::NETHER_WART, 0, mt_rand(2, 4)];
+            }else{
+                $drops[] = [Item::NETHER_WART, 0, 1];
+            }
+
+            return $drops;
+    }
+}
