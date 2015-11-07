@@ -36,5 +36,5 @@ class NetherWart extends NetherCrops{
             }
 
             return $drops;
-    }
+            }
 }
