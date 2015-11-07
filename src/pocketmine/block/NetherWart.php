@@ -18,6 +18,20 @@
  *
 */
 namespace pocketmine\block;
-
-use pocketmine\item\item;
-
+use pocketmine\item\Item;
+class NetherWart extends NetherCrops{
+	protected $id = self::NETHER_WART;
+	public function __construct($meta = 0){
+		$this->meta = $meta;
+	}
+	public function getName(){
+		return "Nether Wart";
+	}
+	public function getDrops(Item $item){
+		$drops = [];
+		if($this->meta >= 0x07){
+			$drops[] = [Item::NETHER_WART, 0, 1];
+		}
+		return $drops;
+	}
+}
