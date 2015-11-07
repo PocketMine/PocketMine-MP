@@ -19,14 +19,34 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
+use pocketmine\item\Item;
+use pocketmine\level\Level;
+use pocketmine\math\Vector3;
+use pocketmine\Player;
 
-class NetherWart extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::NETHER_WART, $meta, $count, "Nether Wart");
+
+class FlowerPot extends Solid{
+	protected $id = self::FLOWER_POT_BLOCK;
+	public function __construct(){
 	}
-
+	public function getName(){
+		return "Flower Pot";
+	}
+	public function getToolType(){
+		return Tool::TYPE_PICKAXE;
+	}
+	public function getHardness(){
+		return 5;
+	}
+	public function getDrops(Item $item){
+		if($item->isPickaxe() >= 3){
+			return [
+				[Item::FLOWER_POT, 0, 1],
+			];
+		}else{
+			return [];
+		}
+	}
 }
-
