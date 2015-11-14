@@ -297,6 +297,7 @@ class Item{
 	const APPLE = 260; //
 	const BOW = 261;
 	const ARROW = 262;
+	const FISHING_ROD = 346;
 	const COAL = 263; //
 	const DIAMOND = 264; //
 	const IRON_INGOT = 265; //
@@ -832,9 +833,11 @@ class Item{
                 self::addCreativeItem(Item::get(Item::CLOCK, 0));
                 self::addCreativeItem(Item::get(Item::COMPASS, 0));
                 self::addCreativeItem(Item::get(Item::MINECART, 0));
+                self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
                 self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
                 self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
-                self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
+                elf::addCreativeItem(Item::get(Item::IRON_PICKAXE, 0));
+                elf::addCreativeItem(Item::get(Item::IRON_AXE, 0));
                 self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 10)); //Chicken
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 11)); //Cow
