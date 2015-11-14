@@ -710,6 +710,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
 		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 0));
+		self::addCreativeItem(Item::get(Item::IRON_DOOR, 0));
 		self::addCreativeItem(Item::get(Item::TRAPDOOR, 0));
 		self::addCreativeItem(Item::get(Item::FENCE, Fence::FENCE_OAK));
 		self::addCreativeItem(Item::get(Item::FENCE, Fence::FENCE_SPRUCE));
@@ -827,7 +828,6 @@ class Item{
                 self::addCreativeItem(Item::get(Item::TNT, 0));
                 self::addCreativeItem(Item::get(Item::REDSTONE, 0));
                 self::addCreativeItem(Item::get(Item::BOW, 0));
-                self::addCreativeItem(Item::get(Item::FISHING_ROD, 0));
                 self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
                 self::addCreativeItem(Item::get(Item::SHEARS, 0));
                 self::addCreativeItem(Item::get(Item::CLOCK, 0));
