@@ -297,7 +297,6 @@ class Item{
 	const APPLE = 260; //
 	const BOW = 261;
 	const ARROW = 262;
-	const FISHING_ROD = 346;
 	const COAL = 263; //
 	const DIAMOND = 264; //
 	const IRON_INGOT = 265; //
