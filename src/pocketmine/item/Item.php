@@ -826,7 +826,6 @@ class Item{
 		self::addCreativeItem(Item::get(Item::TNT, 0));
 		self::addCreativeItem(Item::get(Item::REDSTONE, 0));
 		self::addCreativeItem(Item::get(Item::BOW, 0));
-		self::addCreativeItem(Item::get(Item::FISHING_ROD, 0));
 		self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
 	        self::addCreativeItem(Item::get(Item::SHEARS, 0));
 	        self::addCreativeItem(Item::get(Item::CLOCK, 0));
