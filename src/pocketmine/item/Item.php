@@ -708,7 +708,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LADDER, 0));
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
-		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 0));;
+		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 0));
 		self::addCreativeItem(Item::get(Item::TRAPDOOR, 0));
 		self::addCreativeItem(Item::get(Item::FENCE, Fence::FENCE_OAK));
 		self::addCreativeItem(Item::get(Item::FENCE, Fence::FENCE_SPRUCE));
@@ -818,24 +818,22 @@ class Item{
 		//Tools
 		//TODO self::addCreativeItem(Item::get(Item::RAILS, 0));
 		//TODO self::addCreativeItem(Item::get(Item::POWERED_RAILS, 0));
-	        self::addCreativeItem(Item::get(Item::TORCH, 0));
-                self::addCreativeItem(Item::get(Item::BUCKET, 0));
-                self::addCreativeItem(Item::get(Item::BUCKET, 1));
-                self::addCreativeItem(Item::get(Item::BUCKET, 8));
-                self::addCreativeItem(Item::get(Item::BUCKET, 10));
-                self::addCreativeItem(Item::get(Item::TNT, 0));
-                self::addCreativeItem(Item::get(Item::BOW, 0));
-                self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
-                self::addCreativeItem(Item::get(Item::SHEARS, 0));
-                self::addCreativeItem(Item::get(Item::CLOCK, 0));
-                self::addCreativeItem(Item::get(Item::COMPASS, 0));
-                self::addCreativeItem(Item::get(Item::MINECART, 0));
-                self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
-                self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
-                self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
-                elf::addCreativeItem(Item::get(Item::IRON_PICKAXE, 0));
-                elf::addCreativeItem(Item::get(Item::IRON_AXE, 0));
-                self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::TORCH, 0));
+		self::addCreativeItem(Item::get(Item::BUCKET, 0));
+		self::addCreativeItem(Item::get(Item::BUCKET, 1));
+		self::addCreativeItem(Item::get(Item::BUCKET, 8));
+		self::addCreativeItem(Item::get(Item::BUCKET, 10));
+		self::addCreativeItem(Item::get(Item::TNT, 0));
+		self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
+		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
+		self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
+		self::addCreativeItem(Item::get(Item::BOW, 0));
+		self::addCreativeItem(Item::get(Item::SHEARS, 0));
+		self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
+		self::addCreativeItem(Item::get(Item::CLOCK, 0));
+		self::addCreativeItem(Item::get(Item::COMPASS, 0));
+		self::addCreativeItem(Item::get(Item::MINECART, 0));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 10)); //Chicken
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 11)); //Cow
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 12)); //Pig
