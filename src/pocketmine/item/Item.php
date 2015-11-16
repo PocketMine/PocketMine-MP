@@ -441,6 +441,9 @@ class Item{
 	const BEETROOT_SEED = 458;
 	const BEETROOT_SOUP = 459;
 
+	const OAK_BOAT = 333;
+	
+
 
 	/** @var \SplFixedArray */
 	public static $list = null;
@@ -522,6 +525,7 @@ class Item{
 			self::$list[self::GOLD_CHESTPLATE] = GoldChestplate::class;
 			self::$list[self::GOLD_LEGGINGS] = GoldLeggings::class;
 			self::$list[self::GOLD_BOOTS] = GoldBoots::class;
+			self::$list[self::OAK_BOAT] =Boat::class;
 			self::$list[self::FLINT] = Flint::class;
 			self::$list[self::RAW_PORKCHOP] = RawPorkchop::class;
 			self::$list[self::COOKED_PORKCHOP] = CookedPorkchop::class;
@@ -846,26 +850,7 @@ class Item{
 	        self::addCreativeItem(Item::get(Item::GOLD_SHOVEL, 0));
 	        self::addCreativeItem(Item::get(Item::GOLD_PICKAXE, 0));
 	        self::addCreativeItem(Item::get(Item::GOLD_AXE, 0));
-	        self::addCreativeItem(Item::get(Item::LEATHER_CAP, 0));
-	        self::addCreativeItem(Item::get(Item::LEATHER_TUNIC, 0));
-	        self::addCreativeItem(Item::get(Item::LEATHER_PANTS, 0));
-	        self::addCreativeItem(Item::get(Item::LEATHER_BOOTS, 0));
-	        self::addCreativeItem(Item::get(Item::CHAIN_HELMET, 0));
-	        self::addCreativeItem(Item::get(Item::CHAIN_CHESTPLATE, 0));
-	        self::addCreativeItem(Item::get(Item::CHAIN_LEGGINGS, 0));
-	        self::addCreativeItem(Item::get(Item::CHAIN_BOOTS, 0));
-	        self::addCreativeItem(Item::get(Item::IRON_HELMET, 0));
-	        self::addCreativeItem(Item::get(Item::IRON_CHESTPLATE, 0));
-	        self::addCreativeItem(Item::get(Item::IRON_LEGGINGS, 0));
-	        self::addCreativeItem(Item::get(Item::IRON_BOOTS, 0));
-	        self::addCreativeItem(Item::get(Item::DIAMOND_HELMET, 0));
-	        self::addCreativeItem(Item::get(Item::DIAMOND_CHESTPLATE, 0));
-	        self::addCreativeItem(Item::get(Item::DIAMOND_LEGGINGS, 0));
-	        self::addCreativeItem(Item::get(Item::DIAMOND_BOOTS, 0));
-	        self::addCreativeItem(Item::get(Item::GOLD_HELMET, 0));
-	        self::addCreativeItem(Item::get(Item::GOLD_CHESTPLATE, 0));
-	        self::addCreativeItem(Item::get(Item::GOLD_LEGGINGS, 0));
-	        self::addCreativeItem(Item::get(Item::GOLD_BOOTS, 0));
+	        self::addCreativeItem(Item::get(Item::OAK_BOAT, 0));
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 10)); //Chicken
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 11)); //Cow
