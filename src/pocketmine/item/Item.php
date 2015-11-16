@@ -824,15 +824,17 @@ class Item{
 		self::addCreativeItem(Item::get(Item::BUCKET, 8));
 		self::addCreativeItem(Item::get(Item::BUCKET, 10));
 		self::addCreativeItem(Item::get(Item::TNT, 0));
-		self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
-		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
-		self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
 		self::addCreativeItem(Item::get(Item::BOW, 0));
-		self::addCreativeItem(Item::get(Item::SHEARS, 0));
 		self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
-		self::addCreativeItem(Item::get(Item::CLOCK, 0));
+	        self::addCreativeItem(Item::get(Item::SHEARS, 0));
+	        self::addCreativeItem(Item::get(Item::CLOCK, 0));
 		self::addCreativeItem(Item::get(Item::COMPASS, 0));
 		self::addCreativeItem(Item::get(Item::MINECART, 0));
+		self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
+		self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
+		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
+		self::addCreativeItem(Item::get(Item::IRON_PICKAXE, 0));
+		self::addCreativeItem(Item::get(Item::IRON_AXE, 0));
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 10)); //Chicken
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 11)); //Cow
