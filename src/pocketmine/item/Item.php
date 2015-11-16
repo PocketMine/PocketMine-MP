@@ -31,6 +31,7 @@ use pocketmine\entity\Entity;
 use pocketmine\entity\Squid;
 use pocketmine\entity\Villager;
 use pocketmine\entity\Zombie;
+use pocketmine\entity\Wolf;
 use pocketmine\inventory\Fuel;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\level\Level;
@@ -816,8 +817,8 @@ class Item{
 		self::addCreativeItem(Item::get(Item::ANVIL, 8));
 
 		//Tools
-		//TODO self::addCreativeItem(Item::get(Item::RAILS, 0));
-		//TODO self::addCreativeItem(Item::get(Item::POWERED_RAILS, 0));
+		self::addCreativeItem(Item::get(Item::RAILS, 0));
+		self::addCreativeItem(Item::get(Item::POWERED_RAILS, 0));
 		self::addCreativeItem(Item::get(Item::TORCH, 0));
 		self::addCreativeItem(Item::get(Item::BUCKET, 0));
 		self::addCreativeItem(Item::get(Item::BUCKET, 1));
@@ -851,7 +852,7 @@ class Item{
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 11)); //Cow
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 12)); //Pig
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 13)); //Sheep
-		//TODO: Wolf
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG,Wolf::NETWORK_ID));
 		//TODO: Mooshroom
 		//TODO: Creeper
 		//TODO: Enderman
