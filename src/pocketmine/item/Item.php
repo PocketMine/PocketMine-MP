@@ -864,15 +864,36 @@ class Item{
 
 
 		//Seeds
+		self::addCreativeItem(Item::get(Item::COAL, 0));
+		self::addCreativeItem(Item::get(Item::CHARCOAL, 0));
+		self::addCreativeItem(Item::get(Item::DIAMOND, 0));	
+		self::addCreativeItem(Item::get(Item::IRON_INGOT, 0));
+		self::addCreativeItem(Item::get(Item::GOLD_INGOT, 0));
+		self::addCreativeItem(Item::get(Item::EMERALD, 0));
+		self::addCreativeItem(Item::get(Item::STICK, 0));
+		self::addCreativeItem(Item::get(Item::BOWL, 0));
+		self::addCreativeItem(Item::get(Item::STRING, 0));
+		self::addCreativeItem(Item::get(Item::FEATHER, 0));
+		self::addCreativeItem(Item::get(Item::FLINT, 0));
+		self::addCreativeItem(Item::get(Item::LEATHER, 0));
+		self::addCreativeItem(Item::get(Item::CLAY, 0));
+		self::addCreativeItem(Item::get(Item::SUGAR, 0));
+		self::addCreativeItem(Item::get(Item::NETHER_QUARTZ, 0));
+		self::addCreativeItem(Item::get(Item::PAPER, 0));
+		self::addCreativeItem(Item::get(Item::BOOK, 0));
+		self::addCreativeItem(Item::get(Item::ARROW, 0));
+		self::addCreativeItem(Item::get(Item::BONE, 0));
 		self::addCreativeItem(Item::get(Item::SUGARCANE, 0));
 		self::addCreativeItem(Item::get(Item::WHEAT, 0));
 		self::addCreativeItem(Item::get(Item::SEEDS, 0));
-		self::addCreativeItem(Item::get(Item::MELON_SEEDS, 0));
 		self::addCreativeItem(Item::get(Item::PUMPKIN_SEEDS, 0));
+		self::addCreativeItem(Item::get(Item::MELON_SEEDS, 0));
+		self::addCreativeItem(Item::get(Item::BEETROOT_SEEDS, 0));
+		self::addCreativeItem(Item::get(Item::EGG, 0));
+		self::addCreativeItem(Item::get(Item::APPLE, 0));
 		self::addCreativeItem(Item::get(Item::CARROT, 0));
 		self::addCreativeItem(Item::get(Item::POTATO, 0));
 		self::addCreativeItem(Item::get(Item::BEETROOT_SEEDS, 0));
-		self::addCreativeItem(Item::get(Item::EGG, 0));
 		self::addCreativeItem(Item::get(Item::RAW_FISH, 0));
 		self::addCreativeItem(Item::get(Item::RAW_FISH, 1));
 		self::addCreativeItem(Item::get(Item::RAW_FISH, 2));
