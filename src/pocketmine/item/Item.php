@@ -441,10 +441,6 @@ class Item{
 	const BEETROOT_SEED = 458;
 	const BEETROOT_SOUP = 459;
 
-	const OAK_BOAT = 333;
-	
-
-
 	/** @var \SplFixedArray */
 	public static $list = null;
 	protected $block;
@@ -525,7 +521,6 @@ class Item{
 			self::$list[self::GOLD_CHESTPLATE] = GoldChestplate::class;
 			self::$list[self::GOLD_LEGGINGS] = GoldLeggings::class;
 			self::$list[self::GOLD_BOOTS] = GoldBoots::class;
-			self::$list[self::OAK_BOAT] =Boat::class;
 			self::$list[self::FLINT] = Flint::class;
 			self::$list[self::RAW_PORKCHOP] = RawPorkchop::class;
 			self::$list[self::COOKED_PORKCHOP] = CookedPorkchop::class;
@@ -713,6 +708,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
 		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 0));
+		self::addCreativeItem(Item::get(Item:IRON_DOOR, 0));
 		self::addCreativeItem(Item::get(Item::TRAPDOOR, 0));
 		self::addCreativeItem(Item::get(Item::FENCE, Fence::FENCE_OAK));
 		self::addCreativeItem(Item::get(Item::FENCE, Fence::FENCE_SPRUCE));
@@ -850,7 +846,6 @@ class Item{
 	        self::addCreativeItem(Item::get(Item::GOLD_SHOVEL, 0));
 	        self::addCreativeItem(Item::get(Item::GOLD_PICKAXE, 0));
 	        self::addCreativeItem(Item::get(Item::GOLD_AXE, 0));
-	        self::addCreativeItem(Item::get(Item::OAK_BOAT, 0));
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 10)); //Chicken
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 11)); //Cow
