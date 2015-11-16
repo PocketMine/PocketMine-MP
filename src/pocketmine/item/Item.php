@@ -836,6 +836,16 @@ class Item{
 		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
 		self::addCreativeItem(Item::get(Item::IRON_PICKAXE, 0));
 		self::addCreativeItem(Item::get(Item::IRON_AXE, 0));
+		self::addCreativeItem(Item::get(Item::DIAMOND_SWORD, 0));
+		self::addCreativeItem(Item::get(Item::DIAMOND_HOE, 0));
+		self::addCreativeItem(Item::get(Item::DIAMOND_SHOVEL, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_PICKAXE, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_AXE, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_SWORD, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_HOE, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_SHOVEL, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_PICKAXE, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_AXE, 0));
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 10)); //Chicken
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 11)); //Cow
