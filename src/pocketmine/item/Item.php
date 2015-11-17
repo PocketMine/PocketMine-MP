@@ -899,7 +899,6 @@ class Item{
 		self::addCreativeItem(Item::get(Item::RAW_FISH, 3));
 		self::addCreativeItem(Item::get(Item::COOKED_FISH, 0));
 		self::addCreativeItem(Item::get(Item::COOKED_FISH, 1));
-		self::addCreativeItem(Item::get(Item::ROTTEN_FLESH 0));
 		self::addCreativeItem(Item::get(Item::DYE, 0));
 		self::addCreativeItem(Item::get(Item::DYE, 7));
 		self::addCreativeItem(Item::get(Item::DYE, 6));
