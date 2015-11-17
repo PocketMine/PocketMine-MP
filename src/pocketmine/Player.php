@@ -445,7 +445,11 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	 * @return bool
 	 */
 	public function hasPermission($name){
-		return $this->perm->hasPermission($name);
+	    if(is_null($this->perm)) {
+	        $this->server->getLogger()->warning("Failed to read permission " . $name . "Crash Averted!");
+	        return false;
+	    }
+	    return $this->perm->hasPermission($name);
 	}
 
 	/**
@@ -1686,7 +1690,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 			return;
 		}
-
+		if($this->inventory->getHotbarSlotIndex(0) === null){
+			return;
+		}
 		if($this->isCreative()){
 			$this->inventory->setHeldItemSlot(0);
 		}else{

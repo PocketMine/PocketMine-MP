@@ -11,7 +11,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version
+ * (at your option) any later version.
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
@@ -21,12 +21,10 @@
 
 namespace pocketmine\item;
 
-use pocketmine\block\Block;
 
-class FlowerPot extends Item{
+class RottenFlesh extends Item{
 	public function __construct($meta = 0, $count = 1){
-		$this->block = Block::get(Item::FLOWER_POT_BLOCK);
-		parent::__construct(self::FLOWER_POT, 0, $count, "Flower Pot"); 
-		
+		parent::__construct(self::ROTTEN_FLESH, 0, $count, "Rotten Flesh");
 	}
+
 }

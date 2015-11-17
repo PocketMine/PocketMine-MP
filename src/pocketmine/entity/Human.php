@@ -41,7 +41,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 	const DATA_PLAYER_FLAG_SLEEP = 1;
 	const DATA_PLAYER_FLAG_DEAD = 2;
 
-	const DATA_PLAYER_FLAGS = 16;
+	const DATA_PLAYER_FLAGS = 17; //16
 	const DATA_PLAYER_BED_POSITION = 17;
 
 	/** @var PlayerInventory */
