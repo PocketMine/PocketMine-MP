@@ -441,7 +441,6 @@ class Item{
 	const BEETROOT_SEED = 458;
 	const BEETROOT_SOUP = 459;
 
-
 	/** @var \SplFixedArray */
 	public static $list = null;
 	protected $block;
@@ -704,7 +703,6 @@ class Item{
 		self::addCreativeItem(Item::get(Item::GLASS, 0));
 		self::addCreativeItem(Item::get(Item::GLOWSTONE_BLOCK, 0));
 		self::addCreativeItem(Item::get(Item::VINES, 0));
-		self::addCreativeItem(Item::get(Item::NETHER_REACTOR, 0));
 		self::addCreativeItem(Item::get(Item::LADDER, 0));
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
@@ -824,21 +822,53 @@ class Item{
 		self::addCreativeItem(Item::get(Item::BUCKET, 8));
 		self::addCreativeItem(Item::get(Item::BUCKET, 10));
 		self::addCreativeItem(Item::get(Item::TNT, 0));
-		self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
-		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
-		self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
+		self::addCreativeItem(Item::get(Item::REDSTONE, 0));
 		self::addCreativeItem(Item::get(Item::BOW, 0));
-		self::addCreativeItem(Item::get(Item::SHEARS, 0));
 		self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
-		self::addCreativeItem(Item::get(Item::CLOCK, 0));
+	        self::addCreativeItem(Item::get(Item::SHEARS, 0));
+	        self::addCreativeItem(Item::get(Item::CLOCK, 0));
 		self::addCreativeItem(Item::get(Item::COMPASS, 0));
 		self::addCreativeItem(Item::get(Item::MINECART, 0));
+		self::addCreativeItem(Item::get(Item::IRON_SWORD, 0));
+		self::addCreativeItem(Item::get(Item::IRON_HOE, 0));
+		self::addCreativeItem(Item::get(Item::IRON_SHOVEL, 0));
+		self::addCreativeItem(Item::get(Item::IRON_PICKAXE, 0));
+		self::addCreativeItem(Item::get(Item::IRON_AXE, 0));
+		self::addCreativeItem(Item::get(Item::DIAMOND_SWORD, 0));
+		self::addCreativeItem(Item::get(Item::DIAMOND_HOE, 0));
+		self::addCreativeItem(Item::get(Item::DIAMOND_SHOVEL, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_PICKAXE, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_AXE, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_SWORD, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_HOE, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_SHOVEL, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_PICKAXE, 0));
+	        self::addCreativeItem(Item::get(Item::LEATHER_CAP, 0));
+	        self::addCreativeItem(Item::get(Item::LEATHER_TUNIC, 0));
+	        self::addCreativeItem(Item::get(Item::LEATHER_PANTS, 0));
+	        self::addCreativeItem(Item::get(Item::LEATHER_BOOTS, 0));
+	        self::addCreativeItem(Item::get(Item::CHAIN_HELMET, 0));
+	        self::addCreativeItem(Item::get(Item::CHAIN_CHESTPLATE, 0));
+	        self::addCreativeItem(Item::get(Item::CHAIN_LEGGINGS, 0));
+	        self::addCreativeItem(Item::get(Item::CHAIN_BOOTS, 0));
+	        self::addCreativeItem(Item::get(Item::IRON_HELMET, 0));
+	        self::addCreativeItem(Item::get(Item::IRON_CHESTPLATE, 0));
+	        self::addCreativeItem(Item::get(Item::IRON_LEGGINGS, 0));
+	        self::addCreativeItem(Item::get(Item::IRON_BOOTS, 0));	        
+                self::addCreativeItem(Item::get(Item::DIAMOND_HELMET, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_CHESTPLATE, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_LEGGINGS, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_BOOTS, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_HELMET, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_CHESTPLATE, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_LEGGINGS, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_BOOTS, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_AXE, 0));
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 10)); //Chicken
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 11)); //Cow
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 12)); //Pig
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 13)); //Sheep
-		//TODO: Wolf
 		//TODO: Mooshroom
 		//TODO: Creeper
 		//TODO: Enderman
@@ -853,15 +883,35 @@ class Item{
 
 
 		//Seeds
+		self::addCreativeItem(Item::get(Item::COAL, 0));
+		self::addCreativeItem(Item::get(Item::COAL, 1));
+		self::addCreativeItem(Item::get(Item::DIAMOND, 0));	
+		self::addCreativeItem(Item::get(Item::IRON_INGOT, 0));
+		self::addCreativeItem(Item::get(Item::GOLD_INGOT, 0));
+		self::addCreativeItem(Item::get(Item::EMERALD, 0));
+		self::addCreativeItem(Item::get(Item::STICK, 0));
+		self::addCreativeItem(Item::get(Item::BOWL, 0));
+		self::addCreativeItem(Item::get(Item::STRING, 0));
+		self::addCreativeItem(Item::get(Item::FEATHER, 0));
+		self::addCreativeItem(Item::get(Item::FLINT, 0));
+		self::addCreativeItem(Item::get(Item::LEATHER, 0));
+		self::addCreativeItem(Item::get(Item::CLAY, 0));
+		self::addCreativeItem(Item::get(Item::SUGAR, 0));
+		self::addCreativeItem(Item::get(Item::PAPER, 0));
+		self::addCreativeItem(Item::get(Item::BOOK, 0));
+		self::addCreativeItem(Item::get(Item::ARROW, 0));
+		self::addCreativeItem(Item::get(Item::BONE, 0));
 		self::addCreativeItem(Item::get(Item::SUGARCANE, 0));
 		self::addCreativeItem(Item::get(Item::WHEAT, 0));
 		self::addCreativeItem(Item::get(Item::SEEDS, 0));
-		self::addCreativeItem(Item::get(Item::MELON_SEEDS, 0));
 		self::addCreativeItem(Item::get(Item::PUMPKIN_SEEDS, 0));
+		self::addCreativeItem(Item::get(Item::MELON_SEEDS, 0));
+		self::addCreativeItem(Item::get(Item::BEETROOT_SEEDS, 0));
+		self::addCreativeItem(Item::get(Item::EGG, 0));
+		self::addCreativeItem(Item::get(Item::APPLE, 0));
 		self::addCreativeItem(Item::get(Item::CARROT, 0));
 		self::addCreativeItem(Item::get(Item::POTATO, 0));
 		self::addCreativeItem(Item::get(Item::BEETROOT_SEEDS, 0));
-		self::addCreativeItem(Item::get(Item::EGG, 0));
 		self::addCreativeItem(Item::get(Item::RAW_FISH, 0));
 		self::addCreativeItem(Item::get(Item::RAW_FISH, 1));
 		self::addCreativeItem(Item::get(Item::RAW_FISH, 2));

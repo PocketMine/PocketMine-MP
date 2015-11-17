@@ -1,5 +1,4 @@
 <?php
-
 /*
  *
  *  ____            _        _   __  __ _                  __  __ ____  
@@ -18,24 +17,23 @@
  * 
  *
 */
-
-namespace pocketmine\item;
-
-
-class Fish extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::RAW_FISH, $meta, $count, "Raw Fish");
-		if($this->meta === 1){
-			$this->name = "Raw Salmon";
-		}elseif($this->meta === 2){
-			$this->name = "Clownfish";
-		}elseif($this->meta === 3){
-			$this->name = "Pufferfish";
-		}elseif($this->meta === 4){
-			$this->name = "Cooked Fish";
-		}elseif($this->meta === 5){
-			$this->name = "Cooked Salmon";
-		}
+namespace pocketmine\block;
+use pocketmine\item\Item;
+class GoldenCarrot extends Crops{
+	protected $id = self::GOLDENCARROT_BLOCK;
+	public function __construct($meta = 0){
+		$this->meta = $meta;
 	}
-
+	public function getName(){
+		return "GoldenCarrot Block";
+	}
+	public function getDrops(Item $item){
+		$drops = [];
+		if($this->meta >= 0x07){
+			$drops[] = [Item::GOLDEN_CARROT, 0, mt_rand(1, 4)];
+		}else{
+			$drops[] = [Item::GOLDEN_CARROT, 0, 1];
+		}
+		return $drops;
+	}
 }

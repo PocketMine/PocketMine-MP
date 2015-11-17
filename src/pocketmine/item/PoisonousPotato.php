@@ -22,20 +22,9 @@
 namespace pocketmine\item;
 
 
-class Fish extends Item{
+class PoisonousPotato extends Item{
 	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::RAW_FISH, $meta, $count, "Raw Fish");
-		if($this->meta === 1){
-			$this->name = "Raw Salmon";
-		}elseif($this->meta === 2){
-			$this->name = "Clownfish";
-		}elseif($this->meta === 3){
-			$this->name = "Pufferfish";
-		}elseif($this->meta === 4){
-			$this->name = "Cooked Fish";
-		}elseif($this->meta === 5){
-			$this->name = "Cooked Salmon";
-		}
+		parent::__construct(self::POISONOUS_POTATO, 0, $count, "Poisonous Potato.");
 	}
 
 }
