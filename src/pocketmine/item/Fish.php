@@ -31,6 +31,10 @@ class Fish extends Item{
 			$this->name = "Clownfish";
 		}elseif($this->meta === 3){
 			$this->name = "Pufferfish";
+		}elseif($this->meta === 4){
+			$this->name = "Cooked Fish";
+		}elseif($this->meta === 5){
+			$this->name = "Cooked Salmon";
 		}
 	}
 
