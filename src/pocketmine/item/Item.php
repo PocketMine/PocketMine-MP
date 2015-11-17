@@ -878,7 +878,6 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LEATHER, 0));
 		self::addCreativeItem(Item::get(Item::CLAY, 0));
 		self::addCreativeItem(Item::get(Item::SUGAR, 0));
-		self::addCreativeItem(Item::get(Item::NETHER_QUARTZ, 0));
 		self::addCreativeItem(Item::get(Item::PAPER, 0));
 		self::addCreativeItem(Item::get(Item::BOOK, 0));
 		self::addCreativeItem(Item::get(Item::ARROW, 0));
