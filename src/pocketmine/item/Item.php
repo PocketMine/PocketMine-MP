@@ -890,7 +890,6 @@ class Item{
 		self::addCreativeItem(Item::get(Item::BEETROOT_SEEDS, 0));
 		self::addCreativeItem(Item::get(Item::EGG, 0));
 		self::addCreativeItem(Item::get(Item::APPLE, 0));
-		self::addCreativeItem(Item::get(Item::GOLDEN_APPLE, 0));
 		self::addCreativeItem(Item::get(Item::CARROT, 0));
 		self::addCreativeItem(Item::get(Item::POTATO, 0));
 		self::addCreativeItem(Item::get(Item::BEETROOT_SEEDS, 0));
