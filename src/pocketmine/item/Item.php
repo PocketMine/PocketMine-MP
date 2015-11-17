@@ -703,7 +703,6 @@ class Item{
 		self::addCreativeItem(Item::get(Item::GLASS, 0));
 		self::addCreativeItem(Item::get(Item::GLOWSTONE_BLOCK, 0));
 		self::addCreativeItem(Item::get(Item::VINES, 0));
-		self::addCreativeItem(Item::get(Item::NETHER_REACTOR, 0));
 		self::addCreativeItem(Item::get(Item::LADDER, 0));
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
@@ -878,7 +877,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LEATHER, 0));
 		self::addCreativeItem(Item::get(Item::CLAY, 0));
 		self::addCreativeItem(Item::get(Item::SUGAR, 0));
-		self::addCreativeItem(Item::get(Item::NETHER_QUARTZ, 0));
+                self::addCreativeItem(Item::get(Item::NETHER_QUARTZ, 0));
 		self::addCreativeItem(Item::get(Item::PAPER, 0));
 		self::addCreativeItem(Item::get(Item::BOOK, 0));
 		self::addCreativeItem(Item::get(Item::ARROW, 0));
@@ -891,6 +890,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::BEETROOT_SEEDS, 0));
 		self::addCreativeItem(Item::get(Item::EGG, 0));
 		self::addCreativeItem(Item::get(Item::APPLE, 0));
+		self::addCreativeItem(Item::get(Item::GOLDEN_APPLE, 0));
 		self::addCreativeItem(Item::get(Item::CARROT, 0));
 		self::addCreativeItem(Item::get(Item::POTATO, 0));
 		self::addCreativeItem(Item::get(Item::BEETROOT_SEEDS, 0));
@@ -900,6 +900,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::RAW_FISH, 3));
 		self::addCreativeItem(Item::get(Item::COOKED_FISH, 0));
 		self::addCreativeItem(Item::get(Item::COOKED_FISH, 1));
+		self::addCreativeItem(Item::get(Item::ROTTEN_FLESH 0));
 		self::addCreativeItem(Item::get(Item::DYE, 0));
 		self::addCreativeItem(Item::get(Item::DYE, 7));
 		self::addCreativeItem(Item::get(Item::DYE, 6));
