@@ -865,7 +865,7 @@ class Item{
 
 		//Seeds
 		self::addCreativeItem(Item::get(Item::COAL, 0));
-		self::addCreativeItem(Item::get(Item::CHARCOAL, 0));
+		self::addCreativeItem(Item::get(Item::COAL, 1));
 		self::addCreativeItem(Item::get(Item::DIAMOND, 0));	
 		self::addCreativeItem(Item::get(Item::IRON_INGOT, 0));
 		self::addCreativeItem(Item::get(Item::GOLD_INGOT, 0));
