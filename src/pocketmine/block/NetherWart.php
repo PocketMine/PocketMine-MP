@@ -1,5 +1,4 @@
 <?php
-
 /*
  *
  *  ____            _        _   __  __ _                  __  __ ____  
@@ -18,33 +17,27 @@
  * 
  *
 */
+namespace pocketmine\block;
 
-namespace pocketmine\entity;
+use pocketmine\item\Item;
 
-
-class Wolf extends Animal implements Tameable{
-
-	const NETWORK_ID = 14;
-
+class NetherWart extends NetherCrops{
+	protected $id = self::NETHER_WART;
+	public function __construct($meta = 0){
+		$this->meta = $meta;
+	}
 	public function getName(){
-		return "Wolf";
+		return "Nether Wart";
 	}
-	
-	public function spawnTo(Player $player){
-		$pk = new AddEntityPacket();
-		$pk->eid = $this->getId();
-		$pk->type = Wolf::NETWORK_ID;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->speedX = $this->motionX;
-		$pk->speedY = $this->motionY;
-		$pk->speedZ = $this->motionZ;
-		$pk->yaw = $this->yaw;
-		$pk->pitch = $this->pitch;
-		$pk->metadata = $this->dataProperties;
-		$player->dataPacket($pk);
 
-		parent::spawnTo($player);
-	}
+    public function getDrops(Item $item){
+        $drops = [];
+        if($this->meta >= 0x07){
+            $drops[] = [Item::NETHER_WART, 0, mt_rand(2, 4)];
+        }else{
+            $drops[] = [Item::NETHER_WART, 0, 1];
+        }
+
+        return $drops;
+        }
 }

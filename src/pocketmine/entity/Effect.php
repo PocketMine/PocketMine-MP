@@ -26,7 +26,7 @@ use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\network\Network;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\Player;
-
+use pocketmine\Server;
 
 class Effect{
 	const SPEED = 1;
@@ -36,8 +36,8 @@ class Effect{
 	const FATIGUE = 4;
 	const MINING_FATIGUE = 4;
 	const STRENGTH = 5;
-	//TODO: const HEALING = 6;
-	//TODO: const HARMING = 7;
+	const HEALING = 6;
+	const HARMING = 7;
 	const JUMP = 8;
 	const NAUSEA = 9;
 	const CONFUSION = 9;
@@ -46,15 +46,15 @@ class Effect{
 	const FIRE_RESISTANCE = 12;
 	const WATER_BREATHING = 13;
 	const INVISIBILITY = 14;
-	//const BLINDNESS = 15;
-	//const NIGHT_VISION = 16;
-	//const HUNGER = 17;
+	const BLINDNESS = 15;
+	const NIGHT_VISION = 16;
+	const HUNGER = 17;
 	const WEAKNESS = 18;
 	const POISON = 19;
 	const WITHER = 20;
 	const HEALTH_BOOST = 21;
-	//const ABSORPTION = 22;
-	//const SATURATION = 23;
+	const ABSORPTION = 22;
+	const SATURATION = 23;
 
 	/** @var Effect[] */
 	protected static $effects;
@@ -67,8 +67,8 @@ class Effect{
 		self::$effects[Effect::SWIFTNESS] = new Effect(Effect::SWIFTNESS, "%potion.digSpeed", 217, 192, 67);
 		self::$effects[Effect::FATIGUE] = new Effect(Effect::FATIGUE, "%potion.digSlowDown", 74, 66, 23, true);
 		self::$effects[Effect::STRENGTH] = new Effect(Effect::STRENGTH, "%potion.damageBoost", 147, 36, 35);
-		//self::$effects[Effect::HEALING] = new InstantEffect(Effect::HEALING, "%potion.heal", 248, 36, 35);
-		//self::$effects[Effect::HARMING] = new InstantEffect(Effect::HARMING, "%potion.harm", 67, 10, 9, true);
+		self::$effects[Effect::HEALING] = new InstantEffect(Effect::HEALING, "%potion.heal", 248, 36, 35);
+		self::$effects[Effect::HARMING] = new InstantEffect(Effect::HARMING, "%potion.harm", 67, 10, 9, true);
 		self::$effects[Effect::JUMP] = new Effect(Effect::JUMP, "%potion.jump", 34, 255, 76);
 		self::$effects[Effect::NAUSEA] = new Effect(Effect::NAUSEA, "%potion.confusion", 85, 29, 74, true);
 		self::$effects[Effect::REGENERATION] = new Effect(Effect::REGENERATION, "%potion.regeneration", 205, 92, 171);
@@ -76,13 +76,15 @@ class Effect{
 		self::$effects[Effect::FIRE_RESISTANCE] = new Effect(Effect::FIRE_RESISTANCE, "%potion.fireResistance", 228, 154, 58);
 		self::$effects[Effect::WATER_BREATHING] = new Effect(Effect::WATER_BREATHING, "%potion.waterBreathing", 46, 82, 153);
 		self::$effects[Effect::INVISIBILITY] = new Effect(Effect::INVISIBILITY, "%potion.invisibility", 127, 131, 146);
-		//Hunger
+		self::$effects[Effect::HUNGER] = new Effect(Effect::HUNGER, "%potion.hunger", 79, 145, 49, true);
 		self::$effects[Effect::WEAKNESS] = new Effect(Effect::WEAKNESS, "%potion.weakness", 72, 77, 72 , true);
 		self::$effects[Effect::POISON] = new Effect(Effect::POISON, "%potion.poison", 78, 147, 49, true);
 		self::$effects[Effect::WITHER] = new Effect(Effect::WITHER, "%potion.wither", 53, 42, 39, true);
 		self::$effects[Effect::HEALTH_BOOST] = new Effect(Effect::HEALTH_BOOST, "%potion.healthBoost", 248, 125, 35);
-		//Absorption
-		//Saturation
+		self::$effects[Effect::ABSORPTION] = new Effect(Effect::ABSORPTION, "%potion.absorption", 38, 83, 166);
+		self::$effects[Effect::SATURATION] = new Effect(Effect::SATURATION, "%potion.saturation", 248, 32, 32);
+		self::$effects[Effect::BLINDNESS] = new Effect(Effect::BLINDNESS, "%potion.blindness", 31, 31, 35);
+		self::$effects[Effect::NIGHT_VISION] = new Effect(Effect::NIGHT_VISION, "%potion.nightVision", 31, 31, 163);
 	}
 
 	/**
@@ -249,7 +251,7 @@ class Effect{
 				$pk->eventId = MobEffectPacket::EVENT_ADD;
 			}
 
-			$entity->dataPacket($pk);
+			$entity->dataPacket($pk->setChannel(Network::CHANNEL_WORLD_EVENTS));
 		}
 
 		if($this->id === Effect::INVISIBILITY){
@@ -265,7 +267,7 @@ class Effect{
 			$pk->eventId = MobEffectPacket::EVENT_REMOVE;
 			$pk->effectId = $this->getId();
 
-			$entity->dataPacket($pk);
+			$entity->dataPacket($pk->setChannel(Network::CHANNEL_WORLD_EVENTS));
 		}
 
 		if($this->id === Effect::INVISIBILITY){

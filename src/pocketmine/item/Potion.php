@@ -19,32 +19,16 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\item;
 
 
-class Wolf extends Animal implements Tameable{
-
-	const NETWORK_ID = 14;
-
-	public function getName(){
-		return "Wolf";
+class Potion extends Item{
+	public function __construct($meta = 0, $count = 1){
+		parent::__construct(self::POTION, 0, $count, "Potion");
 	}
-	
-	public function spawnTo(Player $player){
-		$pk = new AddEntityPacket();
-		$pk->eid = $this->getId();
-		$pk->type = Wolf::NETWORK_ID;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->speedX = $this->motionX;
-		$pk->speedY = $this->motionY;
-		$pk->speedZ = $this->motionZ;
-		$pk->yaw = $this->yaw;
-		$pk->pitch = $this->pitch;
-		$pk->metadata = $this->dataProperties;
-		$player->dataPacket($pk);
 
-		parent::spawnTo($player);
+	public function getMaxStackSize(){
+		return 1;
 	}
+
 }

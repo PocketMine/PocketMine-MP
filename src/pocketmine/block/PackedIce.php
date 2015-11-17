@@ -19,32 +19,32 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\block;
 
+use pocketmine\item\Item;
+use pocketmine\item\Tool;
 
-class Wolf extends Animal implements Tameable{
+class PackedIce extends Transparent{
 
-	const NETWORK_ID = 14;
+	protected $id = self::PACKED_ICE;
+
+	public function __construct(){
+
+	}
 
 	public function getName(){
-		return "Wolf";
+		return "Packed Ice";
 	}
-	
-	public function spawnTo(Player $player){
-		$pk = new AddEntityPacket();
-		$pk->eid = $this->getId();
-		$pk->type = Wolf::NETWORK_ID;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->speedX = $this->motionX;
-		$pk->speedY = $this->motionY;
-		$pk->speedZ = $this->motionZ;
-		$pk->yaw = $this->yaw;
-		$pk->pitch = $this->pitch;
-		$pk->metadata = $this->dataProperties;
-		$player->dataPacket($pk);
 
-		parent::spawnTo($player);
+	public function getHardness(){
+		return 0.5;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_PICKAXE;
+	}
+
+	public function getDrops(Item $item){
+		return [];
 	}
 }

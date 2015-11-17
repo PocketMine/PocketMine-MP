@@ -1,5 +1,4 @@
 <?php
-
 /*
  *
  *  ____            _        _   __  __ _                  __  __ ____  
@@ -18,74 +17,62 @@
  * 
  *
 */
-
 namespace pocketmine\block;
-
+use pocketmine\event\block\BlockGrowEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\Player;
-
-class TallGrass extends Flowable{
-
-	protected $id = self::TALL_GRASS;
-
-	public function __construct($meta = 1){
-		$this->meta = $meta;
-	}
-	
+use pocketmine\Server;
+abstract class NetherCrops extends Flowable{
 	public function canBeActivated(){
 		return true;
 	}
-
-	public function canBeReplaced(){
-		return true;
-	}
-
-	public function getName(){
-		static $names = [
-			0 => "Dead Shrub",
-			1 => "Tall Grass",
-			2 => "Fern",
-			3 => ""
-		];
-		return $names[$this->meta & 0x03];
-	}
-	
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$down = $this->getSide(0);
-		if($down->getId() === self::GRASS){
-			$this->getLevel()->setBlock($block, $this, true);
-
+		if($down->getId() === self::SOUL_SAND){
+			$this->getLevel()->setBlock($block, $this, true, true);
 			return true;
 		}
-
 		return false;
 	}
-	
 	public function onActivate(Item $item, Player $player = null){
-		if($item->getId() === Item::DYE and $item->getDamage() === 0x0F){
-			$this->getLevel()->setBlock($this->getSide(1), new DoublePlant(2));
+		if($item->getId() === Item::DYE and $item->getDamage() === 0x0F){ //Bonemeal
+			$block = clone $this;
+			$block->meta += mt_rand(2, 5);
+			if($block->meta > 7){
+				$block->meta = 7;
+			}
+			Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($this, $block));
+			if(!$ev->isCancelled()){
+				$this->getLevel()->setBlock($this, $ev->getNewState(), true, true);
+			}
+			$item->count--;
+			return true;
 		}
+		return false;
 	}
-
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->isTransparent() === true){ //Replace with common break method
-				$this->getLevel()->setBlock($this, new Air(), false, false, true);
-
+			if($this->getSide(0)->isTransparent() === true){
+				$this->getLevel()->useBreakOn($this);
 				return Level::BLOCK_UPDATE_NORMAL;
 			}
+		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
+			if(mt_rand(0, 2) == 1){
+				if($this->meta < 0x07){
+					$block = clone $this;
+					++$block->meta;
+					Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($this, $block));
+					if(!$ev->isCancelled()){
+						$this->getLevel()->setBlock($this, $ev->getNewState(), true, true);
+					}else{
+						return Level::BLOCK_UPDATE_RANDOM;
+					}
+				}
+			}else{
+				return Level::BLOCK_UPDATE_RANDOM;
+			}
 		}
-
 		return false;
 	}
-
-	public function getDrops(Item $item){
-		if(mt_rand(0, 15) === 0){
-			return [Item::WHEAT_SEEDS, 0, 1];
-		}
-
-		return [];
-	}
-
 }
