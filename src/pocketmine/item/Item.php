@@ -843,6 +843,26 @@ class Item{
 	        self::addCreativeItem(Item::get(Item::GOLD_HOE, 0));
 	        self::addCreativeItem(Item::get(Item::GOLD_SHOVEL, 0));
 	        self::addCreativeItem(Item::get(Item::GOLD_PICKAXE, 0));
+	        self::addCreativeItem(Item::get(Item::LEATHER_CAP, 0));
+	        self::addCreativeItem(Item::get(Item::LEATHER_TUNIC, 0));
+	        self::addCreativeItem(Item::get(Item::LEATHER_PANTS, 0));
+	        self::addCreativeItem(Item::get(Item::LEATHER_BOOTS, 0));
+	        self::addCreativeItem(Item::get(Item::CHAIN_HELMET, 0));
+	        self::addCreativeItem(Item::get(Item::CHAIN_CHESTPLATE, 0));
+	        self::addCreativeItem(Item::get(Item::CHAIN_LEGGINGS, 0));
+	        self::addCreativeItem(Item::get(Item::CHAIN_BOOTS, 0));
+	        self::addCreativeItem(Item::get(Item::IRON_HELMET, 0));
+	        self::addCreativeItem(Item::get(Item::IRON_CHESTPLATE, 0));
+	        self::addCreativeItem(Item::get(Item::IRON_LEGGINGS, 0));
+	        self::addCreativeItem(Item::get(Item::IRON_BOOTS, 0));	        
+                self::addCreativeItem(Item::get(Item::DIAMOND_HELMET, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_CHESTPLATE, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_LEGGINGS, 0));
+	        self::addCreativeItem(Item::get(Item::DIAMOND_BOOTS, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_HELMET, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_CHESTPLATE, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_LEGGINGS, 0));
+	        self::addCreativeItem(Item::get(Item::GOLD_BOOTS, 0));
 	        self::addCreativeItem(Item::get(Item::GOLD_AXE, 0));
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Villager::NETWORK_ID));
 		//self::addCreativeItem(Item::get(Item::SPAWN_EGG, 10)); //Chicken
