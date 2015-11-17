@@ -19,23 +19,12 @@
  *
 */
 
-namespace pocketmine\block;
+namespace pocketmine\item;
 
 
-class NetherReactor extends Solid{
-
-	protected $id = self::NETHER_REACTOR;
-
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
-
-	public function getName(){
-		return "Nether Reactor";
-	}
-
-	public function canBeActivated(){
-		return true;
+class Apple extends Item{
+	public function __construct($meta = 0, $count = 1){
+		parent::__construct(self::GOLDDEN_APPLE, 0, $count, "Goldden Apple");
 	}
 
 }
