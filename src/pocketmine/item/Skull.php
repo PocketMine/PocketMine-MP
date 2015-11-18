@@ -25,6 +25,15 @@ namespace pocketmine\item;
 class Skull extends Item{
 	public function __construct($meta = 0, $count = 1){
 		parent::__construct(self::SKULL, 0, $count, "Skull");
+	       	if($this->meta === 1){
+			$this->name = "Wither Skeleton Skull";
+		}elseif($this->meta === 2){
+			$this->name = "Zombie Head";
+		}elseif($this->meta === 3){
+			$this->name = "Head";
+		}elseif($this->meta === 4){
+			$this->name = "Creeper Head";
+		}
 	}
 
 	public function getMaxStackSize(){
