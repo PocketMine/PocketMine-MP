@@ -98,12 +98,12 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 
 		if(isset($this->namedtag->Inventory) and $this->namedtag->Inventory instanceof Enum){
 			foreach($this->namedtag->Inventory as $item){
-				if($item["Slot"] >= 0 and $item["Slot"] < 9){ //Hotbar
+				if($item["Slot"] >= 0 and $item["Slot"] < 6){ //Hotbar
 					$this->inventory->setHotbarSlotIndex($item["Slot"], isset($item["TrueSlot"]) ? $item["TrueSlot"] : -1);
 				}elseif($item["Slot"] >= 100 and $item["Slot"] < 104){ //Armor
 					$this->inventory->setItem($this->inventory->getSize() + $item["Slot"] - 100, ItemItem::get($item["id"], $item["Damage"], $item["Count"]));
 				}else{
-					$this->inventory->setItem($item["Slot"] - 9, ItemItem::get($item["id"], $item["Damage"], $item["Count"]));
+					$this->inventory->setItem($item["Slot"] - 6, ItemItem::get($item["id"], $item["Damage"], $item["Count"]));
 				}
 			}
 		}
@@ -131,7 +131,7 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 		$this->namedtag->Inventory = new Enum("Inventory", []);
 		$this->namedtag->Inventory->setTagType(NBT::TAG_Compound);
 		if($this->inventory !== null){
-			for($slot = 0; $slot < 9; ++$slot){
+			for($slot = 0; $slot < 6; ++$slot){
 				$hotbarSlot = $this->inventory->getHotbarSlotIndex($slot);
 				if($hotbarSlot !== -1){
 					$item = $this->inventory->getItem($hotbarSlot);
@@ -156,10 +156,10 @@ class Human extends Creature implements ProjectileSource, InventoryHolder{
 			}
 
 			//Normal inventory
-			$slotCount = Player::SURVIVAL_SLOTS + 9;
-			//$slotCount = (($this instanceof Player and ($this->gamemode & 0x01) === 1) ? Player::CREATIVE_SLOTS : Player::SURVIVAL_SLOTS) + 9;
-			for($slot = 9; $slot < $slotCount; ++$slot){
-				$item = $this->inventory->getItem($slot - 9);
+			$slotCount = Player::SURVIVAL_SLOTS + 6;
+			//$slotCount = (($this instanceof Player and ($this->gamemode & 0x01) === 1) ? Player::CREATIVE_SLOTS : Player::SURVIVAL_SLOTS) + 6;
+			for($slot = 6; $slot < $slotCount; ++$slot){
+				$item = $this->inventory->getItem($slot - 6);
 				$this->namedtag->Inventory[$slot] = new Compound("", [
 					new Byte("Count", $item->getCount()),
 					new Short("Damage", $item->getDamage()),
