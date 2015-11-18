@@ -803,7 +803,6 @@ class Item{
 		Item::addCreativeItem(Item::get(Item::GLASS, 0));
 		Item::addCreativeItem(Item::get(Item::GLOWSTONE_BLOCK, 0));
 		Item::addCreativeItem(Item::get(Item::VINES, 0));
-		//Item::addCreativeItem(Item::get(Item::NETHER_REACTOR, 0));
 		Item::addCreativeItem(Item::get(Item::LADDER, 0));
 		Item::addCreativeItem(Item::get(Item::SPONGE, 0));
 		Item::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
@@ -1041,6 +1040,25 @@ class Item{
 	
 	private static function seedsTab(){
 		//Seeds I will do this eventually...
+		Item::addCreativeItem(Item::get(Item::COAL, 0));
+		Item::addCreativeItem(Item::get(Item::COAL, 1));
+		Item::addCreativeItem(Item::get(Item::DIAMOND, 0));
+		Item::addCreativeItem(Item::get(Item::IRON_INGOT, 0));
+		Item::addCreativeItem(Item::get(Item::GOLD_INGOT, 0));
+		Item::addCreativeItem(Item::get(Item::EMERALD, 0));
+		Item::addCreativeItem(Item::get(Item::STICK, 0));
+		Item::addCreativeItem(Item::get(Item::BOWL, 0));
+		Item::addCreativeItem(Item::get(Item::STRING, 0));
+		Item::addCreativeItem(Item::get(Item::FEATHER, 0));
+		Item::addCreativeItem(Item::get(Item::FLINT, 0));
+		Item::addCreativeItem(Item::get(Item::LEATHER, 0));
+		Item::addCreativeItem(Item::get(Item::CLAY, 0));
+		Item::addCreativeItem(Item::get(Item::SUGAR, 0));
+		Item::addCreativeItem(Item::get(Item::NETHER_QUARTZ, 0));
+		Item::addCreativeItem(Item::get(Item::PAPER, 0));
+		Item::addCreativeItem(Item::get(Item::BOOK, 0));
+		Item::addCreativeItem(Item::get(Item::ARROW, 0));
+		Item::addCreativeItem(Item::get(Item::BONE, 0));
 		Item::addCreativeItem(Item::get(Item::SUGARCANE, 0));
 		Item::addCreativeItem(Item::get(Item::WHEAT, 0));
 		Item::addCreativeItem(Item::get(Item::SEEDS, 0));
