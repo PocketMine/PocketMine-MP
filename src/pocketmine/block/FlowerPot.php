@@ -27,19 +27,46 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 
-class FlowerPot extends Solid{
+class FlowerPot extends Transparent{
 	protected $id = self::FLOWER_POT_BLOCK;
+	
 	public function __construct(){
 	}
+	
 	public function getName(){
 		return "Flower Pot";
 	}
+	
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
 	}
+	
 	public function getHardness(){
 		return 5;
 	}
+	
+	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+		$this->getLevel()->setBlock($block, $this, true, true);
+		$nbt = new Compound("", [
+			new String("id", Tile::FLOWER_POT),
+			new Int("id", $this->id),
+			new Int("data", $this->data),
+			new Int("x", $this->x),
+			new Int("y", $this->y),
+			new Int("z", $this->z)
+		]);
+
+		Tile::createTile(Tile::FLOWER_POT, $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+
+		return true;
+	}
+	
+	public function onBreak(Item $item){
+		$this->getLevel()->setBlock($this, new Air(), true, true);
+
+		return true;
+	}
+	
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= 3){
 			return [

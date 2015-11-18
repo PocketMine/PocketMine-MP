@@ -11,7 +11,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version
+ * (at your option) any later version.
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
@@ -19,14 +19,29 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\tile;
 
-use pocketmine\block\Block;
+use pocketmine\nbt\tag\Compound;
+use pocketmine\nbt\tag\Int;
+use pocketmine\nbt\tag\String;
 
-class FlowerPot extends Item{
-	public function __construct($meta = 0, $count = 1){
-		$this->block = Block::get(Item::FLOWER_POT);
-		parent::__construct(self::FLOWER_POT, 0, $count, "Flower Pot"); 
+class FlowerPot extends Spawnable{
+
+	public function setFlower($id, $meta){
+		$this->id = new Int("id", $id);
+		$this->data = new Int("data", $meta);
+	}
+
+	public function getSpawnCompound(){
+		$c = new Compound("", [
+				new String("id", Tile::FLOWER_POT),
+				new Int("id", (int) $this->id),
+				new Int("data", (int) $this->data),
+				new Int("x", (int) $this->x),
+				new Int("y", (int) $this->y),
+				new Int("z", (int) $this->z)
+		]);
 		
+		return $c;
 	}
 }
