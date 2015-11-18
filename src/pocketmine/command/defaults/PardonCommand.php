@@ -24,7 +24,7 @@ namespace pocketmine\command\defaults;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\TranslationContainer;
-use pocketmine\utils\TextFormat;
+
 
 class PardonCommand extends VanillaCommand{
 
@@ -32,7 +32,8 @@ class PardonCommand extends VanillaCommand{
 		parent::__construct(
 			$name,
 			"%pocketmine.command.unban.player.description",
-			"%commands.unban.usage"
+			"%commands.unban.usage",
+			["unban", "uban"]
 		);
 		$this->setPermission("pocketmine.command.unban.player");
 	}
