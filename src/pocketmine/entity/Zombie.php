@@ -52,14 +52,14 @@ class Zombie extends Monster{
 		$pk->yaw = $this->yaw;
 		$pk->pitch = $this->pitch;
 		$pk->metadata = $this->dataProperties;
-		$player->dataPacket($pk->setChannel(Network::CHANNEL_ENTITY_SPAWNING));
+		$player->dataPacket($pk);
 
 		parent::spawnTo($player);
 	}
 
 	public function getDrops(){
 		$drops = [
-			ItemItem::get(ItemItem::FEATHER, 0, 1)
+			ItemItem::get(ItemItem::ROTTEN_FLESH, 0, 1)
 		];
 		if($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player){
 			if(mt_rand(0, 199) < 5){
