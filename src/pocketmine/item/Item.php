@@ -1041,6 +1041,8 @@ class Item{
 	
 	private static function seedsTab(){
 		//Seeds I will do this eventually...
+		Item::addCreativeItem(Item::get(Item::COAL, 0));
+		Item::addCreativeItem(Item::get(Item::COAL, 1));
 		Item::addCreativeItem(Item::get(Item::SUGARCANE, 0));
 		Item::addCreativeItem(Item::get(Item::WHEAT, 0));
 		Item::addCreativeItem(Item::get(Item::SEEDS, 0));
