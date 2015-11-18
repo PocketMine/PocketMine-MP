@@ -887,10 +887,10 @@ class Item{
 		Item::addCreativeItem(Item::get(Item::CAKE, 0));
 		
 		Item::addCreativeItem(Item::get(Item::SKULL, 0));
-		Item::addCreativeItem(Item::get(Item::SKULL, 1));
-		Item::addCreativeItem(Item::get(Item::SKULL, 2));
-		Item::addCreativeItem(Item::get(Item::SKULL, 3));
-		Item::addCreativeItem(Item::get(Item::SKULL, 4));
+		Item::addCreativeItem(Item::get(Item::WITHER_SKULL, 0));
+		Item::addCreativeItem(Item::get(Item::ZOMBIE_HEAD, 0));
+		Item::addCreativeItem(Item::get(Item::HEAD, 0));
+		Item::addCreativeItem(Item::get(Item::CREEPER_HEAD, 0));
 		
 		Item::addCreativeItem(Item::get(Item::SIGN, 0));
 		Item::addCreativeItem(Item::get(Item::FLOWER_POT, 0));
