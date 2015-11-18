@@ -755,7 +755,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$pk = new PlayStatusPacket();
 		$pk->status = PlayStatusPacket::PLAYER_SPAWN;
 		$this->dataPacket($pk);
-
+		
+		$this->server->sendFullPlayerListData($this);
+		
 		$this->server->getPluginManager()->callEvent($ev = new PlayerJoinEvent($this,
 			new TranslationContainer(TextFormat::YELLOW . "%multiplayer.player.joined", [
 				$this->getDisplayName()
