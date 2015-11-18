@@ -37,7 +37,7 @@ fclose($pipes[2]);
 
 echo "\n\nReturn value: ". proc_close($server) ."\n";
 
-if(count(glob("plugins/DevTools/PocketMine-MP*.phar")) === 0){
+if(count(glob("plugins/DevTools/PocketMine-Elite*.phar")) === 0){
 	echo "No server Phar created!\n";
 	exit(1);
 }else{
