@@ -1681,7 +1681,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				$this->server->getPluginManager()->callEvent($ev = new PlayerPreLoginEvent($this, "Plugin reason"));
 				if($ev->isCancelled()){
 					$this->close("", $ev->getKickMessage());
-
+					break;
+				}
+				if($this->closed){
 					break;
 				}
 
@@ -1762,7 +1764,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				$this->server->getPluginManager()->callEvent($ev = new PlayerLoginEvent($this, "Plugin reason"));
 				if($ev->isCancelled()){
 					$this->close($this->getLeaveMessage(), $ev->getKickMessage());
-
+					break;
+				}
+				if($this->closed){
 					break;
 				}
 
