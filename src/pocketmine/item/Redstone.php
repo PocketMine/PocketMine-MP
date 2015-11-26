@@ -38,5 +38,9 @@ class Redstone extends Item{
 			$player->getInventory()->setItemInHand($this);
 		}
 	}
+
+	public function canBeActivated(){
+		return true;
+	}
 }
 
