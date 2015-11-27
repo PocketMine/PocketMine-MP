@@ -19,28 +19,8 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
-use pocketmine\level\Level;
-use pocketmine\Player;
+interface RedstoneTransmitter extends RedstonePowerSource{
 
-class Redstone extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::REDSTONE, $meta, $count, "Redstone");
-	}
-
-	public function onActivate(Level $level, Player $player, Block $block, Block $target, $face, $fx, $fy, $fz){
-		if($block->canBeReplaced()){
-			$level->setBlock($block, Block::get(Block::REDSTONE_DUST));
-			$level->scheduleUpdate($block, 1);
-			--$this->count;
-			$player->getInventory()->setItemInHand($this);
-		}
-	}
-
-	public function canBeActivated(){
-		return true;
-	}
 }
-
