@@ -19,32 +19,12 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace pocketmine\item;
 
-#include <rules/DataPacket.h>
-
-
-class TileEntityDataPacket extends DataPacket{
-	const NETWORK_ID = Info::TILE_ENTITY_DATA_PACKET;
-
-	public $x;
-	public $y;
-	public $z;
-	public $namedtag;
-
-	public function decode(){
-		$this->x = $this->getInt();
-		$this->y = $this->getInt();
-		$this->z = $this->getInt();
-		$this->namedtag = $this->get(true);
-	}
-
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->x);
-		$this->putInt($this->y);
-		$this->putInt($this->z);
-		$this->put($this->namedtag);
+class Clock extends Item{
+	public function __construct($meta = 0, $count = 1){
+		parent::__construct(self::CLOCK, $meta, $count, "Clock");
 	}
 
 }
+

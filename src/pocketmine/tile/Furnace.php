@@ -71,7 +71,7 @@ class Furnace extends Tile implements InventoryHolder, Container, Nameable{
 	}
 
 	public function getName(){
-		return isset($this->namedtag->CustomName) ? $this->namedtag->CustomName->getValue() : "Chest";
+		return isset($this->namedtag->CustomName) ? $this->namedtag->CustomName->getValue() : "Furnace";
 	}
 
 	public function hasName(){
@@ -253,7 +253,6 @@ class Furnace extends Tile implements InventoryHolder, Container, Nameable{
 			}
 			$ret = true;
 		}else{
-			;
 			if($this->getBlock()->getId() === Item::BURNING_FURNACE){
 				$this->getLevel()->setBlock($this, Block::get(Item::FURNACE, $this->getBlock()->getDamage()), true);
 			}

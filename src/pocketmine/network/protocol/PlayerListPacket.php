@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -24,14 +24,16 @@ namespace pocketmine\network\protocol;
 #include <rules/DataPacket.h>
 
 
+use pocketmine\player\PlayerListEntry;
+
 class PlayerListPacket extends DataPacket{
 	const NETWORK_ID = Info::PLAYER_LIST_PACKET;
 
 	const TYPE_ADD = 0;
 	const TYPE_REMOVE = 1;
 
-	//REMOVE: UUID, ADD: UUID, entity id, name, isSlim, skin
-	/** @var array[] */
+	//REMOVE: UUID; ADD: UUID, entity id, name, isSlim, transparency, skin
+	/** @var PlayerListEntry[] */
 	public $entries = [];
 	public $type;
 
@@ -48,15 +50,16 @@ class PlayerListPacket extends DataPacket{
 		$this->reset();
 		$this->putByte($this->type);
 		$this->putInt(count($this->entries));
-		foreach($this->entries as $d){
+		foreach($this->entries as $entry){
 			if($this->type === self::TYPE_ADD){
-				$this->putUUID($d[0]);
-				$this->putLong($d[1]);
-				$this->putString($d[2]);
-				$this->putByte($d[3] ? 1 : 0);
-				$this->putString($d[4]);
+				$this->putUUID($entry->uuid);
+				$this->putLong($entry->entityId);
+				$this->putString($entry->name);
+				$this->putByte($entry->isSlim ? 1 : 0);
+				$this->putByte($entry->transparency ? 1 : 0);
+				$this->putString($entry->skinData);
 			}else{
-				$this->putUUID($d[0]);
+				$this->putUUID($entry->uuid);
 			}
 		}
 	}

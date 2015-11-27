@@ -23,5 +23,7 @@ namespace pocketmine\entity;
 
 
 class Chicken extends Animal{
-
+	public function getName() {
+		return "Chicken";
+	}
 }

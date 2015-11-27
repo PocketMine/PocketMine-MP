@@ -19,31 +19,15 @@
  *
 */
 
-namespace pocketmine\network\protocol;
+namespace pocketmine\item;
 
-#include <rules/DataPacket.h>
+use pocketmine\block\Block;
 
-
-class TileEventPacket extends DataPacket{
-	const NETWORK_ID = Info::TILE_EVENT_PACKET;
-
-	public $x;
-	public $y;
-	public $z;
-	public $case1;
-	public $case2;
-
-	public function decode(){
-
-	}
-
-	public function encode(){
-		$this->reset();
-		$this->putInt($this->x);
-		$this->putInt($this->y);
-		$this->putInt($this->z);
-		$this->putInt($this->case1);
-		$this->putInt($this->case2);
+class Redstone extends Item{
+	public function __construct($meta = 0, $count = 1){
+		$this->block = Block::get(Item::REDSTONE_WIRE);
+		parent::__construct(self::REDSTONE, $meta, $count, "Redstone");
 	}
 
 }
+

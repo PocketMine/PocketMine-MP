@@ -48,7 +48,7 @@ class PluginDescription{
 	 * @param string|array $yamlString
 	 */
 	public function __construct($yamlString){
-		$this->loadMap(!is_array($yamlString) ? \yaml_parse($yamlString) : $yamlString);
+		$this->loadMap(!is_array($yamlString) ? yaml_parse($yamlString) : $yamlString);
 	}
 
 	/**

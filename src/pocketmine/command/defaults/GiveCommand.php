@@ -36,7 +36,8 @@ class GiveCommand extends VanillaCommand{
 		parent::__construct(
 			$name,
 			"%pocketmine.command.give.description",
-			"%pocketmine.command.give.usage"
+			"%pocketmine.command.give.usage",
+			["i"]
 		);
 		$this->setPermission("pocketmine.command.give");
 	}

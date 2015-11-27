@@ -24,7 +24,7 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
 
-class IronDoor extends Door{
+class IronDoor extends Door2{
 
 	protected $id = self::IRON_DOOR_BLOCK;
 
@@ -45,7 +45,7 @@ class IronDoor extends Door{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= 1){
+		if($item->isPickaxe() >= Tool::TIER_WOODEN){
 			return [
 				[Item::IRON_DOOR, 0, 1],
 			];

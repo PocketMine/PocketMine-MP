@@ -23,7 +23,20 @@ namespace pocketmine\entity;
 
 
 use pocketmine\inventory\InventoryHolder;
-
+use pocketmine\inventory\Inventory;
 class Enderman extends Monster implements InventoryHolder{
+	private $inventory;
+
+	public function __construct() {
+		$this->inventory = new Inventory();
+	}
+
+        public function getName() {
+                return "Enderman";
+        }
+
+	public function getInventory() {
+		return $this->inventory;
+	}
 
 }

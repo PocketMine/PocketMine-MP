@@ -105,6 +105,10 @@ class TimeCommand extends VanillaCommand{
 				$value = 0;
 			}elseif($args[1] === "night"){
 				$value = Level::TIME_NIGHT;
+			}elseif($args[1] === "sunrise"){
+				$value = Level::TIME_SUNRISE;
+			}elseif($args[1] === "sunset"){
+				$value = Level::TIME_SUNSET;
 			}else{
 				$value = $this->getInteger($sender, $args[1], 0);
 			}
