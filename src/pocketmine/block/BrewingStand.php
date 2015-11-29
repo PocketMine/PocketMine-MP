@@ -21,8 +21,10 @@
 
 namespace pocketmine\block;
 
+use pocketmine\inventory\BrewingstandInventory;
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
+use pocketmine\Player;
 
 class BrewingStand extends Transparent{
 
@@ -42,5 +44,19 @@ class BrewingStand extends Transparent{
 
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
+	}
+
+        public function canBeActivated(){
+                return true;
+        }
+
+        public function onActivate(Item $item, Player $player = null){
+		if($player instanceof Player){
+			if($player->isCreative()){
+				return true;
+			}
+			$player->addWindow(new BrewingstandInventory($this));
+		}
+		return true;
 	}
 }
