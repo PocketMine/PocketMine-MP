@@ -23,5 +23,7 @@ namespace pocketmine\entity;
 
 
 class Silverfish extends Monster{
-
+ 	public function getName() {
+                return "Silverfish";
+        }
 }

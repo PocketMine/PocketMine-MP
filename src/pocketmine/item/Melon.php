@@ -21,10 +21,21 @@
 
 namespace pocketmine\item;
 
+<<<<<<< HEAD
+class Melon extends Item implements Food{
+=======
 class Melon extends Item{
+>>>>>>> remotes/base/mcpe-0.13
 	public function __construct($meta = 0, $count = 1){
 		parent::__construct(self::MELON, $meta, $count, "Melon");
 	}
 
+<<<<<<< HEAD
+        public function isEatable() {
+                return true;
+        }
+
+=======
+>>>>>>> remotes/base/mcpe-0.13
 }
 

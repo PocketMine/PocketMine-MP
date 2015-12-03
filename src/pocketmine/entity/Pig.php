@@ -23,5 +23,7 @@ namespace pocketmine\entity;
 
 
 class Pig extends Animal implements Rideable{
-
+ public function getName() {
+                return "Pig";
+        }
 }

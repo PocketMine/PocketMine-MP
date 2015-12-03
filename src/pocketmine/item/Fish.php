@@ -22,7 +22,7 @@
 namespace pocketmine\item;
 
 
-class Fish extends Item{
+class Fish extends Item implements Food{
 	public function __construct($meta = 0, $count = 1){
 		parent::__construct(self::RAW_FISH, $meta, $count, "Raw Fish");
 		if($this->meta === 1){
@@ -33,5 +33,9 @@ class Fish extends Item{
 			$this->name = "Pufferfish";
 		}
 	}
+
+        public function isEatable() {
+                return true;
+        }
 
 }

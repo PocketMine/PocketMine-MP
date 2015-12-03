@@ -216,7 +216,7 @@ class QueryRegenerateEvent extends ServerEvent{
 	}
 
 	public function getShortQuery(){
-		return $this->serverName . "\x00" . $this->gametype . "\x00" . $this->map . "\x00" . $this->numPlayers . "\x00" . $this->maxPlayers . "\x00" . Binary::writeLShort($this->port) . $this->ip . "\x00";
+		return $this->serverName . "\x00" . $this->gametype . "\x00" . $this->map . "\x00" . $this->numPlayers . "\x00" . $this->maxPlayers . "\x00" . pack("v", $this->port) . $this->ip . "\x00";
 	}
 
 }

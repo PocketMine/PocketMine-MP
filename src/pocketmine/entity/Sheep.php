@@ -23,5 +23,7 @@ namespace pocketmine\entity;
 
 
 class Sheep extends Animal implements Colorable{
-
+ 	public function getName() {
+                return "Sheep";
+        }
 }

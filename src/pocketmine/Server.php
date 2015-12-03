@@ -95,6 +95,7 @@ use pocketmine\network\SourceInterface;
 use pocketmine\network\upnp\UPnP;
 use pocketmine\permission\BanList;
 use pocketmine\permission\DefaultPermissions;
+use pocketmine\player\PlayerListEntry;
 use pocketmine\plugin\PharPluginLoader;
 use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginLoadOrder;
@@ -105,6 +106,10 @@ use pocketmine\scheduler\SendUsageTask;
 use pocketmine\scheduler\ServerScheduler;
 use pocketmine\tile\Chest;
 use pocketmine\tile\EnchantTable;
+use pocketmine\tile\BrewingStand;
+use pocketmine\tile\Skull;
+use pocketmine\tile\TrappedChest;
+use pocketmine\tile\FlowerPot;
 use pocketmine\tile\Furnace;
 use pocketmine\tile\Sign;
 use pocketmine\tile\Tile;
@@ -1596,7 +1601,8 @@ class Server{
 			$this->getApiVersion()
 		]));
 		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.license", [$this->getName()]));
-
+		$this->logger->info("This is a third-party PM Build!");
+		$this->logger->info("Please report any issues here: https://github.com/ImagicalCorp/PocketMine-0.13.0/issues");
 		Timings::init();
 
 		$this->consoleSender = new ConsoleCommandSender();
@@ -1611,7 +1617,6 @@ class Server{
 		Biome::init();
 		Effect::init();
 		Enchantment::init();
-		Attribute::init();
 		/** TODO: @deprecated */
 		TextWrapper::init();
 		$this->craftingManager = new CraftingManager();
@@ -1745,7 +1750,7 @@ class Server{
 
 		return count($recipients);
 	}
-	
+
 	/**
 	 * @param string        $popup
 	 * @param Player[]|null $recipients
@@ -1763,7 +1768,7 @@ class Server{
 				}
 			}
 		}
-		
+
 		/** @var Player[] $recipients */
 		foreach($recipients as $recipient){
 			$recipient->sendPopup($popup);
@@ -2257,22 +2262,33 @@ class Server{
 
 			$pk = new PlayerListPacket();
 			$pk->type = PlayerListPacket::TYPE_REMOVE;
-			$pk->entries[] = [$player->getUniqueId()];
+			$entry = new PlayerListEntry;
+			$entry->uuid = $player->getUniqueId();
+			$pk->entries[] = $entry;
 			Server::broadcastPacket($this->playerList, $pk);
 		}
 	}
 
-	public function updatePlayerListData(UUID $uuid, $entityId, $name, $isSlim, $skinData, array $players = null){
+	public function updatePlayerListData(UUID $uuid, $entityId, $name, $isSlim, $skinData, array $players = null, $skinTransparency = false){
 		$pk = new PlayerListPacket();
 		$pk->type = PlayerListPacket::TYPE_ADD;
-		$pk->entries[] = [$uuid, $entityId, $name, $isSlim, $skinData];
+		$entry = new PlayerListEntry;
+		$entry->uuid = $uuid;
+		$entry->entityId = $entityId;
+		$entry->name = $name;
+		$entry->isSlim = $isSlim;
+		$entry->skinData = $skinData;
+		$entry->transparency = $skinTransparency;
+		$pk->entries[] = $entry;
 		Server::broadcastPacket($players === null ? $this->playerList : $players, $pk);
 	}
 
 	public function removePlayerListData(UUID $uuid, array $players = null){
 		$pk = new PlayerListPacket();
 		$pk->type = PlayerListPacket::TYPE_REMOVE;
-		$pk->entries[] = [$uuid];
+		$entry = new PlayerListEntry;
+		$entry->uuid = $uuid;
+		$pk->entries[] = $entry;
 		Server::broadcastPacket($players === null ? $this->playerList : $players, $pk);
 	}
 
@@ -2280,7 +2296,14 @@ class Server{
 		$pk = new PlayerListPacket();
 		$pk->type = PlayerListPacket::TYPE_ADD;
 		foreach($this->playerList as $player){
-			$pk->entries[] = [$player->getUniqueId(), $player->getId(), $player->getDisplayName(), $player->isSkinSlim(), $player->getSkinData()];
+			$entry = new PlayerListEntry;
+			$entry->uuid = $player->getUniqueId();
+			$entry->entityId = $player->getId();
+			$entry->name = $player->getDisplayName();
+			$entry->isSlim = $player->isSkinSlim();
+			$entry->skinData = $player->getSkinData();
+			$entry->transparency = $player->isSkinTransparent();
+			$pk->entries[] = $entry;
 		}
 
 		$p->dataPacket($pk);
@@ -2410,7 +2433,7 @@ class Server{
 		}
 
 		$d = Utils::getRealMemoryUsage();
-		
+
 		$u = Utils::getMemoryUsage(true);
 		$usage = round(($u[0] / 1024) / 1024, 2) . "/" . round(($d[0] / 1024) / 1024, 2) . "/" . round(($u[1] / 1024) / 1024, 2) . "/".round(($u[2] / 1024) / 1024, 2)." MB @ " . Utils::getThreadCount() . " threads";
 
@@ -2578,6 +2601,10 @@ class Server{
 	private function registerTiles(){
 		Tile::registerTile(Chest::class);
 		Tile::registerTile(Furnace::class);
+		Tile::registerTile(BrewingStand::class);
+		Tile::registerTile(Skull::class);
+		Tile::registerTile(TrappedChest::class);
+		Tile::registerTile(FlowerPot::class);
 		Tile::registerTile(Sign::class);
 		Tile::registerTile(EnchantTable::class);
 	}

@@ -86,7 +86,12 @@ interface Info{
 	const SET_PLAYER_GAMETYPE_PACKET = 0xc2;
 	const PLAYER_LIST_PACKET = 0xc3;
 	//const TELEMETRY_EVENT_PACKET = 0xc4;
+<<<<<<< HEAD
+        const ATTRIBUTE_PACKET = 0x60;
+
+=======
 	//const SPAWN_EXPERIENCE_ORB_PACKET = 0xc5
+>>>>>>> remotes/base/mcpe-0.13
 }
 
 

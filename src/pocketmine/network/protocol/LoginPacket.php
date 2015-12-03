@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -37,6 +37,7 @@ class LoginPacket extends DataPacket{
 	public $clientSecret;
 
 	public $slim = false;
+	public $transparency;
 	public $skin = null;
 
 	public function decode(){
@@ -53,7 +54,11 @@ class LoginPacket extends DataPacket{
 		$this->clientSecret = $this->getString();
 
 		$this->slim = $this->getByte() > 0;
+<<<<<<< HEAD
+		$this->transparency = $this->getByte() > 0;
+=======
 		$this->getByte(); // TODO: skin transparency, experimental or not?
+>>>>>>> remotes/base/mcpe-0.13
 		$this->skin = $this->getString();
 	}
 

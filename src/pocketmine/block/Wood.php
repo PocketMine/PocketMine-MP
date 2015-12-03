@@ -30,8 +30,8 @@ class Wood extends Solid{
 	const SPRUCE = 1;
 	const BIRCH = 2;
 	const JUNGLE = 3;
-	//const ACACIA = 4;
-	//const DARK_OAK = 5;
+	const ACACIA = 4;
+	const DARK_OAK = 5;
 
 	protected $id = self::WOOD;
 
@@ -49,6 +49,8 @@ class Wood extends Solid{
 			self::SPRUCE => "Spruce Wood",
 			self::BIRCH => "Birch Wood",
 			self::JUNGLE => "Jungle Wood",
+                        self::ACACIA => "Acacia Wood",
+                        self::DARK_OAK => "Dark Oak Wood",
 		];
 		return $names[$this->meta & 0x03];
 	}

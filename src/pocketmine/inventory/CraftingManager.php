@@ -50,7 +50,7 @@ class CraftingManager{
 
 	public function __construct(){
 
-		$this->registerStonecutter();
+	
 		$this->registerFurnace();
 
 
@@ -74,7 +74,7 @@ class CraftingManager{
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::SNOW_BLOCK, 0, 1),
 			"XX",
 			"XX"
-		))->setIngredient("X", Item::get(Item::SNOWBALL)));
+		))->setIngredient("X", Item::get(Item::SNOWBALL, 0, 16)));
 
 		$this->registerRecipe((new ShapelessRecipe(Item::get(Item::SNOW_LAYER, 0, 6)))->addIngredient(Item::get(Item::SNOW_BLOCK, 0, 3)));
 
@@ -83,33 +83,34 @@ class CraftingManager{
 			"X "
 		))->setIngredient("X", Item::get(Item::WOODEN_PLANK, null)));
 
-		$this->registerRecipe((new ShapedRecipe(Item::get(Item::STONECUTTER, 0, 1),
-			"XX",
-			"XX"
-		))->setIngredient("X", Item::get(Item::COBBLESTONE)));
-
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::OAK, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD, Wood::OAK, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::SPRUCE, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD, Wood::SPRUCE, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::BIRCH, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD, Wood::BIRCH, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::JUNGLE, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD, Wood::JUNGLE, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::ACACIA, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD2, Wood2::ACACIA, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::DARK_OAK, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD2, Wood2::DARK_OAK, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOOL, 0, 1),
@@ -219,16 +220,63 @@ class CraftingManager{
 			"S S"
 		))->setIngredient("S", Item::get(Item::STICK, 0, 7)));
 
+<<<<<<< HEAD
+/* 		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::NETHER_REACTOR, 0, 1),
+			"IDI",
+			"IDI",
+			"IDI"
+		))->setIngredient("D", Item::get(Item::DIAMOND, 0, 3))->setIngredient("I", Item::get(Item::IRON_INGOT, 0, 6))); */
+
+=======
+>>>>>>> remotes/base/mcpe-0.13
 		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::TRAPDOOR, 0, 2),
 			"PPP",
 			"PPP"
 		))->setIngredient("P", Item::get(Item::WOODEN_PLANK, null, 6)));
 
+<<<<<<< HEAD
+		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::OAK_DOOR, 0, 1),
+			"PP",
+			"PP",
+			"PP"
+		))->setIngredient("P", Item::get(Item::WOODEN_PLANK, Planks::OAK, 6)));
+
+		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::SPRUCE_DOOR, 0, 1),
+			"PP",
+			"PP",
+			"PP"
+		))->setIngredient("P", Item::get(Item::WOODEN_PLANK, Planks::SPRUCE, 6)));
+		
+		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::BIRCH_DOOR, 0, 1),
+			"PP",
+			"PP",
+			"PP"
+		))->setIngredient("P", Item::get(Item::WOODEN_PLANK, Planks::BIRCH, 6)));
+
+		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::JUNGLE_DOOR, 0, 1),
+			"PP",
+			"PP",
+			"PP"
+		))->setIngredient("P", Item::get(Item::WOODEN_PLANK, Planks::JUNGLE, 6)));
+		
+		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::ACACIA_DOOR, 0, 1),
+			"PP",
+			"PP",
+			"PP"
+		))->setIngredient("P", Item::get(Item::WOODEN_PLANK, Planks::ACACIA, 6)));
+
+		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::DARK_OAK_DOOR, 0, 1),
+			"PP",
+			"PP",
+			"PP"
+		))->setIngredient("P", Item::get(Item::WOODEN_PLANK, Planks::DARK_OAK, 6)));		
+=======
 		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::WOODEN_DOOR, 0, 1),
 			"PP",
 			"PP",
 			"PP"
 		))->setIngredient("P", Item::get(Item::WOODEN_PLANK, null, 6)));
+>>>>>>> remotes/base/mcpe-0.13
 
 		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::WOODEN_STAIRS, 0, 4),
 			"  P",
@@ -356,6 +404,14 @@ class CraftingManager{
 			"III",
 			"III"
 		))->setIngredient("I", Item::get(Item::IRON_INGOT, 0, 9)));
+<<<<<<< HEAD
+		
+		$this->registerRecipe((new BigShapedRecipe(Item::get(Item::BREWING_STAND, 0, 1),
+			" B",
+			"CCC"
+		))->setIngredient("B", Item::get(Item::BLAZE_ROD, 0, 1))->setIngredient("C", Item::get(Item::COBBLESTONE, 0, 3)));
+=======
+>>>>>>> remotes/base/mcpe-0.13
 	}
 
 	protected function registerFurnace(){
@@ -381,6 +437,15 @@ class CraftingManager{
 		$this->registerRecipe(new FurnaceRecipe(Item::get(Item::HARDENED_CLAY, 0, 1), Item::get(Item::CLAY_BLOCK, 0, 1)));
 	}
 
+<<<<<<< HEAD
+	protected function registerBrewingStand(){
+		$this->registerRecipe(new BrewingRecipe(Item::get(Item::POTION, 4, 1), Item::get(Item::NETHER_WART, 0, 1), Item::get(Item::POTION, 0, 1))); //Akward Potion
+		$this->registerRecipe(new BrewingRecipe(Item::get(Item::POTION, 14, 1), Item::get(Item::SUGAR, 0, 1), Item::get(Item::POTION, 4, 1))); //Swiftness
+		$this->registerRecipe(new BrewingRecipe(Item::get(Item::POTION, 15, 1), Item::get(Item::REDSTONE, 0, 1), Item::get(Item::POTION, 14, 1))); //Swiftness Extended
+		$this->registerRecipe(new BrewingRecipe(Item::get(Item::POTION, 14, 1), Item::get(Item::GLOWSTONE_DUST, 0, 1), Item::get(Item::POTION, 14, 1))); //Swiftness II
+
+	}
+=======
 	protected function registerStonecutter(){	
 		$shapes = [
 			"slab" => [
@@ -474,6 +539,7 @@ class CraftingManager{
 		$this->sortAndAddRecipesArray($buildRecipes);
 	}
 
+>>>>>>> remotes/base/mcpe-0.13
 	private function sortAndAddRecipesArray(&$recipes){
 		// Sort the recipes based on the result item name with the bubblesort algoritm.
 		for ($i = 0; $i < count($recipes); ++$i){
@@ -746,6 +812,13 @@ class CraftingManager{
 	public function getFurnaceRecipes(){
 		return $this->furnaceRecipes;
 	}
+	
+	/**
+	 * @return FurnaceRecipe[]
+	 */
+	public function getBrewingRecipes(){
+		return $this->brewingRecipes;
+	}	
 
 	/**
 	 * @param Item $input
@@ -807,6 +880,14 @@ class CraftingManager{
 		$this->furnaceRecipes[$input->getId() . ":" . ($input->getDamage() === null ? "?" : $input->getDamage())] = $recipe;
 	}
 
+	/**
+	 * @param BrewingRecipe $recipe
+	 */
+	public function registerBrewingRecipe(BrewingRecipe $recipe){
+		$input = $recipe->getInput();
+		$this->brewingRecipes[$input->getId() . ":" . ($input->getDamage() === null ? "?" : $input->getDamage())] = $recipe;
+	}
+	
 	/**
 	 * @param ShapelessRecipe $recipe
 	 * @return bool
@@ -877,6 +958,8 @@ class CraftingManager{
 			$this->registerShapelessRecipe($recipe);
 		}elseif($recipe instanceof FurnaceRecipe){
 			$this->registerFurnaceRecipe($recipe);
+		}elseif($recipe instanceof BrewingRecipe){
+			$this->registerBrewingRecipe($recipe);
 		}
 	}
 

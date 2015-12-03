@@ -74,7 +74,11 @@ namespace pocketmine {
 
 	const VERSION = "1.6dev";
 	const API_VERSION = "1.13.0";
+<<<<<<< HEAD
+	const CODENAME = "ImagicalMine";
+=======
 	const CODENAME = "[REDACTED]";
+>>>>>>> remotes/base/mcpe-0.13
 	const MINECRAFT_VERSION = "v0.13.0 alpha";
 	const MINECRAFT_VERSION_NETWORK = "0.13.0";
 
@@ -88,7 +92,7 @@ namespace pocketmine {
 	if(\Phar::running(true) !== ""){
 		@define("pocketmine\\PATH", \Phar::running(true) . "/");
 	}else{
-		@define("pocketmine\\PATH", \getcwd() . DIRECTORY_SEPARATOR);
+		@define("pocketmine\\PATH", getcwd() . DIRECTORY_SEPARATOR);
 	}
 
 	if(!extension_loaded("pthreads")){
@@ -124,8 +128,8 @@ namespace pocketmine {
 
 	$opts = getopt("", ["data:", "plugins:", "no-wizard", "enable-profiler"]);
 
-	define("pocketmine\\DATA", isset($opts["data"]) ? $opts["data"] . DIRECTORY_SEPARATOR : \getcwd() . DIRECTORY_SEPARATOR);
-	define("pocketmine\\PLUGIN_PATH", isset($opts["plugins"]) ? $opts["plugins"] . DIRECTORY_SEPARATOR : \getcwd() . DIRECTORY_SEPARATOR . "plugins" . DIRECTORY_SEPARATOR);
+	define("pocketmine\\DATA", isset($opts["data"]) ? $opts["data"] . DIRECTORY_SEPARATOR : getcwd() . DIRECTORY_SEPARATOR);
+	define("pocketmine\\PLUGIN_PATH", isset($opts["plugins"]) ? $opts["plugins"] . DIRECTORY_SEPARATOR : getcwd() . DIRECTORY_SEPARATOR . "plugins" . DIRECTORY_SEPARATOR);
 
 	Terminal::init();
 
@@ -297,7 +301,7 @@ namespace pocketmine {
 
 	if(isset($opts["enable-profiler"])){
 		if(function_exists("profiler_enable")){
-			\profiler_enable();
+			profiler_enable();
 			$logger->notice("Execution is being profiled");
 		}else{
 			$logger->notice("No profiler found. Please install https://github.com/krakjoe/profiler");

@@ -11,7 +11,11 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
+<<<<<<< HEAD
+ * (at your option) any later version
+=======
  * (at your option) any later version.
+>>>>>>> remotes/base/mcpe-0.13
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
@@ -25,7 +29,13 @@ use pocketmine\block\Block;
 
 class FlowerPot extends Item{
 	public function __construct($meta = 0, $count = 1){
+<<<<<<< HEAD
+		$this->block = Block::get(Item::FLOWER_POT);
+		parent::__construct(self::FLOWER_POT, 0, $count, "Flower Pot"); 
+		
+=======
 		$this->block = Block::get(Item::FLOWER_POT_BLOCK);
 		parent::__construct(self::FLOWER_POT, 0, $count, "Flower Pot");
+>>>>>>> remotes/base/mcpe-0.13
 	}
 }

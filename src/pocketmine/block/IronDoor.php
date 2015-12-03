@@ -24,7 +24,7 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
 
-class IronDoor extends Door{
+class IronDoor extends Door2{
 
 	protected $id = self::IRON_DOOR_BLOCK;
 

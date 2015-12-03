@@ -24,7 +24,11 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
 
+<<<<<<< HEAD
+class PackedIce extends Transparent{
+=======
 class PackedIce extends Solid{
+>>>>>>> remotes/base/mcpe-0.13
 
 	protected $id = self::PACKED_ICE;
 
@@ -44,4 +48,10 @@ class PackedIce extends Solid{
 		return Tool::TYPE_PICKAXE;
 	}
 
+<<<<<<< HEAD
+	public function getDrops(Item $item){
+		return [];
+	}
+=======
+>>>>>>> remotes/base/mcpe-0.13
 }

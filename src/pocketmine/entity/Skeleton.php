@@ -22,5 +22,7 @@
 namespace pocketmine\entity;
 
 class Skeleton extends Monster implements ProjectileSource{
-
+ 	public function getName() {
+                return "Skeleton";
+        }
 }
