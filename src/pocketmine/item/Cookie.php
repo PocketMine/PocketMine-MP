@@ -21,14 +21,21 @@
 
 namespace pocketmine\item;
 
+<<<<<<< HEAD
 class Cookie extends Item implements Food{
+=======
+class Cookie extends Item{
+>>>>>>> remotes/base/mcpe-0.13
 	public function __construct($meta = 0, $count = 1){
 		parent::__construct(self::COOKIE, $meta, $count, "Cookie");
 	}
 
+<<<<<<< HEAD
         public function isEatable() {
                 return true;
         }
 
+=======
+>>>>>>> remotes/base/mcpe-0.13
 }
 

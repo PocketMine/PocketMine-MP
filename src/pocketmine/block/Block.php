@@ -222,11 +222,15 @@ class Block extends Position implements Metadatable{
 	const ENCHANTING_TABLE = 116;
 	const ENCHANT_TABLE = 116;
 	const ENCHANTMENT_TABLE = 116;
+<<<<<<< HEAD
 	const BREWING_STAND_BLOCK = 117;
 	
 	const CAULDRON = 118;
 	const END_PORTAL = 119;
 
+=======
+	const BREWING_STAND = 117;
+>>>>>>> remotes/base/mcpe-0.13
 	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
 	const DRAGON_EGG = 122;
@@ -261,7 +265,10 @@ class Block extends Position implements Metadatable{
 	const COBBLE_WALL = 139;
 	const STONE_WALL = 139;
 	const COBBLESTONE_WALL = 139;
+<<<<<<< HEAD
 	
+=======
+>>>>>>> remotes/base/mcpe-0.13
 	const FLOWER_POT_BLOCK = 140;
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
@@ -274,11 +281,14 @@ class Block extends Position implements Metadatable{
 
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
+<<<<<<< HEAD
 	const LIGHT_WEIGHTED_PRESSURE_PLATE = 147;
 	const HEAVY_WEIGHTED_PRESSURE_PLATE = 148;
 	const UNPOWERED_COMPARATOR = 149;
 	const POWERED_COMPARATOR = 150;
 	const DAYLIGHT_DETECTOR = 151;
+=======
+>>>>>>> remotes/base/mcpe-0.13
 
 	const REDSTONE_BLOCK = 152;
 	
@@ -319,12 +329,16 @@ class Block extends Position implements Metadatable{
 	const PRISMARINE = 168;
 	const SEA_LANTERN = 169;
 
+	const IRON_TRAPDOOR = 167;
 	const HAY_BALE = 170;
 	const CARPET = 171;
 	const HARDENED_CLAY = 172;
 	const COAL_BLOCK = 173;
 	const PACKED_ICE = 174;
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/base/mcpe-0.13
 	const DOUBLE_PLANT = 175;
 	const STANDING_BANNER = 176;
 	const WALL_BANNER = 177;
@@ -354,8 +368,11 @@ class Block extends Position implements Metadatable{
 	const BEETROOT_BLOCK = 244;
 	const STONECUTTER = 245;
 	const GLOWING_OBSIDIAN = 246;
+<<<<<<< HEAD
 	const NETHER_REACTOR = 247;
 	const RESERVED = 255;
+=======
+>>>>>>> remotes/base/mcpe-0.13
 
 	/** @var \SplFixedArray */
 	public static $list = null;
@@ -549,10 +566,14 @@ class Block extends Position implements Metadatable{
 			self::$list[self::NETHER_WART_BLOCK] = NetherWart::class;
 
 			self::$list[self::ENCHANTING_TABLE] = EnchantingTable::class;
+<<<<<<< HEAD
 			self::$list[self::BREWING_STAND_BLOCK] = BrewingStand::class;
 			//self::$list[self::CAULDRON] = Cauldron::class;
 			//self::$list[self::END_PORTAL] = EndPortal::class;
 
+=======
+			self::$list[self::BREWING_STAND] = BrewingStand::class;
+>>>>>>> remotes/base/mcpe-0.13
 			self::$list[self::END_PORTAL_FRAME] = EndPortalFrame::class;
 			self::$list[self::END_STONE] = EndStone::class;
 			//self::$list[self::DRAGON_EGG] = DragonEgg::class;
@@ -579,7 +600,10 @@ class Block extends Position implements Metadatable{
 			//self::$list[self::BEACON] = Beacon::class;
 			
 			self::$list[self::STONE_WALL] = StoneWall::class;
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/base/mcpe-0.13
 			self::$list[self::FLOWER_POT_BLOCK] = FlowerPot::class;
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
@@ -587,12 +611,15 @@ class Block extends Position implements Metadatable{
 			self::$list[self::SKULL_BLOCK] = SkullBlock::class;
 			self::$list[self::ANVIL] = Anvil::class;
 			self::$list[self::TRAPPED_CHEST] = TrappedChest::class;
+<<<<<<< HEAD
 		//	self::$list[self::LIGHT_WEIGHTED_PRESSURE_PLATE] = LightPlate::class;
 		//	self::$list[self::HEAVY_WEIGHTED_PRESSURE_PLATE] = HeavyPlate::class;
 			//self::$list[self::UNPOWERED_COMPARATOR] = UnpoweredComparator::class;
 			//self::$list[self::POWERED_COMPARATOR] = PoweredComparator::class;
 		//	self::$list[self::DAYLIGHT_DETECTOR] = DaylightDetector::class;
 
+=======
+>>>>>>> remotes/base/mcpe-0.13
 			self::$list[self::REDSTONE_BLOCK] = Redstone::class;
 
 			self::$list[self::QUARTZ_ORE] = QuartzOre::class;
@@ -614,12 +641,16 @@ class Block extends Position implements Metadatable{
 			//self::$list[self::PRISMARINE] = Prismarine::class;
 			//self::$list[self::SEA_LANTERN] = SeaLantern::class;
 
+			self::$list[self::IRON_TRAPDOOR] = IronTrapdoor::class;
 			self::$list[self::HAY_BALE] = HayBale::class;
 			self::$list[self::CARPET] = Carpet::class;
 			self::$list[self::HARDENED_CLAY] = HardenedClay::class;
 			self::$list[self::COAL_BLOCK] = Coal::class;
 			self::$list[self::PACKED_ICE] = PackedIce::class;
+<<<<<<< HEAD
 
+=======
+>>>>>>> remotes/base/mcpe-0.13
 			self::$list[self::DOUBLE_PLANT] = DoublePlant::class;
 			//self::$list[self::STANDING_BANNER] = StandingBanner::class;
 			//self::$list[self::WALL_BANNER] = WallBanner::class;
@@ -647,8 +678,11 @@ class Block extends Position implements Metadatable{
 			self::$list[self::BEETROOT_BLOCK] = Beetroot::class;
 			self::$list[self::STONECUTTER] = Stonecutter::class;
 			self::$list[self::GLOWING_OBSIDIAN] = GlowingObsidian::class;
+<<<<<<< HEAD
 			self::$list[self::NETHER_REACTOR] = NetherReactor::class;
 		//	self::$list[self::RESERVED] = Reserved::class;
+=======
+>>>>>>> remotes/base/mcpe-0.13
 
 			foreach(self::$list as $id => $class){
 				if($class !== null){

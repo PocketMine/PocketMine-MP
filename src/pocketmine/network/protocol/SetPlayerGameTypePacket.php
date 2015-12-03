@@ -19,23 +19,23 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\network\protocol;
 
-<<<<<<< HEAD
-class RawBeef extends Item implements Food{
-=======
-class RawBeef extends Item{
->>>>>>> remotes/base/mcpe-0.13
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::RAW_BEEF, $meta, $count, "Raw Beef");
+#include <rules/DataPacket.h>
+
+
+class SetPlayerGameTypePacket extends DataPacket{
+	const NETWORK_ID = Info::SET_PLAYER_GAMETYPE_PACKET;
+
+	public $gamemode;
+
+	public function decode(){
+
 	}
 
-<<<<<<< HEAD
-        public function isEatable() {
-                return true;
-        }
+	public function encode(){
+		$this->reset();
+		$this->putInt($this->gamemode);
+	}
 
-=======
->>>>>>> remotes/base/mcpe-0.13
 }
-

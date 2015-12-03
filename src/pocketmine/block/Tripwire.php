@@ -22,20 +22,49 @@
 namespace pocketmine\block;
 
 
-class NetherReactor extends Solid{
+use pocketmine\item\Item;
 
-	protected $id = self::NETHER_REACTOR;
+use pocketmine\math\AxisAlignedBB;
+
+class Tripwire extends Flowable{
+
+	protected $id = self::TRIPWIRE;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
 	}
 
-	public function getName(){
-		return "Nether Reactor";
+	public function isSolid(){
+		return false;
 	}
 
-	public function canBeActivated(){
+	public function getName(){
+		return "Tripwire";
+	}
+
+	public function getHardness(){
+		return 0.1;
+	}
+
+	public function canPassThrough(){
 		return true;
 	}
 
+	protected function recalculateBoundingBox(){
+		return new AxisAlignedBB(
+			$this->x,
+			$this->y,
+			$this->z,
+			$this->x,
+			$this->y + 0.0625,
+			$this->z
+		);
+	}
+
+	public function getDrops(Item $item){
+		$drops = [];
+		$drops[] = [Item::STRING, 0, 1];
+
+		return $drops;
+	}
 }

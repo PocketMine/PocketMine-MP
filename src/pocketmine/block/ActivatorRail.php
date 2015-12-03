@@ -23,35 +23,37 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
+use pocketmine\level\Level;
+use pocketmine\Player;
 
-<<<<<<< HEAD
-class PackedIce extends Transparent{
-=======
-class PackedIce extends Solid{
->>>>>>> remotes/base/mcpe-0.13
+class ActivatorRail extends RailBlock{
 
-	protected $id = self::PACKED_ICE;
+	protected $id = self::ACTIVATOR_RAIL;
 
-	public function __construct(){
-
+	public function __construct($meta = 0){
+		$this->meta = $meta;
 	}
 
 	public function getName(){
-		return "Packed Ice";
+		return "Activator Rail";
 	}
 
 	public function getHardness(){
-		return 0.5;
+		return 0.1;
 	}
 
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
 	}
 
-<<<<<<< HEAD
-	public function getDrops(Item $item){
-		return [];
+	public function onUpdate($type){
+		if($type === Level::BLOCK_UPDATE_NORMAL){
+			if($this->getSide(0)->getId() === self::AIR){ // Replace with common break method
+				$this->getLevel()->setBlock($this, new Air(), true);
+				
+				return Level::BLOCK_UPDATE_NORMAL;
+			}
+		}
+		return false;
 	}
-=======
->>>>>>> remotes/base/mcpe-0.13
 }

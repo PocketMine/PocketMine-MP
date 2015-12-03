@@ -52,12 +52,21 @@ class PlayerListPacket extends DataPacket{
 		$this->putInt(count($this->entries));
 		foreach($this->entries as $entry){
 			if($this->type === self::TYPE_ADD){
+<<<<<<< HEAD
 				$this->putUUID($entry->uuid);
 				$this->putLong($entry->entityId);
 				$this->putString($entry->name);
 				$this->putByte($entry->isSlim ? 1 : 0);
 				$this->putByte($entry->transparency ? 1 : 0);
 				$this->putString($entry->skinData);
+=======
+				$this->putUUID($d[0]);
+				$this->putLong($d[1]);
+				$this->putString($d[2]);
+				$this->putByte($d[3] ? 1 : 0);
+				$this->putByte(0); // TODO: skin transparency, experimental or not?
+				$this->putString($d[4]);
+>>>>>>> remotes/base/mcpe-0.13
 			}else{
 				$this->putUUID($entry->uuid);
 			}

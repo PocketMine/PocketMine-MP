@@ -54,7 +54,11 @@ class LoginPacket extends DataPacket{
 		$this->clientSecret = $this->getString();
 
 		$this->slim = $this->getByte() > 0;
+<<<<<<< HEAD
 		$this->transparency = $this->getByte() > 0;
+=======
+		$this->getByte(); // TODO: skin transparency, experimental or not?
+>>>>>>> remotes/base/mcpe-0.13
 		$this->skin = $this->getString();
 	}
 

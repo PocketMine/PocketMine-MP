@@ -21,11 +21,16 @@
 
 namespace pocketmine\item;
 
+<<<<<<< HEAD
 use pocketmine\block\Block;
 
 class StringItem extends Item{
 	public function __construct($meta = 0, $count = 1){
 		$this->block = Block::get(Item::TRIPWIRE);
+=======
+class StringItem extends Item{
+	public function __construct($meta = 0, $count = 1){
+>>>>>>> remotes/base/mcpe-0.13
 		parent::__construct(self::STRING, $meta, $count, "String");
 	}
 

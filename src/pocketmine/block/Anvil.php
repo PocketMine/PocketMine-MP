@@ -71,9 +71,16 @@ class Anvil extends Fallable{
 
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+<<<<<<< HEAD
 			return [[$this->id,0,1]]; // TODO break level
 		}
 		else{
+=======
+			return [
+				[$this->id, 0, 1], //TODO break level
+			];
+		}else{
+>>>>>>> remotes/base/mcpe-0.13
 			return [];
 		}
 	}

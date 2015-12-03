@@ -115,7 +115,11 @@ use pocketmine\network\protocol\Info as ProtocolInfo;
 use pocketmine\network\protocol\PlayerActionPacket;
 use pocketmine\network\protocol\PlayStatusPacket;
 use pocketmine\network\protocol\RespawnPacket;
+<<<<<<< HEAD
 use pocketmine\network\protocol\SetEntityDataPacket;
+=======
+use pocketmine\network\protocol\SetPlayerGameTypePacket;
+>>>>>>> remotes/base/mcpe-0.13
 use pocketmine\network\protocol\TextPacket;
 
 use pocketmine\network\protocol\MovePlayerPacket;
@@ -1104,7 +1108,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			return false;
 		}
 
-
 		$this->gamemode = $gm;
 
 		$this->allowFlight = $this->isCreative();
@@ -1117,19 +1120,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 		$this->namedtag->playerGameType = new Int("playerGameType", $this->gamemode);
 
-		$spawnPosition = $this->getSpawn();
-
-		$pk = new StartGamePacket();
-		$pk->seed = -1;
-		$pk->x = $this->x;
-		$pk->y = $this->y;
-		$pk->z = $this->z;
-		$pk->spawnX = (int) $spawnPosition->x;
-		$pk->spawnY = (int) $spawnPosition->y;
-		$pk->spawnZ = (int) $spawnPosition->z;
-		$pk->generator = 1; //0 old, 1 infinite, 2 flat
+		$pk = new SetPlayerGameTypePacket();
 		$pk->gamemode = $this->gamemode & 0x01;
-		$pk->eid = 0;
 		$this->dataPacket($pk);
 		$this->sendSettings();
 
@@ -1956,7 +1948,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				}
 
 				$this->randomClientId = $packet->clientId;
-				$this->loginData = ["clientId" => $packet->clientId, "loginData" => null];
 
 				$this->uuid = $packet->clientUUID;
 				$this->rawUUID = $this->uuid->toBinary();
@@ -2598,9 +2589,74 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				$this->setDataFlag(self::DATA_FLAGS, self::DATA_FLAG_ACTION, false); //TODO: check if this should be true
 
 				switch($packet->event){
+<<<<<<< HEAD
                                     case 9: //Eating
                                         $this->eatFoodInHand();
                                     break;
+=======
+					case 9: //Eating
+						$items = [ //TODO: move this to item classes
+							Item::APPLE => 4,
+							Item::MUSHROOM_STEW => 10,
+							Item::BEETROOT_SOUP => 10,
+							Item::BREAD => 5,
+							Item::RAW_PORKCHOP => 3,
+							Item::COOKED_PORKCHOP => 8,
+							Item::RAW_BEEF => 3,
+							Item::STEAK => 8,
+							Item::COOKED_CHICKEN => 6,
+							Item::RAW_CHICKEN => 2,
+							Item::MELON_SLICE => 2,
+							Item::GOLDEN_APPLE => 10,
+							Item::PUMPKIN_PIE => 8,
+							Item::CARROT => 4,
+							Item::POTATO => 1,
+							Item::BAKED_POTATO => 6,
+							Item::COOKIE => 2,
+							Item::COOKED_FISH => [
+								0 => 5,
+								1 => 6
+							],
+							Item::RAW_FISH => [
+								0 => 2,
+								1 => 2,
+								2 => 1,
+								3 => 1
+							],
+						];
+						$slot = $this->inventory->getItemInHand();
+						if($this->getHealth() < $this->getMaxHealth() and isset($items[$slot->getId()])){
+							$this->server->getPluginManager()->callEvent($ev = new PlayerItemConsumeEvent($this, $slot));
+							if($ev->isCancelled()){
+								$this->inventory->sendContents($this);
+								break;
+							}
+
+							$pk = new EntityEventPacket();
+							$pk->eid = $this->getId();
+							$pk->event = EntityEventPacket::USE_ITEM;
+							$this->dataPacket($pk);
+							Server::broadcastPacket($this->getViewers(), $pk);
+
+							$amount = $items[$slot->getId()];
+							if(is_array($amount)){
+								$amount = isset($amount[$slot->getDamage()]) ? $amount[$slot->getDamage()] : 0;
+							}
+                            $ev = new EntityRegainHealthEvent($this, $amount, EntityRegainHealthEvent::CAUSE_EATING);
+							$this->heal($ev->getAmount(), $ev);
+
+							--$slot->count;
+							$this->inventory->setItemInHand($slot);
+							if($slot->getId() === Item::MUSHROOM_STEW or $slot->getId() === Item::BEETROOT_SOUP){
+								$this->inventory->addItem(Item::get(Item::BOWL, 0, 1));
+							}elseif($slot->getId() === Item::RAW_FISH and $slot->getDamage() === 3){ //Pufferfish
+								//$this->addEffect(Effect::getEffect(Effect::HUNGER)->setAmplifier(2)->setDuration(15 * 20));
+								$this->addEffect(Effect::getEffect(Effect::NAUSEA)->setAmplifier(1)->setDuration(15 * 20));
+								$this->addEffect(Effect::getEffect(Effect::POISON)->setAmplifier(3)->setDuration(60 * 20));
+							}
+						}
+						break;
+>>>>>>> remotes/base/mcpe-0.13
 				}
 				break;
 			case ProtocolInfo::DROP_ITEM_PACKET:

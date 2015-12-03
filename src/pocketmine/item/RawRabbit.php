@@ -1,5 +1,4 @@
 <?php
-
 /*
  *
  *  ____            _        _   __  __ _                  __  __ ____  
@@ -18,24 +17,13 @@
  * 
  *
 */
-
 namespace pocketmine\item;
-
-<<<<<<< HEAD
-class RawBeef extends Item implements Food{
-=======
-class RawBeef extends Item{
->>>>>>> remotes/base/mcpe-0.13
+class RawRabbit extends Item{
 	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::RAW_BEEF, $meta, $count, "Raw Beef");
+		parent::__construct(self::RAW_RABBIT, $meta, $count, "Raw Rabbit");
 	}
-
-<<<<<<< HEAD
-        public function isEatable() {
-                return true;
-        }
-
-=======
->>>>>>> remotes/base/mcpe-0.13
+	
+	public function getMaxStackSize(){
+		return 64;
+	}
 }
-

@@ -30,12 +30,20 @@ use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Int;
 use pocketmine\nbt\tag\String;
 use pocketmine\Player;
+<<<<<<< HEAD
 use pocketmine\tile\TrappedChest as TileChest;
+=======
+use pocketmine\tile\Chest as TileChest;
+>>>>>>> remotes/base/mcpe-0.13
 use pocketmine\tile\Tile;
 
 class TrappedChest extends Transparent{
 
+<<<<<<< HEAD
 	protected $id = self::TRAPPED_CHEST;
+=======
+	protected $id = self::CHEST;
+>>>>>>> remotes/base/mcpe-0.13
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
@@ -98,7 +106,11 @@ class TrappedChest extends Transparent{
 		$this->getLevel()->setBlock($block, $this, true, true);
 		$nbt = new Compound("", [
 			new Enum("Items", []),
+<<<<<<< HEAD
 			new String("id", Tile::TRAPPED_CHEST),
+=======
+			new String("id", Tile::CHEST),
+>>>>>>> remotes/base/mcpe-0.13
 			new Int("x", $this->x),
 			new Int("y", $this->y),
 			new Int("z", $this->z)
@@ -115,7 +127,11 @@ class TrappedChest extends Transparent{
 			}
 		}
 
+<<<<<<< HEAD
 		$tile = Tile::createTile("Trapped Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+=======
+		$tile = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+>>>>>>> remotes/base/mcpe-0.13
 
 		if($chest instanceof TileChest and $tile instanceof TileChest){
 			$chest->pairWith($tile);
@@ -149,13 +165,21 @@ class TrappedChest extends Transparent{
 			}else{
 				$nbt = new Compound("", [
 					new Enum("Items", []),
+<<<<<<< HEAD
 					new String("id", Tile::TRAPPED_CHEST),
+=======
+					new String("id", Tile::CHEST),
+>>>>>>> remotes/base/mcpe-0.13
 					new Int("x", $this->x),
 					new Int("y", $this->y),
 					new Int("z", $this->z)
 				]);
 				$nbt->Items->setTagType(NBT::TAG_Compound);
+<<<<<<< HEAD
 				$chest = Tile::createTile("Trapped Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+=======
+				$chest = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+>>>>>>> remotes/base/mcpe-0.13
 			}
 
 			if(isset($chest->namedtag->Lock) and $chest->namedtag->Lock instanceof String){
@@ -167,10 +191,14 @@ class TrappedChest extends Transparent{
 			if($player->isCreative()){
 				return true;
 			}
+<<<<<<< HEAD
 			
 			if($chest !== null){
 				$player->addWindow($chest->getInventory());
 			}
+=======
+			$player->addWindow($chest->getInventory());
+>>>>>>> remotes/base/mcpe-0.13
 		}
 
 		return true;
@@ -181,4 +209,8 @@ class TrappedChest extends Transparent{
 			[$this->id, 0, 1],
 		];
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> remotes/base/mcpe-0.13

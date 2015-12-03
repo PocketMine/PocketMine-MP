@@ -21,6 +21,7 @@
 
 namespace pocketmine\block;
 
+<<<<<<< HEAD
 use pocketmine\inventory\BrewingInventory;
 use pocketmine\item\Item;
 
@@ -33,11 +34,20 @@ use pocketmine\tile\Tile;
 class BrewingStand extends Transparent{
 
 	protected $id = self::BREWING_STAND_BLOCK;
+=======
+use pocketmine\item\Item;
+use pocketmine\item\Tool;
+
+class BrewingStand extends Transparent{
+
+	protected $id = self::BREWING_STAND;
+>>>>>>> remotes/base/mcpe-0.13
 
 	public function __construct(){
 
 	}
 
+<<<<<<< HEAD
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$this->getLevel()->setBlock($block, $this, true, true);
 		$nbt = new Compound("", [
@@ -70,10 +80,13 @@ class BrewingStand extends Transparent{
 		return 3;
 	}
 
+=======
+>>>>>>> remotes/base/mcpe-0.13
 	public function getName(){
 		return "Brewing Stand";
 	}
 
+<<<<<<< HEAD
 	public function onActivate(Item $item, Player $player = null){
 		if($player instanceof Player){
 			//TODO lock
@@ -100,5 +113,13 @@ class BrewingStand extends Transparent{
 		$this->getLevel()->setBlock($this, new Air(), true, true);
 
 		return true;
+=======
+	public function getHardness(){
+		return 0.5;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_PICKAXE;
+>>>>>>> remotes/base/mcpe-0.13
 	}
 }

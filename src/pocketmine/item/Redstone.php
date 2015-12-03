@@ -21,11 +21,16 @@
 
 namespace pocketmine\item;
 
+<<<<<<< HEAD
 use pocketmine\block\Block;
 
 class Redstone extends Item{
 	public function __construct($meta = 0, $count = 1){
 		$this->block = Block::get(Item::REDSTONE_WIRE);
+=======
+class Redstone extends Item{
+	public function __construct($meta = 0, $count = 1){
+>>>>>>> remotes/base/mcpe-0.13
 		parent::__construct(self::REDSTONE, $meta, $count, "Redstone");
 	}
 
