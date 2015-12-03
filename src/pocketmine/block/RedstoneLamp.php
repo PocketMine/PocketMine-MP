@@ -43,29 +43,4 @@ class RedstoneLamp extends Solid{
 	public function getHardness(){
 		return 0.3;
 	}
-	
-	public function onPlace(){
-		$blockNorth = $this->getSide(2); //Gets the blocks around the lamp
-		$blockSouth = $this->getSide(3);
-		$blockEast = $this->getSide(5);
-		$blockWest = $this->getSide(4);			
-		if($blockNorth->getId() === Block::get(Item::LIT_REDSTONE_TORCH, 0)){
-			$this->getLevel()->setBlock($this, Block::get(Item::LIT_REDSTONE_LAMP, 0), true, true);
-			return true;
-		}elseif($blockSouth->getId() === Block::get(Item::LIT_REDSTONE_TORCH, 0)){
-			$this->getLevel()->setBlock($this, Block::get(Item::LIT_REDSTONE_LAMP, 0), true, true);
-			return true;
-		}elseif($blockEast->getId() === Block::get(Item::LIT_REDSTONE_TORCH, 0)){
-			$this->getLevel()->setBlock($this, Block::get(Item::LIT_REDSTONE_LAMP, 0), true, true);
-			return true;
-		}elseif($blockWest->getId() === Block::get(Item::LIT_REDSTONE_TORCH, 0)){
-			$this->getLevel()->setBlock($this, Block::get(Item::LIT_REDSTONE_LAMP, 0), true, true);
-			return true;
-		}
-		return false;
-	}
-
-	public function getDrops(Item $item){
-		return [];
-	}
 }

@@ -51,7 +51,7 @@ class PoweredRail extends Flowable{
 		$blockNorth = $this->getSide(2); //Gets the blocks around them
 		$blockSouth = $this->getSide(3);
 		$blockEast = $this->getSide(5);
-		$blockWest = $this->getSide(4);
+		$blockWest = $this->getSide(4);//Activated rail + 0x8 to meta
 		if($down->isTransparent() === false){
 			if($blockNorth->getId() === $this->id){
 				$this->getLevel()->setBlock($block, Block::get(Item::POWERED_RAIL, 0), true, true);

@@ -30,6 +30,6 @@ class SpruceDoor extends Item{
 	}
 
 	public function getMaxStackSize(){
-		return 1;
+		return 3;
 	}
 }

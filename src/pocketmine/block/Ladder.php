@@ -124,10 +124,10 @@ class Ladder extends Transparent{
 
 	public function onUpdate($type){
 		$faces = [
-			2 => 2,
-			3 => 3,
-			4 => 4,
-			5 => 5,
+			2 => 3,
+			3 => 2,
+			4 => 5,
+			5 => 4,
 		];
 		if($type === Level::BLOCK_UPDATE_NORMAL){
 			if(isset($faces[$this->meta])) {

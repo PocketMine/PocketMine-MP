@@ -175,7 +175,9 @@ class Block extends Position implements Metadatable{
 	const SOUL_SAND = 88;
 	const GLOWSTONE = 89;
 	const GLOWSTONE_BLOCK = 89;
-
+	
+	const NETHER_PORTAL = 90;
+	const PORTAL = 90;
 
 	const LIT_PUMPKIN = 91;
 	const JACK_O_LANTERN = 91;
@@ -259,7 +261,7 @@ class Block extends Position implements Metadatable{
 	const COBBLE_WALL = 139;
 	const STONE_WALL = 139;
 	const COBBLESTONE_WALL = 139;
-
+	
 	const FLOWER_POT_BLOCK = 140;
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
@@ -489,15 +491,15 @@ class Block extends Position implements Metadatable{
 
 			self::$list[self::COBBLESTONE_STAIRS] = CobblestoneStairs::class;
 			self::$list[self::WALL_SIGN] = WallSign::class;
-		//	self::$list[self::LEVER] = Lever::class;
+			self::$list[self::LEVER] = Lever::class;
 		//	self::$list[self::STONE_PRESSURE_PLATE] = StonePressurePlate::class;
 
 			self::$list[self::IRON_DOOR_BLOCK] = IronDoor::class;
 			self::$list[self::REDSTONE_ORE] = RedstoneOre::class;
 			self::$list[self::GLOWING_REDSTONE_ORE] = GlowingRedstoneOre::class;
-		//	self::$list[self::UNLIT_REDSTONE_TORCH] = UnlitRedstoneTorch::class;
-		//	self::$list[self::LIT_REDSTONE_TORCH] = LitRedstoneTorch::class;
-		//	self::$list[self::STONE_BUTTON] = StoneButton::class;
+			self::$list[self::UNLIT_REDSTONE_TORCH] = UnlitRedstoneTorch::class;
+			self::$list[self::LIT_REDSTONE_TORCH] = LitRedstoneTorch::class;
+			self::$list[self::STONE_BUTTON] = StoneButton::class;
 
 			self::$list[self::SNOW_LAYER] = SnowLayer::class;
 			self::$list[self::ICE] = Ice::class;
@@ -512,6 +514,8 @@ class Block extends Position implements Metadatable{
 			self::$list[self::NETHERRACK] = Netherrack::class;
 			self::$list[self::SOUL_SAND] = SoulSand::class;
 			self::$list[self::GLOWSTONE_BLOCK] = Glowstone::class;
+			
+			self::$list[self::NETHER_PORTAL] = NetherPortal::class;
 
 			self::$list[self::LIT_PUMPKIN] = LitPumpkin::class;
 			self::$list[self::CAKE_BLOCK] = Cake::class;
@@ -553,8 +557,8 @@ class Block extends Position implements Metadatable{
 			self::$list[self::END_STONE] = EndStone::class;
 			//self::$list[self::DRAGON_EGG] = DragonEgg::class;
 			
-		//	self::$list[self::REDSTONE_LAMP] = RedstoneLamp::class;
-		//	self::$list[self::LIT_REDSTONE_LAMP] = LitRedstoneLamp::class;
+			self::$list[self::REDSTONE_LAMP] = RedstoneLamp::class;
+			self::$list[self::LIT_REDSTONE_LAMP] = LitRedstoneLamp::class;
 
 		//	self::$list[self::COCOA] = Cocoa::class;
 			
@@ -563,8 +567,8 @@ class Block extends Position implements Metadatable{
 			
 			//self::$list[self::ENDERCHEST] = Enderchest::class;
 			
-		//	self::$list[self::TRIPWIRE_HOOK] = TripwireHook::class;
-		//	self::$list[self::TRIPWIRE] = Tripwire::class;
+			self::$list[self::TRIPWIRE_HOOK] = TripwireHook::class;
+			self::$list[self::TRIPWIRE] = Tripwire::class;
 
 			self::$list[self::EMERALD_BLOCK] = Emerald::class;
 			self::$list[self::SPRUCE_WOOD_STAIRS] = SpruceWoodStairs::class;
@@ -579,6 +583,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::FLOWER_POT_BLOCK] = FlowerPot::class;
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
+			self::$list[self::WOODEN_BUTTON] = WoodenButton::class;
 			self::$list[self::SKULL_BLOCK] = SkullBlock::class;
 			self::$list[self::ANVIL] = Anvil::class;
 			self::$list[self::TRAPPED_CHEST] = TrappedChest::class;
@@ -605,7 +610,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::DARK_OAK_WOOD_STAIRS] = DarkOakWoodStairs::class;
 			//self::$list[self::SLIMEBLOCK] = Slimeblock::class;
 		//	self::$list[self::BARRIER] = Barrier::class;
-		//	self::$list[self::IRON_TRAPDOOR] = IronTrapdoor::class;
+			self::$list[self::IRON_TRAPDOOR] = IronTrapdoor::class;
 			//self::$list[self::PRISMARINE] = Prismarine::class;
 			//self::$list[self::SEA_LANTERN] = SeaLantern::class;
 
@@ -714,10 +719,12 @@ class Block extends Position implements Metadatable{
 	/**
 	 * @param int $id
 	 * @param int $meta
+	 * @param int $power
 	 */
-	public function __construct($id, $meta = 0){
+	public function __construct($id, $meta = 0, $power = 0){
 		$this->id = (int) $id;
 		$this->meta = (int) $meta;
+		$this->power = (int) $power;
 	}
 
 	/**
@@ -846,7 +853,7 @@ class Block extends Position implements Metadatable{
 	public function isSolid(){
 		return true;
 	}
-
+	
 	/**
 	 * AKA: Block->isFlowable
 	 *
@@ -897,7 +904,7 @@ class Block extends Position implements Metadatable{
 	final public function getDamage(){
 		return $this->meta;
 	}
-
+	
 	/**
 	 * @param int $meta
 	 */
@@ -905,6 +912,10 @@ class Block extends Position implements Metadatable{
 		$this->meta = $meta & 0x0f;
 	}
 
+	public function getPower(){
+		return $this->power;
+	}
+	
 	/**
 	 * Sets the block position to a new Position object
 	 *

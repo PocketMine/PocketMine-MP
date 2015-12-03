@@ -27,7 +27,6 @@ use pocketmine\item\Tool;
 use pocketmine\Player;
 
 class Anvil extends Fallable{
-
 	protected $id = self::ANVIL;
 
 	public function isSolid(){
@@ -63,20 +62,32 @@ class Anvil extends Fallable{
 			if($player->isCreative()){
 				return true;
 			}
-
+			
 			$player->addWindow(new AnvilInventory($this));
 		}
-
+		
 		return true;
 	}
 
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= Tool::TIER_WOODEN){
-			return [
-				[$this->id, 0, 1], //TODO break level
-			];
-		}else{
+			return [[$this->id,0,1]]; // TODO break level
+		}
+		else{
 			return [];
 		}
+	}
+
+	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+		$faces = [
+			0 => 0,
+			1 => 1,
+			2 => 2,
+			3 => 3,
+		];
+		$this->meta = $faces[$player instanceof Player?$player->getDirection():0];
+		$this->getLevel()->setBlock($block, $this, true);
+		
+		return true;
 	}
 }

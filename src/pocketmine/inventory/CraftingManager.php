@@ -84,27 +84,33 @@ class CraftingManager{
 		))->setIngredient("X", Item::get(Item::WOODEN_PLANK, null)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::OAK, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD, Wood::OAK, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::SPRUCE, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD, Wood::SPRUCE, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::BIRCH, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD, Wood::BIRCH, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::JUNGLE, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD, Wood::JUNGLE, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::ACACIA, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD2, Wood2::ACACIA, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOODEN_PLANK, Planks::DARK_OAK, 4),
-			"X"
+			"  ",
+			" X"
 		))->setIngredient("X", Item::get(Item::WOOD2, Wood2::DARK_OAK, 1)));
 
 		$this->registerRecipe((new ShapedRecipe(Item::get(Item::WOOL, 0, 1),

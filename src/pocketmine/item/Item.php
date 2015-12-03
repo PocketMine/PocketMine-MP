@@ -266,6 +266,8 @@ class Item{
 	
 	//const DOUBLE_WOODEN_SLAB = 125;
 	//const WOODEN_SLAB = 126;
+	const ACTIVATOR_RAIL = 126;
+	
 	const COCOA_POD = 127;
 	const COCOA_BEANS = 127;
 
@@ -959,7 +961,6 @@ class Item{
 		Item::addCreativeItem(Item::get(Item::RED_MUSHROOM_BLOCK, 0));
 		Item::addCreativeItem(Item::get(Item::BROWN_MUSHROOM_BLOCK, 15));
 		Item::addCreativeItem(Item::get(Item::RED_MUSHROOM_BLOCK, 15));
-
 		Item::addCreativeItem(Item::get(Item::CACTUS, 0));
 		Item::addCreativeItem(Item::get(Item::MELON_BLOCK, 0));
 		Item::addCreativeItem(Item::get(Item::PUMPKIN, 0));
@@ -1031,7 +1032,6 @@ class Item{
 		Item::addCreativeItem(Item::get(Item::CARPET, 13));
 		Item::addCreativeItem(Item::get(Item::CARPET, 14));
 		Item::addCreativeItem(Item::get(Item::CARPET, 15));
-
 	}
 	
 	private static function toolsTab(){
@@ -1039,8 +1039,7 @@ class Item{
 		Item::addCreativeItem(Item::get(Item::RAIL, 0));
 		Item::addCreativeItem(Item::get(Item::POWERED_RAIL, 0));
 		Item::addCreativeItem(Item::get(Item::DETECTOR_RAIL, 0));
-		// Item::addCreativeItem(Item::get(Item::ACTIVATOR_RAIL, 0));
-
+		Item::addCreativeItem(Item::get(Item::ACTIVATOR_RAIL, 0));
 		Item::addCreativeItem(Item::get(Item::TORCH, 0));
 		Item::addCreativeItem(Item::get(Item::BUCKET, 0));
 		Item::addCreativeItem(Item::get(Item::BUCKET, 1)); // milk
@@ -1095,7 +1094,6 @@ class Item{
 		Item::addCreativeItem(Item::get(Item::STONE_SHOVEL));
 		Item::addCreativeItem(Item::get(Item::STONE_PICKAXE));
 		Item::addCreativeItem(Item::get(Item::STONE_AXE));
-
 		Item::addCreativeItem(Item::get(Item::IRON_SWORD));
 		Item::addCreativeItem(Item::get(Item::IRON_HOE));
 		Item::addCreativeItem(Item::get(Item::IRON_SHOVEL));
@@ -1141,12 +1139,13 @@ class Item{
 		Item::addCreativeItem(Item::get(Item::LEVER));
 		Item::addCreativeItem(Item::get(Item::REDSTONE_LAMP));
 		Item::addCreativeItem(Item::get(Item::REDSTONE_TORCH));
-		// WOODEN_PRESSURE_PLATE - not implemented
-		// STONE_PRESSURE_PLATE - not implemented
-		// Weighted pressure plate(light) - not implemented
-		// Weighted pressure plate(heavy) - not implemented
-		// BUTTON_WOOD
-		// BUTTON_STONE
+		
+		Item::addCreativeItem(Item::get(Item::WOODEN_PRESSURE_PLATE));
+		Item::addCreativeItem(Item::get(Item::STONE_PRESSURE_PLATE));
+		Item::addCreativeItem(Item::get(Item::LIGHT_WEIGHTED_PRESSURE_PLATE));
+		Item::addCreativeItem(Item::get(Item::HEAVY_WEIGHTED_PRESSURE_PLATE));
+		Item::addCreativeItem(Item::get(Item::WOODEN_BUTTON));
+		Item::addCreativeItem(Item::get(Item::STONE_BUTTON));
 		Item::addCreativeItem(Item::get(Item::DAYLIGHT_DETECTOR));
 		Item::addCreativeItem(Item::get(Item::TRIPWIRE_HOOK));
 		Item::addCreativeItem(Item::get(Item::SNOWBALL));

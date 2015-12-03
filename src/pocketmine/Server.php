@@ -106,6 +106,10 @@ use pocketmine\scheduler\SendUsageTask;
 use pocketmine\scheduler\ServerScheduler;
 use pocketmine\tile\Chest;
 use pocketmine\tile\EnchantTable;
+use pocketmine\tile\BrewingStand;
+use pocketmine\tile\Skull;
+use pocketmine\tile\TrappedChest;
+use pocketmine\tile\FlowerPot;
 use pocketmine\tile\Furnace;
 use pocketmine\tile\Sign;
 use pocketmine\tile\Tile;
@@ -1597,7 +1601,8 @@ class Server{
 			$this->getApiVersion()
 		]));
 		$this->logger->info($this->getLanguage()->translateString("pocketmine.server.license", [$this->getName()]));
-
+		$this->logger->info("This is a third-party PM Build!");
+		$this->logger->info("Please report any issues here: https://github.com/ImagicalCorp/PocketMine-0.13.0/issues");
 		Timings::init();
 
 		$this->consoleSender = new ConsoleCommandSender();
@@ -1612,7 +1617,6 @@ class Server{
 		Biome::init();
 		Effect::init();
 		Enchantment::init();
-		Attribute::init();
 		/** TODO: @deprecated */
 		TextWrapper::init();
 		$this->craftingManager = new CraftingManager();
@@ -2597,6 +2601,10 @@ class Server{
 	private function registerTiles(){
 		Tile::registerTile(Chest::class);
 		Tile::registerTile(Furnace::class);
+		Tile::registerTile(BrewingStand::class);
+		Tile::registerTile(Skull::class);
+		Tile::registerTile(TrappedChest::class);
+		Tile::registerTile(FlowerPot::class);
 		Tile::registerTile(Sign::class);
 		Tile::registerTile(EnchantTable::class);
 	}

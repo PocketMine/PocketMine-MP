@@ -22,12 +22,11 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
-use pocketmine\level\Level;
 use pocketmine\Player;
-use pocketmine\item\Tool;
+use pocketmine\Server;
+use pocketmine\entity\Entity;
 
-class NetherPortal extends Flowable {
-
+class NetherPortal extends Flowable{
 	protected $id = self::NETHER_PORTAL;
 
 	public function __construct($meta = 0){
@@ -43,7 +42,7 @@ class NetherPortal extends Flowable {
 	}
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-	  $this->getLevel()->setBlock($block, $this, true, true);
+		$this->getLevel()->setBlock($block, $this, true, true);
 		return false;
 	}
 
@@ -51,8 +50,16 @@ class NetherPortal extends Flowable {
 		return;
 	}
 
- public function onBreak(Item $item){
+	public function onBreak(Item $item){
 		$this->getLevel()->setBlock($this, new Air(), true, true);
 		return true;
 	}
+	
+	public function onEntityCollide(Entity $entity){
+        //Server::getInstance()->getPluginManager()->callEvent($ev = new EntityEnterPortalEvent($this, $entity));
+        //if(!$ev->isCancelled()) {
+            //TODO: Delayed teleport entity to nether world.
+        //}
+        return true;
+    }
 }

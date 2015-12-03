@@ -44,27 +44,6 @@ class LitRedstoneLamp extends Solid{
 		return 0.3;
 	}
 	
-	public function onPlace(){ //onUpdate .... 
-		$blockNorth = $this->getSide(2); //Gets the blocks around the lamp
-		$blockSouth = $this->getSide(3);
-		$blockEast = $this->getSide(5);
-		$blockWest = $this->getSide(4);			
-		if($blockNorth->getId() === Block::get(Item::REDSTONE_TORCH, 0)){
-			$this->getLevel()->setBlock($this, Block::get(Item::REDSTONE_LAMP, 0), true, true);
-			return true;
-		}elseif($blockSouth->getId() === Block::get(Item::REDSTONE_TORCH, 0)){
-			$this->getLevel()->setBlock($this, Block::get(Item::REDSTONE_LAMP, 0), true, true);
-			return true;
-		}elseif($blockEast->getId() === Block::get(Item::REDSTONE_TORCH, 0)){
-			$this->getLevel()->setBlock($this, Block::get(Item::REDSTONE_LAMP, 0), true, true);
-			return true;
-		}else($blockWest->getId() === Block::get(Item::REDSTONE_TORCH, 0)){
-			$this->getLevel()->setBlock($this, Block::get(Item::REDSTONE_LAMP, 0), true, true);
-			return true;
-		}
-		return false;
-	}
-	
 	public function getLightLevel(){
 		return 15;
 	}
