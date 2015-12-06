@@ -31,10 +31,10 @@ use pocketmine\Player;
 class Attribute{
 
 	const MAX_HEALTH = 0;
+	const MAX_HUNGER = 1;
 
-
-	const EXPERIENCE = 1;
-	const EXPERIENCE_LEVEL = 2;
+	const EXPERIENCE = 2;
+	const EXPERIENCE_LEVEL = 3;
 
 	private $id;
 	protected $minValue;
@@ -49,6 +49,7 @@ class Attribute{
 
 	public static function init(){
 		self::addAttribute(self::MAX_HEALTH, "generic.health", 0, 0x7fffffff, 20, true);
+		self::addAttribute(self::MAX_HUNGER, "player.hunger", 0, 20, 20, true);
 		self::addAttribute(self::EXPERIENCE, "player.experience", 0, 1, 0, true);
 		self::addAttribute(self::EXPERIENCE_LEVEL, "player.level", 0, 24791, 0, true);
 	}
@@ -88,7 +89,7 @@ class Attribute{
 				return clone $a;
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -106,7 +107,7 @@ class Attribute{
 	public function getMinValue(){
 		return $this->minValue;
 	}
-	
+
 	public function setMinValue($minValue){
 		if($minValue > $this->getMaxValue()){
 			throw new \InvalidArgumentException("Value $minValue is bigger than the maxValue!");
