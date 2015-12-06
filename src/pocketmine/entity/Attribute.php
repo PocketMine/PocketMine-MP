@@ -21,85 +21,41 @@
 
 namespace pocketmine\entity;
 
-use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntityRegainHealthEvent;
-use pocketmine\network\Network;
-use pocketmine\network\protocol\MobEffectPacket;
+use pocketmine\network\protocol\UpdateAttributesPacket;
 use pocketmine\Player;
+use pocketmine\utils\ModelledEnum;
 
+class Attribute extends ModelledEnum{
 
-class Attribute{
-
+	const HEALTH = 0;
 	const MAX_HEALTH = 0;
+
+	const HUNGER = 1;
 	const MAX_HUNGER = 1;
 
 	const EXPERIENCE = 2;
 	const EXPERIENCE_LEVEL = 3;
 
-	private $id;
 	protected $minValue;
 	protected $maxValue;
 	protected $defaultValue;
 	protected $currentValue;
-	protected $name;
 	protected $shouldSend;
 
-	/** @var Attribute[] */
-	protected static $attributes = [];
-
 	public static function init(){
-		self::addAttribute(self::MAX_HEALTH, "generic.health", 0, 0x7fffffff, 20, true);
-		self::addAttribute(self::MAX_HUNGER, "player.hunger", 0, 20, 20, true);
-		self::addAttribute(self::EXPERIENCE, "player.experience", 0, 1, 0, true);
-		self::addAttribute(self::EXPERIENCE_LEVEL, "player.level", 0, 24791, 0, true);
+
+		self::addEnumEntry(new Attribute(self::HEALTH, "generic.health", 0, 0x7fffffff, 20, true));
+		self::addEnumEntry(new Attribute(self::HUNGER, "player.hunger", 0, 20, 20, true));
+		self::addEnumEntry(new Attribute(self::EXPERIENCE, "player.experience", 0, 1, 0, true));
+		self::addEnumEntry(new Attribute(self::EXPERIENCE_LEVEL, "player.level", 0, 24791, 0, true));
 	}
 
-	/**
-	 * @param int    $id
-	 * @param string $name
-	 * @param float  $minValue
-	 * @param float  $maxValue
-	 * @param float  $defaultValue
-	 * @param bool   $shouldSend
-	 * @return Attribute
-	 */
-	public static function addAttribute($id, $name, $minValue, $maxValue, $defaultValue, $shouldSend = false){
-		if($minValue > $maxValue or $defaultValue > $maxValue or $defaultValue < $minValue){
-			throw new \InvalidArgumentException("Invalid ranges: min value: $minValue, max value: $maxValue, $defaultValue: $defaultValue");
-		}
-
-		return self::$attributes[(int) $id] = new Attribute($id, $name, $minValue, $maxValue, $defaultValue, $shouldSend);
-	}
-
-	/**
-	 * @param $id
-	 * @return null|Attribute
-	 */
-	public static function getAttribute($id){
-		return isset(self::$attributes[$id]) ? clone self::$attributes[$id] : null;
-	}
-
-	/**
-	 * @param $name
-	 * @return null|Attribute
-	 */
-	public static function getAttributeByName($name){
-		foreach(self::$attributes as $a){
-			if($a->getName() === $name){
-				return clone $a;
-			}
-		}
-
-		return null;
-	}
-
-	private function __construct($id, $name, $minValue, $maxValue, $defaultValue, $shouldSend = false){
-		$this->id = (int) $id;
-		$this->name = (string) $name;
+	protected function __construct($id, $name, $minValue, $maxValue, $defaultValue, $shouldSend = false){
+		parent::__construct((int) $id, (string) $name);
 		$this->minValue = (float) $minValue;
 		$this->maxValue = (float) $maxValue;
 		$this->defaultValue = (float) $defaultValue;
-		$this->shouldSend = (float) $shouldSend;
+		$this->shouldSend = (bool) $shouldSend;
 
 		$this->currentValue = $this->defaultValue;
 	}
@@ -148,25 +104,34 @@ class Attribute{
 	}
 
 	public function setValue($value){
-		if($value > $this->getMaxValue() or $value < $this->getMinValue()){
-			throw new \InvalidArgumentException("Value $value exceeds the range!");
-		}
+		$value = max($this->minValue, min($this->maxValue, $value));
 
 		$this->currentValue = $value;
 
 		return $this;
 	}
 
-	public function getName(){
-		return $this->name;
-	}
-
-	public function getId(){
-		return $this->id;
-	}
-
 	public function isSyncable(){
 		return $this->shouldSend;
 	}
 
+	/**
+	 * @param Player        $subject
+	 * @param Player[]|null $recipients
+	 */
+	public function send(Player $subject, $recipients = null){
+		$pk = new UpdateAttributesPacket;
+		$pk->entityId = $subject->getId();
+		$pk->entries = [$this];
+		foreach($recipients === null ? [$subject] : $recipients as $recipient){
+			if($recipient === $subject){
+				$packet = clone $pk;
+				$packet->entityId = 0;
+				$packet->isEncoded = false;
+				$recipient->dataPacket($packet);
+			}else{
+				$recipient->dataPacket($pk);
+			}
+		}
+	}
 }

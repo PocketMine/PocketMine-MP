@@ -24,6 +24,7 @@ namespace pocketmine;
 use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Arrow;
+use pocketmine\entity\Attribute;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
 use pocketmine\entity\Human;
@@ -150,6 +151,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 	const SURVIVAL_SLOTS = 36;
 	const CREATIVE_SLOTS = 112;
+	const HUNGER_TICK_RATIO = 100000;
 
 	/** @var SourceInterface */
 	protected $interface;
@@ -238,12 +240,19 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 	protected $allowFlight = false;
 
+	protected $hungerTicks = 0;
+	protected $saturationTicks = 0;
+	protected $starveTicks = 0;
+
 	private $needACK = [];
 
 	private $batchedPackets = [];
 
 	/** @var PermissibleBase */
 	private $perm = null;
+
+	/** @var Attribute[] */
+	private $attributes = [];
 
 	public function getLeaveMessage(){
 		return new TranslationContainer(TextFormat::YELLOW . "%multiplayer.player.left", [
@@ -1527,6 +1536,32 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 					++$this->inAirTicks;
 				}
 			}
+
+			if($this->isSurvival()){
+				if($this->speed->x > 0 or $this->speed->z > 0){
+					$this->incrementHungerTicks($this->isSprinting() ? 500 : 200);
+				}
+			}
+			if($this->getFood() <= 0){
+				$this->starveTicks++;
+				if($this->starveTicks > 20){
+					$this->starveTicks = 0;
+					$this->attack(1, new EntityDamageEvent($this, EntityDamageEvent::CAUSE_STARVATION, 1));
+				}
+			}else{
+				$this->starveTicks = 0;
+			}
+			if($this->getFood() >= 18){
+				if($this->getHealth() === $this->getMaxHealth()){
+					$this->saturationTicks = 0;
+				}else{
+					$this->saturationTicks++;
+					if($this->saturationTicks > 80){
+						$this->saturationTicks = 0;
+						$this->heal(1, new EntityRegainHealthEvent($this, 1, EntityRegainHealthEvent::CAUSE_EATING));
+					}
+				}
+			}
 		}
 
 		$this->checkTeleportPosition();
@@ -1534,6 +1569,15 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$this->timings->stopTiming();
 
 		return true;
+	}
+
+	public function incrementHungerTicks($ticks){
+		$this->hungerTicks += $ticks;
+		// while will act like if for most cases, so this code is comparatively more efficient
+		while($this->hungerTicks > self::HUNGER_TICK_RATIO){
+			$this->hungerTicks -= self::HUNGER_TICK_RATIO;
+			$this->setFood($this->getFood() - 1);
+		}
 	}
 
 	public function checkNetwork(){
@@ -1668,6 +1712,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		parent::__construct($this->level->getChunk($nbt["Pos"][0] >> 4, $nbt["Pos"][2] >> 4, true), $nbt);
 		$this->loggedIn = true;
 		$this->server->addOnlinePlayer($this);
+		$this->attributes = self::getDefaultAttributes();
 
 		$this->server->getPluginManager()->callEvent($ev = new PlayerLoginEvent($this, "Plugin reason"));
 		if($ev->isCancelled()){
@@ -1675,6 +1720,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 			return;
 		}
+		$this->attributes[Attribute::HEALTH]->setMaxValue($this->getMaxHealth())->setValue($this->getHealth());
 
 		if($this->isCreative()){
 			$this->inventory->setHeldItemSlot(0);
@@ -3076,6 +3122,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 	/**
 	 * Handles player data saving
+	 *
+	 * @param bool $async
 	 */
 	public function save($async = false){
 		if($this->closed){
@@ -3261,10 +3309,21 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	public function setHealth($amount){
 		parent::setHealth($amount);
 		if($this->spawned === true){
-			$pk = new SetHealthPacket();
-			$pk->health = $this->getHealth();
-			$this->dataPacket($pk);
+			$this->attributes[Attribute::HEALTH]->setValue($this->getHealth())->send($this);
 		}
+	}
+
+	public function setMaxHealth($amount){
+		parent::setMaxHealth($amount);
+		$this->attributes[Attribute::HEALTH]->setMaxValue($this->getMaxHealth())->setValue($this->getHealth())->send($this);
+	}
+
+	public function getFood(){
+		return $this->attributes[Attribute::HUNGER]->getValue();
+	}
+
+	public function setFood($amount){
+		$this->attributes[Attribute::HUNGER]->setValue($amount)->send($this);
 	}
 
 	public function attack($damage, EntityDamageEvent $source){
@@ -3532,9 +3591,11 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	}
 
 	/**
-	 * @param $chunkX
-	 * @param $chunkZ
-	 * @param $payload
+	 * @param     $chunkX
+	 * @param     $chunkZ
+	 * @param     $payload
+	 *
+	 * @param int $ordering
 	 *
 	 * @return DataPacket
 	 */
@@ -3554,4 +3615,15 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		return $batch;
 	}
 
+	/**
+	 * @return Attribute[]
+	 */
+	private static function getDefaultAttributes(){
+		return [
+			Attribute::get(Attribute::HEALTH),
+			Attribute::get(Attribute::HUNGER),
+			Attribute::get(Attribute::EXPERIENCE),
+			Attribute::get(Attribute::EXPERIENCE_LEVEL),
+		];
+	}
 }
