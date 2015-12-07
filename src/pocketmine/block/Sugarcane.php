@@ -78,7 +78,11 @@ class Sugarcane extends Flowable{
 			$down = $this->getSide(0);
 			if($down->isTransparent() === true and $down->getId() !== self::SUGARCANE_BLOCK){
 				$this->getLevel()->useBreakOn($this);
-
+				$ycane=$this->y+1;
+				while($this->getSide(1, $ycane) === self::SUGARCANE_BLOCK){
+					$this->getLevel()->useBreakOn($this->getSide(1, $ycane));
+					$ycane++;
+				}
 				return Level::BLOCK_UPDATE_NORMAL;
 			}
 		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
@@ -87,6 +91,7 @@ class Sugarcane extends Flowable{
 					for($y = 1; $y < 3; ++$y){
 						$b = $this->getLevel()->getBlock(new Vector3($this->x, $this->y + $y, $this->z));
 						if($b->getId() === self::AIR){
+							Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($b, new Sugarcane()));
 							$this->getLevel()->setBlock($b, new Sugarcane(), true);
 							break;
 						}
