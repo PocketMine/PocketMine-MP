@@ -35,7 +35,7 @@ abstract class ModelledEnum{
 		self::$pool[$entry->getId()] = $entry;
 	}
 	public static function get($id){
-		return isset(self::$pool[$id]) ? self::$pool[$id] : null;
+		return isset(self::$pool[$id]) ? clone self::$pool[$id] : null;
 	}
 
 	public static function getByName($name){
