@@ -274,7 +274,7 @@ namespace pocketmine {
 		}
 
 		$parsed = date_parse($offset);
-		$offset = $parsed['hour'] * 3600 + $parsed['minute'] * 60 + $parsed['second'];
+		$offset = $parsed['hour'] / 3600 + $parsed['minute'] / 60 + $parsed['second'];
 
 		//After date_parse is done, put the sign back
 		if($negative_offset == true){
