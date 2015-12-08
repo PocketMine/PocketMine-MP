@@ -21,41 +21,92 @@
 
 namespace pocketmine\entity;
 
-use pocketmine\network\protocol\UpdateAttributesPacket;
-use pocketmine\Player;
-use pocketmine\utils\ModelledEnum;
+class Attribute{
 
-class Attribute extends ModelledEnum{
+	const ABSORPTION = 0;
+	const SATURATION = 1;
+	const EXHAUSTION = 2;
+	const KNOCKBACK_RESISTANCE = 3;
+	const HEALTH = 4;
+	const MOVEMENT_SPEED = 5;
+	const FOLLOW_RANGE = 6;
+	const HUNGER = 7;
+	const ATTACK_DAMAGE = 8;
+	const EXPERIENCE_LEVEL = 9;
+	const EXPERIENCE = 10;
 
-	const HEALTH = 0;
-	const MAX_HEALTH = 0;
-
-	const HUNGER = 1;
-	const MAX_HUNGER = 1;
-
-	const EXPERIENCE = 2;
-	const EXPERIENCE_LEVEL = 3;
-
+	private $id;
 	protected $minValue;
 	protected $maxValue;
 	protected $defaultValue;
 	protected $currentValue;
-	protected $shouldSend;
+	protected $name;
+
+	/** @var Attribute[] */
+	protected static $attributes = [];
 
 	public static function init(){
-
-		self::addEnumEntry(new Attribute(self::HEALTH, "generic.health", 0, 0x7fffffff, 20, true));
-		self::addEnumEntry(new Attribute(self::HUNGER, "player.hunger", 0, 20, 20, true));
-		self::addEnumEntry(new Attribute(self::EXPERIENCE, "player.experience", 0, 1, 0, true));
-		self::addEnumEntry(new Attribute(self::EXPERIENCE_LEVEL, "player.level", 0, 24791, 0, true));
+		self::addAttribute(self::ABSORPTION, "generic.absorption", 0.00, 340282346638528859811704183484516925440.00, 0.00);
+		self::addAttribute(self::SATURATION, "player.saturation", 0.00, 20.00, 5.00);
+		self::addAttribute(self::EXHAUSTION, "player.exhaustion", 0.00, 5.00, 0.41);
+		self::addAttribute(self::KNOCKBACK_RESISTANCE, "generic.knockbackResistance", 0.00, 1.00, 0.00);
+		self::addAttribute(self::HEALTH, "generic.health", 0.00, 20.00, 20.00);
+		self::addAttribute(self::MOVEMENT_SPEED, "generic.movementSpeed", 0.00, 340282346638528859811704183484516925440.00, 0.10);
+		self::addAttribute(self::FOLLOW_RANGE, "generic.followRange", 0.00, 2048.00, 16.00);
+		self::addAttribute(self::HUNGER, "player.hunger", 0.00, 20.00, 20.00);
+		self::addAttribute(self::ATTACK_DAMAGE, "generic.attackDamage", 0.00, 340282346638528859811704183484516925440.00, 1.00);
+		self::addAttribute(self::EXPERIENCE_LEVEL, "player.level", 0.00, 24791.00, 0.00);
+		self::addAttribute(self::EXPERIENCE, "player.experience", 0.00, 1.00, 0.00);
 	}
 
-	protected function __construct($id, $name, $minValue, $maxValue, $defaultValue, $shouldSend = false){
-		parent::__construct((int) $id, (string) $name);
+	/**
+	 * @param int    $id
+	 * @param string $name
+	 * @param float  $minValue
+	 * @param float  $maxValue
+	 * @param float  $defaultValue
+	 * @param bool   $shouldSend
+	 *
+	 * @return Attribute
+	 */
+	public static function addAttribute($id, $name, $minValue, $maxValue, $defaultValue){
+		if($minValue > $maxValue or $defaultValue > $maxValue or $defaultValue < $minValue){
+			throw new \InvalidArgumentException("Invalid ranges: min value: $minValue, max value: $maxValue, $defaultValue: $defaultValue");
+		}
+
+		return self::$attributes[(int) $id] = new Attribute($id, $name, $minValue, $maxValue, $defaultValue);
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return null|Attribute
+	 */
+	public static function getAttribute($id){
+		return isset(self::$attributes[$id]) ? clone self::$attributes[$id] : null;
+	}
+
+	/**
+	 * @param $name
+	 *
+	 * @return null|Attribute
+	 */
+	public static function getAttributeByName($name){
+		foreach(self::$attributes as $a){
+			if($a->getName() === $name){
+				return clone $a;
+			}
+		}
+
+		return null;
+	}
+
+	private function __construct($id, $name, $minValue, $maxValue, $defaultValue){
+		$this->id = (int) $id;
+		$this->name = (string) $name;
 		$this->minValue = (float) $minValue;
 		$this->maxValue = (float) $maxValue;
 		$this->defaultValue = (float) $defaultValue;
-		$this->shouldSend = (bool) $shouldSend;
 
 		$this->currentValue = $this->defaultValue;
 	}
@@ -104,34 +155,20 @@ class Attribute extends ModelledEnum{
 	}
 
 	public function setValue($value){
-		$value = max($this->minValue, min($this->maxValue, $value));
+		if($value > $this->getMaxValue() or $value < $this->getMinValue()){
+			throw new \InvalidArgumentException("Value $value exceeds the range!");
+		}
 
 		$this->currentValue = $value;
 
 		return $this;
 	}
 
-	public function isSyncable(){
-		return $this->shouldSend;
+	public function getName(){
+		return $this->name;
 	}
 
-	/**
-	 * @param Player        $subject
-	 * @param Player[]|null $recipients
-	 */
-	public function send(Player $subject, $recipients = null){
-		$pk = new UpdateAttributesPacket;
-		$pk->entityId = $subject->getId();
-		$pk->entries = [$this];
-		foreach($recipients === null ? [$subject] : $recipients as $recipient){
-			if($recipient === $subject){
-				$packet = clone $pk;
-				$packet->entityId = 0;
-				$packet->isEncoded = false;
-				$recipient->dataPacket($packet);
-			}else{
-				$recipient->dataPacket($pk);
-			}
-		}
+	public function getId(){
+		return $this->id;
 	}
 }
