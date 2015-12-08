@@ -31,7 +31,7 @@ abstract class ModelledEnum{
 	/** @var string */
 	private $name;
 
-	protected static function addEnumEntry(static $entry){
+	protected static function addEnumEntry(ModelledEnum $entry){
 		self::$pool[$entry->getId()] = $entry;
 	}
 	public static function get($id){
