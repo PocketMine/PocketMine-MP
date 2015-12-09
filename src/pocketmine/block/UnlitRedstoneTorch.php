@@ -21,43 +21,11 @@
 
 namespace pocketmine\block;
 
-use pocketmine\item\Item;
-use pocketmine\item\Tool;
+class UnlitRedstoneTorch extends RedstoneTorch{
 
-class RedstoneBlock extends Solid implements RedstonePowerSource{
-
-	protected $id = self::REDSTONE_BLOCK;
-
-	public function __construct(){
-	}
-
-	public function getHardness(){
-		return 5;
-	}
-
-	public function getToolType(){
-		return Tool::TYPE_PICKAXE;
-	}
-
-	public function getName(){
-		return "Redstone Block";
-	}
-
-	public function getDrops(Item $item){
-		if($item->isPickaxe() >= Tool::TIER_WOODEN){
-			return [
-				[Item::REDSTONE_BLOCK, 0, 1],
-			];
-		}else{
-			return [];
-		}
-	}
+	protected $id = self::UNLIT_REDSTONE_TORCH;
 
 	public function getPowerLevel(){
-		return 16;
-	}
-
-	public function isStronglyPowering(Block $block){
-		return false;
+		return 0;
 	}
 }

@@ -21,6 +21,15 @@
 
 namespace pocketmine\block;
 
-interface RedstoneTransmitter extends RedstonePowerSource{
+interface RedstoneTransmitter extends RedstoneComponent{
+	public function getPowerLevel();
 
+	/**
+	 * Returns whether the transmitter is pointing towards $block.
+	 *
+	 * @param Block $block
+	 *
+	 * @return bool
+	 */
+	public function isPowering(Block $block);
 }

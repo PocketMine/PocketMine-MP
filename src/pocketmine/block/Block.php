@@ -25,8 +25,6 @@
 namespace pocketmine\block;
 
 use pocketmine\entity\Entity;
-
-
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
 use pocketmine\level\Level;
@@ -38,7 +36,6 @@ use pocketmine\metadata\Metadatable;
 use pocketmine\metadata\MetadataValue;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
-
 
 class Block extends Position implements Metadatable{
 	const AIR = 0;
@@ -76,7 +73,6 @@ class Block extends Position implements Metadatable{
 	const SANDSTONE = 24;
 
 	const BED_BLOCK = 26;
-
 
 	const COBWEB = 30;
 	const TALL_GRASS = 31;
@@ -136,6 +132,10 @@ class Block extends Position implements Metadatable{
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
 
+	const REDSTONE_TORCH = 76;
+	const LIT_REDSTONE_TORCH = 76;
+	const UNLIT_REDSTONE_TORCH = 75;
+
 	const SNOW = 78;
 	const SNOW_LAYER = 78;
 	const ICE = 79;
@@ -151,7 +151,6 @@ class Block extends Position implements Metadatable{
 	const SOUL_SAND = 88;
 	const GLOWSTONE = 89;
 	const GLOWSTONE_BLOCK = 89;
-
 
 	const LIT_PUMPKIN = 91;
 	const JACK_O_LANTERN = 91;
@@ -261,6 +260,11 @@ class Block extends Position implements Metadatable{
 	/** @var \SplFixedArray */
 	public static $fullList = null;
 
+	const POWER_STRONG = 3;
+	const POWER_WEAK = 2;
+	const POWER_TOUCHED = 1;
+	const POWER_NONE = 0;
+
 	/** @var \SplFixedArray */
 	public static $light = null;
 	/** @var \SplFixedArray */
@@ -299,7 +303,7 @@ class Block extends Position implements Metadatable{
 			"isSolid" => "isSolid",
 			"isFlowable" => "canBeFlowedInto",
 			"isActivable" => "canBeActivated",
-			"hasEntityCollision" => "hasEntityCollision"
+			"hasEntityCollision" => "hasEntityCollision",
 		];
 		return isset($map[$key]) ? $this->{$map[$key]}() : null;
 	}
@@ -360,7 +364,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::MONSTER_SPAWNER] = MonsterSpawner::class;
 			self::$list[self::WOOD_STAIRS] = WoodStairs::class;
 			self::$list[self::CHEST] = Chest::class;
-			self::$list[self::REDSTONE_DUST] = RedstoneDustSource::class;
+			self::$list[self::REDSTONE_DUST] = RedstoneDust::class;
 			self::$list[self::DIAMOND_ORE] = DiamondOre::class;
 			self::$list[self::DIAMOND_BLOCK] = Diamond::class;
 			self::$list[self::WORKBENCH] = Workbench::class;
@@ -432,7 +436,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::POTATO_BLOCK] = Potato::class;
 			self::$list[self::ANVIL] = Anvil::class;
 
-			self::$list[self::REDSTONE_BLOCK] = RedstoneBlockSource::class;
+			self::$list[self::REDSTONE_BLOCK] = RedstoneBlock::class;
 
 			self::$list[self::QUARTZ_BLOCK] = Quartz::class;
 			self::$list[self::QUARTZ_STAIRS] = QuartzStairs::class;
@@ -588,7 +592,11 @@ class Block extends Position implements Metadatable{
 	 * @return void
 	 */
 	public function onUpdate($type){
-
+		if($type === Level::BLOCK_UPDATE_NORMAL){
+			if($this instanceof Attaching and $this->getSide($this->getAttachSide())->getId() === Item::AIR){
+				$this->getLevel()->useBreakOn($this);
+			}
+		}
 	}
 
 	/**
@@ -708,7 +716,6 @@ class Block extends Position implements Metadatable{
 	}
 
 	public function addVelocityToEntity(Entity $entity, Vector3 $vector){
-
 	}
 
 	/**
@@ -821,10 +828,35 @@ class Block extends Position implements Metadatable{
 		return Block::get(Item::AIR, 0, Position::fromObject(Vector3::getSide($side, $step)));
 	}
 
+	public function getPowerType(){
+		for($side = 0; $side < 6; $side++){
+			$block = $this->getSide($side);
+			if($block instanceof RedstonePowerSource){
+				if($block->getPowerLevel() === 0){
+					continue;
+				}
+				if($block->isStronglyPowering($this)){
+					return self::POWER_STRONG;
+				}
+				$powered = true;
+			}elseif($block instanceof RedstoneTransmitter){
+				if($block->getPowerLevel() === 0){
+					continue;
+				}
+				if($block->isPowering($this)){
+					return self::POWER_WEAK;
+				}
+				$powered = true;
+			}
+		}
+		return isset($powered) ? self::POWER_TOUCHED : self::POWER_NONE;
+	}
+
 	/**
 	 * @return string
 	 */
-	public function __toString(){
+	public
+	function __toString(){
 		return "Block[" . $this->getName() . "] (" . $this->getId() . ":" . $this->getDamage() . ")";
 	}
 
@@ -835,7 +867,8 @@ class Block extends Position implements Metadatable{
 	 *
 	 * @return bool
 	 */
-	public function collidesWithBB(AxisAlignedBB $bb){
+	public
+	function collidesWithBB(AxisAlignedBB $bb){
 		$bb2 = $this->getBoundingBox();
 
 		return $bb2 !== null and $bb->intersectsWith($bb2);
@@ -844,14 +877,15 @@ class Block extends Position implements Metadatable{
 	/**
 	 * @param Entity $entity
 	 */
-	public function onEntityCollide(Entity $entity){
-
+	public
+	function onEntityCollide(Entity $entity){
 	}
 
 	/**
 	 * @return AxisAlignedBB
 	 */
-	public function getBoundingBox(){
+	public
+	function getBoundingBox(){
 		if($this->boundingBox === null){
 			$this->boundingBox = $this->recalculateBoundingBox();
 		}
@@ -861,7 +895,8 @@ class Block extends Position implements Metadatable{
 	/**
 	 * @return AxisAlignedBB
 	 */
-	protected function recalculateBoundingBox(){
+	protected
+	function recalculateBoundingBox(){
 		return new AxisAlignedBB(
 			$this->x,
 			$this->y,
@@ -878,7 +913,8 @@ class Block extends Position implements Metadatable{
 	 *
 	 * @return MovingObjectPosition
 	 */
-	public function calculateIntercept(Vector3 $pos1, Vector3 $pos2){
+	public
+	function calculateIntercept(Vector3 $pos1, Vector3 $pos2){
 		$bb = $this->getBoundingBox();
 		if($bb === null){
 			return null;
@@ -960,13 +996,15 @@ class Block extends Position implements Metadatable{
 		return MovingObjectPosition::fromBlock($this->x, $this->y, $this->z, $f, $vector->add($this->x, $this->y, $this->z));
 	}
 
-	public function setMetadata($metadataKey, MetadataValue $metadataValue){
+	public
+	function setMetadata($metadataKey, MetadataValue $metadataValue){
 		if($this->getLevel() instanceof Level){
 			$this->getLevel()->getBlockMetadata()->setMetadata($this, $metadataKey, $metadataValue);
 		}
 	}
 
-	public function getMetadata($metadataKey){
+	public
+	function getMetadata($metadataKey){
 		if($this->getLevel() instanceof Level){
 			return $this->getLevel()->getBlockMetadata()->getMetadata($this, $metadataKey);
 		}
@@ -974,13 +1012,15 @@ class Block extends Position implements Metadatable{
 		return null;
 	}
 
-	public function hasMetadata($metadataKey){
+	public
+	function hasMetadata($metadataKey){
 		if($this->getLevel() instanceof Level){
 			$this->getLevel()->getBlockMetadata()->hasMetadata($this, $metadataKey);
 		}
 	}
 
-	public function removeMetadata($metadataKey, Plugin $plugin){
+	public
+	function removeMetadata($metadataKey, Plugin $plugin){
 		if($this->getLevel() instanceof Level){
 			$this->getLevel()->getBlockMetadata()->removeMetadata($this, $metadataKey, $plugin);
 		}

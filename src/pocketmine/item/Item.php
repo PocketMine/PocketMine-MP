@@ -34,12 +34,12 @@ use pocketmine\entity\Zombie;
 use pocketmine\inventory\Fuel;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\level\Level;
+use pocketmine\nbt\NBT;
+use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Short;
 use pocketmine\nbt\tag\String;
 use pocketmine\Player;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\NBT;
 
 class Item{
 
@@ -47,6 +47,7 @@ class Item{
 
 	/**
 	 * @param $tag
+	 *
 	 * @return Compound
 	 */
 	private static function parseCompoundTag($tag){
@@ -60,6 +61,7 @@ class Item{
 
 	/**
 	 * @param Compound $tag
+	 *
 	 * @return string
 	 */
 	private static function writeCompoundTag(Compound $tag){
@@ -107,7 +109,6 @@ class Item{
 	const SANDSTONE = 24;
 
 	const BED_BLOCK = 26;
-
 
 	const COBWEB = 30;
 	const TALL_GRASS = 31;
@@ -166,6 +167,7 @@ class Item{
 	const REDSTONE_ORE = 73;
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
+	const REDSTONE_TORCH = 75;
 
 	const SNOW = 78;
 	const SNOW_LAYER = 78;
@@ -182,7 +184,6 @@ class Item{
 	const SOUL_SAND = 88;
 	const GLOWSTONE = 89;
 	const GLOWSTONE_BLOCK = 89;
-
 
 	const LIT_PUMPKIN = 91;
 	const JACK_O_LANTERN = 91;
@@ -284,7 +285,6 @@ class Item{
 	const BEETROOT_BLOCK = 244;
 	const STONECUTTER = 245;
 	const GLOWING_OBSIDIAN = 246;
-
 
 	//Normal Item IDs
 
@@ -398,9 +398,7 @@ class Item{
 	const CAKE = 354;
 	const BED = 355;
 
-
 	const COOKIE = 357;
-
 
 	const SHEARS = 359;
 	const MELON = 360;
@@ -439,7 +437,6 @@ class Item{
 	const BEETROOT_SEEDS = 458;
 	const BEETROOT_SEED = 458;
 	const BEETROOT_SOUP = 459;
-
 
 	/** @var \SplFixedArray */
 	public static $list = null;
@@ -843,6 +840,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::BUCKET, 10));
 		self::addCreativeItem(Item::get(Item::TNT, 0));
 		self::addCreativeItem(Item::get(Item::REDSTONE, 0));
+		self::addCreativeItem(Item::get(Item::REDSTONE_TORCH, 0));
 		self::addCreativeItem(Item::get(Item::BOW, 0));
 		// TODO: fishing rod
 		self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
@@ -1061,6 +1059,7 @@ class Item{
 
 	/**
 	 * @param $index
+	 *
 	 * @return Item
 	 */
 	public static function getCreativeItem($index){
@@ -1069,6 +1068,7 @@ class Item{
 
 	/**
 	 * @param Item $item
+	 *
 	 * @return int
 	 */
 	public static function getCreativeItemIndex(Item $item){
@@ -1232,6 +1232,7 @@ class Item{
 
 	/**
 	 * @param $id
+	 *
 	 * @return Enchantment|null
 	 */
 	public function getEnchantment($id){
@@ -1271,7 +1272,7 @@ class Item{
 			if($entry["id"] === $ench->getId()){
 				$tag->ench->{$k} = new Compound("", [
 					"id" => new Short("id", $ench->getId()),
-					"lvl" => new Short("lvl", $ench->getLevel())
+					"lvl" => new Short("lvl", $ench->getLevel()),
 				]);
 				$found = true;
 				break;
@@ -1281,7 +1282,7 @@ class Item{
 		if(!$found){
 			$tag->ench->{count($tag->ench) + 1} = new Compound("", [
 				"id" => new Short("id", $ench->getId()),
-				"lvl" => new Short("lvl", $ench->getLevel())
+				"lvl" => new Short("lvl", $ench->getLevel()),
 			]);
 		}
 
@@ -1354,7 +1355,7 @@ class Item{
 			$tag->display->Name = new String("Name", $name);
 		}else{
 			$tag->display = new Compound("display", [
-				"Name" => new String("Name", $name)
+				"Name" => new String("Name", $name),
 			]);
 		}
 
@@ -1511,7 +1512,7 @@ class Item{
 	}
 
 	final public function __toString(){
-		return "Item " . $this->name . " (" . $this->id . ":" . ($this->meta === null ? "?" : $this->meta) . ")x" . $this->count . ($this->hasCompoundTag() ? " tags:0x".bin2hex($this->getCompoundTag()) : "");
+		return "Item " . $this->name . " (" . $this->id . ":" . ($this->meta === null ? "?" : $this->meta) . ")x" . $this->count . ($this->hasCompoundTag() ? " tags:0x" . bin2hex($this->getCompoundTag()) : "");
 	}
 
 	public function getDestroySpeed(Block $block, Player $player){

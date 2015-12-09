@@ -21,12 +21,20 @@
 
 namespace pocketmine\block;
 
-interface RedstonePowerSource{
-
+interface RedstonePowerSource extends RedstoneComponent{
 	/**
 	 * Returns an integer between 0 and 15 (inclusive), indicating the power level of this redstone power component.
 	 *
 	 * @return int
 	 */
 	public function getPowerLevel();
+
+	/**
+	 * Returns whether this block is providing strong power to $block.
+	 *
+	 * @param Block $block
+	 *
+	 * @return bool
+	 */
+	public function isStronglyPowering(Block $block);
 }
