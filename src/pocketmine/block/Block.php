@@ -74,7 +74,6 @@ class Block extends Position implements Metadatable{
 
 	const BED_BLOCK = 26;
 
-
 	const COBWEB = 30;
 	const TALL_GRASS = 31;
 	const BUSH = 32;
@@ -127,15 +126,18 @@ class Block extends Position implements Metadatable{
 	const COBBLESTONE_STAIRS = 67;
 	const WALL_SIGN = 68;
 
+	const LEVER = 69;
+
 	const IRON_DOOR_BLOCK = 71;
 
 	const REDSTONE_ORE = 73;
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
 
+	const UNLIT_REDSTONE_TORCH = 75;
 	const REDSTONE_TORCH = 76;
 	const LIT_REDSTONE_TORCH = 76;
-	const UNLIT_REDSTONE_TORCH = 75;
+	const STONE_BUTTON = 77;
 
 	const SNOW = 78;
 	const SNOW_LAYER = 78;
@@ -209,6 +211,7 @@ class Block extends Position implements Metadatable{
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
 
+	const WOODEN_BUTTON = 143;
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
 
@@ -382,9 +385,14 @@ class Block extends Position implements Metadatable{
 			self::$list[self::COBBLESTONE_STAIRS] = CobblestoneStairs::class;
 			self::$list[self::WALL_SIGN] = WallSign::class;
 
+			self::$list[self::LEVER] = Lever::class;
 			self::$list[self::IRON_DOOR_BLOCK] = IronDoor::class;
 			self::$list[self::REDSTONE_ORE] = RedstoneOre::class;
 			self::$list[self::GLOWING_REDSTONE_ORE] = GlowingRedstoneOre::class;
+
+			self::$list[self::UNLIT_REDSTONE_TORCH] = UnlitRedstoneTorch::class;
+			self::$list[self::REDSTONE_TORCH] = RedstoneTorch::class;
+			self::$list[self::STONE_BUTTON] = StoneButton::class;
 
 			self::$list[self::SNOW_LAYER] = SnowLayer::class;
 			self::$list[self::ICE] = Ice::class;
@@ -437,8 +445,9 @@ class Block extends Position implements Metadatable{
 			self::$list[self::FLOWER_POT_BLOCK] = FlowerPot::class;
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
-			self::$list[self::ANVIL] = Anvil::class;
 
+			self::$list[self::WOODEN_BUTTON] = WoodenButton::class;
+			self::$list[self::ANVIL] = Anvil::class;
 			self::$list[self::TRAPPED_CHEST] = TrappedChest::class;
 			self::$list[self::REDSTONE_BLOCK] = RedstoneBlock::class;
 
@@ -564,6 +573,9 @@ class Block extends Position implements Metadatable{
 	 * @return bool
 	 */
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+		if($this instanceof Attaching and !$this->canAttachTo($target)){
+			return false;
+		}
 		return $this->getLevel()->setBlock($this, $this, true, true);
 	}
 
@@ -598,7 +610,7 @@ class Block extends Position implements Metadatable{
 	 */
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this instanceof Attaching and $this->getSide($this->getAttachSide())->getId() === Item::AIR){
+			if($this instanceof Attaching and !$this->canAttachTo($this->getSide($this->getAttachSide()))){
 				$this->getLevel()->useBreakOn($this);
 			}
 		}
@@ -721,7 +733,6 @@ class Block extends Position implements Metadatable{
 	}
 
 	public function addVelocityToEntity(Entity $entity, Vector3 $vector){
-
 	}
 
 	/**
@@ -837,22 +848,24 @@ class Block extends Position implements Metadatable{
 	public function getPowerType(){
 		for($side = 0; $side < 6; $side++){
 			$block = $this->getSide($side);
-			if($block instanceof RedstonePowerSource){
-				if($block->getPowerLevel() === 0){
-					continue;
+			if($block instanceof RedstoneTransmitter){
+				if($block instanceof RedstonePowerSource){
+					if($block->getPowerLevel() === 0){
+						continue;
+					}
+					if($block->isStronglyPowering($this)){
+						return self::POWER_STRONG;
+					}
+					$powered = true;
+				}elseif($block instanceof RedstoneConnector){
+					if($block->getPowerLevel() === 0){
+						continue;
+					}
+					if($block->isPowering($this)){
+						return self::POWER_WEAK;
+					}
+					$powered = true;
 				}
-				if($block->isStronglyPowering($this)){
-					return self::POWER_STRONG;
-				}
-				$powered = true;
-			}elseif($block instanceof RedstoneTransmitter){
-				if($block->getPowerLevel() === 0){
-					continue;
-				}
-				if($block->isPowering($this)){
-					return self::POWER_WEAK;
-				}
-				$powered = true;
 			}
 		}
 		return isset($powered) ? self::POWER_TOUCHED : self::POWER_NONE;
@@ -882,7 +895,6 @@ class Block extends Position implements Metadatable{
 	 * @param Entity $entity
 	 */
 	public function onEntityCollide(Entity $entity){
-
 	}
 
 	/**

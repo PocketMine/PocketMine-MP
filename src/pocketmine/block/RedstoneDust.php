@@ -23,7 +23,7 @@ namespace pocketmine\block;
 
 use pocketmine\level\Level;
 
-class RedstoneDust extends Flowable implements RedstoneTransmitter, Attaching{
+class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 
 	protected $id = self::REDSTONE_DUST;
 
@@ -37,15 +37,19 @@ class RedstoneDust extends Flowable implements RedstoneTransmitter, Attaching{
 
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
+			$maxPower = 0;
 			for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
 				$block = $this->getSide($side);
-				if($block instanceof RedstonePowerSource and $block->getPowerLevel() > $this->getPowerLevel()){
-					$this->meta = $block->getPowerLevel() - 1;
-					$this->level->setBlock($this, $this);
-				}elseif($block->getPowerType() === Block::POWER_STRONG and $this->meta !== 0x0F){
-					$this->meta = 0x0F;
-					$this->level->setBlock($this, $this);
+				if($block instanceof RedstoneTransmitter){
+					$maxPower = max($maxPower, $block->getPowerLevel() - 1);
+				}elseif($block->getPowerType() === Block::POWER_STRONG){
+					$maxPower = 0x0F;
+					break;
 				}
+			}
+			if($maxPower !== $this->meta){
+				$this->meta = $maxPower;
+				$this->getLevel()->setBlock($this, $this);
 			}
 		}
 	}
@@ -59,7 +63,7 @@ class RedstoneDust extends Flowable implements RedstoneTransmitter, Attaching{
 	}
 
 	public function canAttachTo(Block $block){
-		return $block->isTransparent();
+		return !$block->isTransparent();
 	}
 
 	public function isPowering(Block $block){

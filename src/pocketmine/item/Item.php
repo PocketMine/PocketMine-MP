@@ -162,12 +162,15 @@ class Item{
 	const COBBLESTONE_STAIRS = 67;
 	const WALL_SIGN = 68;
 
+	const LEVER = 69;
 	const IRON_DOOR_BLOCK = 71;
 
 	const REDSTONE_ORE = 73;
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
-	const REDSTONE_TORCH = 75;
+	const UNLIT_REDSTONE_TORCH = 75;
+	const REDSTONE_TORCH = 76;
+	const STONE_BUTTON = 77;
 
 	const SNOW = 78;
 	const SNOW_LAYER = 78;
@@ -239,6 +242,7 @@ class Item{
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
 
+	const WOODEN_BUTTON = 143;
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
 
@@ -845,6 +849,9 @@ class Item{
 		self::addCreativeItem(Item::get(Item::TNT, 0));
 		self::addCreativeItem(Item::get(Item::REDSTONE, 0));
 		self::addCreativeItem(Item::get(Item::REDSTONE_TORCH, 0));
+		self::addCreativeItem(Item::get(Item::LEVER));
+		self::addCreativeItem(Item::get(Item::STONE_BUTTON));
+		self::addCreativeItem(Item::get(Item::WOODEN_BUTTON));
 		self::addCreativeItem(Item::get(Item::BOW, 0));
 		self::addCreativeItem(Item::get(Item::FISHING_ROD, 0));
 		self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));

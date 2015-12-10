@@ -21,9 +21,13 @@
 
 namespace pocketmine\block;
 
-/**
- * Represents a block that can provide an amount of power to an adjacent redstone dust
- */
-interface RedstoneTransmitter extends RedstoneComponent{
-	public function getPowerLevel();
+interface RedstoneConnector extends RedstoneTransmitter{
+	/**
+	 * Returns whether the transmitter is pointing towards $block.
+	 *
+	 * @param Block $block
+	 *
+	 * @return bool
+	 */
+	public function isPowering(Block $block);
 }
