@@ -21,6 +21,7 @@
 
 namespace pocketmine\block;
 
+use pocketmine\item\Item;
 use pocketmine\level\Level;
 
 class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
@@ -36,6 +37,7 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 	}
 
 	public function onUpdate($type){
+		parent::onUpdate($type);
 		if($type === Level::BLOCK_UPDATE_NORMAL){
 			$maxPower = 0;
 			for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
@@ -45,11 +47,24 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 				}elseif($block->getPowerType() === Block::POWER_STRONG){
 					$maxPower = 0x0F;
 					break;
+				}else{
+					if(!$block->isTransparent()){
+						$up = $block->getSide(self::SIDE_UP);
+						if($up instanceof RedstoneDust and $this->getSide(self::SIDE_UP)->isTransparent()){
+							$maxPower = max($maxPower, $up->getPowerLevel() - 1);
+						}
+					}else{
+						$down = $block->getSide(self::SIDE_DOWN);
+						if($down instanceof RedstoneDust){
+							$maxPower = max($maxPower, $down->getPowerLevel() - 1);
+						}
+					}
 				}
 			}
 			if($maxPower !== $this->meta){
 				$this->meta = $maxPower;
 				$this->getLevel()->setBlock($this, $this);
+
 			}
 		}
 	}
@@ -63,11 +78,17 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 	}
 
 	public function canAttachTo(Block $block){
-		return !$block->isTransparent();
+		return !$block->isTransparent() or $block instanceof Slab;
 	}
 
 	public function isPowering(Block $block){
 		// TODO: Implement isPowering() method.
 		return true;
+	}
+
+	public function getDrops(Item $item){
+		return [
+			[Item::REDSTONE, 0, 1]
+		];
 	}
 }
