@@ -30,6 +30,10 @@ use pocketmine\Player;
 class StoneButton extends Lever{
 	protected $id = self::STONE_BUTTON;
 
+	public function getName(){
+		return "Stone Button";
+	}
+
 	public function getAttachSide(){
 		return self::getOppositeSide($this->meta & 7);
 	}
@@ -57,6 +61,7 @@ class StoneButton extends Lever{
 			$this->getLevel()->updateAround($this->getSide($this->getAttachSide()));
 		}
 	}
+
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		if($target->isTransparent()){
 			return false;

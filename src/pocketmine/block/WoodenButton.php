@@ -24,6 +24,10 @@ namespace pocketmine\block;
 class WoodenButton extends StoneButton{
 	protected $id = self::WOODEN_BUTTON;
 
+	public function getName(){
+		return "Wooden Button";
+	}
+
 	protected function getDelay(){
 		return 30;
 	}

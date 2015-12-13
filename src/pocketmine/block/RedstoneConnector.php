@@ -21,7 +21,7 @@
 
 namespace pocketmine\block;
 
-interface RedstoneConnector extends RedstoneTransmitter{
+interface RedstoneConnector extends RedstoneConductor{
 	/**
 	 * Returns whether the transmitter is pointing towards $block.
 	 *

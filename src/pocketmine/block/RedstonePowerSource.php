@@ -21,7 +21,7 @@
 
 namespace pocketmine\block;
 
-interface RedstonePowerSource extends RedstoneTransmitter{
+interface RedstonePowerSource extends RedstoneConductor{
 	/**
 	 * Returns an integer between 0 and 15 (inclusive), indicating the power level of this redstone power component.
 	 *

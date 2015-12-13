@@ -193,6 +193,9 @@ class Block extends Position implements Metadatable{
 	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
 
+	const REDSTONE_LAMP = 123;
+	const LIT_REDSTONE_LAMP = 124;
+
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
 
@@ -266,9 +269,10 @@ class Block extends Position implements Metadatable{
 	/** @var \SplFixedArray */
 	public static $fullList = null;
 
-	const POWER_STRONG = 3;
-	const POWER_WEAK = 2;
-	const POWER_TOUCHED = 1;
+	const POWER_STRONG = 4;
+	const POWER_WEAK = 3;
+	const POWER_STRONG_TOUCHED = 2;
+	const POWER_WEAK_TOUCHED = 1;
 	const POWER_NONE = 0;
 
 	/** @var \SplFixedArray */
@@ -846,29 +850,39 @@ class Block extends Position implements Metadatable{
 	}
 
 	public function getPowerType(){
+		if($this instanceof RedstonePowerSource){
+			return $this->getPowerLevel();
+		}
+		$power = self::POWER_NONE;
 		for($side = 0; $side < 6; $side++){
 			$block = $this->getSide($side);
-			if($block instanceof RedstoneTransmitter){
-				if($block instanceof RedstonePowerSource){
-					if($block->getPowerLevel() === 0){
-						continue;
-					}
-					if($block->isStronglyPowering($this)){
-						return self::POWER_STRONG;
-					}
-					$powered = true;
-				}elseif($block instanceof RedstoneConnector){
-					if($block->getPowerLevel() === 0){
-						continue;
-					}
-					if($block->isPowering($this)){
-						return self::POWER_WEAK;
-					}
-					$powered = true;
+			if($block instanceof RedstonePowerSource){
+				if($block->getPowerLevel() === 0){
+					continue;
 				}
+				if($block->isStronglyPowering($this)){
+					return self::POWER_STRONG;
+				}
+				$power = self::POWER_STRONG_TOUCHED;
+			}elseif($block instanceof RedstoneConnector){
+				if($block->getPowerLevel() === 0){
+					continue;
+				}
+				if($block->isPowering($this)){
+					return self::POWER_WEAK;
+				}
+				$power = max($power, self::POWER_WEAK_TOUCHED);
 			}
 		}
-		return isset($powered) ? self::POWER_TOUCHED : self::POWER_NONE;
+		return $power;
+	}
+
+	public function isRedstoneActivated(){
+		for($i = 0; $i <= 5; $i++){
+			if($this->getSide($i)->getPowerType() >= self::POWER_WEAK){
+				return true;
+			}
+		}
 	}
 
 	/**

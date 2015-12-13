@@ -34,6 +34,10 @@ class Lever extends Flowable implements RedstonePowerSource, Attaching{
 		$this->meta = $meta;
 	}
 
+	public function getName(){
+		return "Lever";
+	}
+
 	public function getPowerLevel(){
 		return $this->isActivated() ? 16 : 0;
 	}

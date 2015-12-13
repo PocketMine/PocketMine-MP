@@ -40,22 +40,22 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 		parent::onUpdate($type);
 		if($type === Level::BLOCK_UPDATE_NORMAL){
 			$maxPower = 0;
-			for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
+			for($side = 0; $side <= 5; $side++){
 				$block = $this->getSide($side);
-				if($block instanceof RedstoneTransmitter){
-					$maxPower = max($maxPower, $block->getPowerLevel() - 1);
+				if($block instanceof RedstoneConductor){
+					$maxPower = max($maxPower, $block->getPowerLevel() - 1); // pass current from adjacent redstone conductor with voltage decrease
 				}elseif($block->getPowerType() === Block::POWER_STRONG){
-					$maxPower = 0x0F;
+					$maxPower = 0x0F; // [wire] [block] [attached power source]
 					break;
-				}else{
-					if(!$block->isTransparent()){
+				}else{ // check for XY/ZY-diagonal current sources
+					if(!$block->isTransparent()){ // check for possible downward delivery
 						$up = $block->getSide(self::SIDE_UP);
-						if($up instanceof RedstoneDust and $this->getSide(self::SIDE_UP)->isTransparent()){
+						if($up instanceof RedstoneDust and $this->getSide(self::SIDE_UP)->isTransparent()){ // not blocked by opaque block like "tripping the knight's leg" in Chinese Chess
 							$maxPower = max($maxPower, $up->getPowerLevel() - 1);
 						}
-					}else{
+					}else{ // if the adjacent block is transparent, i.e. upward delivery is possible
 						$down = $block->getSide(self::SIDE_DOWN);
-						if($down instanceof RedstoneDust){
+						if($down instanceof RedstoneDust){ // upward delivery
 							$maxPower = max($maxPower, $down->getPowerLevel() - 1);
 						}
 					}
@@ -64,7 +64,6 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 			if($maxPower !== $this->meta){
 				$this->meta = $maxPower;
 				$this->getLevel()->setBlock($this, $this);
-
 			}
 		}
 	}
@@ -82,7 +81,26 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 	}
 
 	public function isPowering(Block $block){
-		// TODO: Implement isPowering() method.
+		if($block->x - $this->x === 1){
+			$blockSide = self::SIDE_EAST;
+		}elseif($this->x - $block->x === 1){
+			$blockSide = self::SIDE_WEST;
+		}elseif($block->z - $this->z === 1){
+			$blockSide = self::SIDE_SOUTH;
+		}elseif($this->z - $block->z === 1){
+			$blockSide = self::SIDE_NORTH;
+		}else{
+			return false;
+		}
+		for($i = 2; $i <= 5; $i++){
+			$side = $this->getSide($i);
+			if($side instanceof RedstoneConductor){
+				if(($side & 4) !== ($blockSide & 4)){
+					return false;
+				}
+			}
+		}
+
 		return true;
 	}
 

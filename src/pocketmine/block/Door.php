@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\level\Level;
 use pocketmine\level\sound\DoorSound;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
@@ -284,5 +285,52 @@ abstract class Door extends Transparent implements Attaching{
 		}
 
 		return true;
+	}
+
+	public function onUpdate($type){
+		parent::onUpdate($type);
+		if($type === Level::BLOCK_UPDATE_NORMAL){
+			$damage = $this->getDamage();
+			$activating = $this->isRedstoneActivated();
+			if(($damage & 0x08) === 0x08){
+				$up = $this;
+				$upDamage = $damage;
+				$low = $this->getSide(self::SIDE_DOWN);
+				$lowDamage = $low->getDamage();
+			}else{
+				$up = $this->getSide(self::SIDE_UP);
+				$upDamage = $up->getDamage();
+				$low = $this;
+				$lowDamage = $damage;
+			}
+			$activated = ($upDamage & 0x02) === 0x02;
+			$open = ($lowDamage & 0x04) === 0x04;
+			$upChanged = false;
+			$lowChanged = false;
+			if(!$activated and $activating){
+				$upDamage |= 0x02;
+				$up->setDamage($upDamage);
+				$upChanged = true;
+				if(!$open){
+					$lowDamage |= 0x04;
+					$lowChanged = true;
+				}
+			}elseif($activated and !$activating){
+				$upDamage &= ~0x02;
+				$up->setDamage($upDamage);
+				$upChanged = true;
+				if($open){
+					$lowDamage &= ~0x04;
+					$lowChanged = true;
+				}
+			}
+			if($upChanged){
+				$this->getLevel()->setBlock($up, $up, false, true, true);
+			}
+			if($lowChanged){
+				$this->getLevel()->setBlock($low, $low, false, true, true);
+				$this->getLevel()->addSound(new DoorSound($low));
+			}
+		}
 	}
 }
