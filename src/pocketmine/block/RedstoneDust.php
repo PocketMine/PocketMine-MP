@@ -81,27 +81,15 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 	}
 
 	public function isPowering(Block $block){
-		if($block->x - $this->x === 1){
-			$blockSide = self::SIDE_EAST;
-		}elseif($this->x - $block->x === 1){
-			$blockSide = self::SIDE_WEST;
-		}elseif($block->z - $this->z === 1){
-			$blockSide = self::SIDE_SOUTH;
-		}elseif($this->z - $block->z === 1){
-			$blockSide = self::SIDE_NORTH;
-		}else{
-			return false;
-		}
 		for($i = 2; $i <= 5; $i++){
 			$side = $this->getSide($i);
 			if($side instanceof RedstoneConductor){
-				if(($side & 4) !== ($blockSide & 4)){
-					return false;
+				if($side == $block){
+					return true;
 				}
 			}
 		}
-
-		return true;
+		return false;
 	}
 
 	public function getDrops(Item $item){
