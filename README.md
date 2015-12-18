@@ -7,6 +7,9 @@
 * More Effects
 * Redstone
 * Nether
+* Rail & Powered Rail
+* Minecart (can't follow rails)
+* Boat
 * Potions (Brewing is not supported)
 * Splash Potions
 * Anvil
