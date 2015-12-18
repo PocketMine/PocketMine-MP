@@ -31,10 +31,6 @@ class Trapdoor extends Transparent{
 
 	protected $id = self::TRAPDOOR;
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
-
 	public function getName(){
 		return "Wooden Trapdoor";
 	}
