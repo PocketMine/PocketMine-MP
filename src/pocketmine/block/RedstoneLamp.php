@@ -29,6 +29,10 @@ class RedstoneLamp extends Solid implements RedstoneSensitiveAppliance{
 		return "Redstone Lamp";
 	}
 
+	public function getPowerLevel(){
+		return 0;
+	}
+
 	public function onUpdate($type){
 		parent::onUpdate($type);
 		if($type === Level::BLOCK_UPDATE_NORMAL){

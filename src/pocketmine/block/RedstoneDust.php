@@ -42,9 +42,9 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 			$maxPower = 0;
 			for($side = 0; $side <= 5; $side++){
 				$block = $this->getSide($side);
-				if($block instanceof RedstoneConductor){
+				if($block instanceof RedstoneConductor || $block instanceof RedstoneSensitiveAppliance){
 					$maxPower = max($maxPower, $block->getPowerLevel() - 1); // Pass decreased power from adjacent conductor
-				}elseif($block->getPowerType() === Block::POWER_STRONG){
+                }elseif($block->getPowerType() === Block::POWER_STRONG){
 					$maxPower = 0x0F; // When: [wire] [block] [attached power source]
 					break;
 				}else{ // Checks for XY/ZY-diagonal current sources
