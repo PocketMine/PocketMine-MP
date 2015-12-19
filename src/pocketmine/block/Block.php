@@ -883,6 +883,7 @@ class Block extends Position implements Metadatable{
 				return true;
 			}
 		}
+        return false;
 	}
 
 	/**

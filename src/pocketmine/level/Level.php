@@ -1042,6 +1042,11 @@ class Level implements ChunkManager, Metadatable{
 			$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
 		}
 	}
+
+    /**
+     * @param Vector3 $pos
+     * @param int $ticks
+     */
 	public function scheduleUpdateAround(Vector3 $pos, $ticks){
 		$pos = clone $pos;
 		$pos->x++;

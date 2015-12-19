@@ -25,8 +25,6 @@ use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
-#define $this->isActivated() (bool) ($this->meta & 0x08)
-
 class StoneButton extends Lever{
 	protected $id = self::STONE_BUTTON;
 

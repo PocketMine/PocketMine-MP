@@ -25,8 +25,6 @@ use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-#define $this->isActivated() (bool) ($this->meta & 0x08)
-
 class Lever extends Flowable implements RedstonePowerSource, Attaching{
 	protected $id = self::LEVER;
 

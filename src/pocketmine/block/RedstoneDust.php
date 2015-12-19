@@ -43,11 +43,11 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 			for($side = 0; $side <= 5; $side++){
 				$block = $this->getSide($side);
 				if($block instanceof RedstoneConductor){
-					$maxPower = max($maxPower, $block->getPowerLevel() - 1); // pass current from adjacent redstone conductor with voltage decrease
+					$maxPower = max($maxPower, $block->getPowerLevel() - 1); // Pass decreased power from adjacent conductor
 				}elseif($block->getPowerType() === Block::POWER_STRONG){
-					$maxPower = 0x0F; // [wire] [block] [attached power source]
+					$maxPower = 0x0F; // When: [wire] [block] [attached power source]
 					break;
-				}else{ // check for XY/ZY-diagonal current sources
+				}else{ // Checks for XY/ZY-diagonal current sources
 					if(!$block->isTransparent()){ // check for possible downward delivery
 						$up = $block->getSide(self::SIDE_UP);
 						if($up instanceof RedstoneDust and $this->getSide(self::SIDE_UP)->isTransparent()){ // not blocked by opaque block like "tripping the knight's leg" in Chinese Chess
@@ -81,7 +81,7 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 	}
 
 	public function isPowering(Block $block){
-		for($i = 2; $i <= 5; $i++){
+		for($i = self::SIDE_NORTH; $i <= self::SIDE_EAST; $i++){
 			$side = $this->getSide($i);
 			if($side instanceof RedstoneConductor){
 				if($side == $block){
