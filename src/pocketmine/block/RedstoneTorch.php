@@ -19,16 +19,28 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
 use pocketmine\level\Level;
-use pocketmine\Player;
 
-class Redstone extends Item{
-	public function __construct($meta = 0, $count = 1){
-		$this->block = Block::get(Block::REDSTONE_DUST);
-		parent::__construct(self::REDSTONE, $meta, $count, "Redstone");
+class RedstoneTorch extends Torch implements RedstonePowerSource{
+
+	protected $id = self::REDSTONE_TORCH;
+
+    public function onUpdate($type){
+        parent::onUpdate($type);
+        if($type === Level::BLOCK_UPDATE_POWER){
+            $class = $this->getSide($this->getAttachSide())->isRedstoneActivated() ? UnlitRedstoneTorch::class : RedstoneTorch::class;
+            $this->getLevel()->setBlock($this, new $class($this->getDamage()));
+            $this->getLevel()->updateAround($this);
+        }
+    }
+
+    public function getPowerLevel(){
+		return 16;
+	}
+
+	public function isStronglyPowering(Block $block){
+		return false;
 	}
 }
-

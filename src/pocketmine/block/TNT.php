@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -23,6 +23,7 @@ namespace pocketmine\block;
 
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
+use pocketmine\level\Level;
 use pocketmine\nbt\tag\Byte;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Double;
@@ -31,7 +32,7 @@ use pocketmine\nbt\tag\Float;
 use pocketmine\Player;
 use pocketmine\utils\Random;
 
-class TNT extends Solid{
+class TNT extends Solid implements RedstoneSensitiveAppliance{
 
 	protected $id = self::TNT;
 
@@ -54,32 +55,41 @@ class TNT extends Solid{
 	public function onActivate(Item $item, Player $player = null){
 		if($item->getId() === Item::FLINT_STEEL){
 			$item->useOn($this);
-			$this->getLevel()->setBlock($this, new Air(), true);
-
-			$mot = (new Random())->nextSignedFloat() * M_PI * 2;
-			$tnt = Entity::createEntity("PrimedTNT", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), new Compound("", [
-				"Pos" => new Enum("Pos", [
-					new Double("", $this->x + 0.5),
-					new Double("", $this->y),
-					new Double("", $this->z + 0.5)
-				]),
-				"Motion" => new Enum("Motion", [
-					new Double("", -sin($mot) * 0.02),
-					new Double("", 0.2),
-					new Double("", -cos($mot) * 0.02)
-				]),
-				"Rotation" => new Enum("Rotation", [
-					new Float("", 0),
-					new Float("", 0)
-				]),
-				"Fuse" => new Byte("Fuse", 80)
-			]));
-
-			$tnt->spawnToAll();
-
+			$this->ignite();
 			return true;
 		}
-
 		return false;
+	}
+
+	public function onUpdate($type){
+		parent::onUpdate($type);
+		if($type === Level::BLOCK_UPDATE_NORMAL and $this->isRedstoneActivated()){
+			$this->ignite();
+		}
+	}
+
+	public function ignite(){
+		$this->getLevel()->setBlock($this, new Air(), true);
+
+		$mot = (new Random())->nextSignedFloat() * M_PI * 2;
+		$tnt = Entity::createEntity("PrimedTNT", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), new Compound("", [
+			"Pos" => new Enum("Pos", [
+				new Double("", $this->x + 0.5),
+				new Double("", $this->y),
+				new Double("", $this->z + 0.5)
+			]),
+			"Motion" => new Enum("Motion", [
+				new Double("", -sin($mot) * 0.02),
+				new Double("", 0.2),
+				new Double("", -cos($mot) * 0.02)
+			]),
+			"Rotation" => new Enum("Rotation", [
+				new Float("", 0),
+				new Float("", 0)
+			]),
+			"Fuse" => new Byte("Fuse", 80)
+		]));
+
+		$tnt->spawnToAll();
 	}
 }

@@ -19,16 +19,13 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
-use pocketmine\level\Level;
-use pocketmine\Player;
+class UnlitRedstoneTorch extends RedstoneTorch{
 
-class Redstone extends Item{
-	public function __construct($meta = 0, $count = 1){
-		$this->block = Block::get(Block::REDSTONE_DUST);
-		parent::__construct(self::REDSTONE, $meta, $count, "Redstone");
+	protected $id = self::UNLIT_REDSTONE_TORCH;
+
+	public function getPowerLevel(){
+		return 0;
 	}
 }
-

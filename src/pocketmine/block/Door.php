@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -28,8 +28,8 @@ use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-
-abstract class Door extends Transparent{
+abstract class Door extends Transparent implements Attaching{
+	const META_UP = 0x08;
 
 	public function canBeActivated(){
 		return true;
@@ -203,19 +203,12 @@ abstract class Door extends Transparent{
 		return $bb;
 	}
 
-	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->getId() === self::AIR){ //Replace with common break method
-				$this->getLevel()->setBlock($this, new Air(), false);
-				if($this->getSide(1) instanceof Door){
-					$this->getLevel()->setBlock($this->getSide(1), new Air(), false);
-				}
+	public function getAttachSide(){
+		return self::SIDE_DOWN;
+	}
 
-				return Level::BLOCK_UPDATE_NORMAL;
-			}
-		}
-
-		return false;
+	public function canAttachTo(Block $block){
+		return !$block->canBeReplaced() and !$block->isTransparent();
 	}
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
@@ -234,7 +227,7 @@ abstract class Door extends Transparent{
 			];
 			$next = $this->getSide($face[(($direction + 2) % 4)]);
 			$next2 = $this->getSide($face[$direction]);
-			$metaUp = 0x08;
+			$metaUp = self::META_UP;
 			if($next->getId() === $this->getId() or ($next2->isTransparent() === false and $next->isTransparent() === true)){ //Door hinge
 				$metaUp |= 0x01;
 			}
@@ -292,5 +285,52 @@ abstract class Door extends Transparent{
 		}
 
 		return true;
+	}
+
+	public function onUpdate($type){
+		parent::onUpdate($type);
+		if($type === Level::BLOCK_UPDATE_NORMAL){
+			$damage = $this->getDamage();
+			$activating = $this->isRedstoneActivated();
+			if(($damage & 0x08) === 0x08){
+				$up = $this;
+				$upDamage = $damage;
+				$low = $this->getSide(self::SIDE_DOWN);
+				$lowDamage = $low->getDamage();
+			}else{
+				$up = $this->getSide(self::SIDE_UP);
+				$upDamage = $up->getDamage();
+				$low = $this;
+				$lowDamage = $damage;
+			}
+			$activated = ($upDamage & 0x02) === 0x02;
+			$open = ($lowDamage & 0x04) === 0x04;
+			$upChanged = false;
+			$lowChanged = false;
+			if(!$activated and $activating){
+				$upDamage |= 0x02;
+				$up->setDamage($upDamage);
+				$upChanged = true;
+				if(!$open){
+					$lowDamage |= 0x04;
+					$lowChanged = true;
+				}
+			}elseif($activated and !$activating){
+				$upDamage &= ~0x02;
+				$up->setDamage($upDamage);
+				$upChanged = true;
+				if($open){
+					$lowDamage &= ~0x04;
+					$lowChanged = true;
+				}
+			}
+			if($upChanged){
+				$this->getLevel()->setBlock($up, $up, false, true, true);
+			}
+			if($lowChanged){
+				$this->getLevel()->setBlock($low, $low, false, true, true);
+				$this->getLevel()->addSound(new DoorSound($low));
+			}
+		}
 	}
 }
