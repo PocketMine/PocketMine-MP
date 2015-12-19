@@ -224,6 +224,9 @@ class Item{
 	const END_PORTAL = 120;
 	const END_STONE = 121;
 
+	const REDSTONE_LAMP = 123;
+    const LIT_REDSTONE_LAMP = 124;
+
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
 
@@ -847,11 +850,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::BUCKET, 8));
 		self::addCreativeItem(Item::get(Item::BUCKET, 10));
 		self::addCreativeItem(Item::get(Item::TNT, 0));
-		self::addCreativeItem(Item::get(Item::REDSTONE, 0));
-		self::addCreativeItem(Item::get(Item::REDSTONE_TORCH, 0));
-		self::addCreativeItem(Item::get(Item::LEVER));
-		self::addCreativeItem(Item::get(Item::STONE_BUTTON));
-		self::addCreativeItem(Item::get(Item::WOODEN_BUTTON));
+        self::addCreativeItem(Item::get(Item::REDSTONE, 0));
 		self::addCreativeItem(Item::get(Item::BOW, 0));
 		self::addCreativeItem(Item::get(Item::FISHING_ROD, 0));
 		self::addCreativeItem(Item::get(Item::FLINT_AND_STEEL, 0));
@@ -933,15 +932,15 @@ class Item{
 		self::addCreativeItem(Item::get(Item::GOLD_CHESTPLATE, 0));
 		self::addCreativeItem(Item::get(Item::GOLD_LEGGINGS, 0));
 		self::addCreativeItem(Item::get(Item::GOLD_BOOTS, 0));
-		// TODO: Lever
-		// TODO: Redstone lamp
-		// TODO: Redstone torch
+        self::addCreativeItem(Item::get(Item::LEVER));
+		self::addCreativeItem(Item::get(Item::REDSTONE_LAMP));
+        self::addCreativeItem(Item::get(Item::REDSTONE_TORCH, 0));
 		// TODO: Wood pressure plate
 		// TODO: Stone pressure plate
 		// TODO: Weighted pressure plate light
 		// TODO: Weighted pressure plate heavy
-		// TODO: Wood button
-		// TODO: Stone button
+        self::addCreativeItem(Item::get(Item::WOODEN_BUTTON, 5));
+        self::addCreativeItem(Item::get(Item::STONE_BUTTON, 5));
 		// TODO: Daylight sensor
 		// TODO: Tripwire hook
 		self::addCreativeItem(Item::get(Item::SNOWBALL));

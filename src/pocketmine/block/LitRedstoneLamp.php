@@ -17,7 +17,7 @@ namespace pocketmine\block;
 
 use pocketmine\level\Level;
 
-class LitRedstoneLamp extends Solid implements RedstoneSensitiveAppliance{
+class LitRedstoneLamp extends RedstoneLamp{
 
 	protected $id = self::LIT_REDSTONE_LAMP;
 
@@ -28,7 +28,7 @@ class LitRedstoneLamp extends Solid implements RedstoneSensitiveAppliance{
 	public function onUpdate($type){
 		parent::onUpdate($type);
 		if($type === Level::BLOCK_UPDATE_NORMAL and !$this->isRedstoneActivated()){
-			$this->getLevel()->setBlock($this, new RedstoneLamp);
+			$this->getLevel()->setBlock($this, new RedstoneLamp());
 		}
 	}
 }
