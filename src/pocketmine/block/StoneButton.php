@@ -43,7 +43,7 @@ class StoneButton extends Lever{
 		$this->meta |= 0x08;
 		$this->getLevel()->setBlock($this, $this);
 		$this->getLevel()->scheduleUpdate($this, $this->getDelay());
-		$this->getLevel()->updateAround($this->getSide($this->getAttachSide()));
+		$this->getLevel()->updateAround($this->getSide($this->getAttachSide()), Level::BLOCK_UPDATE_POWER);
 		return true;
 	}
 
@@ -56,7 +56,7 @@ class StoneButton extends Lever{
 		if($type === Level::BLOCK_UPDATE_SCHEDULED){
 			$this->meta &= 0x07;
 			$this->getLevel()->setBlock($this, $this);
-			$this->getLevel()->updateAround($this->getSide($this->getAttachSide()));
+			$this->getLevel()->updateAround($this->getSide($this->getAttachSide()), Level::BLOCK_UPDATE_POWER);
 		}
 	}
 

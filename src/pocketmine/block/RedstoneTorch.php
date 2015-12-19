@@ -21,11 +21,22 @@
 
 namespace pocketmine\block;
 
+use pocketmine\level\Level;
+
 class RedstoneTorch extends Torch implements RedstonePowerSource{
 
 	protected $id = self::REDSTONE_TORCH;
 
-	public function getPowerLevel(){
+    public function onUpdate($type){
+        parent::onUpdate($type);
+        if($type === Level::BLOCK_UPDATE_POWER){
+            $class = $this->getSide($this->getAttachSide())->isRedstoneActivated() ? UnlitRedstoneTorch::class : RedstoneTorch::class;
+            $this->getLevel()->setBlock($this, new $class($this->getDamage()));
+            $this->getLevel()->updateAround($this);
+        }
+    }
+
+    public function getPowerLevel(){
 		return 16;
 	}
 

@@ -121,6 +121,7 @@ class Level implements ChunkManager, Metadatable{
 	const BLOCK_UPDATE_SCHEDULED = 3;
 	const BLOCK_UPDATE_WEAK = 4;
 	const BLOCK_UPDATE_TOUCH = 5;
+    const BLOCK_UPDATE_POWER = 6;
 
 	const TIME_DAY = 0;
 	const TIME_SUNSET = 12000;
@@ -1008,39 +1009,44 @@ class Level implements ChunkManager, Metadatable{
 		}
 	}
 
-	/**
-	 * @param Vector3 $pos
-	 */
-	public function updateAround(Vector3 $pos){
-		$this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y - 1, $pos->z))));
-		if(!$ev->isCancelled()){
-			$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
-		}
+    /**
+     * @param Vector3 $pos
+     * @param int $type
+     */
+	public function updateAround(Vector3 $pos, $type = self::BLOCK_UPDATE_NORMAL){
+		if($type === self::BLOCK_UPDATE_SCHEDULED){
+            return;
+        }else{
+            $this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y - 1, $pos->z))));
+            if(!$ev->isCancelled()){
+                $ev->getBlock()->onUpdate($type);
+            }
 
-		$this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y + 1, $pos->z))));
-		if(!$ev->isCancelled()){
-			$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
-		}
+            $this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y + 1, $pos->z))));
+            if(!$ev->isCancelled()){
+                $ev->getBlock()->onUpdate($type);
+            }
 
-		$this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x - 1, $pos->y, $pos->z))));
-		if(!$ev->isCancelled()){
-			$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
-		}
+            $this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x - 1, $pos->y, $pos->z))));
+            if(!$ev->isCancelled()){
+                $ev->getBlock()->onUpdate($type);
+            }
 
-		$this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x + 1, $pos->y, $pos->z))));
-		if(!$ev->isCancelled()){
-			$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
-		}
+            $this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x + 1, $pos->y, $pos->z))));
+            if(!$ev->isCancelled()){
+                $ev->getBlock()->onUpdate($type);
+            }
 
-		$this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z - 1))));
-		if(!$ev->isCancelled()){
-			$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
-		}
+            $this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z - 1))));
+            if(!$ev->isCancelled()){
+                $ev->getBlock()->onUpdate($type);
+            }
 
-		$this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z + 1))));
-		if(!$ev->isCancelled()){
-			$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
-		}
+            $this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z + 1))));
+            if(!$ev->isCancelled()){
+                $ev->getBlock()->onUpdate($type);
+            }
+        }
 	}
 
     /**
@@ -1048,21 +1054,12 @@ class Level implements ChunkManager, Metadatable{
      * @param int $ticks
      */
 	public function scheduleUpdateAround(Vector3 $pos, $ticks){
-		$pos = clone $pos;
-		$pos->x++;
-		$this->scheduleUpdate(clone $pos, $ticks);
-		$pos->x -= 2;
-		$this->scheduleUpdate(clone $pos, $ticks);
-		$pos->x++;
-		$pos->y++;
-		$this->scheduleUpdate(clone $pos, $ticks);
-		$pos->y -= 2;
-		$this->scheduleUpdate(clone $pos, $ticks);
-		$pos->y++;
-		$pos->z++;
-		$this->scheduleUpdate(clone $pos, $ticks);
-		$pos->z -= 2;
-		$this->scheduleUpdate(clone $pos, $ticks);
+        $this->scheduleUpdate($this->temporalVector->setComponents($pos->x - 1, $pos->y, $pos->z), $ticks);
+        $this->scheduleUpdate($this->temporalVector->setComponents($pos->x + 1, $pos->y, $pos->z), $ticks);
+        $this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y - 1, $pos->z), $ticks);
+        $this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y + 1, $pos->z), $ticks);
+        $this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z - 1), $ticks);
+        $this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z + 1), $ticks);
 	}
 
 	/**

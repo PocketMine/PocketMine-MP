@@ -38,7 +38,7 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 
 	public function onUpdate($type){
 		parent::onUpdate($type);
-		if($type === Level::BLOCK_UPDATE_NORMAL){
+		if($type === Level::BLOCK_UPDATE_NORMAL || $type === Level::BLOCK_UPDATE_POWER){
 			$maxPower = 0;
 			for($side = 0; $side <= 5; $side++){
 				$block = $this->getSide($side);
