@@ -269,6 +269,7 @@ class Block extends Position implements Metadatable{
 	/** @var \SplFixedArray */
 	public static $fullList = null;
 
+	const CHARGE_POWER = 5;
 	const CHARGE_STRONG = 4;
 	const CHARGE_WEAK = 3;
 	const CHARGE_CONTACT_STRONG = 2;
@@ -303,17 +304,17 @@ class Block extends Position implements Metadatable{
 	 */
 	public function __get($key){
 		static $map = [
-				"hardness" => "getHardness",
-				"lightLevel" => "getLightLevel",
-				"frictionFactor" => "getFrictionFactor",
-				"name" => "getName",
-				"isPlaceable" => "canBePlaced",
-				"isReplaceable" => "canBeReplaced",
-				"isTransparent" => "isTransparent",
-				"isSolid" => "isSolid",
-				"isFlowable" => "canBeFlowedInto",
-				"isActivable" => "canBeActivated",
-				"hasEntityCollision" => "hasEntityCollision"
+			"hardness" => "getHardness",
+			"lightLevel" => "getLightLevel",
+			"frictionFactor" => "getFrictionFactor",
+			"name" => "getName",
+			"isPlaceable" => "canBePlaced",
+			"isReplaceable" => "canBeReplaced",
+			"isTransparent" => "isTransparent",
+			"isSolid" => "isSolid",
+			"isFlowable" => "canBeFlowedInto",
+			"isActivable" => "canBeActivated",
+			"hasEntityCollision" => "hasEntityCollision"
 		];
 		return isset($map[$key]) ? $this->{$map[$key]}() : null;
 	}
@@ -560,8 +561,8 @@ class Block extends Position implements Metadatable{
 	 * @param int $meta
 	 */
 	public function __construct($id, $meta = 0){
-		$this->id = (int)$id;
-		$this->meta = (int)$meta;
+		$this->id = (int) $id;
+		$this->meta = (int) $meta;
 	}
 
 	/**
@@ -761,9 +762,9 @@ class Block extends Position implements Metadatable{
 	 * @param Position $v
 	 */
 	final public function position(Position $v){
-		$this->x = (int)$v->x;
-		$this->y = (int)$v->y;
-		$this->z = (int)$v->z;
+		$this->x = (int) $v->x;
+		$this->y = (int) $v->y;
+		$this->z = (int) $v->z;
 		$this->level = $v->level;
 		$this->boundingBox = null;
 	}
@@ -780,7 +781,7 @@ class Block extends Position implements Metadatable{
 			return [];
 		}else{
 			return [
-					[$this->getId(), $this->getDamage(), 1],
+				[$this->getId(), $this->getDamage(), 1],
 			];
 		}
 	}
@@ -798,9 +799,9 @@ class Block extends Position implements Metadatable{
 			if($this->getToolType() === Tool::TYPE_SHEARS and $item->isShears()){
 				$base /= 15;
 			}elseif(
-					($this->getToolType() === Tool::TYPE_PICKAXE and ($tier = $item->isPickaxe()) !== false) or
-					($this->getToolType() === Tool::TYPE_AXE and ($tier = $item->isAxe()) !== false) or
-					($this->getToolType() === Tool::TYPE_SHOVEL and ($tier = $item->isShovel()) !== false)
+				($this->getToolType() === Tool::TYPE_PICKAXE and ($tier = $item->isPickaxe()) !== false) or
+				($this->getToolType() === Tool::TYPE_AXE and ($tier = $item->isAxe()) !== false) or
+				($this->getToolType() === Tool::TYPE_SHOVEL and ($tier = $item->isShovel()) !== false)
 			){
 				switch($tier){
 					case Tool::TIER_WOODEN:
@@ -852,8 +853,8 @@ class Block extends Position implements Metadatable{
 	}
 
 	public function getChargeType(){
-		if($this instanceof RedstonePowerSource){
-			return $this->getPowerLevel();
+		if($this instanceof RedstonePowerSource and $this->getPowerLevel() !== 0){
+			return self::CHARGE_POWER;
 		}
 		$power = self::CHARGE_NONE;
 		for($side = 0; $side < 6; $side++){
@@ -871,9 +872,10 @@ class Block extends Position implements Metadatable{
 					continue;
 				}
 				if($block->isPowering($this)){
-					return self::CHARGE_WEAK;
+					$power = max($power, self::CHARGE_WEAK);
+				}else{
+					$power = max($power, self::CHARGE_CONTACT_WEAK);
 				}
-				$power = max($power, self::CHARGE_CONTACT_WEAK);
 			}
 		}
 		return $power;
@@ -929,12 +931,12 @@ class Block extends Position implements Metadatable{
 	 */
 	protected function recalculateBoundingBox(){
 		return new AxisAlignedBB(
-				$this->x,
-				$this->y,
-				$this->z,
-				$this->x + 1,
-				$this->y + 1,
-				$this->z + 1
+			$this->x,
+			$this->y,
+			$this->z,
+			$this->x + 1,
+			$this->y + 1,
+			$this->z + 1
 		);
 	}
 
