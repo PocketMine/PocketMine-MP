@@ -99,6 +99,7 @@ class Lever extends Flowable implements RedstonePowerSource, Attaching{
 		$this->getLevel()->setBlock($this, $this);
 		return true;
 	}
+
 	protected function processSide(&$meta, Player $player = null){
 		if($player !== null and ($meta === 0 or $meta === 5)){
 			$rotation = ($player->yaw - 90) % 360;

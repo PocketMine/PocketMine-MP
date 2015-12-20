@@ -106,7 +106,7 @@ class Block extends Position implements Metadatable{
 	const OAK_WOOD_STAIRS = 53;
 	const OAK_WOODEN_STAIRS = 53;
 	const CHEST = 54;
-	const REDSTONE_DUST = 55;
+	const REDSTONE_WIRE = 55;
 	const DIAMOND_ORE = 56;
 	const DIAMOND_BLOCK = 57;
 	const CRAFTING_TABLE = 58;
@@ -269,11 +269,11 @@ class Block extends Position implements Metadatable{
 	/** @var \SplFixedArray */
 	public static $fullList = null;
 
-	const POWER_STRONG = 4;
-	const POWER_WEAK = 3;
-	const POWER_STRONG_TOUCHED = 2;
-	const POWER_WEAK_TOUCHED = 1;
-	const POWER_NONE = 0;
+	const CHARGE_STRONG = 4;
+	const CHARGE_WEAK = 3;
+	const CHARGE_CONTACT_STRONG = 2;
+	const CHARGE_CONTACT_WEAK = 1;
+	const CHARGE_NONE = 0;
 
 	/** @var \SplFixedArray */
 	public static $light = null;
@@ -303,17 +303,17 @@ class Block extends Position implements Metadatable{
 	 */
 	public function __get($key){
 		static $map = [
-			"hardness" => "getHardness",
-			"lightLevel" => "getLightLevel",
-			"frictionFactor" => "getFrictionFactor",
-			"name" => "getName",
-			"isPlaceable" => "canBePlaced",
-			"isReplaceable" => "canBeReplaced",
-			"isTransparent" => "isTransparent",
-			"isSolid" => "isSolid",
-			"isFlowable" => "canBeFlowedInto",
-			"isActivable" => "canBeActivated",
-			"hasEntityCollision" => "hasEntityCollision"
+				"hardness" => "getHardness",
+				"lightLevel" => "getLightLevel",
+				"frictionFactor" => "getFrictionFactor",
+				"name" => "getName",
+				"isPlaceable" => "canBePlaced",
+				"isReplaceable" => "canBeReplaced",
+				"isTransparent" => "isTransparent",
+				"isSolid" => "isSolid",
+				"isFlowable" => "canBeFlowedInto",
+				"isActivable" => "canBeActivated",
+				"hasEntityCollision" => "hasEntityCollision"
 		];
 		return isset($map[$key]) ? $this->{$map[$key]}() : null;
 	}
@@ -374,7 +374,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::MONSTER_SPAWNER] = MonsterSpawner::class;
 			self::$list[self::WOOD_STAIRS] = WoodStairs::class;
 			self::$list[self::CHEST] = Chest::class;
-			self::$list[self::REDSTONE_DUST] = RedstoneDust::class;
+			self::$list[self::REDSTONE_WIRE] = RedstoneWire::class;
 			self::$list[self::DIAMOND_ORE] = DiamondOre::class;
 			self::$list[self::DIAMOND_BLOCK] = Diamond::class;
 			self::$list[self::WORKBENCH] = Workbench::class;
@@ -438,8 +438,8 @@ class Block extends Position implements Metadatable{
 			self::$list[self::BREWING_STAND] = BrewingStand::class;
 			self::$list[self::END_PORTAL_FRAME] = EndPortalFrame::class;
 			self::$list[self::END_STONE] = EndStone::class;
-            self::$list[self::REDSTONE_LAMP] = RedstoneLamp::class;
-            self::$list[self::LIT_REDSTONE_LAMP] = LitRedstoneLamp::class;
+			self::$list[self::REDSTONE_LAMP] = RedstoneLamp::class;
+			self::$list[self::LIT_REDSTONE_LAMP] = LitRedstoneLamp::class;
 			self::$list[self::SANDSTONE_STAIRS] = SandstoneStairs::class;
 			self::$list[self::EMERALD_ORE] = EmeraldOre::class;
 
@@ -560,8 +560,8 @@ class Block extends Position implements Metadatable{
 	 * @param int $meta
 	 */
 	public function __construct($id, $meta = 0){
-		$this->id = (int) $id;
-		$this->meta = (int) $meta;
+		$this->id = (int)$id;
+		$this->meta = (int)$meta;
 	}
 
 	/**
@@ -761,9 +761,9 @@ class Block extends Position implements Metadatable{
 	 * @param Position $v
 	 */
 	final public function position(Position $v){
-		$this->x = (int) $v->x;
-		$this->y = (int) $v->y;
-		$this->z = (int) $v->z;
+		$this->x = (int)$v->x;
+		$this->y = (int)$v->y;
+		$this->z = (int)$v->z;
 		$this->level = $v->level;
 		$this->boundingBox = null;
 	}
@@ -780,7 +780,7 @@ class Block extends Position implements Metadatable{
 			return [];
 		}else{
 			return [
-				[$this->getId(), $this->getDamage(), 1],
+					[$this->getId(), $this->getDamage(), 1],
 			];
 		}
 	}
@@ -798,9 +798,9 @@ class Block extends Position implements Metadatable{
 			if($this->getToolType() === Tool::TYPE_SHEARS and $item->isShears()){
 				$base /= 15;
 			}elseif(
-				($this->getToolType() === Tool::TYPE_PICKAXE and ($tier = $item->isPickaxe()) !== false) or
-				($this->getToolType() === Tool::TYPE_AXE and ($tier = $item->isAxe()) !== false) or
-				($this->getToolType() === Tool::TYPE_SHOVEL and ($tier = $item->isShovel()) !== false)
+					($this->getToolType() === Tool::TYPE_PICKAXE and ($tier = $item->isPickaxe()) !== false) or
+					($this->getToolType() === Tool::TYPE_AXE and ($tier = $item->isAxe()) !== false) or
+					($this->getToolType() === Tool::TYPE_SHOVEL and ($tier = $item->isShovel()) !== false)
 			){
 				switch($tier){
 					case Tool::TIER_WOODEN:
@@ -851,11 +851,11 @@ class Block extends Position implements Metadatable{
 		return Block::get(Item::AIR, 0, Position::fromObject(Vector3::getSide($side, $step)));
 	}
 
-	public function getPowerType(){
+	public function getChargeType(){
 		if($this instanceof RedstonePowerSource){
 			return $this->getPowerLevel();
 		}
-		$power = self::POWER_NONE;
+		$power = self::CHARGE_NONE;
 		for($side = 0; $side < 6; $side++){
 			$block = $this->getSide($side);
 			if($block instanceof RedstonePowerSource){
@@ -863,17 +863,17 @@ class Block extends Position implements Metadatable{
 					continue;
 				}
 				if($block->isStronglyPowering($this)){
-					return self::POWER_STRONG;
+					return self::CHARGE_STRONG;
 				}
-				$power = self::POWER_STRONG_TOUCHED;
+				$power = self::CHARGE_CONTACT_STRONG;
 			}elseif($block instanceof RedstoneConnector){
 				if($block->getPowerLevel() === 0){
 					continue;
 				}
 				if($block->isPowering($this)){
-					return self::POWER_WEAK;
+					return self::CHARGE_WEAK;
 				}
-				$power = max($power, self::POWER_WEAK_TOUCHED);
+				$power = max($power, self::CHARGE_CONTACT_WEAK);
 			}
 		}
 		return $power;
@@ -881,11 +881,11 @@ class Block extends Position implements Metadatable{
 
 	public function isRedstoneActivated(){
 		for($i = 0; $i <= 5; $i++){
-			if($this->getSide($i)->getPowerType() >= self::POWER_WEAK){
+			if($this->getSide($i)->getChargeType() >= self::CHARGE_WEAK){
 				return true;
 			}
 		}
-        return false;
+		return false;
 	}
 
 	/**
@@ -929,12 +929,12 @@ class Block extends Position implements Metadatable{
 	 */
 	protected function recalculateBoundingBox(){
 		return new AxisAlignedBB(
-			$this->x,
-			$this->y,
-			$this->z,
-			$this->x + 1,
-			$this->y + 1,
-			$this->z + 1
+				$this->x,
+				$this->y,
+				$this->z,
+				$this->x + 1,
+				$this->y + 1,
+				$this->z + 1
 		);
 	}
 

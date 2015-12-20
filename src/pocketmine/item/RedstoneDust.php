@@ -22,13 +22,11 @@
 namespace pocketmine\item;
 
 use pocketmine\block\Block;
-use pocketmine\level\Level;
-use pocketmine\Player;
 
-class Redstone extends Item{
+class RedstoneDust extends Item{
 	public function __construct($meta = 0, $count = 1){
-		$this->block = Block::get(Block::REDSTONE_DUST);
-		parent::__construct(self::REDSTONE, $meta, $count, "Redstone");
+		$this->block = Block::get(Block::REDSTONE_WIRE);
+		parent::__construct(self::REDSTONE, $meta, $count, "Redstone Dust");
 	}
 }
 

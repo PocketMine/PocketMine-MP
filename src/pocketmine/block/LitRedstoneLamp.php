@@ -25,10 +25,6 @@ class LitRedstoneLamp extends RedstoneLamp{
 		$this->meta = $meta;
 	}
 
-	public function getPowerLevel(){
-		return $this->getPowerType() === self::POWER_STRONG ? 16 : 2;
-	}
-
 	public function onUpdate($type){
 		parent::onUpdate($type);
 		if($type === Level::BLOCK_UPDATE_NORMAL and !$this->isRedstoneActivated()){

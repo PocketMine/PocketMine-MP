@@ -23,10 +23,11 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\math\Vector3;
 
-class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
+class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 
-	protected $id = self::REDSTONE_DUST;
+	protected $id = self::REDSTONE_WIRE;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
@@ -38,24 +39,24 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 
 	public function onUpdate($type){
 		parent::onUpdate($type);
-		if($type === Level::BLOCK_UPDATE_NORMAL || $type === Level::BLOCK_UPDATE_POWER){
+		if($type === Level::BLOCK_UPDATE_NORMAL or $type === Level::BLOCK_UPDATE_POWER){
 			$maxPower = 0;
 			for($side = 0; $side <= 5; $side++){
 				$block = $this->getSide($side);
 				if($block instanceof RedstoneConductor || $block instanceof RedstoneSensitiveAppliance){
 					$maxPower = max($maxPower, $block->getPowerLevel() - 1); // Pass decreased power from adjacent conductor
-                }elseif($block->getPowerType() === Block::POWER_STRONG){
+				}elseif($block->getChargeType() === Block::CHARGE_STRONG){
 					$maxPower = 0x0F; // When: [wire] [block] [attached power source]
 					break;
 				}else{ // Checks for XY/ZY-diagonal current sources
 					if(!$block->isTransparent()){ // check for possible downward delivery
 						$up = $block->getSide(self::SIDE_UP);
-						if($up instanceof RedstoneDust and $this->getSide(self::SIDE_UP)->isTransparent()){ // not blocked by opaque block like "tripping the knight's leg" in Chinese Chess
+						if($up instanceof RedstoneWire and $this->getSide(self::SIDE_UP)->isTransparent()){ // not blocked by opaque block like "tripping the knight's leg" in Chinese Chess
 							$maxPower = max($maxPower, $up->getPowerLevel() - 1);
 						}
 					}else{ // if the adjacent block is transparent, i.e. upward delivery is possible
 						$down = $block->getSide(self::SIDE_DOWN);
-						if($down instanceof RedstoneDust){ // upward delivery
+						if($down instanceof RedstoneWire){ // upward delivery
 							$maxPower = max($maxPower, $down->getPowerLevel() - 1);
 						}
 					}
@@ -81,20 +82,53 @@ class RedstoneDust extends Flowable implements RedstoneConnector, Attaching{
 	}
 
 	public function isPowering(Block $block){
+		// a block is weakly charged by an adjacent (including vertically) powered redstone wire when one or more of the above is true:
+		// 1. the block is directly below the redstone wire (the redstone wire is attached to it)
+		// 2. the block itself is a redstone conductor
+		// 3. no redstone conductors form a horizontal right-angle with the block and the redstone wire
+		//    (there is no block-wire-conductor horizontal right-angle)
+		// 4. no upward or downward delivery on the two sides (similar to 3)
+
+		if($this->x == $block->x and $this->z == $block->z and $block->y + 1 == $this->y){
+			return true; // condition 1
+		}
+
+		if($block instanceof RedstoneConductor){
+			return true; // condition 2
+		}
+
+		$nsConducted = false;
+		$weConducted = false;
+		$blockSide = Vector3::SIDE_DOWN; // dummy value
 		for($i = self::SIDE_NORTH; $i <= self::SIDE_EAST; $i++){
 			$side = $this->getSide($i);
 			if($side instanceof RedstoneConductor){
-				if($side == $block){
-					return true;
+				if($i & 0x04){
+					$weConducted = true;
+				}else{
+					$nsConducted = true;
+				}
+				if($side->equals($block)){
+					$blockSide = $i;
 				}
 			}
 		}
-		return false;
+
+		// TODO fix condition 4
+
+		// condition 3
+		if($blockSide === self::SIDE_EAST or $blockSide === self::SIDE_WEST){ // block is at west/east
+			return !$nsConducted; // if there are no conductors at north/south side
+		}elseif($blockSide === self::SIDE_NORTH or $blockSide === self::SIDE_SOUTH){ // block is at north/west
+			return !$weConducted; // if there are no conductors at west/east side
+		}
+
+		return false; // block is above or more than one block away
 	}
 
 	public function getDrops(Item $item){
 		return [
-			[Item::REDSTONE, 0, 1]
+				[Item::REDSTONE, 0, 1]
 		];
 	}
 }
