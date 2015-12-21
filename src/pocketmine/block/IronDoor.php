@@ -45,7 +45,7 @@ class IronDoor extends Door{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+		if($item->isPickaxe() >= Tool::TIER_WOODEN and ($this->meta & 8) === 0){
 			return [
 				[Item::IRON_DOOR, 0, 1],
 			];

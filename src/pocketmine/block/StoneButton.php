@@ -38,12 +38,12 @@ class StoneButton extends Lever{
 
 	public function onActivate(Item $item, Player $player = null){
 		if($this->isActivated()){
-			return false;
+			return true;
 		}
 		$this->meta |= 0x08;
 		$this->getLevel()->setBlock($this, $this);
 		$this->getLevel()->scheduleUpdate($this, $this->getDelay());
-		$this->getLevel()->updateAround($this->getSide($this->getAttachSide()), Level::BLOCK_UPDATE_REDSTONE);
+		$this->getLevel()->scheduleUpdateAround($this->getSide($this->getAttachSide()), 2);
 		return true;
 	}
 

@@ -73,7 +73,7 @@ class Lever extends Flowable implements RedstonePowerSource, Attaching{
 	public function onActivate(Item $item, Player $player = null){
 		$this->meta ^= 0x08;
 		$this->getLevel()->setBlock($this, $this);
-		$this->getLevel()->updateAround($this->getSide($this->getAttachSide()));
+		$this->getLevel()->scheduleUpdateAround($this->getSide($this->getAttachSide()), 2);
 		return true;
 	}
 

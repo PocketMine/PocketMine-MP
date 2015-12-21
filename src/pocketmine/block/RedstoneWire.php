@@ -65,6 +65,9 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 			if($maxPower !== $this->meta){
 				$this->meta = $maxPower;
 				$this->getLevel()->setBlock($this, $this);
+				foreach($this->getPoweringSides() as $block){
+					$this->getLevel()->scheduleUpdateAround($block, 2);
+				}
 			}
 		}
 	}
@@ -85,9 +88,10 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 		// a block is weakly charged by an adjacent (including vertically) powered redstone wire when one or more of the above is true:
 		// 1. the block is directly below the redstone wire (the redstone wire is attached to it)
 		// 2. the block itself is a redstone conductor
-		// 3. no redstone conductors form a horizontal right-angle with the block and the redstone wire
-		//    (there is no block-wire-conductor horizontal right-angle)
-		// 4. no upward or downward delivery on the two sides (similar to 3)
+		// 3. a)    no redstone conductors form a horizontal right-angle with the block and the redstone wire
+		//          (there is no block-wire-conductor horizontal right-angle)
+		//          AND
+		// 3. b)    no upward or downward delivery on the two sides (similar to 3)
 
 		if($this->x == $block->x and $this->z == $block->z and $block->y + 1 == $this->y){
 			return true; // condition 1
@@ -126,9 +130,56 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 		return false; // block is above or more than one block away
 	}
 
+	/**
+	 * @return Block[]
+	 */
+	public function getPoweringSides(){
+		$output = [self::SIDE_DOWN => $this->getSide(self::SIDE_DOWN)];
+		$nsDone = false;
+		$weDone = false;
+		for($side = 2; $side <= 5; $side++){
+			$block = $this->getSide($side);
+			if($block instanceof RedstoneConductor){
+				// redstone conductor blocks are not included
+				if(($side & 4) === 0){
+					$nsDone = true;
+				}else{
+					$weDone = true;
+				}
+			}
+		}
+		if(!$nsDone){
+			$output[self::SIDE_EAST] = $this->getSide(self::SIDE_EAST);
+			$output[self::SIDE_WEST] = $this->getSide(self::SIDE_WEST);
+		}
+		if(!$weDone){
+			$output[self::SIDE_NORTH] = $this->getSide(self::SIDE_NORTH);
+			$output[self::SIDE_SOUTH] = $this->getSide(self::SIDE_SOUTH);
+		}
+		return array_values($output);
+	}
+
+	public function onBreak(Item $item){
+		$output = parent::onBreak($item);
+		for($i = 2; $i <= 5; $i++){
+			$side = Vector3::getSide($i);
+			if(($block = $this->getLevel()->getBlock($side->add(0, 1))) instanceof RedstoneConnector){
+				$block->onUpdate(Level::BLOCK_UPDATE_REDSTONE);
+			}
+			if(($block = $this->getLevel()->getBlock($side->subtract(0, 1))) instanceof RedstoneConnector){
+				$block->onUpdate(Level::BLOCK_UPDATE_REDSTONE);
+			}
+		}
+		foreach($this->getPoweringSides() as $block){
+			$this->getLevel()->scheduleUpdateAround($block, 2);
+		}
+
+		return $output;
+	}
+
 	public function getDrops(Item $item){
 		return [
-				[Item::REDSTONE, 0, 1]
+			[Item::REDSTONE, 0, 1]
 		];
 	}
 }
