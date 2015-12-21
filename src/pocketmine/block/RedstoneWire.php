@@ -108,9 +108,9 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 				}else{
 					$nsConducted = true;
 				}
-				if($side->equals($block)){
-					$blockSide = $i;
-				}
+			}
+			if($side->equals($block)){
+				$blockSide = $i;
 			}
 		}
 

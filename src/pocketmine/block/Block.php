@@ -856,6 +856,7 @@ class Block extends Position implements Metadatable{
 		if($this instanceof RedstonePowerSource and $this->getPowerLevel() !== 0){
 			return self::CHARGE_POWER;
 		}
+
 		$power = self::CHARGE_NONE;
 		for($side = 0; $side < 6; $side++){
 			$block = $this->getSide($side);
@@ -878,6 +879,7 @@ class Block extends Position implements Metadatable{
 				}
 			}
 		}
+
 		return $power;
 	}
 
@@ -887,6 +889,7 @@ class Block extends Position implements Metadatable{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
