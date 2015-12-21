@@ -39,7 +39,7 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 
 	public function onUpdate($type){
 		parent::onUpdate($type);
-		if($type === Level::BLOCK_UPDATE_NORMAL or $type === Level::BLOCK_UPDATE_POWER){
+		if($type === Level::BLOCK_UPDATE_NORMAL or $type === Level::BLOCK_UPDATE_REDSTONE){
 			$maxPower = 0;
 			for($side = 0; $side <= 5; $side++){
 				$block = $this->getSide($side);

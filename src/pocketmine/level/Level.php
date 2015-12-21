@@ -121,7 +121,7 @@ class Level implements ChunkManager, Metadatable{
 	const BLOCK_UPDATE_SCHEDULED = 3;
 	const BLOCK_UPDATE_WEAK = 4;
 	const BLOCK_UPDATE_TOUCH = 5;
-	const BLOCK_UPDATE_POWER = 6;
+	const BLOCK_UPDATE_REDSTONE = 6;
 
 	const TIME_DAY = 0;
 	const TIME_SUNSET = 12000;
@@ -1409,11 +1409,9 @@ class Level implements ChunkManager, Metadatable{
 	 * @param bool    $direct @deprecated
 	 * @param bool    $update
 	 *
-	 * @param bool    $scheduleUpdate
-	 *
 	 * @return bool Whether the block has been updated or not
 	 */
-	public function setBlock(Vector3 $pos, Block $block, $direct = false, $update = true, $scheduleUpdate = false){
+	public function setBlock(Vector3 $pos, Block $block, $direct = false, $update = true){
 		if($pos->y < 0 or $pos->y >= 128){
 			return false;
 		}
@@ -1454,11 +1452,7 @@ class Level implements ChunkManager, Metadatable{
 					$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
 				}
 
-				if($scheduleUpdate){
-					$this->scheduleUpdateAround($block, 0);
-				}else{
-					$this->updateAround($pos);
-				}
+				$this->updateAround($pos);
 			}
 
 			return true;

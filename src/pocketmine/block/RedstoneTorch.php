@@ -29,9 +29,11 @@ class RedstoneTorch extends Torch implements RedstonePowerSource{
 
 	public function onUpdate($type){
 		parent::onUpdate($type);
-		if($type === Level::BLOCK_UPDATE_POWER){
+		if($type === Level::BLOCK_UPDATE_REDSTONE){
 			$class = $this->getSide($this->getAttachSide())->isRedstoneActivated() ? UnlitRedstoneTorch::class : RedstoneTorch::class;
-			$this->getLevel()->setBlock($this, new $class($this->getDamage()));
+			if($class !== static::class){
+				$this->getLevel()->setBlock($this, new $class($this->getDamage()));
+			}
 		}
 	}
 
