@@ -43,6 +43,10 @@ abstract class Liquid extends Transparent{
 	public function canBeReplaced(){
 		return true;
 	}
+	
+	public function isLiquid(){
+		return true;
+	}
 
 	public function isSolid(){
 		return false;

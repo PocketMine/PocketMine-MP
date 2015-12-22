@@ -687,6 +687,13 @@ class Block extends Position implements Metadatable{
 	public function canBeReplaced(){
 		return false;
 	}
+	
+	/**
+	* @return bool
+	*/
+	public function isLiquid(){
+		return false;
+	}
 
 	/**
 	 * @return bool
@@ -695,6 +702,9 @@ class Block extends Position implements Metadatable{
 		return false;
 	}
 
+	/**
+	* @return bool
+	*/
 	public function isSolid(){
 		return true;
 	}
