@@ -418,12 +418,17 @@ class Item{
 	const RAW_CHICKEN = 365;
 	const COOKED_CHICKEN = 366;
 
+
+
+	const GHAST_TEAR = 370;
 	const GOLD_NUGGET = 371;
 	const GOLDEN_NUGGET = 371;
 	const BLAZE_POWDER = 377;
 	const MAGMA_CREAM = 378;
 
+	const GLISTERING_MELON = 382;
 	const SPAWN_EGG = 383;
+	const BOTTLE_O_ENCHANTING = 384;
 
 	const EMERALD = 388;
 
