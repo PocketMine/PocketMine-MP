@@ -423,6 +423,11 @@ class Item{
 	const GHAST_TEAR = 370;
 	const GOLD_NUGGET = 371;
 	const GOLDEN_NUGGET = 371;
+	
+	
+	const GLASS_BOTTLE = 374;
+	
+	
 	const BLAZE_POWDER = 377;
 	const MAGMA_CREAM = 378;
 
