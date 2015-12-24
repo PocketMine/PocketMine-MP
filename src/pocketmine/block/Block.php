@@ -209,6 +209,8 @@ class Block extends Position implements Metadatable{
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
 
+	const MOB_HEAD = 144;
+	const SKULL = 144;
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
 
@@ -432,6 +434,8 @@ class Block extends Position implements Metadatable{
 			self::$list[self::FLOWER_POT_BLOCK] = FlowerPot::class;
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
+
+			self::$list[self::MOB_HEAD] = MobHead::class;
 			self::$list[self::ANVIL] = Anvil::class;
 			self::$list[self::TRAPPED_CHEST] = TrappedChest::class;
 			self::$list[self::REDSTONE_BLOCK] = Redstone::class;
