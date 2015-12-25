@@ -1,4 +1,4 @@
-#OpenGenisys
+#OpenGenisys(创世纪)
 * Code will be push in a few days
 * Genisys is same to this version.
 
@@ -27,3 +27,23 @@
 * Young Dream
 * Address: mcper.cn
 * Port: 19132
+* 
+* Young Dream - Survival
+* Address: mcper.cn
+* Port: 12345
+* 
+* Young Dream - Happy Town
+* Address:mcper.cn
+* Port: 666
+* 
+* Sao Gao Server
+* Address: sgmcpe.com
+* Port: 100
+* 
+* That the sky
+* Address: g.mcpe.cc
+* Port: 2333
+
+#Test Server
+* Address: mcper.cn
+* Port: 233
