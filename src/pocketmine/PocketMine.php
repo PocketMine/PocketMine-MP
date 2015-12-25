@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -75,8 +75,8 @@ namespace pocketmine {
 	const VERSION = "1.6dev";
 	const API_VERSION = "2.0.0";
 	const CODENAME = "[REDACTED]";
-	const MINECRAFT_VERSION = "v0.12.1 alpha";
-	const MINECRAFT_VERSION_NETWORK = "0.12.1";
+	const MINECRAFT_VERSION = "v0.13.1 alpha";
+	const MINECRAFT_VERSION_NETWORK = "0.13.1";
 
 	/*
 	 * Startup code. Do not look at it, it may harm you.
@@ -170,11 +170,13 @@ namespace pocketmine {
 		 * This is here so that people don't come to us complaining and fill up the issue tracker when they put
 		 * an incorrect timezone abbreviation in php.ini apparently.
 		 */
-		$default_timezone = date_default_timezone_get();
-		if(strpos($default_timezone, "/") === false){
-			$default_timezone = timezone_name_from_abbr($default_timezone);
+		$timezone = ini_get("date.timezone");
+		if(strpos($timezone, "/") === false){
+			$default_timezone = timezone_name_from_abbr($timezone);
 			ini_set("date.timezone", $default_timezone);
 			date_default_timezone_set($default_timezone);
+		} else {
+			date_default_timezone_set($timezone);
 		}
 	}
 
