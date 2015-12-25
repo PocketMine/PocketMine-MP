@@ -1,5 +1,6 @@
 #OpenGenisys
 * Code will be push in a few days
+* Genisys is same to this version.
 
 #Supported Functions:
 * Weather
