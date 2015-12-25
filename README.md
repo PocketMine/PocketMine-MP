@@ -49,5 +49,8 @@
 * Port: 233
 
 #For reselling this free core's People:
-* Copyright has become more and more important in the world, now in many big countries, it is illegal for resell the open source tools, we hope that you can respect the results of the work of the author, please stop doing it, thanks.
-* 给那些倒卖本免费核心的中国小学生们，问候你们全家。 
+* Copyright has become more and more important in the world, now in many big countries, it is illegal for resell the open source tools, we hope that you can respect the results of the work of the author, please stop doing it, thanks.(For Chinese)
+* 给那些倒卖本免费核心的中国小学生们.
+* 售且毙妈，人之常情也
+* (白话文)
+* 倒卖智障你妈暴毙
