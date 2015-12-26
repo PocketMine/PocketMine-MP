@@ -1,10 +1,13 @@
-#OpenGenisys(创世纪)
+#OpenGenisys / 创世纪
 * One Core to rule them ALL
 * Genisys is same to this version.
-* This core is a modified version of pocketmine made by DREAM STUDIO&iTX Tech
+* This core is a modified version of Pocketmine made by DREAM STUDIO&iTX Tech
+* DREAM STUDIO&iTX Tech are CHINESE TEAM.
+* Gensis内核由DREAM插件组&iTX Tech开发，基于Pocketmine.
 
-
-#Supported Functions:
+#Feature / 特性
+* Performance optimization(let 100+ players join in a server)
+* Bug fix in PM-MP
 * Weather
 * Experience
 * More Effects
@@ -25,7 +28,8 @@
 * Hunger (Based on Katana)
 * AI (Based on MOW)
 
-#Servers
+#Servers / 测试服务器
+* (In fact there are more than 80 servers in China use our core and most of them are better than us.Here are some servers set by us.)
 * Young Dream
 * Address: mcper.cn
 * Port: 19132
@@ -50,9 +54,8 @@
 * Address: mcper.cn
 * Port: 233
 
-#For reselling this free core's People:
-* Copyright has become more and more important in the world, now in many big countries, it is illegal for resell the open source tools, we hope that you can respect the results of the work of the author, please stop doing it, thanks.
-* 给那些倒卖本免费核心的小学生们.
+#For reselling this free core's People / 版权声明:
+* Copyright has become more and more important in the world, now in many countries, it is illegal for resell the open source tools, we hope that you can respect the results of the work of the author, please stop doing it, thanks.
+* 天朝小学生乃人间之害也
 * 售且毙妈，人之常情也
-* (白话文)
-* 倒卖智障你妈暴毙
+* 倒卖智障你妈暴毙 **Do not translate it**
