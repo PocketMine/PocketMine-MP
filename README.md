@@ -3,7 +3,7 @@
 * Genisys is same to this version.
 * This core is a modified version of Pocketmine made by DREAM STUDIO&iTX Tech
 * DREAM STUDIO&iTX Tech are CHINESE TEAM.
-* Gensis内核由DREAM插件组&iTX Tech开发，基于Pocketmine.
+* Genisys内核由DREAM插件组&iTX Tech开发，基于Pocketmine.
 
 #Feature / 特性
 * Performance optimization(let 100+ players join in a server)
@@ -63,7 +63,6 @@
 #!!!Hope you can focus on it / 希望你可以关注它!!! >_<
 * https://github.com/Nukkit/Nukkit
 * NUKKIT is a software for MCPE server in JAVA.As U know,it's high-performance.
-* It's developed by Chinese & Russian.
 * The software architecture is similar to PM so that it's easy to develop.
 * Now it can work well with some plugins and keep updated frequently(even 10 times a day)
-* 给NK打广告，前景很好的一个服务器软件，理论上来说效率比pm高得多，如果你关注它，请点击楼上链接，关注百度贴吧=.=
+* 给NK打广告，前景很好的一个服务器软件（事实上是国产），理论上来说效率比pm高得多，如果你关注它，请点击楼上链接，关注百度贴吧=.=
