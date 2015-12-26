@@ -59,3 +59,11 @@
 * 天朝小学生乃人间之害也
 * 售且毙妈，人之常情也
 * 倒卖智障你妈暴毙.    **(Do not translate it)**
+
+#!!!Hope you can focus on it / 希望你可以关注它!!! >_<
+* https://github.com/Nukkit/Nukkit
+* NUKKIT is a software for MCPE server in JAVA.As U know,it's high-performance.
+* It's developed by Chinese & Russian.
+* The software architecture is similar to PM so that it's easy to develop.
+* Now it can work well with some plugins and keep updated frequently(even 10 times a day)
+* 给NK打广告，前景很好的一个服务器软件，理论上来说效率比pm高得多，如果你关注它，请点击楼上链接，关注百度贴吧=.=
