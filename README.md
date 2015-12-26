@@ -1,55 +1,68 @@
-# ![PocketMine-MP](http://cdn.pocketmine.net/img/PocketMine-MP-h.png)
+#OpenGenisys / 创世纪
+* One Core to rule them ALL
+* Genisys is same to this version.
+* This core is a modified version of Pocketmine made by DREAM STUDIO&iTX Tech
+* DREAM STUDIO&iTX Tech are CHINESE TEAM.
+* Genisys内核由DREAM插件组&iTX Tech开发，基于Pocketmine.
 
+#Feature / 特性
+* Performance optimization(let 100+ players join in a server)
+* Bug fix in PM-MP
+* Weather
+* Experience
+* More Effects
+* Redstone (Button, Lever, PressurePlate, RedstoneWire, RedstoneTorch and so on)
+* Nether (Red sky!)
+* Rail & Powered Rail
+* Minecart (can't follow rails)
+* Boat
+* More Doors
+* Potions (Brewing is not supported)
+* Splash Potions
+* Anvil
+* Better Crafting
+* Better Invenory
+* More Items
+* Furnace Fixed
+* Supported 0.13.1 skin format
+* Hunger (Based on Katana)
+* AI (Based on MOW)
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+#Servers / 测试服务器
+* (In fact there are more than 80 servers in China using our core and most of them are better than us.Here are some servers set by us.)
+* Young Dream
+* Address: mcper.cn
+* Port: 19132
+* 
+* Young Dream - Survival
+* Address: mcper.cn
+* Port: 12345
+* 
+* Young Dream - Happy Town
+* Address:mcper.cn
+* Port: 666
+* 
+* Sao Gao Server
+* Address: sgmcpe.com
+* Port: 100
+* 
+* That the sky
+* Address: g.mcpe.cc
+* Port: 2333
+* 
+* Test Server
+* Address: mcper.cn
+* Port: 233
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
+#For reselling this free core's People / 版权声明
+* Copyright has become more and more important in the world, now in many countries, it is illegal for resell the open source tools, we hope that you can respect the results of the work of the author, please stop doing it, thanks.
+* 天朝小学生乃人间之害也
+* 售且毙妈，人之常情也
+* 倒卖智障你妈暴毙.    **(Do not translate it)**
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-__PocketMine-MP is a free, open-source software that creates Minecraft: Pocket Edition servers and allows extending its functionalities__
-
-### [Homepage](http://www.pocketmine.net/)
-
-### [Forums](http://forums.pocketmine.net/)
-
-### [Documentation](http://pocketmine-mp.readthedocs.org/)
-
-### [Plugin Repository](http://plugins.pocketmine.net/)
-
-<!--## [FAQ: Frequently Asked Questions](https://github.com/PocketMine/PocketMine-MP/wiki/Frequently-Asked-Questions)-->
-
-### [Official Jenkins server](http://jenkins.pocketmine.net/)
-
-### API Documentation
- * [Official Doxygen-generated documentation](http://docs.pocketmine.net/)
- * [Latest Doxygen generated from development](http://jenkins.pocketmine.net/job/PocketMine-MP-doc/doxygen/)
-
-### [Twitter @PocketMine](https://twitter.com/PocketMine)
-
-### IRC Chat #pocketmine (or #mcpedevs) @ irc.freenode.net
-[#pocketmine + #mcpedevs channel WebIRC](http://webchat.freenode.net/?channels=pocketmine,mcpedevs)
-
-### Want to contribute?
-* Check the [Contributing Guidelines](CONTRIBUTING.md)
-
-
-## Third-party Libraries/Protocols Used
-* __[PHP Sockets](http://php.net/manual/en/book.sockets.php)__
-* __[PHP SQLite3](http://php.net/manual/en/book.sqlite3.php)__
-* __[PHP BCMath](http://php.net/manual/en/book.bc.php)__
-* __[PHP pthreads](http://pthreads.org/)__ by _[krakjoe](https://github.com/krakjoe)_: Threading for PHP - Share Nothing, Do Everything.
-* __[PHP YAML](https://code.google.com/p/php-yaml/)__ by _Bryan Davis_: The Yaml PHP Extension provides a wrapper to the LibYAML library.
-* __[LibYAML](http://pyyaml.org/wiki/LibYAML)__ by _Kirill Simonov_: A YAML 1.1 parser and emitter written in C.
-* __[cURL](http://curl.haxx.se/)__: cURL is a command line tool for transferring data with URL syntax
-* __[Zlib](http://www.zlib.net/)__: A Massively Spiffy Yet Delicately Unobtrusive Compression Library
-* __[Source RCON Protocol](https://developer.valvesoftware.com/wiki/Source_RCON_Protocol)__
-* __[UT3 Query Protocol](http://wiki.unrealadmin.org/UT3_query_protocol)__
+#!!!Hope you can focus on it / 希望你可以关注它!!! >_<
+* https://github.com/Nukkit/Nukkit
+* NUKKIT is a software for MCPE server in JAVA.As U know,it's high-performance.
+* The software architecture is similar to PM so that it's easy to develop.
+* Now it can work well with some plugins and keep updated frequently(even 10 times a day)
+* 给NK打广告，前景很好的一个服务器软件（事实上是国产），理论上来说效率比pm高得多，如果你关注它，请点击楼上链接，关注百度贴吧=.=
