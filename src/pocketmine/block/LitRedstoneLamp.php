@@ -27,7 +27,7 @@ class LitRedstoneLamp extends RedstoneLamp{
 
 	public function onUpdate($type){
 		parent::onUpdate($type);
-		if($type === Level::BLOCK_UPDATE_NORMAL and !$this->isRedstoneActivated()){
+		if(($type === Level::BLOCK_UPDATE_NORMAL or $type === Level::BLOCK_UPDATE_REDSTONE) and !$this->isRedstoneActivated()){
 			$this->getLevel()->setBlock($this, new RedstoneLamp());
 		}
 	}

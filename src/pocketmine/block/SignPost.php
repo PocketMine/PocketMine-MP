@@ -23,10 +23,9 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
-use pocketmine\level\Level;
 use pocketmine\Player;
 
-class SignPost extends Transparent{
+class SignPost extends Flowable implements Attaching{
 
 	protected $id = self::SIGN_POST;
 
@@ -50,6 +49,13 @@ class SignPost extends Transparent{
 		return null;
 	}
 
+	public function getAttachSide(){
+		return 0;
+	}
+
+	public function canAttachTo(Block $block){
+		return !$block->isTransparent();
+	}
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		if($face !== 0){
@@ -69,18 +75,6 @@ class SignPost extends Transparent{
 				$this->getLevel()->setBlock($block, Block::get(Item::WALL_SIGN, $this->meta), true);
 
 				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public function onUpdate($type){
-		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->getId() === self::AIR){
-				$this->getLevel()->useBreakOn($this);
-
-				return Level::BLOCK_UPDATE_NORMAL;
 			}
 		}
 
