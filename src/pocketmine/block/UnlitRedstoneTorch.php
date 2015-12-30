@@ -29,10 +29,8 @@ class UnlitRedstoneTorch extends RedstoneTorch{
 
 	public function onUpdate($type){
 		parent::onUpdate($type);
-		if($type === Level::BLOCK_UPDATE_REDSTONE or $type === Level::BLOCK_UPDATE_SCHEDULED){
-			if(!$this->getSide($this->getAttachSide())->isRedstoneActivated()){
-				$this->getLevel()->setBlock($this, new RedstoneTorch($this->getDamage()));
-			}
+		if(($type === Level::BLOCK_UPDATE_REDSTONE or $type === Level::BLOCK_UPDATE_SCHEDULED) and !$this->getSide($this->getAttachSide())->isRedstoneActivated()){
+			$this->getLevel()->setBlock($this, new RedstoneTorch($this->getDamage()));
 		}
 	}
 
