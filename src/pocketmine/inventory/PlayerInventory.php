@@ -26,7 +26,6 @@ use pocketmine\event\entity\EntityArmorChangeEvent;
 use pocketmine\event\entity\EntityInventoryChangeEvent;
 use pocketmine\event\player\PlayerItemHeldEvent;
 use pocketmine\item\Item;
-use pocketmine\network\Network;
 use pocketmine\network\protocol\ContainerSetContentPacket;
 use pocketmine\network\protocol\ContainerSetSlotPacket;
 use pocketmine\network\protocol\MobArmorEquipmentPacket;
@@ -107,6 +106,9 @@ class PlayerInventory extends BaseInventory{
 			$item = $this->getItem($slot);
 
 			$itemIndex = $this->getHeldItemIndex();
+			if(($swap = array_search($slot, $this->hotbar)) !== false){
+				$this->hotbar[$swap] = $this->hotbar[$itemIndex];
+			}
 
 			if($this->getHolder() instanceof Player){
 				Server::getInstance()->getPluginManager()->callEvent($ev = new PlayerItemHeldEvent($this->getHolder(), $item, $slot, $itemIndex));
