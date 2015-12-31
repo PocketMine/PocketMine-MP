@@ -163,13 +163,15 @@ class Item{
 	const WALL_SIGN = 68;
 
 	const LEVER = 69;
+	const STONE_PRESSURE_PLATE = 70;
 	const IRON_DOOR_BLOCK = 71;
-
+	const WOODEN_PRESSURE_PLATE = 72;
 	const REDSTONE_ORE = 73;
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
 	const UNLIT_REDSTONE_TORCH = 75;
 	const REDSTONE_TORCH = 76;
+	const LIT_REDSTONE_TORCH = 76;
 	const STONE_BUTTON = 77;
 
 	const SNOW = 78;
@@ -193,6 +195,8 @@ class Item{
 	const CAKE_BLOCK = 92;
 
 	const TRAPDOOR = 96;
+	const WOODEN_TRAPDOOR = 96;
+	const WOOD_TRAPDOOR = 96;
 
 	const STONE_BRICKS = 98;
 	const STONE_BRICK = 98;

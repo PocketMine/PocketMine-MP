@@ -127,13 +127,12 @@ class Block extends Position implements Metadatable{
 	const WALL_SIGN = 68;
 
 	const LEVER = 69;
-
+	const STONE_PRESSURE_PLATE = 70;
 	const IRON_DOOR_BLOCK = 71;
-
+	const WOODEN_PRESSURE_PLATE = 72;
 	const REDSTONE_ORE = 73;
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
-
 	const UNLIT_REDSTONE_TORCH = 75;
 	const REDSTONE_TORCH = 76;
 	const LIT_REDSTONE_TORCH = 76;
