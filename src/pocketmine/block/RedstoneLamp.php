@@ -31,7 +31,6 @@ class RedstoneLamp extends Solid implements RedstoneSensitiveAppliance{
 
 	public function onUpdate($type){
 		parent::onUpdate($type);
-		var_dump($type);
 		if(($type === Level::BLOCK_UPDATE_NORMAL or Level::BLOCK_UPDATE_SCHEDULED or $type === Level::BLOCK_UPDATE_REDSTONE) and $this->isRedstoneActivated()){
 			$this->getLevel()->setBlock($this, new LitRedstoneLamp());
 		}
