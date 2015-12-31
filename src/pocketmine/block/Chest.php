@@ -36,6 +36,7 @@ use pocketmine\tile\Tile;
 class Chest extends Transparent{
 
 	protected $id = self::CHEST;
+	protected $tile;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
@@ -51,6 +52,26 @@ class Chest extends Transparent{
 
 	public function getName(){
 		return "Chest";
+	}
+
+	public function getTile(){
+		if(!$this->tile instanceof TileChest){
+			$t = $this->getLevel()->getTile($this);
+			if($t instanceof TileChest){
+				$this->tile = $t;
+			}else{
+				$nbt = new Compound("", [
+					new Enum("Items", []),
+					new String("id", $this instanceof TrappedChest ? Tile::TRAPPED_CHEST : Tile::CHEST),
+					new Int("x", $this->x),
+					new Int("y", $this->y),
+					new Int("z", $this->z)
+				]);
+				$nbt->Items->setTagType(NBT::TAG_Compound);
+				$this->tile = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+			}
+		}
+		return $this->tile;
 	}
 
 	public function getToolType(){
@@ -98,7 +119,7 @@ class Chest extends Transparent{
 		$this->getLevel()->setBlock($block, $this, true, true);
 		$nbt = new Compound("", [
 			new Enum("Items", []),
-			new String("id", Tile::CHEST),
+			new String("id", $this instanceof TrappedChest ? Tile::TRAPPED_CHEST : Tile::CHEST),
 			new Int("x", $this->x),
 			new Int("y", $this->y),
 			new Int("z", $this->z)
@@ -115,20 +136,19 @@ class Chest extends Transparent{
 			}
 		}
 
-		$tile = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
+		$this->tile = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
 
-		if($chest instanceof TileChest and $tile instanceof TileChest){
-			$chest->pairWith($tile);
-			$tile->pairWith($chest);
+		if($chest instanceof TileChest and $this->getTile() instanceof TileChest){
+			$chest->pairWith($this->getTile());
+			$this->getTile()->pairWith($chest);
 		}
 
 		return true;
 	}
 
 	public function onBreak(Item $item){
-		$t = $this->getLevel()->getTile($this);
-		if($t instanceof TileChest){
-			$t->unpair();
+		if($this->getTile() instanceof TileChest){
+			$this->getTile()->unpair();
 		}
 		$this->getLevel()->setBlock($this, new Air(), true, true);
 
@@ -138,28 +158,12 @@ class Chest extends Transparent{
 	public function onActivate(Item $item, Player $player = null){
 		if($player instanceof Player){
 			$top = $this->getSide(1);
-			if($top->isTransparent() !== true){
+			if($top->isTransparent() !== true) {
 				return true;
 			}
 
-			$t = $this->getLevel()->getTile($this);
-			$chest = null;
-			if($t instanceof TileChest){
-				$chest = $t;
-			}else{
-				$nbt = new Compound("", [
-					new Enum("Items", []),
-					new String("id", Tile::CHEST),
-					new Int("x", $this->x),
-					new Int("y", $this->y),
-					new Int("z", $this->z)
-				]);
-				$nbt->Items->setTagType(NBT::TAG_Compound);
-				$chest = Tile::createTile("Chest", $this->getLevel()->getChunk($this->x >> 4, $this->z >> 4), $nbt);
-			}
-
-			if(isset($chest->namedtag->Lock) and $chest->namedtag->Lock instanceof String){
-				if($chest->namedtag->Lock->getValue() !== $item->getCustomName()){
+			if(isset($this->getTile()->namedtag->Lock) and $this->getTile()->namedtag->Lock instanceof String){
+				if($this->getTile()->namedtag->Lock->getValue() !== $item->getCustomName()){
 					return true;
 				}
 			}
@@ -167,7 +171,7 @@ class Chest extends Transparent{
 			if($player->isCreative()){
 				return true;
 			}
-			$player->addWindow($chest->getInventory());
+			$player->addWindow($this->getTile()->getInventory());
 		}
 
 		return true;
