@@ -252,6 +252,13 @@ class Item{
 	const WOODEN_BUTTON = 143;
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
+	const WEIGHTED_PRESSURE_PLATE_LIGHT = 147;
+	const LIGHT_WEIGHTED_PRESSURE_PLATE = 147;
+	const GOLD_WEIGHTED_PRESSURE_PLATE = 147;
+	const GOLDEN_WEIGHTED_PRESSURE_PLATE = 147;
+	const WEIGHTED_PRESSURE_PLATE_HEAVY = 148;
+	const HEAVY_WEIGHTED_PRESSURE_PLATE = 148;
+	const IRON_WEIGHTED_PRESSURE_PLATE = 148;
 
 	const DAYLIGHT_DETECTOR = 151;
 	const REDSTONE_BLOCK = 152;
@@ -942,10 +949,10 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LEVER));
 		self::addCreativeItem(Item::get(Item::REDSTONE_LAMP));
 		self::addCreativeItem(Item::get(Item::REDSTONE_TORCH));
-		// TODO: Wood pressure plate
-		// TODO: Stone pressure plate
-		// TODO: Weighted pressure plate light
-		// TODO: Weighted pressure plate heavy
+		self::addCreativeItem(Item::get(Item::STONE_PRESSURE_PLATE));
+		self::addCreativeItem(Item::get(Item::WOODEN_PRESSURE_PLATE));
+		self::addCreativeItem(Item::get(Item::WEIGHTED_PRESSURE_PLATE_LIGHT));
+		self::addCreativeItem(Item::get(Item::WEIGHTED_PRESSURE_PLATE_HEAVY));
 		self::addCreativeItem(Item::get(Item::WOODEN_BUTTON, 5));
 		self::addCreativeItem(Item::get(Item::STONE_BUTTON, 5));
 		self::addCreativeItem(Item::get(Item::DAYLIGHT_DETECTOR));

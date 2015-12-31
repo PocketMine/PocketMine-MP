@@ -21,17 +21,11 @@
 
 namespace pocketmine\block;
 
-use pocketmine\entity\Entity;
-use pocketmine\entity\Snowball;
-
-class WoodenPressurePlate extends StonePressurePlate{
-	protected $id = self::WOODEN_PRESSURE_PLATE;
-
-	public function acceptsEntity(Entity $entity){
-		return !($entity instanceof Snowball);
-	}
+class HeavyPressurePlate extends LightPressurePlate{
+	protected $id = self::WEIGHTED_PRESSURE_PLATE_HEAVY;
+	protected $denominator = 10;
 
 	public function getName(){
-		return "Wooden Pressure Plate";
+		return "Weighted Pressure Plate (Heavy)";
 	}
 }

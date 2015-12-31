@@ -216,6 +216,13 @@ class Block extends Position implements Metadatable{
 	const WOODEN_BUTTON = 143;
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
+	const WEIGHTED_PRESSURE_PLATE_LIGHT = 147;
+	const LIGHT_WEIGHTED_PRESSURE_PLATE = 147;
+	const GOLD_WEIGHTED_PRESSURE_PLATE = 147;
+	const GOLDEN_WEIGHTED_PRESSURE_PLATE = 147;
+	const WEIGHTED_PRESSURE_PLATE_HEAVY = 148;
+	const HEAVY_WEIGHTED_PRESSURE_PLATE = 148;
+	const IRON_WEIGHTED_PRESSURE_PLATE = 148;
 
 	const DAYLIGHT_DETECTOR = 151;
 	const REDSTONE_BLOCK = 152;
@@ -393,7 +400,9 @@ class Block extends Position implements Metadatable{
 			self::$list[self::WALL_SIGN] = WallSign::class;
 
 			self::$list[self::LEVER] = Lever::class;
+			self::$list[self::STONE_PRESSURE_PLATE] = StonePressurePlate::class;
 			self::$list[self::IRON_DOOR_BLOCK] = IronDoor::class;
+			self::$list[self::WOODEN_PRESSURE_PLATE] = WoodenPressurePlate::class;
 			self::$list[self::REDSTONE_ORE] = RedstoneOre::class;
 			self::$list[self::GLOWING_REDSTONE_ORE] = GlowingRedstoneOre::class;
 
@@ -458,6 +467,8 @@ class Block extends Position implements Metadatable{
 			self::$list[self::WOODEN_BUTTON] = WoodenButton::class;
 			self::$list[self::ANVIL] = Anvil::class;
 			self::$list[self::TRAPPED_CHEST] = TrappedChest::class;
+			self::$list[self::LIGHT_WEIGHTED_PRESSURE_PLATE] = LightPressurePlate::class;
+			self::$list[self::HEAVY_WEIGHTED_PRESSURE_PLATE] = HeavyPressurePlate::class;
 
 			self::$list[self::DAYLIGHT_DETECTOR] = DaylightDetector::class;
 			self::$list[self::REDSTONE_BLOCK] = RedstoneBlock::class;
