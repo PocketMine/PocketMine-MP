@@ -34,10 +34,16 @@ class TrappedChest extends Chest implements RedstonePowerSource{
 	}
 
 	public function getPowerLevel(){
-		return $this->isActivated() ? 16 : 0;
+		return $this->isActivated() ? 15 : 0;
 	}
 
 	public function isStronglyPowering(Block $block){
+		for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
+			if($this->getSide($side)->equals($block)){
+				return true;
+				break;
+			}
+		}
 		return false;
 	}
 

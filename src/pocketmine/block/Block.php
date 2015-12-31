@@ -217,6 +217,7 @@ class Block extends Position implements Metadatable{
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
 
+	const DAYLIGHT_DETECTOR = 151;
 	const REDSTONE_BLOCK = 152;
 
 	const QUARTZ_BLOCK = 155;
@@ -249,6 +250,8 @@ class Block extends Position implements Metadatable{
 	const COAL_BLOCK = 173;
 	const PACKED_ICE = 174;
 	const DOUBLE_PLANT = 175;
+
+	const DAYLIGHT_DETECTOR_INVERTED = 178;
 
 	const FENCE_GATE_SPRUCE = 183;
 	const FENCE_GATE_BIRCH = 184;
@@ -455,6 +458,8 @@ class Block extends Position implements Metadatable{
 			self::$list[self::WOODEN_BUTTON] = WoodenButton::class;
 			self::$list[self::ANVIL] = Anvil::class;
 			self::$list[self::TRAPPED_CHEST] = TrappedChest::class;
+
+			self::$list[self::DAYLIGHT_DETECTOR] = DaylightDetector::class;
 			self::$list[self::REDSTONE_BLOCK] = RedstoneBlock::class;
 
 			self::$list[self::QUARTZ_BLOCK] = Quartz::class;
@@ -475,6 +480,8 @@ class Block extends Position implements Metadatable{
 			self::$list[self::COAL_BLOCK] = Coal::class;
 			self::$list[self::PACKED_ICE] = PackedIce::class;
 			self::$list[self::DOUBLE_PLANT] = DoublePlant::class;
+
+			self::$list[self::DAYLIGHT_DETECTOR_INVERTED] = DaylightDetectorInverted::class;
 
 			self::$list[self::FENCE_GATE_SPRUCE] = FenceGateSpruce::class;
 			self::$list[self::FENCE_GATE_BIRCH] = FenceGateBirch::class;
@@ -898,7 +905,6 @@ class Block extends Position implements Metadatable{
 				return true;
 			}
 		}
-
 		return false;
 	}
 

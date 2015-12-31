@@ -21,6 +21,7 @@
 
 namespace pocketmine\block;
 
+use pocketmine\item\Item;
 use pocketmine\level\Level;
 
 class RedstoneTorch extends Torch implements RedstonePowerSource{
@@ -35,10 +36,25 @@ class RedstoneTorch extends Torch implements RedstonePowerSource{
 	}
 
 	public function getPowerLevel(){
-		return 16;
+		return 15;
 	}
 
 	public function isStronglyPowering(Block $block){
+		if($this->getSide($this->getAttachSide())->equals($block)){
+			return false;
+		}
+		for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
+			if($side !== $this->getAttachSide() and $this->getSide($side)->equals($block)){
+				return true;
+				break;
+			}
+		}
 		return false;
+	}
+
+	public function getDrops(Item $item){
+		return [
+			[self::REDSTONE_TORCH, 0, 1]
+		];
 	}
 }
