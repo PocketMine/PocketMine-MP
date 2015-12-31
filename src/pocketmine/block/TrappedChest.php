@@ -24,7 +24,6 @@ namespace pocketmine\block;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\Player;
-use pocketmine\tile\Chest as TileChest;
 
 class TrappedChest extends Chest implements RedstonePowerSource{
 
@@ -61,11 +60,9 @@ class TrappedChest extends Chest implements RedstonePowerSource{
 	public function onActivate(Item $item, Player $player = null){
 		parent::onActivate($item, $player);
 		if($this->getPowerLevel() > 0){
-			$this->getLevel()->updateAround($this, Level::BLOCK_UPDATE_REDSTONE);
 			$this->getLevel()->scheduleUpdate($this, 20);
-		}else{
-			$this->getLevel()->updateAround($this, Level::BLOCK_UPDATE_REDSTONE);
 		}
+		$this->getLevel()->updateAround($this, Level::BLOCK_UPDATE_REDSTONE);
 		return true;
 	}
 }
