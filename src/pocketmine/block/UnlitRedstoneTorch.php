@@ -37,4 +37,8 @@ class UnlitRedstoneTorch extends RedstoneTorch{
 	public function getPowerLevel(){
 		return 0;
 	}
+
+	public function isStronglyPowering(Block $block){
+		return false;
+	}
 }

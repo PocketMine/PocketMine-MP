@@ -249,6 +249,7 @@ class Item{
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
 
+	const DAYLIGHT_DETECTOR = 151;
 	const REDSTONE_BLOCK = 152;
 
 	const QUARTZ_BLOCK = 155;
@@ -281,6 +282,8 @@ class Item{
 	const COAL_BLOCK = 173;
 	const PACKED_ICE = 174;
 	const DOUBLE_PLANT = 175;
+
+	const DAYLIGHT_DETECTOR_INVERTED = 178;
 
 	const FENCE_GATE_SPRUCE = 183;
 	const FENCE_GATE_BIRCH = 184;
@@ -934,14 +937,14 @@ class Item{
 		self::addCreativeItem(Item::get(Item::GOLD_BOOTS, 0));
 		self::addCreativeItem(Item::get(Item::LEVER));
 		self::addCreativeItem(Item::get(Item::REDSTONE_LAMP));
-		self::addCreativeItem(Item::get(Item::REDSTONE_TORCH, 0));
+		self::addCreativeItem(Item::get(Item::REDSTONE_TORCH));
 		// TODO: Wood pressure plate
 		// TODO: Stone pressure plate
 		// TODO: Weighted pressure plate light
 		// TODO: Weighted pressure plate heavy
 		self::addCreativeItem(Item::get(Item::WOODEN_BUTTON, 5));
 		self::addCreativeItem(Item::get(Item::STONE_BUTTON, 5));
-		// TODO: Daylight sensor
+		self::addCreativeItem(Item::get(Item::DAYLIGHT_DETECTOR));
 		// TODO: Tripwire hook
 		self::addCreativeItem(Item::get(Item::SNOWBALL));
 

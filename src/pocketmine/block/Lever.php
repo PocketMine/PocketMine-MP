@@ -37,15 +37,20 @@ class Lever extends Flowable implements RedstonePowerSource, Attaching{
 	}
 
 	public function getPowerLevel(){
-		return $this->isActivated() ? 16 : 0;
+		return $this->isActivated() ? 15 : 0;
 	}
 
 	public function isStronglyPowering(Block $block){
 		if(!$this->isActivated()){
 			return false;
 		}
-		$vector = new Vector3($this->x, $this->y, $this->z);
-		return $vector->getSide($this->getAttachSide())->equals($block);
+		for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
+			if($this->getSide($side)->equals($block)){
+				return true;
+				break;
+			}
+		}
+		return false;
 	}
 
 	public function isActivated(){
