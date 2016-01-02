@@ -20,8 +20,19 @@
 */
 
 namespace pocketmine\entity;
-
+use pocketmine\Player;
 
 class Silverfish extends Monster{
-
+	const NETWORK_ID = 39;
+	
+	public function getName(){
+		return "Silverfish";
+	}
+	
+	public function spawnTo(Player $player){
+		$pk = $this->createAddEntityPacket($player);
+		$pk->type = Silverfish::NETWORK_ID;
+		$player->dataPacket($pk);
+		parent::spawnTo($player);
+	}
 }

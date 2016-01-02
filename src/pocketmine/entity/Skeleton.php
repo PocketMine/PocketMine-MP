@@ -20,7 +20,18 @@
 */
 
 namespace pocketmine\entity;
-
+use pocketmine\Player;
 class Skeleton extends Monster implements ProjectileSource{
-
+	const NETWORK_ID = 34;
+	
+	public function getName(){
+		return "Skeleton";
+	}
+	
+	public function spawnTo(Player $player){
+		$pk = $this->createAddEntityPacket($player);
+		$pk->type = Skeleton::NETWORK_ID;
+		$player->dataPacket($pk);
+		parent::spawnTo($player);
+	}
 }

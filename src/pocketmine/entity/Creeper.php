@@ -20,8 +20,23 @@
 */
 
 namespace pocketmine\entity;
-
+use pocketmine\Player;
 
 class Creeper extends Monster implements Explosive{
-
+	const NETWORK_ID = 33;
+	
+	public function getName(){
+		return "Creeper";
+	}
+	
+	public function spawnTo(Player $player){
+		$pk = $this->createAddEntityPacket($player);
+		$pk->type = Creeper::NETWORK_ID;
+		$player->dataPacket($pk);
+		parent::spawnTo($player);
+	}
+	
+	public function explode() {
+		// TODO
+	}
 }
