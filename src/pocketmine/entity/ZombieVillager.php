@@ -22,23 +22,17 @@
 namespace pocketmine\entity;
 use pocketmine\Player;
 
-use pocketmine\inventory\InventoryHolder;
-
-class Enderman extends Monster implements InventoryHolder{
-	const NETWORK_ID = 38;
+class ZombieVillager extends Monster{
+	const NETWORK_ID = 44;
 	
 	public function getName(){
-		return "Enderman";
+		return "ZombieVillager";
 	}
-	
+
 	public function spawnTo(Player $player){
 		$pk = $this->createAddEntityPacket($player);
-		$pk->type = Enderman::NETWORK_ID;
+		$pk->type = ZombieVillager::NETWORK_ID;
 		$player->dataPacket($pk);
 		parent::spawnTo($player);
-	}
-	
-	public function getInventory() {
-		// TODO
 	}
 }

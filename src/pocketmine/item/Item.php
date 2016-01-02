@@ -31,6 +31,18 @@ use pocketmine\entity\Entity;
 use pocketmine\entity\Squid;
 use pocketmine\entity\Villager;
 use pocketmine\entity\Zombie;
+use pocketmine\entity\Creeper;
+use pocketmine\entity\Spider;
+use pocketmine\entity\Skeleton;
+use pocketmine\entity\ZombiePigman;
+use pocketmine\entity\Slime;
+use pocketmine\entity\Enderman;
+use pocketmine\entity\Silverfish;
+use pocketmine\entity\CaveSpider;
+use pocketmine\entity\Ghast;
+use pocketmine\entity\MagmaCube;
+use pocketmine\entity\Blaze;
+use pocketmine\entity\ZombieVillager;
 use pocketmine\inventory\Fuel;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\level\Level;
@@ -877,6 +889,18 @@ class Item{
 		// TODO: Slime
 		// TODO: Spider
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Zombie::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Creeper::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Skeleton::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Spider::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, ZombiePigman::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Slime::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Enderman::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Silverfish::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, CaveSpider::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Ghast::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, MagmaCube::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Blaze::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, ZombieVillager::NETWORK_ID));
 		//TODO: PigZombie
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Squid::NETWORK_ID));
 		// TODO: Cave spider
