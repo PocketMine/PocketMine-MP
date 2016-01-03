@@ -46,10 +46,8 @@ class MobsCommand extends VanillaCommand{
 			return true;
 		}
 		
-// 		Command::broadcastCommandMessage($sender, new TranslationContainer("commands.mobs.start"));
 		if(count($args) < 1){
-// 			$sender->sendMessage(new TranslationContainer("commands.generic.usage", [$this->usageMessage]));
-			MainLogger::getLogger()->info("$args[0] is not a supported mobs command.  Issue mobs help for a list of valid commands");
+			$sender->sendMessage("$args[0] is not a supported mobs command.  Issue mobs help for a list of valid commands");
 			return false;
 		}
 		
@@ -70,17 +68,19 @@ class MobsCommand extends VanillaCommand{
 			} else if (strtolower($args[0]) === "status") {
 				$mobsControl->displayStatus();
 			} else if (strtolower($args[0]) === "help"){
-				MainLogger::getLogger()->info("Supported mobs commands");
-				MainLogger::getLogger()->info("mobs sleep - Put all mobs to sleep");
-				MainLogger::getLogger()->info("mobs wakeup - Wake up all mobs");
-				MainLogger::getLogger()->info("mobs kill - Kill all mobs");
-				MainLogger::getLogger()->info("mobs status - Show mobs status");
-				MainLogger::getLogger()->info("mobs types - List supported mob types");
-				MainLogger::getLogger()->info("mobs speed [All, MobType] speedValue - Set mob speed");
-				MainLogger::getLogger()->info("mobs attack [All, MobType] attackValue - Set mob attack damage");
-				MainLogger::getLogger()->info("mobs health [All, MobType] healthValue - Set mob health");
-				MainLogger::getLogger()->info("mobs proximity [All, MobType] healthValue - Set mob proximity");
-// 				MainLogger::getLogger()->info("mobs follow [All, MobType] [Normal, Target] - Set mob follow rule");
+				$sender->sendMessage("Supported mobs commands");
+				$sender->sendMessage("mobs sleep - Put all mobs to sleep");
+				$sender->sendMessage("mobs wakeup - Wake up all mobs");
+				$sender->sendMessage("mobs kill - Kill all mobs");
+				$sender->sendMessage("mobs status - Show mobs status");
+				$sender->sendMessage("mobs types - List supported mob types");
+				$sender->sendMessage("mobs speed [All, MobType] speedValue - Set mob speed");
+				$sender->sendMessage("mobs attack [All, MobType] attackValue - Set mob attack damage");
+				$sender->sendMessage("mobs health [All, MobType] healthValue - Set mob health");
+				$sender->sendMessage("mobs proximity [All, MobType] healthValue - Set mob proximity");
+			} else {
+				$sender->sendMessage("Command entered is not a supported mobs command, enter mobs help for list of supported commands");
+				return false;
 			}
 		} else if (count($args) == 3) {
 			if (strtolower($args[0]) === "speed") {
@@ -97,16 +97,16 @@ class MobsCommand extends VanillaCommand{
 				} else if (strtolower($args[2]) === "target") {
 					$follow = MobsControl::FOLLOW_TARGET;
 				} else {
-					MainLogger::getLogger()->info("$args[2] is not a supported follow mode");
+					$sender->sendMessage("$args[2] is not a supported follow mode");
 					return false;
 				}
 				$mobsControl->setFollow($args[1], $follow);
 			} else {
-				MainLogger::getLogger()->info("Command entered is not a supported mobs command, enter mobs help for list of supported commands");
+				$sender->sendMessage("Command entered is not a supported mobs command, enter mobs help for list of supported commands");
 				return false;
 			}
 		} else {
-			MainLogger::getLogger()->info("Command entered is not a supported mobs command, enter mobs help for list of supported commands");
+			$sender->sendMessage("Command entered is not a supported mobs command, enter mobs help for list of supported commands");
 			return false;
 		}
 		return true;
