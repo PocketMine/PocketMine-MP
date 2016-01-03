@@ -20,7 +20,6 @@
 
 namespace pocketmine\entity;
 
-use pocketmine\entity\Monster;
 use pocketmine\utils\MainLogger;
 
 class MobsControl {
@@ -62,10 +61,10 @@ class MobsControl {
 		$this->countMap["PlaceHolder"] = 0;
 		
 		
-// 		$this->speedMap["Zombie"] = .1;
-// 		$this->damageMap["Zombie"] = 1;
-// 		$this->healthMap["Zombie"] = 20;
-// 		$this->proximityMap["Zombie"] = 10;
+		$this->speedMap["Zombie"] = .03;
+		$this->damageMap["Zombie"] = 3;
+		$this->healthMap["Zombie"] = 20;
+		$this->proximityMap["Zombie"] = 4;
 		
 // 		$this->speedMap["Creeper"] = .1;
 // 		$this->damageMap["Creeper"] = 1;
@@ -82,45 +81,45 @@ class MobsControl {
 // 		$this->healthMap["Spider"] = 20;
 // 		$this->proximityMap["Spider"] = 10;
 		
-// 		$this->speedMap["ZombiePigman"] = .1;
-// 		$this->damageMap["ZombiePigman"] = 1;
-// 		$this->healthMap["ZombiePigman"] = 20;
-// 		$this->proximityMap["ZombiePigman"] = 10;
+		$this->speedMap["ZombiePigman"] = .05;
+		$this->damageMap["ZombiePigman"] = 6;
+		$this->healthMap["ZombiePigman"] = 50;
+		$this->proximityMap["ZombiePigman"] = 6;
 		
 // 		$this->speedMap["Slime"] = .1;
 // 		$this->damageMap["Slime"] = 1;
 // 		$this->healthMap["Slime"] = 20;
 // 		$this->proximityMap["Slime"] = 10;
 		
-// 		$this->speedMap["Enderman"] = .1;
-// 		$this->damageMap["Enderman"] = 1;
-// 		$this->healthMap["Enderman"] = 20;
-// 		$this->proximityMap["Enderman"] = 10;
+		$this->speedMap["Enderman"] = .08;
+		$this->damageMap["Enderman"] = 8;
+		$this->healthMap["Enderman"] = 60;
+		$this->proximityMap["Enderman"] = 6;
 		
-// 		$this->speedMap["Silverfish"] = .1;
-// 		$this->damageMap["Silverfish"] = 1;
-// 		$this->healthMap["Silverfish"] = 20;
-// 		$this->proximityMap["Silverfish"] = 10;
+		$this->speedMap["Silverfish"] = .01;
+		$this->damageMap["Silverfish"] = 0;
+		$this->healthMap["Silverfish"] = 20;
+		$this->proximityMap["Silverfish"] = 2;
 		
 // 		$this->speedMap["CaveSpider"] = .1;
 // 		$this->damageMap["CaveSpider"] = 1;
 // 		$this->healthMap["CaveSpider"] = 20;
 // 		$this->proximityMap["CaveSpider"] = 10;
 		
-// 		$this->speedMap["Ghast"] = .1;
-// 		$this->damageMap["Ghast"] = 1;
-// 		$this->healthMap["Ghast"] = 20;
-// 		$this->proximityMap["Ghast"] = 10;
+		$this->speedMap["Ghast"] = .1;
+		$this->damageMap["Ghast"] = 13;
+		$this->healthMap["Ghast"] = 1000;
+		$this->proximityMap["Ghast"] = 6;
 		
 // 		$this->speedMap["MagmaCube"] = .1;
 // 		$this->damageMap["MagmaCube"] = 1;
 // 		$this->healthMap["MagmaCube"] = 20;
 // 		$this->proximityMap["MagmaCube"] = 10;
 		
-// 		$this->speedMap["Blaze"] = .1;
-// 		$this->damageMap["Blaze"] = 1;
-// 		$this->healthMap["Blaze"] = 20;
-// 		$this->proximityMap["Blaze"] = 10;
+		$this->speedMap["Blaze"] = .04;
+		$this->damageMap["Blaze"] = 10;
+		$this->healthMap["Blaze"] = 15;
+		$this->proximityMap["Blaze"] = 2;
 		
 // 		$this->speedMap["ZombieVillager"] = .1;
 // 		$this->damageMap["ZombieVillager"] = 1;
