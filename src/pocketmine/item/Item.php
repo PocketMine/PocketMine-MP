@@ -31,6 +31,7 @@ use pocketmine\entity\Entity;
 use pocketmine\entity\Squid;
 use pocketmine\entity\Villager;
 use pocketmine\entity\Zombie;
+use pocketmine\entity\ZombiePigman;
 use pocketmine\inventory\Fuel;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\level\Level;
@@ -877,6 +878,7 @@ class Item{
 		// TODO: Slime
 		// TODO: Spider
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Zombie::NETWORK_ID));
+		self::addCreativeItem(Item::get(Item::SPAWN_EGG, ZombiePigman::NETWORK_ID));
 		//TODO: PigZombie
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Squid::NETWORK_ID));
 		// TODO: Cave spider
