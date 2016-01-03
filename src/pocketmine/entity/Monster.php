@@ -43,7 +43,7 @@ abstract class Monster extends Creature{
 		parent::initEntity();
 		$this->mobsControl = MobsControl::getInstance();
 		$this->mobsControl->register($this);
-		$health = $mobsControl->getHealth($this->getName());
+		$health = $this->mobsControl->getHealth($this->getName());
 		$this->setMaxHealth($health);
 		$this->setHealth($health);
 	}
