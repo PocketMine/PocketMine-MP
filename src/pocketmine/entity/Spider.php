@@ -20,8 +20,19 @@
 */
 
 namespace pocketmine\entity;
-
+use pocketmine\Player;
 
 class Spider extends Monster{
-
+	const NETWORK_ID = 35;
+	
+	public function getName(){
+		return "Spider";
+	}
+	
+	public function spawnTo(Player $player){
+		$pk = $this->createAddEntityPacket($player);
+		$pk->type = Spider::NETWORK_ID;
+		$player->dataPacket($pk);
+		parent::spawnTo($player);
+	}
 }

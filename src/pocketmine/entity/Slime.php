@@ -20,8 +20,19 @@
 */
 
 namespace pocketmine\entity;
+use pocketmine\Player;
 
-
-class Slime extends Living{
-
+class Slime extends Monster{
+	const NETWORK_ID = 37;
+	
+	public function getName(){
+		return "Slime";
+	}
+	
+	public function spawnTo(Player $player){
+		$pk = $this->createAddEntityPacket($player);
+		$pk->type = Slime::NETWORK_ID;
+		$player->dataPacket($pk);
+		parent::spawnTo($player);
+	}
 }

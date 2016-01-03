@@ -43,6 +43,18 @@ use pocketmine\entity\Snowball;
 use pocketmine\entity\Squid;
 use pocketmine\entity\Villager;
 use pocketmine\entity\Zombie;
+use pocketmine\entity\Creeper;
+use pocketmine\entity\Skeleton;
+use pocketmine\entity\Spider;
+use pocketmine\entity\ZombiePigman;
+use pocketmine\entity\Slime;
+use pocketmine\entity\Enderman;
+use pocketmine\entity\Silverfish;
+use pocketmine\entity\CaveSpider;
+use pocketmine\entity\Ghast;
+use pocketmine\entity\MagmaCube;
+use pocketmine\entity\Blaze;
+use pocketmine\entity\ZombieVillager;
 use pocketmine\event\HandlerList;
 use pocketmine\event\level\LevelInitEvent;
 use pocketmine\event\level\LevelLoadEvent;
@@ -2570,6 +2582,20 @@ class Server{
 		Entity::registerEntity(Snowball::class);
 		Entity::registerEntity(Villager::class);
 		Entity::registerEntity(Zombie::class);
+		Entity::registerEntity(Creeper::class);
+		Entity::registerEntity(Skeleton::class);
+		Entity::registerEntity(Spider::class);
+		Entity::registerEntity(ZombiePigman::class);
+		Entity::registerEntity(Slime::class);
+		Entity::registerEntity(Enderman::class);
+		Entity::registerEntity(Silverfish::class);
+		Entity::registerEntity(CaveSpider::class);
+		Entity::registerEntity(Ghast::class);
+		Entity::registerEntity(MagmaCube::class);
+		Entity::registerEntity(Blaze::class);
+		Entity::registerEntity(ZombieVillager::class);
+		
+		
 		Entity::registerEntity(Squid::class);
 
 		Entity::registerEntity(Human::class, true);
