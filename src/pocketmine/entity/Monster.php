@@ -51,7 +51,6 @@ abstract class Monster extends Creature{
 	public function kill() {
 		if ($this->getHealth() > 0) {
 			$name = $this->getName();
-			print "Monster:kill called for $name \n";
 			$this->mobsControl->deregister($this);
 		}
 		parent::kill();
@@ -85,7 +84,8 @@ abstract class Monster extends Creature{
 			if ($proximity == 0) {
 				$ev = new EntityDamageByEntityEvent($this, $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, $attackDamage);
 				$player->attack($attackDamage, $ev);
-			} else if ($proximity == 1) {
+			} else {
+// 			} else if ($proximity == 1) {
 				$monsterPosition = new PositionAndOrientation($this);
 				if ($this->x < $player->getX()) {
 					if ($this->z < $player->getZ()) {
@@ -115,10 +115,10 @@ abstract class Monster extends Creature{
 				$this->y = $monsterPosition->y;
 				$this->z = $monsterPosition->z;
 				$this->yaw = $monsterPosition->yaw;
-			} else {
-				print "Not near player, so resetting to not following anyone \n";
-				$chosenPlayer = null;
 			}
+// 			} else {
+// 				$chosenPlayer = null;
+// 			}
 		}
 	}
 	
@@ -138,28 +138,28 @@ abstract class Monster extends Creature{
 	}
 	
 	public function getDrops(){
-		print "Monster:getDrops \n";
+// 		print "Monster:getDrops \n";
 		$drops = [
 				ItemItem::get(ItemItem::FEATHER, 0, 1)
 		];
 // 		if($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player){
 		if(mt_rand(0, 199) < 5){
-			print "Monster:gerDrops 1 \n";
+// 			print "Monster:gerDrops 1 \n";
 			switch(mt_rand(0, 2)){
 				case 0:
 					$drops[] = ItemItem::get(ItemItem::IRON_INGOT, 0, 1);
-					print "Monster:gerDrops 2 \n";
+// 					print "Monster:gerDrops 2 \n";
 					break;
 				case 1:
 					$drops[] = ItemItem::get(ItemItem::CARROT, 0, 1);
-					print "Monster:gerDrops 2 \n";
+// 					print "Monster:gerDrops 2 \n";
 					break;
 				case 2:
 					$drops[] = ItemItem::get(ItemItem::POTATO, 0, 1);
-					print "Monster:gerDrops 3 \n";
+// 					print "Monster:gerDrops 3 \n";
 					break;
 			}
-			print "Monster:gerDrops 4 \n";
+// 			print "Monster:gerDrops 4 \n";
 		}
 // 		}
 // 		print "Monster:gerDrops 5 $drops\n";
@@ -168,18 +168,19 @@ abstract class Monster extends Creature{
 	
 	private function choosePlayer($withinProximity) {
 		if ($this->chosenPlayer != null) {
-			if ($this->chosenPlayer->isOnline()) {
-				$name = $this->chosenPlayer->getName();
-				// 				print "Already following a player: $name \n";
-				return $this->chosenPlayer;
+			if ($this->chosenPlayer->isOnline() && $this->chosenPlayer->getHealth() > 0) {
+				$proximity = $this->getPlayerProximity($this->chosenPlayer, $withinProximity);
+				if ($proximity >= 0) {
+					return $this->chosenPlayer;
+				}
 			}
 		}
 		$playerCount = 0;
 		foreach($this->level->getChunkPlayers($this->chunk->getX(), $this->chunk->getZ()) as $player){
-			if($player->isOnline()) {
+			if($player->isOnline() && $player->getHealth() > 0) {
 				$proximity = $this->getPlayerProximity($player, $withinProximity);
 				if ($proximity >= 0) {
-					$name = $player->getName();
+// 					$name = $player->getName();
 					//print "Adding player: $name to list of nearby players \n";
 					$playerCount = $playerCount + 1;
 					$playerArray[$playerCount] = $player;

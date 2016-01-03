@@ -21,6 +21,7 @@
 namespace pocketmine\entity;
 
 use pocketmine\utils\MainLogger;
+use pocketmine\command\CommandSender;
 
 class MobsControl {
 	
@@ -140,12 +141,13 @@ class MobsControl {
 			foreach($this->types as $val) {
 				$this->speedMap[$val] = $speed;
 			}
-			MainLogger::getLogger()->info("Set speed for all mobs to: $speed");
+			return true;
 		} else if (in_array($mobName, $this->types)) {
 			$this->speedMap[$mobName] = $speed;
+			return true;
 			MainLogger::getLogger()->info("Set $mobName speed to: $speed");
 		} else {
-			MainLogger::getLogger()->info("$mobName is not a supported mob");
+			return false;
 		}
 	}
 	
@@ -163,12 +165,12 @@ class MobsControl {
 			foreach($this->types as $val) {
 				$this->damageMap[$val] = $damage;
 			}
-			MainLogger::getLogger()->info("Set attack damage for all mobs to: $damage");
+			return true;
 		} else if (in_array($mobName, $this->types)) {
 			$this->damageMap[$mobName] = $damage;
-			MainLogger::getLogger()->info("Set $mobName damage to: $damage");
+			return true;
 		} else {
-			MainLogger::getLogger()->info("$mobName is not a supported mob");
+			return false;
 		}
 	}
 	
@@ -186,12 +188,12 @@ class MobsControl {
 			foreach($this->types as $val) {
 				$this->healthMap[$val] = $health;
 			}
-			MainLogger::getLogger()->info("Set health for all mobs to: $health");
+			return true;
 		} else if (in_array($mobName, $this->types)) {
 			$this->healthMap[$mobName] = $health;
-			MainLogger::getLogger()->info("Set $mobName health to: $health");
+			return true;
 		} else {
-			MainLogger::getLogger()->info("$mobName is not a supported mob");
+			return false;
 		}
 	}
 	
@@ -210,12 +212,12 @@ class MobsControl {
 			foreach($this->types as $val) {
 				$this->proximityMap[$val] = $proximity;
 			}
-			MainLogger::getLogger()->info("Set proximity detection for all mobs to: $proximity");
+			return true;
 		} else if (in_array($mobName, $this->types)) {
 			$this->proximityMap[$mobName] = $proximity;
-			MainLogger::getLogger()->info("Set $mobName proximity detection to: $proximity");
+			return true;
 		} else {
-			MainLogger::getLogger()->info("$mobName is not a supported mob");
+			return false;
 		}
 	}
 	
@@ -233,12 +235,12 @@ class MobsControl {
 			foreach($this->types as $val) {
 				$this->followMap[$val] = $follow;
 			}
-			MainLogger::getLogger()->info("Set follow mode for all mobs to: $follow");
+			return true;
 		} else if (in_array($mobName, $this->types)) {
 			$this->followMap[$mobName] = $follow;
-			MainLogger::getLogger()->info("Set $mobName follow mode to: $follow");
+			return true;
 		} else {
-			MainLogger::getLogger()->info("$$mobName is not a supported mob");
+			return false;
 		}
 		$this->healthMap[$mobName] = $follow;
 	}
@@ -253,17 +255,11 @@ class MobsControl {
 	}
 	
 	public function register(Monster $monster) {
-		print "MobsControl register 1 \n";
 		$mobName = $monster->getName();
-		print "MobsControl register 2 type = $mobName \n";
 		if (array_key_exists($mobName, $this->countMap)) {
-			print "MobsControl register 3 \n";
 			$this->countMap[$mobName] = $this->countMap[$mobName] + 1;
-			print "MobsControl register 4 \n";
 		} else {
-			print "MobsControl register 5 \n";
 			$this->countMap[$mobName] = 1;
-			print "MobsControl register 6 \n";
 		}
 	}
 	
@@ -287,81 +283,81 @@ class MobsControl {
 		return $this->types;
 	}
 	
-	public function displaySupportedTypes() {
-		MainLogger::getLogger()->info("Supported Mob Types:");
+	public function displaySupportedTypes(CommandSender $sender) {
+		$sender->sendMessage("Supported Mob Types:");
 		foreach($this->types as $val) {
-			MainLogger::getLogger()->info("$val");
+			$sender->sendMessage("$val");
 		}
 	}
 	
-	public function displayState() {
+	public function displayState(CommandSender $sender) {
 		switch($this->state) {
 			case MobsControl::STATE_KILL:
-				MainLogger::getLogger()->info("  Mobs state: Killed");
+				$sender->sendMessage("  Mobs state: Killed");
 				break;
 			case MobsControl::STATE_SLEEP:
-				MainLogger::getLogger()->info("  Mobs state: Sleeping");
+				$sender->sendMessage("  Mobs state: Sleeping");
 				break;			
 			case MobsControl::STATE_ACTIVE:
-				MainLogger::getLogger()->info("  Mobs state: Awake");
+				$sender->sendMessage("  Mobs state: Awake");
 				break;
 		}
 	}
 	
-	public function displaySpeed() {
-		MainLogger::getLogger()->info(" ");
-		MainLogger::getLogger()->info("  Speed:");
+	public function displaySpeed(CommandSender $sender) {
+		$sender->sendMessage(" ");
+		$sender->sendMessage("  Speed:");
 		foreach($this->types as $val) {
 			$speed = $this->getSpeed($val);
-			MainLogger::getLogger()->info("    $val: $speed");
+			$sender->sendMessage("    $val: $speed");
 		}
 	}
 	
-	public function displayAttackDamage() {
-		MainLogger::getLogger()->info(" ");
-		MainLogger::getLogger()->info("  Attack Damage:");
+	public function displayAttackDamage(CommandSender $sender) {
+		$sender->sendMessage(" ");
+		$sender->sendMessage("  Attack Damage:");
 		foreach($this->types as $val) {
 			$damage = $this->getAttackDamage($val);
-			MainLogger::getLogger()->info("    $val: $damage");
+			$sender->sendMessage("    $val: $damage");
 		}
 	}
 	
-	public function displayProximity() {
-		MainLogger::getLogger()->info(" ");
-		MainLogger::getLogger()->info("  Proximity Detection:");
+	public function displayProximity(CommandSender $sender) {
+		$sender->sendMessage(" ");
+		$sender->sendMessage("  Proximity Detection:");
 		foreach($this->types as $val) {
 			$proximity = $this->getProximity($val);
-			MainLogger::getLogger()->info("    $val: $proximity");
+			$sender->sendMessage("    $val: $proximity");
 		}
 	}
 	
-	public function displayHealth() {
-		MainLogger::getLogger()->info(" ");
-		MainLogger::getLogger()->info("  Starting Health:");
+	public function displayHealth(CommandSender $sender) {
+		$sender->sendMessage(" ");
+		$sender->sendMessage("  Starting Health:");
 		foreach($this->types as $val) {
 			$health = $this->getHealth($val);
-			MainLogger::getLogger()->info("    $val: $health");
+			$sender->sendMessage("    $val: $health");
 		}
 	}
 	
-	public function displayCount() {
-		MainLogger::getLogger()->info(" ");
-		MainLogger::getLogger()->info("  Monster Count:");
+	public function displayCount(CommandSender $sender) {
+		$sender->sendMessage(" ");
+		$sender->sendMessage("  Monster Count:");
 		foreach($this->types as $val) {
 			$count = $this->getCount($val);
-			MainLogger::getLogger()->info("    $val: $count");
+			$sender->sendMessage("    $val: $count");
 		}
 	}
 	
-	public function displayStatus() {
-		MainLogger::getLogger()->info("Mobs Status:");
-		MainLogger::getLogger()->info("------------");
-		$this->displayState();
-		$this->displaySpeed();
-		$this->displayProximity();
-		$this->displayAttackDamage();
-		$this->displayHealth();
-		$this->displayCount();
+	public function displayStatus(CommandSender $sender) {
+		$sender->sendMessage("Mobs Status:");
+		$sender->sendMessage("------------");
+		$this->displayState($sender);
+		$this->displaySpeed($sender);
+		$this->displayProximity($sender);
+		$this->displayAttackDamage($sender);
+		$this->displayHealth($sender);
+		$this->displayCount($sender);
 	}
 	
 }

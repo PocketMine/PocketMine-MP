@@ -56,17 +56,17 @@ class MobsCommand extends VanillaCommand{
 		if (count($args) == 1) {
 			if (strtolower($args[0]) === "sleep"){
 				$mobsControl->setState(MobsControl::STATE_SLEEP);
-				Command::broadcastCommandMessage($sender, new TranslationContainer("Put all mobs to sleep"));
+				$sender->sendMessage("Put all mobs to sleep");
 			} else if (strtolower($args[0]) === "kill"){
 				$mobsControl->setState(MobsControl::STATE_KILL);
-				Command::broadcastCommandMessage($sender, new TranslationContainer("Killing all mobs"));
+				$sender->sendMessage("Killing all mobs");
 			} else if (strtolower($args[0]) === "wakeup"){
 				$mobsControl->setState(MobsControl::STATE_ACTIVE);
-				Command::broadcastCommandMessage($sender, new TranslationContainer("Woke up all mobs"));
+				$sender->sendMessage("Woke up all mobs");
 			} else if (strtolower($args[0]) === "types") {
-				 $mobsControl->displaySupportedTypes();
+				 $mobsControl->displaySupportedTypes($sender);
 			} else if (strtolower($args[0]) === "status") {
-				$mobsControl->displayStatus();
+				$mobsControl->displayStatus($sender);
 			} else if (strtolower($args[0]) === "help"){
 				$sender->sendMessage("Supported mobs commands");
 				$sender->sendMessage("mobs sleep - Put all mobs to sleep");
@@ -84,23 +84,29 @@ class MobsCommand extends VanillaCommand{
 			}
 		} else if (count($args) == 3) {
 			if (strtolower($args[0]) === "speed") {
-				$mobsControl->setSpeed($args[1], $args[2]);
-			} else if (strtolower($args[0]) === "attack") {
-				$mobsControl->setAttackDamage($args[1], $args[2]);
-			} else if (strtolower($args[0]) === "health") {
-				$mobsControl->setHealth($args[1], $args[2]);
-			} else if (strtolower($args[0]) === "proximity") {
-				$mobsControl->setProximity($args[1], $args[2]);
-			} else if (strtolower($args[0]) === "follow") {
-				if (strtolower($args[2]) === "normal") {
-					$follow = MobsControl::FOLLOW_NORMAL;
-				} else if (strtolower($args[2]) === "target") {
-					$follow = MobsControl::FOLLOW_TARGET;
+				if ($mobsControl->setSpeed($args[1], $args[2])) {
+					$sender->sendMessage("Set speed for mobs: $args[1] to: $args[2]");
 				} else {
-					$sender->sendMessage("$args[2] is not a supported follow mode");
-					return false;
+					$sender->sendMessage("$mobName is not a supported mob");
 				}
-				$mobsControl->setFollow($args[1], $follow);
+			} else if (strtolower($args[0]) === "attack") {
+				if ($mobsControl->setAttackDamage($args[1], $args[2])) {
+					$sender->sendMessage("Set attack damage for mobs: $args[1] to: $args[2]");
+				} else {
+					$sender->sendMessage("$mobName is not a supported mob");
+				}
+			} else if (strtolower($args[0]) === "health") {
+				if ($mobsControl->setHealth($args[1], $args[2])) {
+					$sender->sendMessage("Set initial health for mobs: $args[1] to: $args[2]");
+				} else {
+					$sender->sendMessage("$mobName is not a supported mob");
+				}
+			} else if (strtolower($args[0]) === "proximity") {
+				if ($mobsControl->setProximity($args[1], $args[2])) {
+					$sender->sendMessage("Set proximity detection for mobs: $args[1] to: $args[2]");
+				} else {
+					$sender->sendMessage("$mobName is not a supported mob");
+				}
 			} else {
 				$sender->sendMessage("Command entered is not a supported mobs command, enter mobs help for list of supported commands");
 				return false;
