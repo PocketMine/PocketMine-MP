@@ -59,7 +59,6 @@ abstract class Monster extends Creature{
 	public function entityBaseTick($tickDiff = 1){
 		$hasUpdate = parent::entityBaseTick($tickDiff);
 		if($this->chunk === null or $this->closed){
-			print "Monster: No chunk or closed \n";
 			return;
 		}
 		if ($this->mobsControl == null) {
@@ -67,9 +66,7 @@ abstract class Monster extends Creature{
 		}
 		$mobsState = $this->mobsControl->getState();
 		if ($mobsState == MobsControl::STATE_KILL) {
-			print "Kill command sent, so killing monster \n";
 			$this->kill();
-			print "Killed monster \n";
 			return;
 		} else if ($mobsState == MobsControl::STATE_SLEEP) {
 			return;
@@ -77,7 +74,6 @@ abstract class Monster extends Creature{
 		$speed = $this->mobsControl->getSpeed($this->getName());;
 		$attackDamage = $this->mobsControl->getAttackDamage($this->getName());
 		$withinProximity = $this->mobsControl->getProximity($this->getName());;
-// 		print "Got attack damage as: $attackDamage \n";
 		$player = $this->choosePlayer($withinProximity);
 		if ($player != null) {			
 			$proximity = $this->getPlayerProximity($player, $withinProximity);
@@ -85,7 +81,6 @@ abstract class Monster extends Creature{
 				$ev = new EntityDamageByEntityEvent($this, $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, $attackDamage);
 				$player->attack($attackDamage, $ev);
 			} else {
-// 			} else if ($proximity == 1) {
 				$monsterPosition = new PositionAndOrientation($this);
 				if ($this->x < $player->getX()) {
 					if ($this->z < $player->getZ()) {
@@ -116,9 +111,6 @@ abstract class Monster extends Creature{
 				$this->z = $monsterPosition->z;
 				$this->yaw = $monsterPosition->yaw;
 			}
-// 			} else {
-// 				$chosenPlayer = null;
-// 			}
 		}
 	}
 	
@@ -138,31 +130,22 @@ abstract class Monster extends Creature{
 	}
 	
 	public function getDrops(){
-// 		print "Monster:getDrops \n";
 		$drops = [
 				ItemItem::get(ItemItem::FEATHER, 0, 1)
 		];
-// 		if($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player){
 		if(mt_rand(0, 199) < 5){
-// 			print "Monster:gerDrops 1 \n";
 			switch(mt_rand(0, 2)){
 				case 0:
 					$drops[] = ItemItem::get(ItemItem::IRON_INGOT, 0, 1);
-// 					print "Monster:gerDrops 2 \n";
 					break;
 				case 1:
 					$drops[] = ItemItem::get(ItemItem::CARROT, 0, 1);
-// 					print "Monster:gerDrops 2 \n";
 					break;
 				case 2:
 					$drops[] = ItemItem::get(ItemItem::POTATO, 0, 1);
-// 					print "Monster:gerDrops 3 \n";
 					break;
 			}
-// 			print "Monster:gerDrops 4 \n";
 		}
-// 		}
-// 		print "Monster:gerDrops 5 $drops\n";
 		return $drops;
 	}
 	
@@ -180,21 +163,15 @@ abstract class Monster extends Creature{
 			if($player->isOnline() && $player->getHealth() > 0) {
 				$proximity = $this->getPlayerProximity($player, $withinProximity);
 				if ($proximity >= 0) {
-// 					$name = $player->getName();
-					//print "Adding player: $name to list of nearby players \n";
 					$playerCount = $playerCount + 1;
 					$playerArray[$playerCount] = $player;
-					//print "Added player number $playerCount \n";
 				}
 			}
 		}
 		if ($playerCount > 0) {
-			//print "Chosing a player from list of $playerCount players \n";
 			$chosen = rand(1, $playerCount);
-			//print "Chosen is $chosen \n";
 			$player = $playerArray[$chosen];
 			$name = $player->getName();
-			//print "Chose player $name \n";
 			$this->chosenPlayer = $player;
 			return $player;
 		}
