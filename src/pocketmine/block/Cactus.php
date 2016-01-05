@@ -21,86 +21,86 @@
 
 namespace pocketmine\block;
 
+use pocketmine\entity\Entity;
 use pocketmine\event\block\BlockGrowEvent;
+use pocketmine\event\entity\EntityDamageByBlockEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
-use pocketmine\math\Vector3 as Vector3;
+use pocketmine\math\AxisAlignedBB;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 
-class Sugarcane extends Flowable{
+class Cactus extends Transparent{
 
-	protected $id = self::SUGARCANE_BLOCK;
+	protected $id = self::CACTUS;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
 	}
 
+	public function getHardness(){
+		return 0.4;
+	}
+
+	public function hasEntityCollision(){
+		return true;
+	}
+
 	public function getName(){
-		return "Sugarcane";
+		return "Cactus";
 	}
 
+	protected function recalculateBoundingBox(){
 
-	public function getDrops(Item $item){
-		return [
-			[Item::SUGARCANE, 0, 1],
-		];
+		return new AxisAlignedBB(
+			$this->x + 0.0625,
+			$this->y + 0.0625,
+			$this->z + 0.0625,
+			$this->x + 0.9375,
+			$this->y + 0.9375,
+			$this->z + 0.9375
+		);
 	}
 
-	public function onActivate(Item $item, Player $player = null){
-		if($item->getId() === Item::DYE and $item->getDamage() === 0x0F){ //Bonemeal
-			if($this->getSide(0)->getId() !== self::SUGARCANE_BLOCK){
-				for($y = 1; $y < 3; ++$y){
-					$b = $this->getLevel()->getBlock(new Vector3($this->x, $this->y + $y, $this->z));
-					if($b->getId() === self::AIR){
-						Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($b, new Sugarcane()));
-						if(!$ev->isCancelled()){
-							$this->getLevel()->setBlock($b, $ev->getNewState(), true);
-						}
-						break;
-					}
-				}
-				$this->meta = 0;
-				$this->getLevel()->setBlock($this, $this, true);
-			}
-			if(($player->gamemode & 0x01) === 0){
-				$item->count--;
-			}
-
-			return true;
-		}
-
-		return false;
+	public function onEntityCollide(Entity $entity){
+		$ev = new EntityDamageByBlockEvent($this, $entity, EntityDamageEvent::CAUSE_CONTACT, 1);
+		$entity->attack($ev->getFinalDamage(), $ev);
 	}
 
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
 			$down = $this->getSide(0);
-			if($down->isTransparent() === true and $down->getId() !== self::SUGARCANE_BLOCK){
-				$this->getLevel()->scheduleUpdate($this, 0);
+			if($down->getId() !== self::SAND and $down->getId() !== self::CACTUS){
+				$this->getLevel()->useBreakOn($this);
+			}else{
+				for($side = 2; $side <= 5; ++$side){
+					$b = $this->getSide($side);
+					if(!$b->canBeFlowedInto()){
+						$this->getLevel()->useBreakOn($this);
+					}
+				}
 			}
 		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
-			if($this->getSide(0)->getId() !== self::SUGARCANE_BLOCK){
-				if($this->meta === 0x0F){
+			if($this->getSide(0)->getId() !== self::CACTUS){
+				if($this->meta == 0x0F){
 					for($y = 1; $y < 3; ++$y){
 						$b = $this->getLevel()->getBlock(new Vector3($this->x, $this->y + $y, $this->z));
 						if($b->getId() === self::AIR){
-							Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($b, new Sugarcane()));
-							$this->getLevel()->setBlock($b, new Sugarcane(), true);
-							break;
+							Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($b, new Cactus()));
+							if(!$ev->isCancelled()){
+								$this->getLevel()->setBlock($b, $ev->getNewState(), true);
+							}
 						}
 					}
 					$this->meta = 0;
-					$this->getLevel()->setBlock($this, $this, true);
+					$this->getLevel()->setBlock($this, $this);
 				}else{
 					++$this->meta;
-					$this->getLevel()->setBlock($this, $this, true);
+					$this->getLevel()->setBlock($this, $this);
 				}
-
-				return Level::BLOCK_UPDATE_RANDOM;
 			}
-		}elseif($type === Level::BLOCK_UPDATE_SCHEDULED){
-			$this->getLevel()->useBreakOn($this);
 		}
 
 		return false;
@@ -108,22 +108,24 @@ class Sugarcane extends Flowable{
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$down = $this->getSide(0);
-		if($down->getId() === self::SUGARCANE_BLOCK){
-			$this->getLevel()->setBlock($block, new Sugarcane(), true);
-
-			return true;
-		}elseif($down->getId() === self::GRASS or $down->getId() === self::DIRT or $down->getId() === self::SAND){
-			$block0 = $down->getSide(2);
-			$block1 = $down->getSide(3);
-			$block2 = $down->getSide(4);
-			$block3 = $down->getSide(5);
-			if(($block0 instanceof Water) or ($block1 instanceof Water) or ($block2 instanceof Water) or ($block3 instanceof Water)){
-				$this->getLevel()->setBlock($block, new Sugarcane(), true);
+		if($down->getId() === self::SAND or $down->getId() === self::CACTUS){
+			$block0 = $this->getSide(2);
+			$block1 = $this->getSide(3);
+			$block2 = $this->getSide(4);
+			$block3 = $this->getSide(5);
+			if($block0->isTransparent() === true and $block1->isTransparent() === true and $block2->isTransparent() === true and $block3->isTransparent() === true){
+				$this->getLevel()->setBlock($this, $this, true);
 
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	public function getDrops(Item $item){
+		return [
+			[$this->id, 0, 1],
+		];
 	}
 }
