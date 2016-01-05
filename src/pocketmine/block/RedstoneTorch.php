@@ -57,4 +57,8 @@ class RedstoneTorch extends Torch implements RedstonePowerSource{
 			[self::REDSTONE_TORCH, 0, 1]
 		];
 	}
+
+	public function getPoweringSides(){
+		return [];
+	}
 }

@@ -26,4 +26,11 @@ namespace pocketmine\block;
  */
 interface RedstoneConductor extends RedstoneComponent{
 	public function getPowerLevel();
+
+	/**
+	 * Gets the sides that the block is strongly or weakly powering
+	 *
+	 * @return int[]
+	 */
+	public function getPoweringSides();
 }

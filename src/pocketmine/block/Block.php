@@ -866,12 +866,17 @@ class Block extends Position implements Metadatable{
 	/**
 	 * Returns the Block on the side $side, works like Vector3::side()
 	 *
-	 * @param int $side
-	 * @param int $step
+	 * @param int  $side
+	 * @param int  $step default 1
+	 * @param bool $v3   default false - act like a Vector3 without searching the block
 	 *
 	 * @return Block
 	 */
-	public function getSide($side, $step = 1){
+	public function getSide($side, $step = 1, $v3 = false){
+		if($v3){
+			return Vector3::getSide($side, $step);
+		}
+
 		if($this->isValid()){
 			return $this->getLevel()->getBlock(Vector3::getSide($side, $step));
 		}

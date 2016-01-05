@@ -66,4 +66,8 @@ class RedstoneBlock extends Solid implements RedstonePowerSource{
 		}
 		return false;
 	}
+
+	public function getPoweringSides(){
+		return [];
+	}
 }

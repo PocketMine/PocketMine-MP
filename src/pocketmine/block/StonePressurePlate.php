@@ -104,4 +104,8 @@ class StonePressurePlate extends Transparent implements RedstonePowerSource, Att
 	public function canPassThrough(){
 		return true;
 	}
+
+	public function getPoweringSides(){
+		return [self::SIDE_DOWN];
+	}
 }

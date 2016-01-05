@@ -12,8 +12,8 @@ class DaylightDetector extends Transparent implements RedstonePowerSource{
 	protected $id = self::DAYLIGHT_DETECTOR;
 	protected $power;
 
-	public function __construct(){
-
+	public function __construct($meta = 0){
+		$this->meta = $meta;
 	}
 
 	public function getName(){
@@ -48,7 +48,7 @@ class DaylightDetector extends Transparent implements RedstonePowerSource{
 	}
 
 	public function getPowerLevel(){
-		return $this->power;
+		return $this->meta;
 	}
 
 	public function isStronglyPowering(Block $block){
@@ -108,15 +108,17 @@ class DaylightDetector extends Transparent implements RedstonePowerSource{
 
 	public function onUpdate($type){
 		parent::onUpdate($type);
-		if($type === Level::BLOCK_UPDATE_SCHEDULED or !is_int($this->power)){
-			$this->power = $this->calculatePower();
-			$this->getLevel()->updateAround($this, Level::BLOCK_UPDATE_REDSTONE);
+		if($type === Level::BLOCK_UPDATE_SCHEDULED){
+			$power = $this->calculatePower();
+			if($power !== $this->meta){
+				$this->getLevel()->setBlock($this, $this);
+			}
 			$this->getLevel()->scheduleUpdate($this, 50);
 		}
 	}
 
 	public function onActivate(Item $item, Player $player = null){
-		$this->getLevel()->setBlock($this, new DaylightDetectorInverted(), true, false);
+		$this->getLevel()->setBlock($this, new DaylightDetectorInverted($this->meta), true, false);
 		return true;
 	}
 
@@ -128,5 +130,9 @@ class DaylightDetector extends Transparent implements RedstonePowerSource{
 		}else{
 			return [];
 		}
+	}
+
+	public function getPoweringSides(){
+		return [];
 	}
 }

@@ -22,7 +22,6 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
-use pocketmine\math\Vector3;
 use pocketmine\Player;
 
 class Lever extends Flowable implements RedstonePowerSource, Attaching{
@@ -119,5 +118,9 @@ class Lever extends Flowable implements RedstonePowerSource, Attaching{
 				$meta = ($meta === 0 ? 7 : 6);
 			}
 		}
+	}
+
+	public function getPoweringSides(){
+		return [$this->getAttachSide()];
 	}
 }

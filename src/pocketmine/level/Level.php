@@ -40,6 +40,7 @@ use pocketmine\block\Mycelium;
 use pocketmine\block\Potato;
 use pocketmine\block\PumpkinStem;
 use pocketmine\block\RedMushroom;
+use pocketmine\block\RedstoneConductor;
 use pocketmine\block\Sapling;
 use pocketmine\block\SnowLayer;
 use pocketmine\block\Sugarcane;
@@ -1409,9 +1410,11 @@ class Level implements ChunkManager, Metadatable{
 	 * @param bool    $direct @deprecated
 	 * @param bool    $update
 	 *
+	 * @param bool    $schedule
+	 *
 	 * @return bool Whether the block has been updated or not
 	 */
-	public function setBlock(Vector3 $pos, Block $block, $direct = false, $update = true){
+	public function setBlock(Vector3 $pos, Block $block, $direct = false, $update = true, $schedule = false){
 		if($pos->y < 0 or $pos->y >= 128){
 			return false;
 		}
@@ -1452,7 +1455,21 @@ class Level implements ChunkManager, Metadatable{
 					$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
 				}
 
-				$this->updateAround($pos);
+				if($schedule){
+					$this->updateAround($pos);
+				}else{
+					$this->scheduleUpdateAround($pos, 0);
+				}
+
+				if($block instanceof RedstoneConductor){
+					foreach($block->getPoweringSides() as $side){
+						if($schedule){
+							$this->scheduleUpdate($block->getSide($side, 1, true), 0);
+						}else{
+							$block->getSide($side)->onUpdate(self::BLOCK_UPDATE_REDSTONE);
+						}
+					}
+				}
 			}
 
 			return true;

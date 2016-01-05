@@ -152,9 +152,6 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 		return !isset($sideConnected);
 	}
 
-	/**
-	 * @return Block[]
-	 */
 	public function getPoweringSides(){
 		$output = [self::SIDE_DOWN => $this->getSide(self::SIDE_DOWN)];
 		$nsDone = false;
@@ -178,7 +175,7 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 			$output[self::SIDE_NORTH] = $this->getSide(self::SIDE_NORTH);
 			$output[self::SIDE_SOUTH] = $this->getSide(self::SIDE_SOUTH);
 		}
-		return array_values($output);
+		return array_keys($output);
 	}
 
 	public function onBreak(Item $item){
@@ -192,8 +189,8 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 				$block->onUpdate(Level::BLOCK_UPDATE_REDSTONE);
 			}
 		}
-		foreach($this->getPoweringSides() as $block){
-			$this->getLevel()->scheduleUpdateAround($block, 2);
+		foreach($this->getPoweringSides() as $side){
+			$this->getLevel()->scheduleUpdateAround($this->getSide($side), 2);
 		}
 
 		return $output;
