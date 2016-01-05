@@ -121,6 +121,50 @@ chunk-ticking:
  tick-radius: 3
  light-updates: false
  clear-tick-list: true
+ 
+block-ticking:
+ #Configure which blocks should tick and which not
+ #Useful on slow PC's and to disable ice melting, fire burning down things etc.
+ #Grass
+ 2: true
+ #Sapling
+ 6: true
+ #Leaves
+ 18: true
+ #Wheat
+ 59: true
+ #Farmland
+ 60: true
+ #SnowLayer
+ 78: true
+ #Ice
+ 79: true
+ #Cactus
+ 81: true
+ #Sugarcane
+ 83: true
+ #RedMushroom
+ 40: true
+ #BrownMushroom
+ 39: true
+ #PumpkinStem
+ 104: true
+ #MelonStem
+ 105: true
+ #Vine
+ 106: true
+ #Mycelium
+ 110: true
+ #Carrot
+ 141: true
+ #Potato
+ 142: true
+ #Leaves2
+ 161: true
+ #Beetroot
+ 244: true
+ #Fire
+ 51: true
 
 chunk-generation:
  #Max. amount of chunks in the waiting queue to be generated
