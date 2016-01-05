@@ -40,6 +40,7 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 	public function onUpdate($type){
 		parent::onUpdate($type);
 		if($type === Level::BLOCK_UPDATE_NORMAL or $type === Level::BLOCK_UPDATE_REDSTONE or $type === Level::BLOCK_UPDATE_SCHEDULED){
+			// downward delivery occurs when there is an adjacent transparent block (but it appears that TNT isn't transparent?)
 			$maxPower = 0;
 			for($side = 0; $side <= 5; $side++){
 				$block = $this->getSide($side);
@@ -65,9 +66,9 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 			if($maxPower !== $this->meta){
 				$this->meta = $maxPower;
 				$this->getLevel()->setBlock($this, $this);
-				foreach($this->getPoweringSides() as $block){
-					$this->getLevel()->scheduleUpdateAround($block, 2);
-				}
+//				foreach($this->getPoweringSides() as $block){
+//					$this->getLevel()->scheduleUpdateAround($block, 2);
+//				}
 			}
 		}
 	}
@@ -81,7 +82,11 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 	}
 
 	public function canAttachTo(Block $block){
-		return !$block->isTransparent() or $block instanceof Slab;
+		return !$block->isTransparent() or (
+			$block instanceof Glowstone
+			or ($block instanceof Slab and ($block->getDamage() & 8))
+			or ($block instanceof Stair and ($block->getDamage() & 4))
+		);
 	}
 
 	public function isPowering(Block $block){
@@ -101,33 +106,50 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 			return true; // condition 2
 		}
 
-		$nsConducted = false;
-		$weConducted = false;
-		$blockSide = Vector3::SIDE_DOWN; // dummy value
-		for($i = self::SIDE_NORTH; $i <= self::SIDE_EAST; $i++){
-			$side = $this->getSide($i);
-			if($side instanceof RedstoneConductor){
-				if($i & 0x04){
-					$weConducted = true;
-				}else{
-					$nsConducted = true;
+		if($block->y == $this->y){
+			if($block->x == $this->x){
+				if($block->z == $this->z - 1 or $block->z == $this->z + 1){
+					$opponents = [self::SIDE_WEST, self::SIDE_EAST];
 				}
 			}
-			if($side->equals($block)){
-				$blockSide = $i;
+			if($block->z == $this->z){
+				if($block->x == $this->x - 1 or $block->x == $this->x + 1){
+					$opponents = [self::SIDE_NORTH, self::SIDE_SOUTH];
+				}
+			}
+		}
+		if(!isset($opponents)){
+			return false; // not a horizontally adjacent block
+		}
+
+		foreach($opponents as $side){
+			$sideBlock = $this->getSide($side);
+			if($sideBlock instanceof RedstoneConductor){
+				$sideConnected = true; // condition 3. a)
+				break;
+			}
+			if($this->canAttachTo($sideBlock)){
+				if($sideBlock->getSide(self::SIDE_UP) instanceof RedstoneWire){
+					$sideConnected = true; // upward delivery possible
+					break;
+				}
+				if($sideBlock instanceof Slab and $sideBlock->getSide(self::SIDE_DOWN) instanceof RedstoneWire){
+					if(!$this->getSide($this->getAttachSide())->isTransparent()){
+						$sideConnected = true;// downward delivery possible
+						break;
+					}
+				}
+			}else{
+				if($sideBlock->getSide(self::SIDE_DOWN) instanceof RedstoneWire){
+					if(!$this->getSide($this->getAttachSide())->isTransparent()){
+						$sideConnected = true; // downward delivery possible
+						break;
+					}
+				}
 			}
 		}
 
-		// TODO fix condition 4
-
-		// condition 3
-		if($blockSide === self::SIDE_EAST or $blockSide === self::SIDE_WEST){ // block is at west/east
-			return !$nsConducted; // if there are no conductors at north/south side
-		}elseif($blockSide === self::SIDE_NORTH or $blockSide === self::SIDE_SOUTH){ // block is at north/west
-			return !$weConducted; // if there are no conductors at west/east side
-		}
-
-		return false; // block is above or more than one block away
+		return !isset($sideConnected);
 	}
 
 	/**
