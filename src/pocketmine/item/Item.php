@@ -234,6 +234,8 @@ class Item{
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
 
+	const TRIPWIRE_HOOK = 131;
+	const TRIPWIRE = 132;
 	const EMERALD_BLOCK = 133;
 	const SPRUCE_WOOD_STAIRS = 134;
 	const SPRUCE_WOODEN_STAIRS = 134;
@@ -956,7 +958,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::WOODEN_BUTTON, 5));
 		self::addCreativeItem(Item::get(Item::STONE_BUTTON, 5));
 		self::addCreativeItem(Item::get(Item::DAYLIGHT_DETECTOR));
-		// TODO: Tripwire hook
+		self::addCreativeItem(Item::get(Item::TRIPWIRE_HOOK));
 		self::addCreativeItem(Item::get(Item::SNOWBALL));
 
 		//Seeds

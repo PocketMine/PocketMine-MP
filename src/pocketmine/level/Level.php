@@ -1407,14 +1407,14 @@ class Level implements ChunkManager, Metadatable{
 	 *
 	 * @param Vector3 $pos
 	 * @param Block   $block
-	 * @param bool    $direct @deprecated
-	 * @param bool    $update
+	 * @param bool    $direct   @deprecated
+	 * @param bool    $update   default true
 	 *
-	 * @param bool    $schedule
+	 * @param bool    $schedule default null ($block instanceof RedstoneConductor)
 	 *
 	 * @return bool Whether the block has been updated or not
 	 */
-	public function setBlock(Vector3 $pos, Block $block, $direct = false, $update = true, $schedule = false){
+	public function setBlock(Vector3 $pos, Block $block, $direct = false, $update = true, $schedule = null){
 		if($pos->y < 0 or $pos->y >= 128){
 			return false;
 		}
@@ -1453,6 +1453,10 @@ class Level implements ChunkManager, Metadatable{
 						$entity->scheduleUpdate();
 					}
 					$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
+				}
+
+				if($schedule === null){
+					$schedule = $block instanceof RedstoneConductor;
 				}
 
 				if($schedule){
