@@ -37,7 +37,7 @@ class Lever extends Flowable implements RedstonePowerSource, Attaching{
 	}
 
 	public function getPowerLevel(){
-		return $this->isActivated() ? 15 : 0;
+		return $this->isActivated() ? 16 : 0;
 	}
 
 	public function isStronglyPowering(Block $block){
@@ -72,7 +72,6 @@ class Lever extends Flowable implements RedstonePowerSource, Attaching{
 	public function onActivate(Item $item, Player $player = null){
 		$this->meta ^= 0x08;
 		$this->getLevel()->setBlock($this, $this);
-		$this->getLevel()->scheduleUpdateAround($this->getSide($this->getAttachSide()), 2);
 		return true;
 	}
 

@@ -45,7 +45,7 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 			for($side = 0; $side <= 5; $side++){
 				$block = $this->getSide($side);
 				if($block instanceof RedstoneConductor){
-					$maxPower = max($maxPower, $block->getPowerLevel() - (int) ($block->getChargeType() === self::CHARGE_POWER)); // Pass decreased power from adjacent conductor
+					$maxPower = max($maxPower, $block->getPowerLevel() - 1); // Pass decreased power from adjacent conductor
 				}elseif($block->getChargeType() === Block::CHARGE_STRONG){
 					$maxPower = 0x0F; // When: [wire] [block] [attached power source]
 					break;

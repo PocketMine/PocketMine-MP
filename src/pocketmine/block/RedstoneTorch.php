@@ -36,7 +36,7 @@ class RedstoneTorch extends Torch implements RedstonePowerSource{
 	}
 
 	public function getPowerLevel(){
-		return 15;
+		return 16;
 	}
 
 	public function isStronglyPowering(Block $block){

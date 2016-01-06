@@ -195,6 +195,7 @@ class Level implements ChunkManager, Metadatable{
 	/** @var ReversePriorityQueue */
 	private $updateQueue;
 	private $updateQueueIndex = [];
+	private $updateQueueType = [];
 
 	/** @var Player[][] */
 	private $chunkSendQueue = [];
@@ -684,8 +685,13 @@ class Level implements ChunkManager, Metadatable{
 		$this->timings->doTickPending->startTiming();
 		while($this->updateQueue->count() > 0 and $this->updateQueue->current()["priority"] <= $currentTick){
 			$block = $this->getBlock($this->updateQueue->extract()["data"]);
-			unset($this->updateQueueIndex[Level::blockHash($block->x, $block->y, $block->z)]);
-			$block->onUpdate(self::BLOCK_UPDATE_SCHEDULED);
+			unset($this->updateQueueIndex[$hash = Level::blockHash($block->x, $block->y, $block->z)]);
+			$type = self::BLOCK_UPDATE_SCHEDULED;
+			if(isset($this->updateQueueType[$hash])){
+				$type = $this->updateQueueType[$hash];
+				unset($this->updateQueueType[$hash]);
+			}
+			$block->onUpdate($type);
 		}
 		$this->timings->doTickPending->stopTiming();
 
@@ -1053,25 +1059,30 @@ class Level implements ChunkManager, Metadatable{
 	/**
 	 * @param Vector3 $pos
 	 * @param int     $ticks
+	 * @param int     $type
 	 */
-	public function scheduleUpdateAround(Vector3 $pos, $ticks){
-		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x - 1, $pos->y, $pos->z), $ticks);
-		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x + 1, $pos->y, $pos->z), $ticks);
-		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y - 1, $pos->z), $ticks);
-		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y + 1, $pos->z), $ticks);
-		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z - 1), $ticks);
-		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z + 1), $ticks);
+	public function scheduleUpdateAround(Vector3 $pos, $ticks, $type = self::BLOCK_UPDATE_SCHEDULED){
+		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x - 1, $pos->y, $pos->z), $ticks, $type);
+		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x + 1, $pos->y, $pos->z), $ticks, $type);
+		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y - 1, $pos->z), $ticks, $type);
+		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y + 1, $pos->z), $ticks, $type);
+		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z - 1), $ticks, $type);
+		$this->scheduleUpdate($this->temporalVector->setComponents($pos->x, $pos->y, $pos->z + 1), $ticks, $type);
 	}
 
 	/**
 	 * @param Vector3 $pos
 	 * @param int     $delay
+	 * @param int     $type
 	 */
-	public function scheduleUpdate(Vector3 $pos, $delay){
+	public function scheduleUpdate(Vector3 $pos, $delay, $type = self::BLOCK_UPDATE_SCHEDULED){
 		if(isset($this->updateQueueIndex[$index = Level::blockHash($pos->x, $pos->y, $pos->z)]) and $this->updateQueueIndex[$index] <= $delay){
 			return;
 		}
 		$this->updateQueueIndex[$index] = $delay;
+		if($type !== self::BLOCK_UPDATE_SCHEDULED){
+			$this->updateQueueType[$index] = $type;
+		}
 		$this->updateQueue->insert(new Vector3((int) $pos->x, (int) $pos->y, (int) $pos->z), (int) $delay + $this->server->getTick());
 	}
 
@@ -1410,13 +1421,18 @@ class Level implements ChunkManager, Metadatable{
 	 * @param bool    $direct   @deprecated
 	 * @param bool    $update   default true
 	 *
-	 * @param bool    $schedule default null ($block instanceof RedstoneConductor)
+	 * @param bool    $schedule default null ($block instanceof RedstoneConductor or old block instanceof
+	 *                          RedstoneConductor)
 	 *
 	 * @return bool Whether the block has been updated or not
 	 */
 	public function setBlock(Vector3 $pos, Block $block, $direct = false, $update = true, $schedule = null){
 		if($pos->y < 0 or $pos->y >= 128){
 			return false;
+		}
+
+		if($update and $schedule === null){
+			$schedule = $block instanceof RedstoneConductor or $this->getBlock($pos) instanceof RedstoneConductor;
 		}
 
 		if($this->getChunk($pos->x >> 4, $pos->z >> 4, true)->setBlock($pos->x & 0x0f, $pos->y & 0x7f, $pos->z & 0x0f, $block->getId(), $block->getDamage())){
@@ -1455,22 +1471,18 @@ class Level implements ChunkManager, Metadatable{
 					$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
 				}
 
-				if($schedule === null){
-					$schedule = $block instanceof RedstoneConductor;
-				}
-
 				if($schedule){
-					$this->updateAround($pos);
+					$this->scheduleUpdateAround($pos, 0, self::BLOCK_UPDATE_NORMAL);
 				}else{
-					$this->scheduleUpdateAround($pos, 0);
+					$this->updateAround($pos);
 				}
 
 				if($block instanceof RedstoneConductor){
 					foreach($block->getPoweringSides() as $side){
 						if($schedule){
-							$this->scheduleUpdate($block->getSide($side, 1, true), 0);
+							$this->scheduleUpdateAround($block->getSide($side, 1, true), 0, self::BLOCK_UPDATE_REDSTONE);
 						}else{
-							$block->getSide($side)->onUpdate(self::BLOCK_UPDATE_REDSTONE);
+							$this->updateAround($block->getSide($side, 1, true), self::BLOCK_UPDATE_REDSTONE);
 						}
 					}
 				}

@@ -58,7 +58,15 @@ class TripwireHook extends Flowable implements RedstonePowerSource, Attaching{
 	}
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		if($face === self::SIDE_UP or $face === self::SIDE_DOWN){
+		if($face === self::SIDE_SOUTH){
+			$this->meta = 0;
+		}elseif($face === self::SIDE_WEST){
+			$this->meta = 1;
+		}elseif($face === self::SIDE_NORTH){
+			$this->meta = 2;
+		}elseif($face === self::SIDE_EAST){
+			$this->meta = 3;
+		}else{
 			return false;
 		}
 		return parent::place($item, $block, $target, $face, $fx, $fy, $fz, $player);
@@ -76,6 +84,7 @@ class TripwireHook extends Flowable implements RedstonePowerSource, Attaching{
 	}
 
 	public function onUpdate($type){
+		parent::onUpdate($type);
 		if($type === Level::BLOCK_UPDATE_SCHEDULED){
 			if($this->triggedUntil > $this->getLevel()->getServer()->getTick()){ // or should I use >= here?
 				$this->getLevel()->updateAround($this, Level::BLOCK_UPDATE_REDSTONE);
