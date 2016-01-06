@@ -58,7 +58,7 @@ class RedstoneBlock extends Solid implements RedstonePowerSource{
 	}
 
 	public function isStronglyPowering(Block $block){
-		for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
+		foreach($this->getPoweringSides() as $side){
 			if($this->getSide($side)->equals($block)){
 				return true;
 				break;
