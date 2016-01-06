@@ -40,15 +40,6 @@ class RedstoneTorch extends Torch implements RedstonePowerSource{
 	}
 
 	public function isStronglyPowering(Block $block){
-		if($this->getSide($this->getAttachSide())->equals($block)){
-			return false;
-		}
-		for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
-			if($side !== $this->getAttachSide() and $this->getSide($side)->equals($block)){
-				return true;
-				break;
-			}
-		}
 		return false;
 	}
 

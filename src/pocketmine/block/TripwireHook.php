@@ -23,9 +23,10 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-class TripwireHook extends Flowable implements RedstoneConductor, Attaching{
+class TripwireHook extends Flowable implements RedstonePowerSource, Attaching{
 	protected $id = self::TRIPWIRE_HOOK;
 	protected $triggedUntil = 0;
 
@@ -81,5 +82,9 @@ class TripwireHook extends Flowable implements RedstoneConductor, Attaching{
 				$this->getLevel()->updateAround($this->getSide($this->getAttachSide()), Level::BLOCK_UPDATE_REDSTONE);
 			}
 		}
+	}
+
+	public function isStronglyPowering(Block $block){
+		return $block->equals(Vector3::getSide($this->getAttachSide()));
 	}
 }

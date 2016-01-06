@@ -84,7 +84,6 @@ class Tripwire extends Transparent{
 		if(!$item->isShears()){
 			$this->generatePulse();
 		}
-		return true;
 	}
 
 	protected function generatePulse($ticks = 10){

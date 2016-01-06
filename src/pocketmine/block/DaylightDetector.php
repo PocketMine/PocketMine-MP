@@ -52,15 +52,6 @@ class DaylightDetector extends Transparent implements RedstonePowerSource{
 	}
 
 	public function isStronglyPowering(Block $block){
-		if($this->getPowerLevel() < 1){
-			return false;
-		}
-		for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
-			if($this->getSide($side)->equals($block)){
-				return true;
-				break;
-			}
-		}
 		return false;
 	}
 
