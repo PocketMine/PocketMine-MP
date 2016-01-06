@@ -54,6 +54,13 @@ class TrappedChest extends Chest implements RedstonePowerSource{
 	}
 
 	public function getPoweringSides(){
-		return [self::SIDE_DOWN];
+		return [
+				self::SIDE_DOWN,
+				self::SIDE_UP,
+				self::SIDE_NORTH,
+				self::SIDE_SOUTH,
+				self::SIDE_WEST,
+				self::SIDE_EAST
+		];
 	}
 }

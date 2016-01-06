@@ -55,7 +55,7 @@ class DaylightDetector extends Transparent implements RedstonePowerSource{
 		if($this->getPowerLevel() < 1){
 			return false;
 		}
-		for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
+		foreach($this->getPoweringSides() as $side){
 			if($this->getSide($side)->equals($block)){
 				return true;
 				break;
@@ -133,6 +133,13 @@ class DaylightDetector extends Transparent implements RedstonePowerSource{
 	}
 
 	public function getPoweringSides(){
-		return [];
+		return [
+			self::SIDE_DOWN,
+			self::SIDE_UP,
+			self::SIDE_NORTH,
+			self::SIDE_SOUTH,
+			self::SIDE_WEST,
+			self::SIDE_EAST
+		];
 	}
 }

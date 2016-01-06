@@ -68,6 +68,13 @@ class RedstoneBlock extends Solid implements RedstonePowerSource{
 	}
 
 	public function getPoweringSides(){
-		return [];
+		return [
+				self::SIDE_DOWN,
+				self::SIDE_UP,
+				self::SIDE_NORTH,
+				self::SIDE_SOUTH,
+				self::SIDE_WEST,
+				self::SIDE_EAST
+		];
 	}
 }
