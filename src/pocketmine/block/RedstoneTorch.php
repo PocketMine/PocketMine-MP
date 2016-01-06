@@ -43,8 +43,8 @@ class RedstoneTorch extends Torch implements RedstonePowerSource{
 		if($this->getSide($this->getAttachSide())->equals($block)){
 			return false;
 		}
-		foreach($this->getPoweringSides() as $side){
-			if($this->getSide($side)->equals($block)){
+		for($side = self::SIDE_DOWN; $side <= self::SIDE_EAST; $side++){
+			if($side !== $this->getAttachSide() and $this->getSide($side)->equals($block)){
 				return true;
 				break;
 			}
@@ -59,13 +59,6 @@ class RedstoneTorch extends Torch implements RedstonePowerSource{
 	}
 
 	public function getPoweringSides(){
-		return array_diff([
-				self::SIDE_DOWN,
-				self::SIDE_UP,
-				self::SIDE_NORTH,
-				self::SIDE_SOUTH,
-				self::SIDE_WEST,
-				self::SIDE_EAST
-		], [$this->getAttachSide()]);
+		return [];
 	}
 }

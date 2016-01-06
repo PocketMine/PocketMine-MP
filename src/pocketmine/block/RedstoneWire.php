@@ -153,7 +153,7 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 	}
 
 	public function getPoweringSides(){
-		$output = [self::SIDE_DOWN];
+		$output = [self::SIDE_DOWN => $this->getSide(self::SIDE_DOWN)];
 		$nsDone = false;
 		$weDone = false;
 		for($side = 2; $side <= 5; $side++){
@@ -168,14 +168,14 @@ class RedstoneWire extends Flowable implements RedstoneConnector, Attaching{
 			}
 		}
 		if(!$nsDone){
-			$output[] = self::SIDE_EAST;
-			$output[] = self::SIDE_WEST;
+			$output[self::SIDE_EAST] = $this->getSide(self::SIDE_EAST);
+			$output[self::SIDE_WEST] = $this->getSide(self::SIDE_WEST);
 		}
 		if(!$weDone){
-			$output[] = self::SIDE_NORTH;
-			$output[] = self::SIDE_SOUTH;
+			$output[self::SIDE_NORTH] = $this->getSide(self::SIDE_NORTH);
+			$output[self::SIDE_SOUTH] = $this->getSide(self::SIDE_SOUTH);
 		}
-		return $output;
+		return array_keys($output);
 	}
 
 	public function onBreak(Item $item){
