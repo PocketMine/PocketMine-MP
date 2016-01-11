@@ -71,7 +71,15 @@ namespace pocketmine {
 	use pocketmine\utils\Terminal;
 	use pocketmine\utils\Utils;
 	use pocketmine\wizard\Installer;
-
+      
+      /* Preparing for 0.14
+       * const VERSION = "1.6dev"; //?
+       * const API_VERSION = "1.13.1"; //?
+       * const CODENAME = "[REDACTED]";
+       * const MINECRAFT_VERSION = "v0.14.0 alpha";
+       * const MINECRAFT_VERSION_NETWORK = "0.14.0";
+       */
+       
 	const VERSION = "1.6dev";
 	const API_VERSION = "1.13.1";
 	const CODENAME = "[REDACTED]";
