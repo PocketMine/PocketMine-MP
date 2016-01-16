@@ -52,8 +52,8 @@ class BlockActivateEvent extends BlockEvent implements Cancellable{
 		return $this->item;
 	}
     
-    public function getBlock(){
-        return $this->block;
-    }
+    	public function getBlock(){
+        	return $this->block;
+    	}
     
 }
