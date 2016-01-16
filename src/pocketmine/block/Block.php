@@ -38,6 +38,8 @@ use pocketmine\metadata\Metadatable;
 use pocketmine\metadata\MetadataValue;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\Server;
+use pocketmine\event\block\BlockActivateEvent;
 
 
 class Block extends Position implements Metadatable{
@@ -603,6 +605,7 @@ class Block extends Position implements Metadatable{
 	 * @return bool
 	 */
 	public function onActivate(Item $item, Player $player = null){
+		Server::getInstance()->getPluginManager()->callEvent($ev = new BlockActivateEvent($this, $item, $player));
 		return false;
 	}
 
