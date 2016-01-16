@@ -36,9 +36,9 @@ class BlockActivateEvent extends BlockEvent implements Cancellable{
 	protected $item;
 
 	/** @var \pocketmine\Player */
-	protected $player;
+	protected $player = null;
 
-	public function __construct(Block $block, Item $item, Player $player){
+	public function __construct(Block $block, Item $item, Player $player = null){
 		$this->block = $block;
 		$this->item = $item;
 		$this->player = $player;
