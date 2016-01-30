@@ -70,10 +70,25 @@ class Anvil extends Fallable{
 		return true;
 	}
 
+	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+		if($player instanceof Player){
+			$this->meta |= $player->getDirection();
+		}
+		$this->getLevel()->setBlock($this, $this, true);
+		return true;
+	}
+
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+			if($this->meta & 0x04){
+				$this->meta = 0x04;
+			}elseif($this->meta & 0x08){
+				$this->meta = 0x08;
+			}else{
+				$this->meta = 0;
+			}
 			return [
-				[$this->id, 0, 1], //TODO break level
+				[$this->id, $this->meta, 1],
 			];
 		}else{
 			return [];

@@ -23,40 +23,34 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
-use pocketmine\Player;
 
-class Pumpkin extends Solid{
+class SpruceDoor extends Door{
 
-	protected $id = self::PUMPKIN;
+	protected $id = self::SPRUCE_DOOR_BLOCK;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
 	}
 
+	public function getName(){
+		return "Spruce Door Block";
+	}
+
+	public function canBeActivated(){
+		return true;
+	}
+
 	public function getHardness(){
-		return 1;
+		return 3;
 	}
 
 	public function getToolType(){
 		return Tool::TYPE_AXE;
 	}
 
-	public function getName(){
-		return "Pumpkin";
-	}
-
-	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
-		if($player instanceof Player){
-			$this->meta = ((int) $player->getDirection() + 5) % 4;
-		}
-		$this->getLevel()->setBlock($block, $this, true, true);
-
-		return true;
-	}
-
 	public function getDrops(Item $item){
 		return [
-			[$this->id, 0, 1],
+			[Item::SPRUCE_DOOR, 0, 1],
 		];
 	}
 }

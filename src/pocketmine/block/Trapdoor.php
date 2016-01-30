@@ -23,6 +23,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
+use pocketmine\level\Level;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\level\sound\DoorSound;
 use pocketmine\Player;
@@ -53,7 +54,7 @@ class Trapdoor extends Transparent{
 
 		$f = 0.1875;
 
-		if(($damage & 0x08) > 0){
+		if(($damage & 0x04) > 0){
 			$bb = new AxisAlignedBB(
 				$this->x,
 				$this->y + 1 - $f,
@@ -73,8 +74,8 @@ class Trapdoor extends Transparent{
 			);
 		}
 
-		if(($damage & 0x04) > 0){
-			if(($damage & 0x03) === 0){
+		if(($damage & 0x08) > 0){
+			if(($damage & 0x03) === 3){
 				$bb->setBounds(
 					$this->x,
 					$this->y,
@@ -83,7 +84,7 @@ class Trapdoor extends Transparent{
 					$this->y + 1,
 					$this->z + 1
 				);
-			}elseif(($damage & 0x03) === 1){
+			}elseif(($damage & 0x03) === 2){
 				$bb->setBounds(
 					$this->x,
 					$this->y,
@@ -93,7 +94,7 @@ class Trapdoor extends Transparent{
 					$this->z + $f
 				);
 			}
-			if(($damage & 0x03) === 2){
+			if(($damage & 0x03) === 1){
 				$bb->setBounds(
 					$this->x + 1 - $f,
 					$this->y,
@@ -103,7 +104,7 @@ class Trapdoor extends Transparent{
 					$this->z + 1
 				);
 			}
-			if(($damage & 0x03) === 3){
+			if(($damage & 0x03) === 0){
 				$bb->setBounds(
 					$this->x,
 					$this->y,
@@ -118,17 +119,37 @@ class Trapdoor extends Transparent{
 		return $bb;
 	}
 
+	public function onUpdate($type){
+		if($type === Level::BLOCK_UPDATE_NORMAL){
+			$side = $this->getDamage() & 0x03;
+			$faces = [
+				0 => self::SIDE_WEST,
+				1 => self::SIDE_EAST,
+				2 => self::SIDE_NORTH,
+				3 => self::SIDE_SOUTH
+			];
+			$target = $this->getSide($faces[$side]);
+			if(!($target->isTransparent() === false or $target->getId() === self::SLAB)){
+				$this->getLevel()->useBreakOn($this);
+
+				return Level::BLOCK_UPDATE_NORMAL;
+			}
+		}
+
+		return false;
+	}
+
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		if(($target->isTransparent() === false or $target->getId() === self::SLAB) and $face !== 0 and $face !== 1){
 			$faces = [
-				2 => 0,
-				3 => 1,
-				4 => 2,
-				5 => 3,
+				2 => 3,
+				3 => 2,
+				4 => 1,
+				5 => 0,
 			];
 			$this->meta = $faces[$face] & 0x03;
 			if($fy > 0.5){
-				$this->meta |= 0x08;
+				$this->meta |= 0x04;
 			}
 			$this->getLevel()->setBlock($block, $this, true, true);
 
@@ -145,7 +166,7 @@ class Trapdoor extends Transparent{
 	}
 
 	public function onActivate(Item $item, Player $player = null){
-		$this->meta ^= 0x04;
+		$this->meta ^= 0x08;
 		$this->getLevel()->setBlock($this, $this, true);
 		$this->level->addSound(new DoorSound($this));
 		return true;

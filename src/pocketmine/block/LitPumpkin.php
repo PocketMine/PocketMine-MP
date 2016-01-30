@@ -57,4 +57,10 @@ class LitPumpkin extends Solid{
 
 		return true;
 	}
+
+	public function getDrops(Item $item){
+		return [
+			[$this->id, 0, 1],
+		];
+	}
 }

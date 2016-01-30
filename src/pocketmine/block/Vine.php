@@ -25,6 +25,8 @@ use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
 use pocketmine\level\Level;
+use pocketmine\math\Vector3;
+use pocketmine\level\particle\DestroyBlockParticle;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 
@@ -144,11 +146,40 @@ class Vine extends Transparent{
 
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
-			/*if($this->getSide(0)->getId() === self::AIR){ //Replace with common break method
-				Server::getInstance()->api->entity->drop($this, Item::get(LADDER, 0, 1));
-				$this->getLevel()->setBlock($this, new Air(), true, true, true);
+			$before = $this->meta;
+			if($this->meta & 0x01){
+				$target = $this->getSide(self::SIDE_SOUTH);
+				if(($target->isTransparent() || !$target->isSolid()) && $this->getSide(self::SIDE_UP)->getId() !== self::VINE){
+					$this->meta &= ~0x01;
+				}
+			}
+			if($this->meta & 0x02){
+				$target = $this->getSide(self::SIDE_NORTH);
+				if(($target->isTransparent() || !$target->isSolid()) && $this->getSide(self::SIDE_UP)->getId() !== self::VINE){
+					$this->meta &= ~0x02;
+				}
+			}
+			if($this->meta & 0x04){
+				$target = $this->getSide(self::SIDE_EAST);
+				if(($target->isTransparent() || !$target->isSolid()) && $this->getSide(self::SIDE_UP)->getId() !== self::VINE){
+					$this->meta &= ~0x04;
+				}
+			}
+			if($this->meta & 0x08){
+				$target = $this->getSide(self::SIDE_WEST);
+				if(($target->isTransparent() || !$target->isSolid()) && $this->getSide(self::SIDE_UP)->getId() !== self::VINE){
+					$this->meta &= ~0x08;
+				}
+			}
+			
+			if($this->meta != $before){
+				$this->getLevel()->setBlock($this, $this->meta > 0 ? $this : new Air(), true);
+				if($this->meta == 0){
+					$players = $this->getLevel()->getChunkPlayers($this->x >> 4, $this->z >> 4);
+					$this->getLevel()->addParticle(new DestroyBlockParticle($this->add(0.5), $this), $players);
+				}
 				return Level::BLOCK_UPDATE_NORMAL;
-			}*/
+			}
 		}
 
 		return false;

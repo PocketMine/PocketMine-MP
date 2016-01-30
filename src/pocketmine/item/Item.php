@@ -25,6 +25,7 @@
 namespace pocketmine\item;
 
 use pocketmine\block\Block;
+use pocketmine\block\DoublePlant;
 use pocketmine\block\Fence;
 use pocketmine\block\Flower;
 use pocketmine\entity\Entity;
@@ -94,9 +95,9 @@ class Item{
 	const GOLD_ORE = 14;
 	const IRON_ORE = 15;
 	const COAL_ORE = 16;
-	const LOG = 17;
 	const WOOD = 17;
 	const TRUNK = 17;
+	const LOG = 17;
 	const LEAVES = 18;
 	const LEAVE = 18;
 	const SPONGE = 19;
@@ -115,8 +116,8 @@ class Item{
 	const DEAD_BUSH = 32;
 	const WOOL = 35;
 	const DANDELION = 37;
-	const POPPY = 38;
 	const ROSE = 38;
+	const POPPY = 38;
 	const RED_FLOWER = 38;
 	const BROWN_MUSHROOM = 39;
 	const RED_MUSHROOM = 40;
@@ -189,6 +190,8 @@ class Item{
 	const CAKE_BLOCK = 92;
 
 	const TRAPDOOR = 96;
+	const WOODEN_TRAPDOOR = 96;
+	const WOOD_TRAPDOOR = 96;
 
 	const STONE_BRICKS = 98;
 	const STONE_BRICK = 98;
@@ -216,8 +219,8 @@ class Item{
 	const ENCHANTING_TABLE = 116;
 	const ENCHANT_TABLE = 116;
 	const ENCHANTMENT_TABLE = 116;
-	const BREWING_STAND = 117;
-	const END_PORTAL = 120;
+	const BREWING_STAND_BLOCK = 117;
+	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
 
 	const SANDSTONE_STAIRS = 128;
@@ -242,6 +245,7 @@ class Item{
 	const TRAPPED_CHEST = 146;
 
 	const REDSTONE_BLOCK = 152;
+	const NETHER_QUARTZ_ORE = 153;
 
 	const QUARTZ_BLOCK = 155;
 	const QUARTZ_STAIRS = 156;
@@ -279,6 +283,12 @@ class Item{
 	const FENCE_GATE_JUNGLE = 185;
 	const FENCE_GATE_DARK_OAK = 186;
 	const FENCE_GATE_ACACIA = 187;
+
+	const SPRUCE_DOOR_BLOCK = 193;
+	const BIRCH_DOOR_BLOCK = 194;
+	const JUNGLE_DOOR_BLOCK = 195;
+	const ACACIA_DOOR_BLOCK = 196;
+	const DARK_OAK_DOOR_BLOCK = 197;
 
 	const GRASS_PATH = 198;
 
@@ -419,6 +429,8 @@ class Item{
 	const GOLD_NUGGET = 371;
 	const GOLDEN_NUGGET = 371;
 
+	const BREWING_STAND = 379;
+
 	const SPAWN_EGG = 383;
 
 	const EMERALD = 388;
@@ -436,6 +448,12 @@ class Item{
 	const NETHER_BRICK = 405;
 	const QUARTZ = 406;
 	const NETHER_QUARTZ = 406;
+
+	const SPRUCE_DOOR = 427;
+	const BIRCH_DOOR = 428;
+	const JUNGLE_DOOR = 429;
+	const ACACIA_DOOR = 430;
+	const DARK_OAK_DOOR = 431;
 
 	const CAMERA = 456;
 	const BEETROOT = 457;
@@ -530,7 +548,7 @@ class Item{
 			self::$list[self::PAINTING] = Painting::class;
 			self::$list[self::GOLDEN_APPLE] = GoldenApple::class;
 			self::$list[self::SIGN] = Sign::class;
-			self::$list[self::WOODEN_DOOR] = WoodenDoor::class;
+			self::$list[self::WOODEN_DOOR] = OakDoor::class;
 			self::$list[self::BUCKET] = Bucket::class;
 			self::$list[self::MINECART] = Minecart::class;
 			self::$list[self::IRON_DOOR] = IronDoor::class;
@@ -564,6 +582,7 @@ class Item{
 			self::$list[self::RAW_CHICKEN] = RawChicken::class;
 			self::$list[self::COOKED_CHICKEN] = CookedChicken::class;
 			self::$list[self::GOLD_NUGGET] = GoldNugget::class;
+			self::$list[self::BREWING_STAND] = BrewingStand::class; 
 			self::$list[self::SPAWN_EGG] = SpawnEgg::class;
 			self::$list[self::EMERALD] = Emerald::class;
 			self::$list[self::FLOWER_POT] = FlowerPot::class;
@@ -574,6 +593,11 @@ class Item{
 			self::$list[self::NETHER_BRICK] = NetherBrick::class;
 			self::$list[self::QUARTZ] = Quartz::class;
 			self::$list[self::QUARTZ] = NetherQuartz::class;
+			self::$list[self::SPRUCE_DOOR] = SpruceDoor::class;
+			self::$list[self::BIRCH_DOOR] = BirchDoor::class;
+			self::$list[self::JUNGLE_DOOR] = JungleDoor::class;
+			self::$list[self::ACACIA_DOOR] = AcaciaDoor::class;
+			self::$list[self::DARK_OAK_DOOR] = DarkOakDoor::class;
 			// self::$list[self::CAMERA] = Camera::class;
 			self::$list[self::BEETROOT] = Beetroot::class;
 			self::$list[self::BEETROOT_SEEDS] = BeetrootSeeds::class;
@@ -688,6 +712,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LAPIS_ORE, 0));
 		self::addCreativeItem(Item::get(Item::REDSTONE_ORE, 0));
 		self::addCreativeItem(Item::get(Item::EMERALD_ORE, 0));
+		self::addCreativeItem(Item::get(Item::NETHER_QUARTZ_ORE, 0));
 		self::addCreativeItem(Item::get(Item::OBSIDIAN, 0));
 		self::addCreativeItem(Item::get(Item::ICE, 0));
 		self::addCreativeItem(Item::get(Item::PACKED_ICE, 0));
@@ -712,12 +737,12 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LADDER, 0));
 		self::addCreativeItem(Item::get(Item::SPONGE, 0));
 		self::addCreativeItem(Item::get(Item::GLASS_PANE, 0));
-		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 0)); // Oak
-		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 1)); // Spruce
-		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 2)); // Birch
-		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 3)); // Jungle
-		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 4)); // Acacia
-		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 5)); // Dark oak
+		self::addCreativeItem(Item::get(Item::WOODEN_DOOR, 0));
+		self::addCreativeItem(Item::get(Item::SPRUCE_DOOR, 0));
+		self::addCreativeItem(Item::get(Item::BIRCH_DOOR, 0));
+		self::addCreativeItem(Item::get(Item::JUNGLE_DOOR, 0));
+		self::addCreativeItem(Item::get(Item::ACACIA_DOOR, 0));
+		self::addCreativeItem(Item::get(Item::DARK_OAK_DOOR, 0));
 		self::addCreativeItem(Item::get(Item::IRON_DOOR, 0));
 		self::addCreativeItem(Item::get(Item::TRAPDOOR, 0));
 		self::addCreativeItem(Item::get(Item::IRON_TRAPDOOR, 0));
@@ -745,7 +770,7 @@ class Item{
 		self::addCreativeItem(Item::get(Item::FURNACE, 0));
 		self::addCreativeItem(Item::get(Item::BREWING_STAND, 0));
 		// TODO: Note Block
-		self::addCreativeItem(Item::get(Item::END_PORTAL, 0));
+		self::addCreativeItem(Item::get(Item::END_PORTAL_FRAME, 0));
 		self::addCreativeItem(Item::get(Item::ANVIL, 0));
 		self::addCreativeItem(Item::get(Item::ANVIL, 4));
 		self::addCreativeItem(Item::get(Item::ANVIL, 8));
@@ -759,12 +784,12 @@ class Item{
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_WHITE_TULIP));
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_PINK_TULIP));
 		self::addCreativeItem(Item::get(Item::RED_FLOWER, Flower::TYPE_OXEYE_DAISY));
-		// TODO: Sunflower
-		// TODO: Lilac
-		// TODO: Double Tallgrass
-		// TODO: Large Fern
-		// TODO: Rose Bush
-		// TODO: Peony
+		self::addCreativeItem(Item::get(Item::DOUBLE_PLANT, DoublePlant::TYPE_SUN_FLOWER));
+		self::addCreativeItem(Item::get(Item::DOUBLE_PLANT, DoublePlant::TYPE_LILAC));
+		self::addCreativeItem(Item::get(Item::DOUBLE_PLANT, DoublePlant::TYPE_DOUBLE_TALLGRASS));
+		self::addCreativeItem(Item::get(Item::DOUBLE_PLANT, DoublePlant::TYPE_LARGE_FERN));
+		self::addCreativeItem(Item::get(Item::DOUBLE_PLANT, DoublePlant::TYPE_ROSE_BUSH));
+		self::addCreativeItem(Item::get(Item::DOUBLE_PLANT, DoublePlant::TYPE_PEONY));
 		self::addCreativeItem(Item::get(Item::BROWN_MUSHROOM, 0));
 		self::addCreativeItem(Item::get(Item::RED_MUSHROOM, 0));
 		// TODO: Mushroom block (brown, cover)
