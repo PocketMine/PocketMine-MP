@@ -23,6 +23,7 @@ namespace pocketmine\block;
 
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
+use pocketmine\Player;
 
 class Quartz extends Solid{
 
@@ -53,6 +54,34 @@ class Quartz extends Solid{
 
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
+	}
+
+	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+		if($this->meta === self::QUARTZ_CHISELED){
+			$faces = [
+				0 => 1,
+				1 => 1,
+				2 => 25,
+				3 => 9,
+				4 => 5,
+				5 => 21
+			];
+			$this->meta = $faces[$face];
+		}
+		if($this->meta === self::QUARTZ_PILLAR){
+			$faces = [
+				0 => 2,
+				1 => 2,
+				2 => 10,
+				3 => 10,
+				4 => 6,
+				5 => 6
+			];
+			$this->meta = $faces[$face];
+		}
+		$this->getLevel()->setBlock($block, $this, true, true);
+
+		return true;
 	}
 
 	public function getDrops(Item $item){
