@@ -754,6 +754,8 @@ class Block extends Position implements Metadatable{
 		}else{
 			return [
 				[$this->getId(), $this->getDamage(), 1],
+				//By adding this line below, the method will return a proper array and actually make use of $item.
+				[$item->getId(), $item->getDamage(), $item->getCount()]
 			];
 		}
 	}
