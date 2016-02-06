@@ -87,7 +87,7 @@ abstract class BaseLevelProvider implements LevelProvider{
 		$this->levelData->Time = new IntTag("Time", (int) $value);
 	}
 
-	public function getSeed(){
+	public function getSeed() : int{
 		return $this->levelData["RandomSeed"];
 	}
 
