@@ -879,7 +879,6 @@ class Item{
 		// TODO: Spider
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Zombie::NETWORK_ID));
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, ZombiePigman::NETWORK_ID));
-		//TODO: PigZombie
 		self::addCreativeItem(Item::get(Item::SPAWN_EGG, Squid::NETWORK_ID));
 		// TODO: Cave spider
 		// TODO: Magma cube
