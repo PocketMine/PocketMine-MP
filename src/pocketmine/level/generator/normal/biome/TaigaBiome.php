@@ -36,7 +36,7 @@ class TaigaBiome extends SnowyBiome{
 		$this->addPopulator($trees);
 
 		$mossStone = new MossStone();
-		$mossStone->setBaseAmount(1);
+		$mossStone->setBaseAmount(3);
 
 		$this->addPopulator($mossStone);
 
@@ -53,7 +53,7 @@ class TaigaBiome extends SnowyBiome{
 		]);
         }
 
-	public function getName() : string{
+	public function getName(){
 		return "Taiga";
 	}
 }
