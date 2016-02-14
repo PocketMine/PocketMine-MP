@@ -1,4 +1,4 @@
-# ![PocketMine-MP](http://cdn.pocketmine.net/img/PocketMine-MP-h.png)
+fury mine. (yus my ne=ame is creative)
 
 
 	This program is free software: you can redistribute it and/or modify

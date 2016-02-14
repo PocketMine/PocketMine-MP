@@ -222,6 +222,8 @@ class Item{
 
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
+	const TRIPWIRE = 130;
+	const TRIPWIRE_HOOK = 131;
 
 	const EMERALD_BLOCK = 133;
 	const SPRUCE_WOOD_STAIRS = 134;
@@ -416,10 +418,22 @@ class Item{
 	const RAW_CHICKEN = 365;
 	const COOKED_CHICKEN = 366;
 
+
+
+	const GHAST_TEAR = 370;
 	const GOLD_NUGGET = 371;
 	const GOLDEN_NUGGET = 371;
+	
+	
+	const GLASS_BOTTLE = 374;
+	
+	
+	const BLAZE_POWDER = 377;
+	const MAGMA_CREAM = 378;
 
+	const GLISTERING_MELON = 382;
 	const SPAWN_EGG = 383;
+	const BOTTLE_O_ENCHANTING = 384;
 
 	const EMERALD = 388;
 

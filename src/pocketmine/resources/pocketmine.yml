@@ -59,7 +59,7 @@ memory:
 
  max-chunks:
   #Limit of chunks to load per player, overrides chunk-sending.max-chunks
-  trigger-limit: 96
+  trigger-limit: 1
 
   #Do chunk garbage collection on trigger
   trigger-chunk-collect: true
@@ -105,28 +105,28 @@ level-settings:
 
 chunk-sending:
  #Amount of chunks sent to players per tick
- per-tick: 4
+ per-tick: 1
  #Amount of chunks sent around each player
- max-chunks: 192
+ max-chunks: 1
  #Amount of chunks that need to be sent before spawning the player
- spawn-threshold: 56
+ spawn-threshold: 1
  #Save a serialized copy of the chunk in memory for faster sending
  #Useful in mostly-static worlds where lots of players join at the same time
  cache-chunks: false
 
 chunk-ticking:
  #Max amount of chunks processed each tick
- per-tick: 40
+ per-tick: 1
  #Radius of chunks around a player to tick
- tick-radius: 3
+ tick-radius: 1
  light-updates: false
  clear-tick-list: true
 
 chunk-generation:
  #Max. amount of chunks in the waiting queue to be generated
- queue-size: 8
+ queue-size: 1
  #Max. amount of chunks in the waiting queue to be populated
- population-queue-size: 8
+ population-queue-size: 1
 
 ticks-per:
  animal-spawns: 400
