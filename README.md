@@ -1,5 +1,7 @@
 # ![PocketMine-MP](http://cdn.pocketmine.net/img/PocketMine-MP-h.png)
 
+[![Join the chat at https://gitter.im/PocketMine/PocketMine-MP](https://badges.gitter.im/PocketMine/PocketMine-MP.svg)](https://gitter.im/PocketMine/PocketMine-MP?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
