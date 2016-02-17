@@ -43,6 +43,7 @@ use pocketmine\entity\Snowball;
 use pocketmine\entity\Squid;
 use pocketmine\entity\Villager;
 use pocketmine\entity\Zombie;
+use pocketmine\entity\ZombiePigman;
 use pocketmine\event\HandlerList;
 use pocketmine\event\level\LevelInitEvent;
 use pocketmine\event\level\LevelLoadEvent;
@@ -2570,6 +2571,7 @@ class Server{
 		Entity::registerEntity(Snowball::class);
 		Entity::registerEntity(Villager::class);
 		Entity::registerEntity(Zombie::class);
+		Entity::registerEntity(ZombiePigman::class);
 		Entity::registerEntity(Squid::class);
 
 		Entity::registerEntity(Human::class, true);
