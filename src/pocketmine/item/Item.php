@@ -239,6 +239,7 @@ class Item{
 	const POTATO_BLOCK = 142;
 
 	const ANVIL = 145;
+	const SKULL_BLOCK = 144;
 	const TRAPPED_CHEST = 146;
 
 	const REDSTONE_BLOCK = 152;
@@ -431,6 +432,9 @@ class Item{
 	const BAKED_POTATO = 393;
 	const BAKED_POTATOES = 393;
 
+	const MOB_HEAD = 397;
+	const SKULL = 397;
+
 	const PUMPKIN_PIE = 400;
 
 	const NETHER_BRICK = 405;
@@ -570,6 +574,7 @@ class Item{
 			self::$list[self::CARROT] = Carrot::class;
 			self::$list[self::POTATO] = Potato::class;
 			self::$list[self::BAKED_POTATO] = BakedPotato::class;
+			self::$list[self::MOB_HEAD] = MobHead::class;
 			self::$list[self::PUMPKIN_PIE] = PumpkinPie::class;
 			self::$list[self::NETHER_BRICK] = NetherBrick::class;
 			self::$list[self::QUARTZ] = Quartz::class;
@@ -793,11 +798,11 @@ class Item{
 		self::addCreativeItem(Item::get(Item::LEAVES2, 0));
 		self::addCreativeItem(Item::get(Item::LEAVES2, 1));
 		self::addCreativeItem(Item::get(Item::CAKE, 0));
-		// TODO: Skeleton skull
-		// TODO: Wither skeleton skull
-		// TODO: Zombie head
-		// TODO: Head
-		// TODO: Creeper head
+		self::addCreativeItem(Item::get(Item::MOB_HEAD, 0));
+		self::addCreativeItem(Item::get(Item::MOB_HEAD, 1));
+		self::addCreativeItem(Item::get(Item::MOB_HEAD, 2));
+		self::addCreativeItem(Item::get(Item::MOB_HEAD, 3));
+		self::addCreativeItem(Item::get(Item::MOB_HEAD, 4));
 		self::addCreativeItem(Item::get(Item::SIGN, 0));
 		self::addCreativeItem(Item::get(Item::FLOWER_POT, 0));
 		self::addCreativeItem(Item::get(Item::MONSTER_SPAWNER, 0));
