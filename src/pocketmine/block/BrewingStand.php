@@ -26,7 +26,7 @@ use pocketmine\item\Tool;
 
 class BrewingStand extends Transparent{
 
-	protected $id = self::BREWING_STAND;
+	protected $id = self::BREWING_STAND_BLOCK;
 
 	public function __construct(){
 
@@ -42,5 +42,15 @@ class BrewingStand extends Transparent{
 
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
+	}
+
+	public function getDrops(Item $item){
+		if($item->isPickaxe() >= Tool::TIER_WOODEN){
+			return [
+				[$this->id, 0, 1],
+			];
+		}else{
+			return [];
+		}
 	}
 }

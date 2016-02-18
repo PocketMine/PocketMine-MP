@@ -106,7 +106,18 @@ class FenceGate extends Transparent{
 			2 => 1,
 			3 => 2,
 		];
-		$this->meta = ($faces[$player instanceof Player ? $player->getDirection() : 0] & 0x03) | ((~$this->meta) & 0x04);
+		$faces2 = [
+			0 => 1,
+			1 => 2,
+			2 => 3,
+			3 => 0,
+		];
+		$before = $this->meta;
+		if($player instanceof Player && (($this->meta & 0x03) === $faces[($direction = $player->getDirection())] || ($this->meta & 0x03) === $faces2[$direction])){
+			$this->meta = ($faces[$direction] & 0x03) | ((~$this->meta) & 0x04);
+		}else{
+			$this->meta ^= 0x04;
+		}
 		$this->getLevel()->setBlock($this, $this, true);
 		$this->level->addSound(new DoorSound($this));
 		return true;

@@ -19,47 +19,13 @@
  *
 */
 
-namespace pocketmine\block;
+namespace pocketmine\item;
 
-use pocketmine\entity\Entity;
-use pocketmine\item\Item;
-use pocketmine\item\Tool;
+use pocketmine\block\Block;
 
-class Cobweb extends Flowable{
-
-	protected $id = self::COBWEB;
-
-	public function __construct(){
-
-	}
-
-	public function hasEntityCollision(){
-		return true;
-	}
-
-	public function getName(){
-		return "Cobweb";
-	}
-
-	public function getHardness(){
-		return 4;
-	}
-
-	public function getToolType(){
-		return Tool::TYPE_SWORD;
-	}
-
-	public function onEntityCollide(Entity $entity){
-		$entity->resetFallDistance();
-	}
-
-	public function getDrops(Item $item){
-		if($item->isShears()){
-			return [
-				[Item::STRING, 0, 1],
-			];
-		}else{
-			return [];
-		}
+class BrewingStand extends Item{
+	public function __construct($meta = 0, $count = 1){
+		$this->block = Block::get(Item::BREWING_STAND_BLOCK);
+		parent::__construct(self::BREWING_STAND, 0, $count, "Brewing Stand");
 	}
 }
