@@ -1492,6 +1492,7 @@ class Server{
 			"announce-player-achievements" => true,
 			"spawn-protection" => 16,
 			"max-players" => 20,
+			"timeout" => 10,
 			"allow-flight" => false,
 			"spawn-animals" => true,
 			"spawn-mobs" => true,
@@ -2309,7 +2310,7 @@ class Server{
 
 	private function checkTickUpdates($currentTick, $tickTime){
 		foreach($this->players as $p){
-			if(!$p->loggedIn and ($tickTime - $p->creationTime) >= 10){
+			if(!$p->loggedIn and ($tickTime - $p->creationTime) >= $this->getConfigInt("timeout", 10)){
 				$p->close("", "Login timeout");
 			}elseif($this->alwaysTickPlayers){
 				$p->onUpdate($currentTick);
