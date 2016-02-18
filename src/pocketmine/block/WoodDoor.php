@@ -48,7 +48,10 @@ class WoodDoor extends Door{
 		return Tool::TYPE_AXE;
 	}
 
-	public function getDrops(Item $item){
+	public function getItem(Item $item){
+		if(($this->meta & 8) === 0){
+			return [];
+		}
 		return [
 			[Item::WOODEN_DOOR, 0, 1],
 		];

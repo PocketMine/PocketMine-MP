@@ -266,7 +266,7 @@ class Chest extends Spawnable implements InventoryHolder, Container, Nameable{
 	public function getSpawnCompound(){
 		if($this->isPaired()){
 			$c = new Compound("", [
-				new String("id", Tile::CHEST),
+				$this->namedtag->id,
 				new Int("x", (int) $this->x),
 				new Int("y", (int) $this->y),
 				new Int("z", (int) $this->z),
@@ -275,7 +275,7 @@ class Chest extends Spawnable implements InventoryHolder, Container, Nameable{
 			]);
 		}else{
 			$c = new Compound("", [
-				new String("id", Tile::CHEST),
+				$this->namedtag->id,
 				new Int("x", (int) $this->x),
 				new Int("y", (int) $this->y),
 				new Int("z", (int) $this->z)

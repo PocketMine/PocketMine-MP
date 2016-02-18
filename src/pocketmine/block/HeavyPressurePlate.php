@@ -19,14 +19,13 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
+class HeavyPressurePlate extends LightPressurePlate{
+	protected $id = self::WEIGHTED_PRESSURE_PLATE_HEAVY;
+	protected $denominator = 10;
 
-class StringItem extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::STRING, $meta, $count, "String");
-		$this->block = Block::get(Block::TRIPWIRE);
+	public function getName(){
+		return "Weighted Pressure Plate (Heavy)";
 	}
 }
-

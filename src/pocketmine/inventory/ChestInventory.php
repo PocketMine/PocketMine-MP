@@ -21,11 +21,10 @@
 
 namespace pocketmine\inventory;
 
+use pocketmine\block\TrappedChest;
 use pocketmine\level\Level;
-use pocketmine\network\Network;
 use pocketmine\network\protocol\BlockEventPacket;
 use pocketmine\Player;
-
 use pocketmine\tile\Chest;
 
 class ChestInventory extends ContainerInventory{
@@ -54,6 +53,11 @@ class ChestInventory extends ContainerInventory{
 				$level->addChunkPacket($this->getHolder()->getX() >> 4, $this->getHolder()->getZ() >> 4, $pk);
 			}
 		}
+
+		$block = $this->getHolder()->getBlock();
+		if($block instanceof TrappedChest){
+			$block->recalculatePower();
+		}
 	}
 
 	public function onClose(Player $who){
@@ -69,5 +73,10 @@ class ChestInventory extends ContainerInventory{
 			}
 		}
 		parent::onClose($who);
+
+		$block = $this->getHolder()->getBlock();
+		if($block instanceof TrappedChest){
+			$block->recalculatePower();
+		}
 	}
 }

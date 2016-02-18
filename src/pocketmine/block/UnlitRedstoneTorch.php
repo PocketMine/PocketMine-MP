@@ -19,14 +19,26 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
+use pocketmine\level\Level;
 
-class StringItem extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::STRING, $meta, $count, "String");
-		$this->block = Block::get(Block::TRIPWIRE);
+class UnlitRedstoneTorch extends RedstoneTorch{
+
+	protected $id = self::UNLIT_REDSTONE_TORCH;
+
+	public function onUpdate($type){
+		parent::onUpdate($type);
+		if(($type === Level::BLOCK_UPDATE_REDSTONE or $type === Level::BLOCK_UPDATE_SCHEDULED) and !$this->getSide($this->getAttachSide())->isRedstoneActivated()){
+			$this->getLevel()->setBlock($this, new RedstoneTorch($this->getDamage()));
+		}
+	}
+
+	public function getPowerLevel(){
+		return 0;
+	}
+
+	public function isStronglyPowering(Block $block){
+		return false;
 	}
 }
-

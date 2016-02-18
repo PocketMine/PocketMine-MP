@@ -19,14 +19,18 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
+/**
+ * Represents a block that can provide an amount of power to an adjacent redstone dust
+ */
+interface RedstoneConductor extends RedstoneComponent{
+	public function getPowerLevel();
 
-class StringItem extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::STRING, $meta, $count, "String");
-		$this->block = Block::get(Block::TRIPWIRE);
-	}
+	/**
+	 * Gets the sides that the block is strongly or weakly powering
+	 *
+	 * @return int[]
+	 */
+	public function getPoweringSides();
 }
-

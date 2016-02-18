@@ -19,14 +19,16 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
+class WoodenButton extends StoneButton{
+	protected $id = self::WOODEN_BUTTON;
 
-class StringItem extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::STRING, $meta, $count, "String");
-		$this->block = Block::get(Block::TRIPWIRE);
+	public function getName(){
+		return "Wooden Button";
+	}
+
+	protected function getDelay(){
+		return 30;
 	}
 }
-

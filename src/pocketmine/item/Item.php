@@ -34,12 +34,12 @@ use pocketmine\entity\Zombie;
 use pocketmine\inventory\Fuel;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\level\Level;
+use pocketmine\nbt\NBT;
+use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Short;
 use pocketmine\nbt\tag\String;
 use pocketmine\Player;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\NBT;
 
 class Item{
 
@@ -47,6 +47,7 @@ class Item{
 
 	/**
 	 * @param $tag
+	 *
 	 * @return Compound
 	 */
 	private static function parseCompoundTag($tag){
@@ -60,6 +61,7 @@ class Item{
 
 	/**
 	 * @param Compound $tag
+	 *
 	 * @return string
 	 */
 	private static function writeCompoundTag(Compound $tag){
@@ -108,7 +110,6 @@ class Item{
 
 	const BED_BLOCK = 26;
 
-
 	const COBWEB = 30;
 	const TALL_GRASS = 31;
 	const BUSH = 32;
@@ -141,7 +142,7 @@ class Item{
 	const OAK_WOOD_STAIRS = 53;
 	const OAK_WOODEN_STAIRS = 53;
 	const CHEST = 54;
-
+	const REDSTONE_WIRE = 55;
 	const DIAMOND_ORE = 56;
 	const DIAMOND_BLOCK = 57;
 	const CRAFTING_TABLE = 58;
@@ -161,11 +162,17 @@ class Item{
 	const COBBLESTONE_STAIRS = 67;
 	const WALL_SIGN = 68;
 
+	const LEVER = 69;
+	const STONE_PRESSURE_PLATE = 70;
 	const IRON_DOOR_BLOCK = 71;
-
+	const WOODEN_PRESSURE_PLATE = 72;
 	const REDSTONE_ORE = 73;
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
+	const UNLIT_REDSTONE_TORCH = 75;
+	const REDSTONE_TORCH = 76;
+	const LIT_REDSTONE_TORCH = 76;
+	const STONE_BUTTON = 77;
 
 	const SNOW = 78;
 	const SNOW_LAYER = 78;
@@ -183,12 +190,13 @@ class Item{
 	const GLOWSTONE = 89;
 	const GLOWSTONE_BLOCK = 89;
 
-
 	const LIT_PUMPKIN = 91;
 	const JACK_O_LANTERN = 91;
 	const CAKE_BLOCK = 92;
 
 	const TRAPDOOR = 96;
+	const WOODEN_TRAPDOOR = 96;
+	const WOOD_TRAPDOOR = 96;
 
 	const STONE_BRICKS = 98;
 	const STONE_BRICK = 98;
@@ -220,9 +228,14 @@ class Item{
 	const END_PORTAL = 120;
 	const END_STONE = 121;
 
+	const REDSTONE_LAMP = 123;
+	const LIT_REDSTONE_LAMP = 124;
+
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
 
+	const TRIPWIRE_HOOK = 131;
+	const TRIPWIRE = 132;
 	const EMERALD_BLOCK = 133;
 	const SPRUCE_WOOD_STAIRS = 134;
 	const SPRUCE_WOODEN_STAIRS = 134;
@@ -238,9 +251,18 @@ class Item{
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
 
+	const WOODEN_BUTTON = 143;
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
+	const WEIGHTED_PRESSURE_PLATE_LIGHT = 147;
+	const LIGHT_WEIGHTED_PRESSURE_PLATE = 147;
+	const GOLD_WEIGHTED_PRESSURE_PLATE = 147;
+	const GOLDEN_WEIGHTED_PRESSURE_PLATE = 147;
+	const WEIGHTED_PRESSURE_PLATE_HEAVY = 148;
+	const HEAVY_WEIGHTED_PRESSURE_PLATE = 148;
+	const IRON_WEIGHTED_PRESSURE_PLATE = 148;
 
+	const DAYLIGHT_DETECTOR = 151;
 	const REDSTONE_BLOCK = 152;
 
 	const QUARTZ_BLOCK = 155;
@@ -274,6 +296,8 @@ class Item{
 	const PACKED_ICE = 174;
 	const DOUBLE_PLANT = 175;
 
+	const DAYLIGHT_DETECTOR_INVERTED = 178;
+
 	const FENCE_GATE_SPRUCE = 183;
 	const FENCE_GATE_BIRCH = 184;
 	const FENCE_GATE_JUNGLE = 185;
@@ -286,7 +310,6 @@ class Item{
 	const BEETROOT_BLOCK = 244;
 	const STONECUTTER = 245;
 	const GLOWING_OBSIDIAN = 246;
-
 
 	//Normal Item IDs
 
@@ -400,9 +423,7 @@ class Item{
 	const CAKE = 354;
 	const BED = 355;
 
-
 	const COOKIE = 357;
-
 
 	const SHEARS = 359;
 	const MELON = 360;
@@ -442,7 +463,6 @@ class Item{
 	const BEETROOT_SEEDS = 458;
 	const BEETROOT_SEED = 458;
 	const BEETROOT_SOUP = 459;
-
 
 	/** @var \SplFixedArray */
 	public static $list = null;
@@ -534,7 +554,7 @@ class Item{
 			self::$list[self::BUCKET] = Bucket::class;
 			self::$list[self::MINECART] = Minecart::class;
 			self::$list[self::IRON_DOOR] = IronDoor::class;
-			self::$list[self::REDSTONE] = Redstone::class;
+			self::$list[self::REDSTONE] = RedstoneDust::class;
 			self::$list[self::SNOWBALL] = Snowball::class;
 			self::$list[self::LEATHER] = Leather::class;
 			self::$list[self::BRICK] = Brick::class;
@@ -928,17 +948,17 @@ class Item{
 		self::addCreativeItem(Item::get(Item::GOLD_CHESTPLATE, 0));
 		self::addCreativeItem(Item::get(Item::GOLD_LEGGINGS, 0));
 		self::addCreativeItem(Item::get(Item::GOLD_BOOTS, 0));
-		// TODO: Lever
-		// TODO: Redstone lamp
-		// TODO: Redstone torch
-		// TODO: Wood pressure plate
-		// TODO: Stone pressure plate
-		// TODO: Weighted pressure plate light
-		// TODO: Weighted pressure plate heavy
-		// TODO: Wood button
-		// TODO: Stone button
-		// TODO: Daylight sensor
-		// TODO: Tripwire hook
+		self::addCreativeItem(Item::get(Item::LEVER));
+		self::addCreativeItem(Item::get(Item::REDSTONE_LAMP));
+		self::addCreativeItem(Item::get(Item::REDSTONE_TORCH));
+		self::addCreativeItem(Item::get(Item::STONE_PRESSURE_PLATE));
+		self::addCreativeItem(Item::get(Item::WOODEN_PRESSURE_PLATE));
+		self::addCreativeItem(Item::get(Item::WEIGHTED_PRESSURE_PLATE_LIGHT));
+		self::addCreativeItem(Item::get(Item::WEIGHTED_PRESSURE_PLATE_HEAVY));
+		self::addCreativeItem(Item::get(Item::WOODEN_BUTTON, 5));
+		self::addCreativeItem(Item::get(Item::STONE_BUTTON, 5));
+		self::addCreativeItem(Item::get(Item::DAYLIGHT_DETECTOR));
+		self::addCreativeItem(Item::get(Item::TRIPWIRE_HOOK));
 		self::addCreativeItem(Item::get(Item::SNOWBALL));
 
 		//Seeds
@@ -1065,6 +1085,7 @@ class Item{
 
 	/**
 	 * @param $index
+	 *
 	 * @return Item
 	 */
 	public static function getCreativeItem($index){
@@ -1073,6 +1094,7 @@ class Item{
 
 	/**
 	 * @param Item $item
+	 *
 	 * @return int
 	 */
 	public static function getCreativeItemIndex(Item $item){
@@ -1236,6 +1258,7 @@ class Item{
 
 	/**
 	 * @param $id
+	 *
 	 * @return Enchantment|null
 	 */
 	public function getEnchantment($id){
@@ -1515,7 +1538,7 @@ class Item{
 	}
 
 	final public function __toString(){
-		return "Item " . $this->name . " (" . $this->id . ":" . ($this->meta === null ? "?" : $this->meta) . ")x" . $this->count . ($this->hasCompoundTag() ? " tags:0x".bin2hex($this->getCompoundTag()) : "");
+		return "Item " . $this->name . " (" . $this->id . ":" . ($this->meta === null ? "?" : $this->meta) . ")x" . $this->count . ($this->hasCompoundTag() ? " tags:0x" . bin2hex($this->getCompoundTag()) : "");
 	}
 
 	public function getDestroySpeed(Block $block, Player $player){

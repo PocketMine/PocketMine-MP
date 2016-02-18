@@ -21,39 +21,35 @@
 
 namespace pocketmine\block;
 
+use pocketmine\item\Item;
 use pocketmine\level\Level;
 
-class TrappedChest extends Chest implements RedstonePowerSource{
+class RedstoneTorch extends Torch implements RedstonePowerSource{
 
-	protected $id = self::TRAPPED_CHEST;
-	protected $lastPower = 0;
+	protected $id = self::REDSTONE_TORCH;
 
-	public function getName(){
-		return "Trapped Chest";
-	}
-
-	public function getPowerLevel(){
-		return $this->lastPower;
-	}
-
-	public function isStronglyPowering(Block $block){
-		return $this->subtract(0, 1)->equals($block) and !$block->isTransparent();
-	}
-
-	public function countViewers(){
-		$chest = $this->getTile();
-		return count($chest->getInventory()->getViewers());
-	}
-
-	public function recalculatePower(){
-		$new = max(min($this->countViewers(), 15), 0);
-		if($this->lastPower !== $new){
-			$this->lastPower = $new;
-			$this->getLevel()->updateAround($this, Level::BLOCK_UPDATE_REDSTONE);
+	public function onUpdate($type){
+		parent::onUpdate($type);
+		if(($type === Level::BLOCK_UPDATE_REDSTONE or $type === Level::BLOCK_UPDATE_SCHEDULED) and $this->getSide($this->getAttachSide())->isRedstoneActivated()){
+			$this->getLevel()->setBlock($this, new UnlitRedstoneTorch($this->getDamage()));
 		}
 	}
 
+	public function getPowerLevel(){
+		return 16;
+	}
+
+	public function isStronglyPowering(Block $block){
+		return false;
+	}
+
+	public function getDrops(Item $item){
+		return [
+			[self::REDSTONE_TORCH, 0, 1]
+		];
+	}
+
 	public function getPoweringSides(){
-		return [self::SIDE_DOWN];
+		return [];
 	}
 }

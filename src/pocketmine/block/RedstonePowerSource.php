@@ -19,14 +19,22 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
+interface RedstonePowerSource extends RedstoneConductor{
+	/**
+	 * Returns an integer between 0 and 15 (inclusive), indicating the power level of this redstone power component.
+	 *
+	 * @return int
+	 */
+	public function getPowerLevel();
 
-class StringItem extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::STRING, $meta, $count, "String");
-		$this->block = Block::get(Block::TRIPWIRE);
-	}
+	/**
+	 * Returns whether this block is providing strong power to $block.
+	 *
+	 * @param Block $block
+	 *
+	 * @return bool
+	 */
+	public function isStronglyPowering(Block $block);
 }
-

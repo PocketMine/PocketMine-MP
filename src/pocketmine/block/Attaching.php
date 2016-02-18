@@ -19,14 +19,20 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
+interface Attaching{
+	/**
+	 * The side this block is attached to
+	 *
+	 * @return int
+	 */
+	public function getAttachSide();
 
-class StringItem extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::STRING, $meta, $count, "String");
-		$this->block = Block::get(Block::TRIPWIRE);
-	}
+	/**
+	 * @param Block $block
+	 *
+	 * @return bool
+	 */
+	public function canAttachTo(Block $block);
 }
-

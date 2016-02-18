@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -25,8 +25,6 @@
 namespace pocketmine\block;
 
 use pocketmine\entity\Entity;
-
-
 use pocketmine\item\Item;
 use pocketmine\item\Tool;
 use pocketmine\level\Level;
@@ -38,7 +36,6 @@ use pocketmine\metadata\Metadatable;
 use pocketmine\metadata\MetadataValue;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
-
 
 class Block extends Position implements Metadatable{
 	const AIR = 0;
@@ -77,7 +74,6 @@ class Block extends Position implements Metadatable{
 
 	const BED_BLOCK = 26;
 
-
 	const COBWEB = 30;
 	const TALL_GRASS = 31;
 	const BUSH = 32;
@@ -110,7 +106,7 @@ class Block extends Position implements Metadatable{
 	const OAK_WOOD_STAIRS = 53;
 	const OAK_WOODEN_STAIRS = 53;
 	const CHEST = 54;
-
+	const REDSTONE_WIRE = 55;
 	const DIAMOND_ORE = 56;
 	const DIAMOND_BLOCK = 57;
 	const CRAFTING_TABLE = 58;
@@ -130,11 +126,17 @@ class Block extends Position implements Metadatable{
 	const COBBLESTONE_STAIRS = 67;
 	const WALL_SIGN = 68;
 
+	const LEVER = 69;
+	const STONE_PRESSURE_PLATE = 70;
 	const IRON_DOOR_BLOCK = 71;
-
+	const WOODEN_PRESSURE_PLATE = 72;
 	const REDSTONE_ORE = 73;
 	const GLOWING_REDSTONE_ORE = 74;
 	const LIT_REDSTONE_ORE = 74;
+	const UNLIT_REDSTONE_TORCH = 75;
+	const REDSTONE_TORCH = 76;
+	const LIT_REDSTONE_TORCH = 76;
+	const STONE_BUTTON = 77;
 
 	const SNOW = 78;
 	const SNOW_LAYER = 78;
@@ -151,7 +153,6 @@ class Block extends Position implements Metadatable{
 	const SOUL_SAND = 88;
 	const GLOWSTONE = 89;
 	const GLOWSTONE_BLOCK = 89;
-
 
 	const LIT_PUMPKIN = 91;
 	const JACK_O_LANTERN = 91;
@@ -191,9 +192,14 @@ class Block extends Position implements Metadatable{
 	const END_PORTAL_FRAME = 120;
 	const END_STONE = 121;
 
+	const REDSTONE_LAMP = 123;
+	const LIT_REDSTONE_LAMP = 124;
+
 	const SANDSTONE_STAIRS = 128;
 	const EMERALD_ORE = 129;
 
+	const TRIPWIRE_HOOK = 131;
+	const TRIPWIRE = 132;
 	const EMERALD_BLOCK = 133;
 	const SPRUCE_WOOD_STAIRS = 134;
 	const SPRUCE_WOODEN_STAIRS = 134;
@@ -209,9 +215,18 @@ class Block extends Position implements Metadatable{
 	const CARROT_BLOCK = 141;
 	const POTATO_BLOCK = 142;
 
+	const WOODEN_BUTTON = 143;
 	const ANVIL = 145;
 	const TRAPPED_CHEST = 146;
+	const WEIGHTED_PRESSURE_PLATE_LIGHT = 147;
+	const LIGHT_WEIGHTED_PRESSURE_PLATE = 147;
+	const GOLD_WEIGHTED_PRESSURE_PLATE = 147;
+	const GOLDEN_WEIGHTED_PRESSURE_PLATE = 147;
+	const WEIGHTED_PRESSURE_PLATE_HEAVY = 148;
+	const HEAVY_WEIGHTED_PRESSURE_PLATE = 148;
+	const IRON_WEIGHTED_PRESSURE_PLATE = 148;
 
+	const DAYLIGHT_DETECTOR = 151;
 	const REDSTONE_BLOCK = 152;
 
 	const QUARTZ_BLOCK = 155;
@@ -245,6 +260,8 @@ class Block extends Position implements Metadatable{
 	const PACKED_ICE = 174;
 	const DOUBLE_PLANT = 175;
 
+	const DAYLIGHT_DETECTOR_INVERTED = 178;
+
 	const FENCE_GATE_SPRUCE = 183;
 	const FENCE_GATE_BIRCH = 184;
 	const FENCE_GATE_JUNGLE = 185;
@@ -262,6 +279,13 @@ class Block extends Position implements Metadatable{
 	public static $list = null;
 	/** @var \SplFixedArray */
 	public static $fullList = null;
+
+	const CHARGE_POWER = 5;
+	const CHARGE_STRONG = 4;
+	const CHARGE_WEAK = 3;
+	const CHARGE_CONTACT_STRONG = 2;
+	const CHARGE_CONTACT_WEAK = 1;
+	const CHARGE_NONE = 0;
 
 	/** @var \SplFixedArray */
 	public static $light = null;
@@ -362,7 +386,7 @@ class Block extends Position implements Metadatable{
 			self::$list[self::MONSTER_SPAWNER] = MonsterSpawner::class;
 			self::$list[self::WOOD_STAIRS] = WoodStairs::class;
 			self::$list[self::CHEST] = Chest::class;
-
+			self::$list[self::REDSTONE_WIRE] = RedstoneWire::class;
 			self::$list[self::DIAMOND_ORE] = DiamondOre::class;
 			self::$list[self::DIAMOND_BLOCK] = Diamond::class;
 			self::$list[self::WORKBENCH] = Workbench::class;
@@ -377,9 +401,16 @@ class Block extends Position implements Metadatable{
 			self::$list[self::COBBLESTONE_STAIRS] = CobblestoneStairs::class;
 			self::$list[self::WALL_SIGN] = WallSign::class;
 
+			self::$list[self::LEVER] = Lever::class;
+			self::$list[self::STONE_PRESSURE_PLATE] = StonePressurePlate::class;
 			self::$list[self::IRON_DOOR_BLOCK] = IronDoor::class;
+			self::$list[self::WOODEN_PRESSURE_PLATE] = WoodenPressurePlate::class;
 			self::$list[self::REDSTONE_ORE] = RedstoneOre::class;
 			self::$list[self::GLOWING_REDSTONE_ORE] = GlowingRedstoneOre::class;
+
+			self::$list[self::UNLIT_REDSTONE_TORCH] = UnlitRedstoneTorch::class;
+			self::$list[self::REDSTONE_TORCH] = RedstoneTorch::class;
+			self::$list[self::STONE_BUTTON] = StoneButton::class;
 
 			self::$list[self::SNOW_LAYER] = SnowLayer::class;
 			self::$list[self::ICE] = Ice::class;
@@ -421,9 +452,13 @@ class Block extends Position implements Metadatable{
 			self::$list[self::BREWING_STAND] = BrewingStand::class;
 			self::$list[self::END_PORTAL_FRAME] = EndPortalFrame::class;
 			self::$list[self::END_STONE] = EndStone::class;
+			self::$list[self::REDSTONE_LAMP] = RedstoneLamp::class;
+			self::$list[self::LIT_REDSTONE_LAMP] = LitRedstoneLamp::class;
 			self::$list[self::SANDSTONE_STAIRS] = SandstoneStairs::class;
 			self::$list[self::EMERALD_ORE] = EmeraldOre::class;
 
+			self::$list[self::TRIPWIRE_HOOK] = TripwireHook::class;
+			self::$list[self::TRIPWIRE] = Tripwire::class;
 			self::$list[self::EMERALD_BLOCK] = Emerald::class;
 			self::$list[self::SPRUCE_WOOD_STAIRS] = SpruceWoodStairs::class;
 			self::$list[self::BIRCH_WOOD_STAIRS] = BirchWoodStairs::class;
@@ -432,9 +467,15 @@ class Block extends Position implements Metadatable{
 			self::$list[self::FLOWER_POT_BLOCK] = FlowerPot::class;
 			self::$list[self::CARROT_BLOCK] = Carrot::class;
 			self::$list[self::POTATO_BLOCK] = Potato::class;
+
+			self::$list[self::WOODEN_BUTTON] = WoodenButton::class;
 			self::$list[self::ANVIL] = Anvil::class;
 			self::$list[self::TRAPPED_CHEST] = TrappedChest::class;
-			self::$list[self::REDSTONE_BLOCK] = Redstone::class;
+			self::$list[self::LIGHT_WEIGHTED_PRESSURE_PLATE] = LightPressurePlate::class;
+			self::$list[self::HEAVY_WEIGHTED_PRESSURE_PLATE] = HeavyPressurePlate::class;
+
+			self::$list[self::DAYLIGHT_DETECTOR] = DaylightDetector::class;
+			self::$list[self::REDSTONE_BLOCK] = RedstoneBlock::class;
 
 			self::$list[self::QUARTZ_BLOCK] = Quartz::class;
 			self::$list[self::QUARTZ_STAIRS] = QuartzStairs::class;
@@ -454,6 +495,8 @@ class Block extends Position implements Metadatable{
 			self::$list[self::COAL_BLOCK] = Coal::class;
 			self::$list[self::PACKED_ICE] = PackedIce::class;
 			self::$list[self::DOUBLE_PLANT] = DoublePlant::class;
+
+			self::$list[self::DAYLIGHT_DETECTOR_INVERTED] = DaylightDetectorInverted::class;
 
 			self::$list[self::FENCE_GATE_SPRUCE] = FenceGateSpruce::class;
 			self::$list[self::FENCE_GATE_BIRCH] = FenceGateBirch::class;
@@ -558,6 +601,9 @@ class Block extends Position implements Metadatable{
 	 * @return bool
 	 */
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
+		if($this instanceof Attaching and !$this->canAttachTo($target)){
+			return false;
+		}
 		return $this->getLevel()->setBlock($this, $this, true, true);
 	}
 
@@ -591,7 +637,11 @@ class Block extends Position implements Metadatable{
 	 * @return void
 	 */
 	public function onUpdate($type){
-
+		if($type === Level::BLOCK_UPDATE_NORMAL){
+			if($this instanceof Attaching and !$this->canAttachTo($this->getSide($this->getAttachSide()))){
+				$this->getLevel()->useBreakOn($this);
+			}
+		}
 	}
 
 	/**
@@ -666,6 +716,16 @@ class Block extends Position implements Metadatable{
 		return false;
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function isLiquid(){
+		return false;
+	}
+
+	/**
+	 * @return bool
+	 */
 	public function isSolid(){
 		return true;
 	}
@@ -711,7 +771,6 @@ class Block extends Position implements Metadatable{
 	}
 
 	public function addVelocityToEntity(Entity $entity, Vector3 $vector){
-
 	}
 
 	/**
@@ -811,17 +870,62 @@ class Block extends Position implements Metadatable{
 	/**
 	 * Returns the Block on the side $side, works like Vector3::side()
 	 *
-	 * @param int $side
-	 * @param int $step
+	 * @param int  $side
+	 * @param int  $step default 1
+	 * @param bool $v3   default false - act like a Vector3 without searching the block
 	 *
 	 * @return Block
 	 */
-	public function getSide($side, $step = 1){
+	public function getSide($side, $step = 1, $v3 = false){
+		if($v3){
+			return Vector3::getSide($side, $step);
+		}
+
 		if($this->isValid()){
 			return $this->getLevel()->getBlock(Vector3::getSide($side, $step));
 		}
 
 		return Block::get(Item::AIR, 0, Position::fromObject(Vector3::getSide($side, $step)));
+	}
+
+	public function getChargeType(){
+		if($this instanceof RedstonePowerSource and $this->getPowerLevel() !== 0){
+			return self::CHARGE_POWER;
+		}
+
+		$power = self::CHARGE_NONE;
+		for($side = 0; $side < 6; $side++){
+			$block = $this->getSide($side);
+			if($block instanceof RedstonePowerSource){
+				if($block->getPowerLevel() === 0){
+					continue;
+				}
+				if($block->isStronglyPowering($this)){
+					return self::CHARGE_STRONG;
+				}
+				$power = self::CHARGE_CONTACT_STRONG;
+			}elseif($block instanceof RedstoneConnector){
+				if($block->getPowerLevel() === 0){
+					continue;
+				}
+				if($block->isPowering($this)){
+					$power = max($power, self::CHARGE_WEAK);
+				}else{
+					$power = max($power, self::CHARGE_CONTACT_WEAK);
+				}
+			}
+		}
+
+		return $power;
+	}
+
+	public function isRedstoneActivated(){
+		for($i = 0; $i <= 5; $i++){
+			if($this->getSide($i)->getChargeType() >= self::CHARGE_WEAK){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -848,7 +952,6 @@ class Block extends Position implements Metadatable{
 	 * @param Entity $entity
 	 */
 	public function onEntityCollide(Entity $entity){
-
 	}
 
 	/**

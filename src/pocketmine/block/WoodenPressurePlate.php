@@ -19,14 +19,19 @@
  *
 */
 
-namespace pocketmine\item;
+namespace pocketmine\block;
 
-use pocketmine\block\Block;
+use pocketmine\entity\Entity;
+use pocketmine\entity\Snowball;
 
-class StringItem extends Item{
-	public function __construct($meta = 0, $count = 1){
-		parent::__construct(self::STRING, $meta, $count, "String");
-		$this->block = Block::get(Block::TRIPWIRE);
+class WoodenPressurePlate extends StonePressurePlate{
+	protected $id = self::WOODEN_PRESSURE_PLATE;
+
+	public function acceptsEntity(Entity $entity){
+		return !($entity instanceof Snowball);
+	}
+
+	public function getName(){
+		return "Wooden Pressure Plate";
 	}
 }
-
