@@ -239,12 +239,12 @@ class Network{
 				$buf = substr($str, $offset, $pkLen);
 				$offset += $pkLen;
 
-				if(($pk = $this->getPacket(ord($buf{0}))) !== null){
+				if(($pk = $this->getPacket(ord($buf{1}))) !== null){
 					if($pk::NETWORK_ID === Info::BATCH_PACKET){
 						throw new \InvalidStateException("Invalid BatchPacket inside BatchPacket");
 					}
 
-					$pk->setBuffer($buf, 1);
+					$pk->setBuffer($buf, 2);
 
 					$pk->decode();
 					$p->handleDataPacket($pk);
