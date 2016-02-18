@@ -2623,12 +2623,33 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 				$canCraft = true;
 
-
 				if($recipe instanceof ShapedRecipe){
-					for($x = 0; $x < 3 and $canCraft; ++$x){
-						for($y = 0; $y < 3; ++$y){
+					$client = [2, 2];
+					for($x = 0; $x < $client[1]; ++$x){
+						for($y = 0; $y < $client[0]; ++$y){
 							$item = $packet->input[$y * 3 + $x];
-							$ingredient = $recipe->getIngredient($x, $y);
+							if($item->getId() !== Item::AIR){
+								if($client[0] > $y) $client[0] = $y; // top
+								if($client[1] > $x) $client[1] = $x;
+							}
+						}
+					}
+
+					$server = [2, 2];
+					$map = $recipe->getIngredientMap();
+					foreach($map as $y => $yVal){
+						foreach($yVal as $x => $item){
+							if($item->getId() !== Item::AIR){
+								if($server[0] > $y) $server[0] = $y; // top
+								if($server[1] > $x) $server[1] = $x;
+							}
+						}
+					}
+
+					for($x = $client[0]; $x < 3 and $canCraft; ++$x){
+						for($y = $client[1]; $y < 3; ++$y){
+							$item = $packet->input[$y * 3 + $x];
+							$ingredient = $recipe->getIngredient($server[1] + $x - $client[1], $server[0] + $y - $client[0]);
 							if($item->getCount() > 0){
 								if($ingredient === null or !$ingredient->deepEquals($item, $ingredient->getDamage() !== null, $ingredient->getCompoundTag() !== null)){
 									$canCraft = false;
@@ -2685,7 +2706,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				foreach($ingredients as $ingredient){
 					$slot = -1;
 					foreach($this->inventory->getContents() as $index => $i){
-						if($ingredient->getId() !== 0 and $ingredient->deepEquals($i, $i->getDamage() !== null) and ($i->getCount() - $used[$index]) >= 1){
+						if($ingredient->getId() !== 0 and $ingredient->deepEquals($i, $ingredient->getDamage() !== null) and ($i->getCount() - $used[$index]) >= 1){
 							$slot = $index;
 							$used[$index]++;
 							break;
