@@ -26,7 +26,7 @@ use pocketmine\event\entity\EntityCombustByEntityEvent;
 use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
-
+use pocketmine\event\entity\ProjectileHitEntityEvent;
 use pocketmine\event\entity\ProjectileHitEvent;
 use pocketmine\level\format\FullChunk;
 use pocketmine\level\MovingObjectPosition;
@@ -136,7 +136,7 @@ abstract class Projectile extends Entity{
 			if($movingObjectPosition !== null){
 				if($movingObjectPosition->entityHit !== null){
 
-					$this->server->getPluginManager()->callEvent(new ProjectileHitEvent($this));
+					$this->server->getPluginManager()->callEvent(new ProjectileHitEntityEvent($this, $movingObjectPosition->entityHit));
 
 					$motion = sqrt($this->motionX ** 2 + $this->motionY ** 2 + $this->motionZ ** 2);
 					$damage = ceil($motion * $this->damage);
