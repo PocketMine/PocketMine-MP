@@ -57,7 +57,6 @@ use pocketmine\network\Network;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\RemoveEntityPacket;
 use pocketmine\network\protocol\SetEntityDataPacket;
-
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
@@ -86,7 +85,7 @@ abstract class Entity extends Location implements Metadatable{
 	const DATA_SILENT = 4;
 	const DATA_POTION_COLOR = 7;
 	const DATA_POTION_AMBIENT = 8;
-    const DATA_NO_AI = 15;
+	const DATA_NO_AI = 15;
 
 
 	const DATA_FLAG_ONFIRE = 0;
@@ -560,7 +559,7 @@ abstract class Entity extends Location implements Metadatable{
 
 	/**
 	 * @param Player[]|Player $player
-	 * @param array $data Properly formatted entity data, defaults to everything
+	 * @param array           $data Properly formatted entity data, defaults to everything
 	 */
 	public function sendData($player, array $data = null){
 		$pk = new SetEntityDataPacket();
@@ -591,23 +590,24 @@ abstract class Entity extends Location implements Metadatable{
 	 * @param EntityDamageEvent $source
 	 *
 	 */
-    public function attack($damage, EntityDamageEvent $source){
-        if($this->hasEffect(Effect::FIRE_RESISTANCE)
-            and $source->getCause() === EntityDamageEvent::CAUSE_FIRE
-            and $source->getCause() === EntityDamageEvent::CAUSE_FIRE_TICK
-            and $source->getCause() === EntityDamageEvent::CAUSE_LAVA){
-            $source->setCancelled();
-        }
+	public function attack($damage, EntityDamageEvent $source){
+		if($this->hasEffect(Effect::FIRE_RESISTANCE)
+			and $source->getCause() === EntityDamageEvent::CAUSE_FIRE
+			and $source->getCause() === EntityDamageEvent::CAUSE_FIRE_TICK
+			and $source->getCause() === EntityDamageEvent::CAUSE_LAVA
+		){
+			$source->setCancelled();
+		}
 
-        $this->server->getPluginManager()->callEvent($source);
-        if($source->isCancelled()){
-            return;
-        }
+		$this->server->getPluginManager()->callEvent($source);
+		if($source->isCancelled()){
+			return;
+		}
 
-        $this->setLastDamageCause($source);
+		$this->setLastDamageCause($source);
 
-        $this->setHealth($this->getHealth() - $source->getFinalDamage());
-    }
+		$this->setHealth($this->getHealth() - $source->getFinalDamage());
+	}
 
 	/**
 	 * @param float                   $amount
@@ -615,13 +615,13 @@ abstract class Entity extends Location implements Metadatable{
 	 *
 	 */
 	public function heal($amount, EntityRegainHealthEvent $source){
-        $this->server->getPluginManager()->callEvent($source);
-        if($source->isCancelled()){
-            return;
-        }
+		$this->server->getPluginManager()->callEvent($source);
+		if($source->isCancelled()){
+			return;
+		}
 
-        $this->setHealth($this->getHealth() + $source->getAmount());
-    }
+		$this->setHealth($this->getHealth() + $source->getAmount());
+	}
 
 	/**
 	 * @return int
@@ -770,7 +770,7 @@ abstract class Entity extends Location implements Metadatable{
 			}
 
 			if($direction === 5){
-				$this->motionY = $force;
+				$this->motionZ = $force;
 
 				return true;
 			}
@@ -1544,7 +1544,7 @@ abstract class Entity extends Location implements Metadatable{
 	}
 
 	/**
-	 * @param int  $propertyId;
+	 * @param int  $propertyId
 	 * @param int  $id
 	 * @param bool $value
 	 */
