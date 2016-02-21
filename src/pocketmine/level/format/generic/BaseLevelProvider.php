@@ -88,7 +88,7 @@ abstract class BaseLevelProvider implements LevelProvider{
 	}
 
 	public function getSeed(){
-		return $this->levelData["RandomSeed"];
+		return intval( $this->levelData["RandomSeed"] );
 	}
 
 	public function setSeed($value){
