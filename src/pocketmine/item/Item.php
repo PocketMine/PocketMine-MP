@@ -400,6 +400,7 @@ class Item{
 	const PAINTING = 321;
 	const GOLDEN_APPLE = 322;
 	const SIGN = 323;
+	const WOODEN_DOOR = 324;
 	const OAK_DOOR = 324;
 	const BUCKET = 325;
 	const MINECART = 328;
