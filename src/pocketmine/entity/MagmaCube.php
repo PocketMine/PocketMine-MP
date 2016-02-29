@@ -21,42 +21,36 @@
 
 namespace pocketmine\entity;
 
-use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item as ItemItem;
 use pocketmine\Player;
 
-class Chicken extends Animal{
-	const NETWORK_ID = 10;
+class MagmaCube extends Living{
+	const NETWORK_ID = 42;
 
-	public $width = 1;
-	public $length = 0.5;
-	public $height = 0.8;
+	public $width = 2;
+	public $length = 2;
+	public $height = 2;
 
 	public function initEntity(){
-		$this->setMaxHealth(4);
+		//$this->setMaxHealth(10); //TODO Size
 		parent::initEntity();
 	}
 
-	public function getName() {
-		return "Chicken";
+	public function getName(){
+		return "Magma Cube";
 	}
 
-	public function spawnTo(Player $player){
+	 public function spawnTo(Player $player){
 		$pk = $this->addEntityDataPacket($player);
-		$pk->type = Chicken::NETWORK_ID;
+		$pk->type = MagmaCube::NETWORK_ID;
 
 		$player->dataPacket($pk);
 		parent::spawnTo($player);
 	}
-	
-	public function getDrops(){
-		$drops = [ItemItem::get(ItemItem::FEATHER, 0, mt_rand(0, 2))];
 
-		if($this->getLastDamageCause() === EntityDamageEvent::CAUSE_FIRE){
-			$drops[] = ItemItem::get(ItemItem::COOKED_CHICKEN, 0, mt_rand(1, 2));
-		}else{
-			$drops[] = ItemItem::get(ItemItem::RAW_CHICKEN, 0, mt_rand(1, 2));
-		}
-		return $drops;
+	public function getDrops(){
+		return [
+			ItemItem::get(ItemItem::MAGMA_CREAM, 0, mt_rand(0, 2))
+		];
 	}
 }

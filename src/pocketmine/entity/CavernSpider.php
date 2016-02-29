@@ -21,42 +21,38 @@
 
 namespace pocketmine\entity;
 
-use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item as ItemItem;
 use pocketmine\Player;
 
-class Chicken extends Animal{
-	const NETWORK_ID = 10;
+class CavernSpider extends Monster{
+	const NETWORK_ID = 40;
 
-	public $width = 1;
-	public $length = 0.5;
-	public $height = 0.8;
+	public $width = 1.438;
+	public $length = 1.188;
+	public $height = 0.547;
 
 	public function initEntity(){
-		$this->setMaxHealth(4);
+		$this->setMaxHealth(12);
 		parent::initEntity();
 	}
 
-	public function getName() {
-		return "Chicken";
+	public function getName(){
+		return "Cave Spider";
 	}
 
 	public function spawnTo(Player $player){
 		$pk = $this->addEntityDataPacket($player);
-		$pk->type = Chicken::NETWORK_ID;
+		$pk->type = CavernSpider::NETWORK_ID;
 
 		$player->dataPacket($pk);
 		parent::spawnTo($player);
 	}
-	
-	public function getDrops(){
-		$drops = [ItemItem::get(ItemItem::FEATHER, 0, mt_rand(0, 2))];
 
-		if($this->getLastDamageCause() === EntityDamageEvent::CAUSE_FIRE){
-			$drops[] = ItemItem::get(ItemItem::COOKED_CHICKEN, 0, mt_rand(1, 2));
-		}else{
-			$drops[] = ItemItem::get(ItemItem::RAW_CHICKEN, 0, mt_rand(1, 2));
-		}
-		return $drops;
-	}
+	public function getDrops(){
+		return[
+			ItemItem::get(ItemItem::STRING, 0, mt_rand(0, 2)),
+			ItemItem::get(ItemItem::SPIDER_EYE, 0, mt_rand(0, 1))
+		];
+	 }
+  	
 }

@@ -21,42 +21,36 @@
 
 namespace pocketmine\entity;
 
-use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\item\Item as ItemItem;
 use pocketmine\Player;
+use pocketmine\item\Item as ItemItem;
 
-class Chicken extends Animal{
-	const NETWORK_ID = 10;
+class Blaze extends Monster{
+	const NETWORK_ID = 43;
 
-	public $width = 1;
-	public $length = 0.5;
-	public $height = 0.8;
+	public $height = 1.5;
+	public $width = 1.25;
+	public $lenght = 0.906;
 
 	public function initEntity(){
-		$this->setMaxHealth(4);
+		$this->setMaxHealth(20);
 		parent::initEntity();
 	}
 
-	public function getName() {
-		return "Chicken";
-	}
+	public function getName(){
+		return "Blaze";
+ 	}
 
 	public function spawnTo(Player $player){
 		$pk = $this->addEntityDataPacket($player);
-		$pk->type = Chicken::NETWORK_ID;
+		$pk->type = Blaze::NETWORK_ID;
 
 		$player->dataPacket($pk);
 		parent::spawnTo($player);
 	}
 	
 	public function getDrops(){
-		$drops = [ItemItem::get(ItemItem::FEATHER, 0, mt_rand(0, 2))];
-
-		if($this->getLastDamageCause() === EntityDamageEvent::CAUSE_FIRE){
-			$drops[] = ItemItem::get(ItemItem::COOKED_CHICKEN, 0, mt_rand(1, 2));
-		}else{
-			$drops[] = ItemItem::get(ItemItem::RAW_CHICKEN, 0, mt_rand(1, 2));
-		}
-		return $drops;
+		return [
+			ItemItem::get(ItemItem::BLAZE_ROD, 0, mt_rand(0, 1))
+		];
 	}
 }
