@@ -9,7 +9,7 @@ class Wood implements Material {
 		return "Wood";
 	}
 
-	public function getItems(){
+	public static function getItems(){
 		return [
 					Item::get(Item::WOOD),
 		 			Item::get(Item::WOOD2),
