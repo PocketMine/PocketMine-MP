@@ -22,7 +22,7 @@
 namespace pocketmine\item;
 
 
-class BeetrootSoup extends Item{
+class BeetrootSoup extends Food{
 	public function __construct($meta = 0, $count = 1){
 		parent::__construct(self::BEETROOT_SOUP, 0, $count, "Beetroot Soup");
 	}
