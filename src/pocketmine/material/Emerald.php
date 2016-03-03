@@ -9,7 +9,7 @@ class Emerald implements Material {
 		return "Emerald";
 	}
 
-	public function getItems(){
+	public static function getItems(){
 		return [
 					Item::get(Item::EMERALD),
 		 			Item::get(Item::EMERALD_BLOCK),

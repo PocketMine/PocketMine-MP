@@ -9,7 +9,7 @@ class Diamond implements Material {
 		return "Diamond";
 	}
 
-	public function getItems(){
+	public static function getItems(){
 		return [
 					Item::get(Item::DIAMOND),
 		 			Item::get(Item::DIAMOND_BLOCK),

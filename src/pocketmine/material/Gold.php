@@ -9,7 +9,7 @@ class Gold implements Material {
 		return "Gold";
 	}
 
-	public function getItems(){
+	public static function getItems(){
 		return [
 					Item::get(Item::GOLD_INGOT),
 		 			Item::get(Item::GOLD_BLOCK),

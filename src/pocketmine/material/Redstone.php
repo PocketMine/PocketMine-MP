@@ -9,7 +9,7 @@ class Redstone implements Material {
 		return "Redstone";
 	}
 
-	public function getItems(){
+	public static function getItems(){
 		return [
 					Item::get(Item::REDSTONE),
 		 			Item::get(Item::REDSTONE_BLOCK),

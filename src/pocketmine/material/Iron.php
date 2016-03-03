@@ -9,7 +9,7 @@ class Iron implements Material {
 		return "Iron";
 	}
 
-	public function getItems(){
+	public static function getItems(){
 		return [
 					Item::get(Item::IRON_INGOT),
 		 			Item::get(Item::IRON_BLOCK),
