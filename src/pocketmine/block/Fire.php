@@ -66,7 +66,7 @@ class Fire extends Flowable{
 
 		$ev = new EntityCombustByBlockEvent($this, $entity, 8);
 		Server::getInstance()->getPluginManager()->callEvent($ev);
-		if(!$ev->isCancelled()){
+		if(!$ev->isCancelled() && !$entity->isCreative()){
 			$entity->setOnFire($ev->getDuration());
 		}
 	}
