@@ -15,48 +15,55 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
 namespace pocketmine\entity;
 
-
+use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\item\Item as ItemItem;
 use pocketmine\Player;
 
-class Slime extends Living{
-    const NETWORK_ID = 37;
-
-    const DATA_SIZE = 16;
-
-    public $height = 2;
-    public $width = 2;
-    public $lenght = 2;
+class WitherSkeleton extends Skeleton{
+    public $height = 2.39;
+    public $width = 0.938;
+    public $lenght = 1.312;
 
     public function initEntity(){
-        $this->setMaxHealth(16);
+        $this->setMaxHealth(20);
         parent::initEntity();
     }
 
     public function getName(){
-        return "Slime";
+        return "Wither Skeleton";
     }
 
     public function spawnTo(Player $player){
         $pk = $this->addEntityDataPacket($player);
-        $pk->type = Slime::NETWORK_ID;
+        $pk->type = Skeleton::NETWORK_ID;
 
         $player->dataPacket($pk);
         parent::spawnTo($player);
     }
 
     public function getDrops(){
-        return [
-            ItemItem::get(ItemItem::SLIMEBALL, 0, mt_rand(0, 2))
-        ];
-    }
+        $drops = [];
+        if($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player){
+            $drops = [
+                ItemItem::get(ItemItem::COAL, 0, mt_rand(0, 1)),
+                ItemItem::get(ItemItem::BONE, 0, mt_rand(0, 2))
+            ];
+        }
 
+        /*if($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof ChargedCreeper){
+            $drops = [
+                ItemItem::get(ItemItem::SKULL, 1, 1)
+            ];
+        }*/
+
+        return $drops;
+    }
 
 
 }

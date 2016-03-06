@@ -1,5 +1,4 @@
 <?php
-
 /*
  *
  *  ____            _        _   __  __ _                  __  __ ____
@@ -15,68 +14,70 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
 namespace pocketmine\entity;
 
-use pocketmine\event\entity\EntityDamageByEntityEvent;
-//use pocketmine\event\entity\EntityExplodeEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item as ItemItem;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\Player;
 
-class Creeper extends Monster implements Explosive{
-    const NETWORK_ID = 33;
+class Rabbit extends Animal{
+    const NETWORK_ID = 18;
+
+    const TYPE_BROWN = 0;
+    const TYPE_BLACK = 1;
+    const TYPE_ALBINO = 2;
+    const TYPE_SPOTTED = 3;
+    const TYPE_SALT_PEPPER = 4;
+    const TYPE_GOLDEN = 5;
+
+    public $height = 0.5;
+    public $width = 0.5;
+    public $lenght = 0.5;
 
     public function initEntity(){
-        $this->setMaxHealth(20);
+        $this->setMaxHealth(3);
         parent::initEntity();
-
-        if(!isset($this->namedtag->Powered)){
-            $this->setPowered(1);
+        if(!isset($this->namedtag->Type)){
+            $this->setType(mt_rand(0, 5));
         }
     }
 
-    public function getName() {
-        return "Creeper";
+    public function getName(){
+        return "Rabbit";
     }
 
     public function spawnTo(Player $player){
         $pk = $this->addEntityDataPacket($player);
-        $pk->type = Creeper::NETWORK_ID;
+        $pk->type = Rabbit::NETWORK_ID;
 
         $player->dataPacket($pk);
         parent::spawnTo($player);
     }
 
-    public function explode(){
-        //TODO: CreeperExplodeEvent
+    public function setType($type){
+        $this->namedtag->Profession = new IntTag("Type", $type);
     }
 
-    public function setPowered($value){
-        $this->namedtag->Powered = new IntTag("Powered", $value);
-    }
-
-    public function isPowered(){
-        return $this->namedtag["Powered"];
+    public function getType(){
+        return $this->namedtag["Type"];
     }
 
     public function getDrops(){
-        $drops = [];
-        if($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player){
-            $drops = [
-                ItemItem::get(ItemItem::GUNPOWDER, 0, mt_rand(0, 2))
-            ];
-        }
+        $drops = [ItemItem::get(ItemItem::RABBIT_HIDE, 0, mt_rand(0, 2))];
 
-        /*if($this->lastDamageCause instanceof EntityExplodeEvent and $this->lastDamageCause->getEntity() instanceof ChargedCreeper){
-            $drops = [
-                ItemItem::get(ItemItem::MOB_HEAD, 4, 1)
-            ];
-        }*/
+        if($this->getLastDamageCause() === EntityDamageEvent::CAUSE_FIRE){
+            $drops[] = ItemItem::get(ItemItem::COOKED_RABBIT, 0, mt_rand(1, 2));
+        }else{
+            $drops[] = ItemItem::get(ItemItem::RAW_RABBIT, 0, mt_rand(1, 2));
+        }
 
         return $drops;
     }
+
+
 }

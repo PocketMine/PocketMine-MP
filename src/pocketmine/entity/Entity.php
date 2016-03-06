@@ -54,6 +54,7 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\Network;
+use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\RemoveEntityPacket;
 use pocketmine\network\protocol\SetEntityDataPacket;
@@ -436,6 +437,26 @@ abstract class Entity extends Location implements Metadatable{
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param  Player $player
+	 * @return AddEntityPacket
+	 */
+	protected function addEntityDataPacket(Player $player){
+		$pk = new AddEntityPacket();
+		$pk->eid = $this->getId();
+		$pk->x = $this->x;
+		$pk->y = $this->y;
+		$pk->z = $this->z;
+		$pk->speedX = $this->motionX;
+		$pk->speedY = $this->motionY;
+		$pk->speedZ = $this->motionZ;
+		$pk->yaw = $this->yaw;
+		$pk->pitch = $this->pitch;
+		$pk->metadata = $this->dataProperties;
+
+		return $pk;
 	}
 
 	/**

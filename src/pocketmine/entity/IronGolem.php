@@ -1,5 +1,4 @@
 <?php
-
 /*
  *
  *  ____            _        _   __  __ _                  __  __ ____
@@ -15,37 +14,34 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
 namespace pocketmine\entity;
 
-
-use pocketmine\item\Item as ItemItem;
+use pocketmine\item\Item as drp;
 use pocketmine\Player;
 
-class Slime extends Living{
-    const NETWORK_ID = 37;
+class IronGolem extends Animal{
+    const NETWORK_ID = 20;
 
-    const DATA_SIZE = 16;
-
-    public $height = 2;
-    public $width = 2;
-    public $lenght = 2;
+    public $height = 2.688;
+    public $width = 1.625;
+    public $lenght = 0.906;
 
     public function initEntity(){
-        $this->setMaxHealth(16);
+        $this->setMaxHealth(100);
         parent::initEntity();
     }
 
     public function getName(){
-        return "Slime";
+        return "Iron Golem";
     }
 
     public function spawnTo(Player $player){
         $pk = $this->addEntityDataPacket($player);
-        $pk->type = Slime::NETWORK_ID;
+        $pk->type = IronGolem::NETWORK_ID;
 
         $player->dataPacket($pk);
         parent::spawnTo($player);
@@ -53,10 +49,9 @@ class Slime extends Living{
 
     public function getDrops(){
         return [
-            ItemItem::get(ItemItem::SLIMEBALL, 0, mt_rand(0, 2))
+            drp::get(ItemItem::IRON_INGOT, 0, mt_rand(3, 5)),
+            drp::get(ItemItem::POPPY, 0, mt_rand(0, 2))
         ];
     }
-
-
 
 }

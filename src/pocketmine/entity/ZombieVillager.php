@@ -15,48 +15,36 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
+
 namespace pocketmine\entity;
 
-use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\item\Item as ItemItem;
+
 use pocketmine\Player;
 
-class Chicken extends Animal{
-	const NETWORK_ID = 10;
-
-	public $width = 1;
-	public $length = 0.5;
-	public $height = 0.8;
+class ZombieVillager extends Zombie{
+	public $width = 1.031;
+	public $length = 0.891;
+	public $height = 2.125;
 
 	public function initEntity(){
-		$this->setMaxHealth(4);
+		$this->setMaxHealth(20);
 		parent::initEntity();
 	}
 
-	public function getName() {
-		return "Chicken";
+	public function getName(){
+		return "Zombie Villager";
 	}
 
 	public function spawnTo(Player $player){
 		$pk = $this->addEntityDataPacket($player);
-		$pk->type = Chicken::NETWORK_ID;
+		$pk->type = Zombie::NETWORK_ID;
 
 		$player->dataPacket($pk);
 		parent::spawnTo($player);
 	}
-	
-	public function getDrops(){
-		$drops = [ItemItem::get(ItemItem::FEATHER, 0, mt_rand(0, 2))];
 
-		if($this->getLastDamageCause() === EntityDamageEvent::CAUSE_FIRE){
-			$drops[] = ItemItem::get(ItemItem::COOKED_CHICKEN, 0, mt_rand(1, 2));
-		}else{
-			$drops[] = ItemItem::get(ItemItem::RAW_CHICKEN, 0, mt_rand(1, 2));
-		}
-		return $drops;
-	}
 }
