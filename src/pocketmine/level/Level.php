@@ -651,7 +651,7 @@ class Level implements ChunkManager, Metadatable{
 		$this->timings->doTickPending->startTiming();
 		while($this->updateQueue->count() > 0 and $this->updateQueue->current()["priority"] <= $currentTick){
 			$block = $this->getBlock($this->updateQueue->extract()["data"]);
-			unset($this->updateQueueIndex[Level::blockHash($block->x, $block->y, $block->z)]);
+			unset($this->updateQueueIndex[Level::blockHash((int)$block->x, (int)$block->y,(int) $block->z)]);
 			$block->onUpdate(self::BLOCK_UPDATE_SCHEDULED);
 		}
 		$this->timings->doTickPending->stopTiming();
@@ -1024,7 +1024,7 @@ class Level implements ChunkManager, Metadatable{
 	 * @param int     $delay
 	 */
 	public function scheduleUpdate(Vector3 $pos, int $delay){
-		if(isset($this->updateQueueIndex[$index = Level::blockHash($pos->x, $pos->y, $pos->z)]) and $this->updateQueueIndex[$index] <= $delay){
+		if(isset($this->updateQueueIndex[$index = Level::blockHash((int)$pos->x, (int)$pos->y, (int)$pos->z)]) and $this->updateQueueIndex[$index] <= $delay){
 			return;
 		}
 		$this->updateQueueIndex[$index] = $delay;
@@ -1236,7 +1236,7 @@ class Level implements ChunkManager, Metadatable{
 	 * @return Block
 	 */
 	public function getBlock(Vector3 $pos, $cached = true) : Block{
-		$index = Level::blockHash($pos->x, $pos->y, $pos->z);
+		$index = Level::blockHash((int)$pos->x, (int)$pos->y, (int)$pos->z);
 		if($cached and isset($this->blockCache[$index])){
 			return $this->blockCache[$index];
 		}elseif($pos->y >= 0 and $pos->y < 128 and isset($this->chunks[$chunkIndex = Level::chunkHash($pos->x >> 4, $pos->z >> 4)])){
@@ -1277,10 +1277,10 @@ class Level implements ChunkManager, Metadatable{
 			$this->setBlockLightAt($x, $y, $z, $newLevel);
 
 			if($newLevel < $oldLevel){
-				$removalVisited[Level::blockHash($x, $y, $z)] = true;
+				$removalVisited[Level::blockHash((int)$x, (int)$y, (int)$z)] = true;
 				$lightRemovalQueue->enqueue([new Vector3($x, $y, $z), $oldLevel]);
 			}else{
-				$visited[Level::blockHash($x, $y, $z)] = true;
+				$visited[Level::blockHash((int)$x, (int)$y, (int)$z)] = true;
 				$lightPropagationQueue->enqueue(new Vector3($x, $y, $z));
 			}
 		}
@@ -1322,14 +1322,14 @@ class Level implements ChunkManager, Metadatable{
 		if($current !== 0 and $current < $currentLight){
 			$this->setBlockLightAt($x, $y, $z, 0);
 
-			if(!isset($visited[$index = Level::blockHash($x, $y, $z)])){
+			if(!isset($visited[$index = Level::blockHash((int)$x, (int)$y, (int)$z)])){
 				$visited[$index] = true;
 				if($current > 1){
 					$queue->enqueue([new Vector3($x, $y, $z), $current]);
 				}
 			}
 		}elseif($current >= $currentLight){
-			if(!isset($spreadVisited[$index = Level::blockHash($x, $y, $z)])){
+			if(!isset($spreadVisited[$index = Level::blockHash((int)$x, (int)$y, (int)$z)])){
 				$spreadVisited[$index] = true;
 				$spreadQueue->enqueue(new Vector3($x, $y, $z));
 			}
@@ -1342,7 +1342,7 @@ class Level implements ChunkManager, Metadatable{
 		if($current < $currentLight){
 			$this->setBlockLightAt($x, $y, $z, $currentLight);
 
-			if(!isset($visited[$index = Level::blockHash($x, $y, $z)])){
+			if(!isset($visited[$index = Level::blockHash((int)$x, (int)$y, (int)$z)])){
 				$visited[$index] = true;
 				if($currentLight > 1){
 					$queue->enqueue(new Vector3($x, $y, $z));
@@ -1380,7 +1380,7 @@ class Level implements ChunkManager, Metadatable{
 			}
 
 			$block->position($pos);
-			unset($this->blockCache[Level::blockHash($pos->x, $pos->y, $pos->z)]);
+			unset($this->blockCache[Level::blockHash((int)$pos->x, (int)$pos->y, (int)$pos->z)]);
 
 			$index = Level::chunkHash($pos->x >> 4, $pos->z >> 4);
 
@@ -1392,7 +1392,7 @@ class Level implements ChunkManager, Metadatable{
 					$this->changedBlocks[$index] = [];
 				}
 
-				$this->changedBlocks[$index][Level::blockHash($block->x, $block->y, $block->z)] = clone $block;
+				$this->changedBlocks[$index][Level::blockHash((int)$block->x, (int)$block->y, (int)$block->z)] = clone $block;
 			}
 
 			foreach($this->getChunkLoaders($pos->x >> 4, $pos->z >> 4) as $loader){
@@ -1936,13 +1936,13 @@ class Level implements ChunkManager, Metadatable{
 	 * @param int $id 0-255
 	 */
 	public function setBlockIdAt(int $x, int $y, int $z, int $id){
-		unset($this->blockCache[Level::blockHash($x, $y, $z)]);
+		unset($this->blockCache[Level::blockHash((int)$x, (int)$y,(int) $z)]);
 		$this->getChunk($x >> 4, $z >> 4, true)->setBlockId($x & 0x0f, $y & 0x7f, $z & 0x0f, $id & 0xff);
 
 		if(!isset($this->changedBlocks[$index = Level::chunkHash($x >> 4, $z >> 4)])){
 			$this->changedBlocks[$index] = [];
 		}
-		$this->changedBlocks[$index][Level::blockHash($x, $y, $z)] = $v = new Vector3($x, $y, $z);
+		$this->changedBlocks[$index][Level::blockHash((int)$x,(int) $y, (int)$z)] = $v = new Vector3($x, $y, $z);
 		foreach($this->getChunkLoaders($x >> 4, $z >> 4) as $loader){
 			$loader->onBlockChanged($v);
 		}
@@ -1998,13 +1998,13 @@ class Level implements ChunkManager, Metadatable{
 	 * @param int $data 0-15
 	 */
 	public function setBlockDataAt(int $x, int $y, int $z, int $data){
-		unset($this->blockCache[Level::blockHash($x, $y, $z)]);
+		unset($this->blockCache[Level::blockHash((int)$x, (int)$y, (int)$z)]);
 		$this->getChunk($x >> 4, $z >> 4, true)->setBlockData($x & 0x0f, $y & 0x7f, $z & 0x0f, $data & 0x0f);
 
 		if(!isset($this->changedBlocks[$index = Level::chunkHash($x >> 4, $z >> 4)])){
 			$this->changedBlocks[$index] = [];
 		}
-		$this->changedBlocks[$index][Level::blockHash($x, $y, $z)] = $v = new Vector3($x, $y, $z);
+		$this->changedBlocks[$index][Level::blockHash((int)$x, (int)$y, (int)$z)] = $v = new Vector3($x, $y, $z);
 		foreach($this->getChunkLoaders($x >> 4, $z >> 4) as $loader){
 			$loader->onBlockChanged($v);
 		}
