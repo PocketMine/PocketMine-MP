@@ -30,7 +30,9 @@ use pocketmine\Player;
 
 class Attribute{
 
-	const MAX_HEALTH = 0;
+	const HEALTH = 0;
+	const HUNGER = 3;
+	const MOVEMENT_SPEED = 4;
 
 
 	const EXPERIENCE = 1;
@@ -48,9 +50,11 @@ class Attribute{
 	protected static $attributes = [];
 
 	public static function init(){
-		self::addAttribute(self::MAX_HEALTH, "generic.health", 0, 0x7fffffff, 20, true);
+		self::addAttribute(self::HEALTH, "generic.health", 0, 0x7fffffff, 20, true);
 		self::addAttribute(self::EXPERIENCE, "player.experience", 0, 1, 0, true);
 		self::addAttribute(self::EXPERIENCE_LEVEL, "player.level", 0, 24791, 0, true);
+		self::addAttribute(self::HUNGER, "player.hunger", 0, 20, 0, true);
+		self::addAttribute(self::MOVEMENT_SPEED, "generic.movementSpeed", 0, 24791, 0.1, false);
 	}
 
 	/**
