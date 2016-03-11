@@ -25,16 +25,13 @@ namespace pocketmine\network\protocol;
 
 
 class UseItemPacket extends DataPacket{
-	public static $pool = [];
-	public static $next = 0;
+	const NETWORK_ID = Info::USE_ITEM_PACKET;
 
 	public $x;
 	public $y;
 	public $z;
 	public $face;
 	public $item;
-	public $meta;
-	public $eid;
 	public $fx;
 	public $fy;
 	public $fz;
@@ -42,24 +39,19 @@ class UseItemPacket extends DataPacket{
 	public $posY;
 	public $posZ;
 
-	public function pid(){
-		return Info::USE_ITEM_PACKET;
-	}
-
 	public function decode(){
 		$this->x = $this->getInt();
 		$this->y = $this->getInt();
 		$this->z = $this->getInt();
 		$this->face = $this->getByte();
-		$this->item = $this->getShort();
-		$this->meta = $this->getShort();
-		$this->eid = $this->getLong();
 		$this->fx = $this->getFloat();
 		$this->fy = $this->getFloat();
 		$this->fz = $this->getFloat();
 		$this->posX = $this->getFloat();
 		$this->posY = $this->getFloat();
 		$this->posZ = $this->getFloat();
+
+		$this->item = $this->getSlot();
 	}
 
 	public function encode(){

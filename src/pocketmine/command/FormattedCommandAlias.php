@@ -46,15 +46,12 @@ class FormattedCommandAlias extends Command{
 		foreach($this->formatStrings as $formatString){
 			try{
 				$commands[] = $this->buildCommand($formatString, $args);
-			}catch(\Exception $e){
+			}catch(\Throwable $e){
 				if($e instanceof \InvalidArgumentException){
 					$sender->sendMessage(TextFormat::RED . $e->getMessage());
 				}else{
 					$sender->sendMessage(new TranslationContainer(TextFormat::RED . "%commands.generic.exception"));
-					$logger = $sender->getServer()->getLogger();
-					if($logger instanceof MainLogger){
-						$logger->logException($e);
-					}
+					$sender->getServer()->getLogger()->logException($e);
 				}
 
 				return false;
@@ -96,7 +93,7 @@ class FormattedCommandAlias extends Command{
 
 			$argStart = $index;
 
-			while($index < strlen($formatString) and self::inRange($formatString{$index} - 48, 0, 9)){
+			while($index < strlen($formatString) and self::inRange(ord($formatString{$index}) - 48, 0, 9)){
 				++$index;
 			}
 

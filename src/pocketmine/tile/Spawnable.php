@@ -23,9 +23,9 @@ namespace pocketmine\tile;
 
 use pocketmine\level\format\FullChunk;
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\Compound;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\Network;
-use pocketmine\network\protocol\TileEntityDataPacket;
+use pocketmine\network\protocol\BlockEntityDataPacket;
 use pocketmine\Player;
 
 abstract class Spawnable extends Tile{
@@ -37,19 +37,22 @@ abstract class Spawnable extends Tile{
 
 		$nbt = new NBT(NBT::LITTLE_ENDIAN);
 		$nbt->setData($this->getSpawnCompound());
-		$pk = new TileEntityDataPacket();
+		$pk = new BlockEntityDataPacket();
 		$pk->x = $this->x;
 		$pk->y = $this->y;
 		$pk->z = $this->z;
 		$pk->namedtag = $nbt->write();
-		$player->dataPacket($pk->setChannel(Network::CHANNEL_WORLD_EVENTS));
+		$player->dataPacket($pk);
 
 		return true;
 	}
 
+	/**
+	 * @return CompoundTag
+	 */
 	public abstract function getSpawnCompound();
 
-	public function __construct(FullChunk $chunk, Compound $nbt){
+	public function __construct(FullChunk $chunk, CompoundTag $nbt){
 		parent::__construct($chunk, $nbt);
 		$this->spawnToAll();
 	}
@@ -59,7 +62,7 @@ abstract class Spawnable extends Tile{
 			return;
 		}
 
-		foreach($this->getLevel()->getUsingChunk($this->chunk->getX(), $this->chunk->getZ()) as $player){
+		foreach($this->getLevel()->getChunkPlayers($this->chunk->getX(), $this->chunk->getZ()) as $player){
 			if($player->spawned === true){
 				$this->spawnTo($player);
 			}

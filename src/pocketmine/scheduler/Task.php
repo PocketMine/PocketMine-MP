@@ -14,13 +14,16 @@
  * (at your option) any later version.
  *
  * @author PocketMine Team
-
+ * @link http://www.pocketmine.net/
  *
  *
 */
 
 namespace pocketmine\scheduler;
 
+/**
+ * WARNING! Plugins that create tasks MUST extend PluginTask
+ */
 abstract class Task{
 
 	/** @var TaskHandler */

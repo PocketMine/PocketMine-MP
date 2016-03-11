@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 use pocketmine\level\Level;
 
 class GlowingRedstoneOre extends Solid{
@@ -40,6 +41,10 @@ class GlowingRedstoneOre extends Solid{
 		return "Glowing Redstone Ore";
 	}
 
+	public function getToolType(){
+		return Tool::TYPE_PICKAXE;
+	}
+
 	public function getLightLevel(){
 		return 9;
 	}
@@ -54,20 +59,8 @@ class GlowingRedstoneOre extends Solid{
 		return false;
 	}
 
-
-	public function getBreakTime(Item $item){
-		switch($item->isPickaxe()){
-			case 5:
-				return 0.6;
-			case 4:
-				return 0.75;
-			default:
-				return 15;
-		}
-	}
-
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= 4){
+		if($item->isPickaxe() >= Tool::TIER_IRON){
 			return [
 				[Item::REDSTONE_DUST, 0, mt_rand(4, 5)],
 			];

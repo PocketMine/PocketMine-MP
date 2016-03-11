@@ -23,15 +23,15 @@ namespace pocketmine\entity;
 
 
 use pocketmine\block\Block;
-use pocketmine\block\Flowable;
+
 use pocketmine\block\Liquid;
 use pocketmine\event\entity\EntityBlockChangeEvent;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntityRegainHealthEvent;
+
 use pocketmine\item\Item as ItemItem;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\Byte;
-use pocketmine\nbt\tag\Int;
+use pocketmine\nbt\tag\ByteTag;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\network\Network;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
@@ -58,7 +58,7 @@ class FallingSand extends Entity{
 			$this->blockId = $this->namedtag["TileID"];
 		}elseif(isset($this->namedtag->Tile)){
 			$this->blockId = $this->namedtag["Tile"];
-			$this->namedtag["TileID"] = new Int("TileID", $this->blockId);
+			$this->namedtag["TileID"] = new IntTag("TileID", $this->blockId);
 		}
 
 		if(isset($this->namedtag->Data)){
@@ -78,7 +78,9 @@ class FallingSand extends Entity{
 	}
 
 	public function attack($damage, EntityDamageEvent $source){
-
+		if($source->getCause() === EntityDamageEvent::CAUSE_VOID){
+			parent::attack($damage, $source);
+		}
 	}
 
 	public function onUpdate($currentTick){
@@ -89,20 +91,25 @@ class FallingSand extends Entity{
 
 		$this->timings->startTiming();
 
-		$tickDiff = max(1, $currentTick - $this->lastUpdate);
+		$tickDiff = $currentTick - $this->lastUpdate;
+		if($tickDiff <= 0 and !$this->justCreated){
+			return true;
+		}
+
 		$this->lastUpdate = $currentTick;
 
 		$hasUpdate = $this->entityBaseTick($tickDiff);
 
-		if(!$this->dead){
+		if($this->isAlive()){
+			$pos = (new Vector3($this->x - 0.5, $this->y, $this->z - 0.5))->round();
+
 			if($this->ticksLived === 1){
-				$block = $this->level->getBlock($pos = (new Vector3($this->x, $this->y, $this->z))->floor());
-				if($block->getId() != $this->blockId){
+				$block = $this->level->getBlock($pos);
+				if($block->getId() !== $this->blockId){
 					$this->kill();
 					return true;
 				}
 				$this->level->setBlock($pos, Block::get(0), true);
-
 			}
 
 			$this->motionY -= $this->gravity;
@@ -115,7 +122,7 @@ class FallingSand extends Entity{
 			$this->motionY *= 1 - $this->drag;
 			$this->motionZ *= $friction;
 
-			$pos = (new Vector3($this->x, $this->y, $this->z))->floor();
+			$pos = (new Vector3($this->x - 0.5, $this->y, $this->z - 0.5))->floor();
 
 			if($this->onGround){
 				$this->kill();
@@ -134,7 +141,7 @@ class FallingSand extends Entity{
 			$this->updateMovement();
 		}
 
-		return $hasUpdate or !$this->onGround or $this->motionX != 0 or $this->motionY != 0 or $this->motionZ != 0;
+		return $hasUpdate or !$this->onGround or abs($this->motionX) > 0.00001 or abs($this->motionY) > 0.00001 or abs($this->motionZ) > 0.00001;
 	}
 
 	public function getBlock(){
@@ -146,8 +153,8 @@ class FallingSand extends Entity{
 	}
 
 	public function saveNBT(){
-		$this->namedtag->TileID = new Int("TileID", $this->blockId);
-		$this->namedtag->Data = new Byte("Data", $this->damage);
+		$this->namedtag->TileID = new IntTag("TileID", $this->blockId);
+		$this->namedtag->Data = new ByteTag("Data", $this->damage);
 	}
 
 	public function spawnTo(Player $player){
@@ -163,7 +170,7 @@ class FallingSand extends Entity{
 		$pk->yaw = $this->yaw;
 		$pk->pitch = $this->pitch;
 		$pk->metadata = $this->dataProperties;
-		$player->dataPacket($pk->setChannel(Network::CHANNEL_ENTITY_SPAWNING));
+		$player->dataPacket($pk);
 
 		parent::spawnTo($player);
 	}

@@ -22,15 +22,17 @@
 namespace pocketmine\entity;
 
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntityRegainHealthEvent;
+
 use pocketmine\event\entity\ItemDespawnEvent;
 use pocketmine\event\entity\ItemSpawnEvent;
 use pocketmine\item\Item as ItemItem;
-use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\Byte;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Short;
-use pocketmine\nbt\tag\String;
+
+use pocketmine\nbt\NBT;
+
+
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\ShortTag;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\Network;
 use pocketmine\network\protocol\AddItemEntityPacket;
 use pocketmine\Player;
@@ -69,57 +71,80 @@ class Item extends Entity{
 		if(isset($this->namedtag->Thrower)){
 			$this->thrower = $this->namedtag["Thrower"];
 		}
-		$this->item = ItemItem::get($this->namedtag->Item["id"], $this->namedtag->Item["Damage"], $this->namedtag->Item["Count"]);
+
+
+		if(!isset($this->namedtag->Item)){
+			$this->close();
+			return;
+		}
+
+		assert($this->namedtag->Item instanceof CompoundTag);
+
+		$this->item = NBT::getItemHelper($this->namedtag->Item);
 
 
 		$this->server->getPluginManager()->callEvent(new ItemSpawnEvent($this));
 	}
 
-
 	public function attack($damage, EntityDamageEvent $source){
-		if($source->getCause() === EntityDamageEvent::CAUSE_FIRE_TICK){
+		if(
+			$source->getCause() === EntityDamageEvent::CAUSE_VOID or
+			$source->getCause() === EntityDamageEvent::CAUSE_FIRE_TICK or
+			$source->getCause() === EntityDamageEvent::CAUSE_ENTITY_EXPLOSION or
+			$source->getCause() === EntityDamageEvent::CAUSE_BLOCK_EXPLOSION
+		){
 			parent::attack($damage, $source);
 		}
 	}
 
 	public function onUpdate($currentTick){
-		if($this->closed !== false){
+		if($this->closed){
 			return false;
 		}
 
-		$tickDiff = max(1, $currentTick - $this->lastUpdate);
+		$tickDiff = $currentTick - $this->lastUpdate;
+		if($tickDiff <= 0 and !$this->justCreated){
+			return true;
+		}
+
 		$this->lastUpdate = $currentTick;
 
 		$this->timings->startTiming();
 
 		$hasUpdate = $this->entityBaseTick($tickDiff);
 
-		if(!$this->dead){
+		if($this->isAlive()){
 
 			if($this->pickupDelay > 0 and $this->pickupDelay < 32767){ //Infinite delay
 				$this->pickupDelay -= $tickDiff;
+				if($this->pickupDelay < 0){
+					$this->pickupDelay = 0;
+				}
 			}
 
 			$this->motionY -= $this->gravity;
 
-			$this->checkObstruction($this->x, ($this->boundingBox->minY + $this->boundingBox->maxY) / 2, $this->z);
+			if($this->checkObstruction($this->x, $this->y, $this->z)){
+				$hasUpdate = true;
+			}
+
 			$this->move($this->motionX, $this->motionY, $this->motionZ);
 
 			$friction = 1 - $this->drag;
 
-			if($this->onGround and ($this->motionX != 0 or $this->motionZ != 0)){
-				$friction = $this->getLevel()->getBlock(new Vector3($this->getFloorX(), $this->getFloorY() - 1, $this->getFloorZ()))->getFrictionFactor() * $friction;
+			if($this->onGround and (abs($this->motionX) > 0.00001 or abs($this->motionZ) > 0.00001)){
+				$friction = $this->getLevel()->getBlock($this->temporalVector->setComponents((int) floor($this->x), (int) floor($this->y - 1), (int) floor($this->z) - 1))->getFrictionFactor() * $friction;
 			}
 
 			$this->motionX *= $friction;
 			$this->motionY *= 1 - $this->drag;
 			$this->motionZ *= $friction;
 
-			$this->updateMovement();
-
 			if($this->onGround){
 				$this->motionY *= -0.5;
 			}
+
+			$this->updateMovement();
 
 			if($this->age > 6000){
 				$this->server->getPluginManager()->callEvent($ev = new ItemDespawnEvent($this));
@@ -135,24 +160,20 @@ class Item extends Entity{
 
 		$this->timings->stopTiming();
 
-		return $hasUpdate or !$this->onGround or $this->motionX != 0 or $this->motionY != 0 or $this->motionZ != 0;
+		return $hasUpdate or !$this->onGround or abs($this->motionX) > 0.00001 or abs($this->motionY) > 0.00001 or abs($this->motionZ) > 0.00001;
 	}
 
 	public function saveNBT(){
 		parent::saveNBT();
-		$this->namedtag->Item = new Compound("Item", [
-			"id" => new Short("id", $this->item->getId()),
-			"Damage" => new Short("Damage", $this->item->getDamage()),
-			"Count" => new Byte("Count", $this->item->getCount())
-		]);
-		$this->namedtag->Health = new Short("Health", $this->getHealth());
-		$this->namedtag->Age = new Short("Age", $this->age);
-		$this->namedtag->PickupDelay = new Short("PickupDelay", $this->pickupDelay);
+		$this->namedtag->Item = NBT::putItemHelper($this->item);
+		$this->namedtag->Health = new ShortTag("Health", $this->getHealth());
+		$this->namedtag->Age = new ShortTag("Age", $this->age);
+		$this->namedtag->PickupDelay = new ShortTag("PickupDelay", $this->pickupDelay);
 		if($this->owner !== null){
-			$this->namedtag->Owner = new String("Owner", $this->owner);
+			$this->namedtag->Owner = new StringTag("Owner", $this->owner);
 		}
 		if($this->thrower !== null){
-			$this->namedtag->Thrower = new String("Thrower", $this->thrower);
+			$this->namedtag->Thrower = new StringTag("Thrower", $this->thrower);
 		}
 	}
 
@@ -219,7 +240,9 @@ class Item extends Entity{
 		$pk->speedY = $this->motionY;
 		$pk->speedZ = $this->motionZ;
 		$pk->item = $this->getItem();
-		$player->dataPacket($pk->setChannel(Network::CHANNEL_ENTITY_SPAWNING));
+		$player->dataPacket($pk);
+
+		$this->sendData($player);
 
 		parent::spawnTo($player);
 	}

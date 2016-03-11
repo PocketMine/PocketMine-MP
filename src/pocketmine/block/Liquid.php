@@ -310,7 +310,7 @@ abstract class Liquid extends Transparent{
 				$this->getLevel()->useBreakOn($block);
 			}
 
-			$this->getLevel()->setBlock($block, Block::get($this->id, $newFlowDecay), true);
+			$this->getLevel()->setBlock($block, Block::get($this->getId(), $newFlowDecay), true);
 			$this->getLevel()->scheduleUpdate($block, $this->tickRate());
 		}
 	}
@@ -361,6 +361,10 @@ abstract class Liquid extends Transparent{
 		}
 
 		return $cost;
+	}
+
+	public function getHardness(){
+		return 100;
 	}
 
 	private function getOptimalFlowDirections(){
@@ -445,5 +449,9 @@ abstract class Liquid extends Transparent{
 
 	public function getBoundingBox(){
 		return null;
+	}
+
+	public function getDrops(Item $item){
+		return [];
 	}
 }

@@ -40,6 +40,10 @@ class Air extends Transparent{
 		return "Air";
 	}
 
+	public function canPassThrough(){
+		return true;
+	}
+
 	public function isBreakable(Item $item){
 		return false;
 	}
@@ -62,6 +66,14 @@ class Air extends Transparent{
 
 	public function getBoundingBox(){
 		return null;
+	}
+
+	public function getHardness(){
+		return -1;
+	}
+
+	public function getResistance(){
+		return 0;
 	}
 
 }

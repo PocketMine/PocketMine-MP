@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 
 class DoubleWoodSlab extends Solid{
 
@@ -32,7 +33,11 @@ class DoubleWoodSlab extends Solid{
 	}
 
 	public function getHardness(){
-		return 15;
+		return 2;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_AXE;
 	}
 
 	public function getName(){
@@ -46,24 +51,7 @@ class DoubleWoodSlab extends Solid{
 			6 => "",
 			7 => ""
 		];
-		return "Double " . $names[$this->meta & 0x07] . " Wooden Slab";
-	}
-
-	public function getBreakTime(Item $item){
-		switch($item->isAxe()){
-			case 5:
-				return 0.4;
-			case 4:
-				return 0.5;
-			case 3:
-				return 0.75;
-			case 2:
-				return 0.25;
-			case 1:
-				return 1.5;
-			default:
-				return 3;
-		}
+		return "DoubleTag " . $names[$this->meta & 0x07] . " Wooden Slab";
 	}
 
 	public function getDrops(Item $item){

@@ -14,7 +14,7 @@
  * (at your option) any later version.
  *
  * @author PocketMine Team
-
+ * @link http://www.pocketmine.net/
  *
  *
 */
@@ -22,37 +22,43 @@
 namespace pocketmine\scheduler;
 
 use pocketmine\Server;
+use pocketmine\Collectable;
 
 /**
  * Class used to run async tasks in other threads.
  *
  * WARNING: Do not call PocketMine-MP API methods, or save objects from/on other Threads!!
  */
-abstract class AsyncTask extends \Collectable{
+abstract class AsyncTask extends Collectable{
 
 	/** @var AsyncWorker $worker */
 	public $worker = null;
 
 	private $result = null;
 	private $serialized = false;
+	private $cancelRun = false;
 	/** @var int */
 	private $taskId = null;
+
+	private $crashed = false;
 
 	public function run(){
 		$this->result = null;
 
-		$this->onRun();
+		if($this->cancelRun !== true){
+			try{
+				$this->onRun();
+			}catch(\Throwable $e){
+				$this->crashed = true;
+				$this->worker->handleException($e);
+			}
+		}
 
 		$this->setGarbage();
 	}
 
-	/**
-	 * @deprecated
-	 *
-	 * @return bool
-	 */
-	public function isFinished(){
-		return $this->isGarbage();
+	public function isCrashed(){
+		return $this->crashed;
 	}
 
 	/**
@@ -60,6 +66,14 @@ abstract class AsyncTask extends \Collectable{
 	 */
 	public function getResult(){
 		return $this->serialized ? unserialize($this->result) : $this->result;
+	}
+
+	public function cancelRun(){
+		$this->cancelRun = true;
+	}
+
+	public function hasCancelledRun(){
+		return $this->cancelRun === true;
 	}
 
 	/**
@@ -133,7 +147,9 @@ abstract class AsyncTask extends \Collectable{
 
 	public function cleanObject(){
 		foreach($this as $p => $v){
-			$this->{$p} = null;
+			if(!($v instanceof \Threaded)){
+				$this->{$p} = null;
+			}
 		}
 	}
 

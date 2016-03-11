@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 
@@ -34,7 +35,7 @@ class WoodSlab extends Transparent{
 	}
 
 	public function getHardness(){
-		return 15;
+		return 2;
 	}
 
 	public function getName(){
@@ -122,22 +123,8 @@ class WoodSlab extends Transparent{
 		return true;
 	}
 
-	public function getBreakTime(Item $item){
-
-		switch($item->isAxe()){
-			case 5:
-				return 0.4;
-			case 4:
-				return 0.5;
-			case 3:
-				return 0.75;
-			case 2:
-				return 0.25;
-			case 1:
-				return 1.5;
-			default:
-				return 3;
-		}
+	public function getToolType(){
+		return Tool::TYPE_AXE;
 	}
 
 	public function getDrops(Item $item){

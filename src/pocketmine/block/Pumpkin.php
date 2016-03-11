@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 use pocketmine\Player;
 
 class Pumpkin extends Solid{
@@ -33,7 +34,11 @@ class Pumpkin extends Solid{
 	}
 
 	public function getHardness(){
-		return 5;
+		return 1;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_AXE;
 	}
 
 	public function getName(){

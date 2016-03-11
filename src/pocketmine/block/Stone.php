@@ -37,11 +37,14 @@ class Stone extends Solid{
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
-
 	}
 
 	public function getHardness(){
-		return 30;
+		return 1.5;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_PICKAXE;
 	}
 
 	public function getName(){
@@ -58,27 +61,10 @@ class Stone extends Solid{
 		return $names[$this->meta & 0x07];
 	}
 
-	public function getBreakTime(Item $item){
-		switch($item->isPickaxe()){
-			case 5:
-				return 0.4;
-			case 4:
-				return 0.5;
-			case 3:
-				return 0.75;
-			case 2:
-				return 0.25;
-			case 1:
-				return 1.5;
-			default:
-				return 7.5;
-		}
-	}
-
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= Tool::TIER_WOODEN){
 			return [
-				[Item::COBBLESTONE, 0, 1],
+				[$this->getDamage() === 0 ? Item::COBBLESTONE : Item::STONE, $this->getDamage(), 1],
 			];
 		}else{
 			return [];

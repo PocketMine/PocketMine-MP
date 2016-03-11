@@ -21,15 +21,13 @@
 
 namespace pocketmine\block;
 
-use pocketmine\event\block\BlockSpreadEvent;
+
 use pocketmine\item\Item;
-use pocketmine\level\generator\object\TallGrass as TallGrassObject;
-use pocketmine\level\Level;
+use pocketmine\item\Tool;
+
+
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\math\Vector3;
-use pocketmine\Player;
-use pocketmine\Server;
-use pocketmine\utils\Random;
+
 
 class GrassPath extends Transparent{
 
@@ -41,6 +39,10 @@ class GrassPath extends Transparent{
 
 	public function getName(){
 		return "Grass Path";
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_SHOVEL;
 	}
 
 	protected function recalculateBoundingBox(){
@@ -55,7 +57,7 @@ class GrassPath extends Transparent{
 	}
 
 	public function getHardness(){
-		return 3;
+		return 0.6;
 	}
 
 	public function getDrops(Item $item){

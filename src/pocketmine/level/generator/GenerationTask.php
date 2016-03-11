@@ -21,14 +21,14 @@
 
 namespace pocketmine\level\generator;
 
-use pocketmine\block\Block;
+
 use pocketmine\level\format\FullChunk;
-use pocketmine\level\generator\biome\Biome;
+
 use pocketmine\level\Level;
 use pocketmine\level\SimpleChunkManager;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
-use pocketmine\utils\Random;
+
 
 class GenerationTask extends AsyncTask{
 
@@ -67,7 +67,7 @@ class GenerationTask extends AsyncTask{
 		$generator->generateChunk($chunk->getX(), $chunk->getZ());
 
 		$chunk = $manager->getChunk($chunk->getX(), $chunk->getZ());
-		$chunk->setGenerated(true);
+		$chunk->setGenerated();
 		$this->chunk = $chunk->toFastBinary();
 
 		$manager->setChunk($chunk->getX(), $chunk->getZ(), null);

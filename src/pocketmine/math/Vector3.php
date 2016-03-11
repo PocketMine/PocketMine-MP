@@ -53,15 +53,15 @@ class Vector3{
 	}
 
 	public function getFloorX(){
-		return (int) $this->x;
+		return (int) floor($this->x);
 	}
 
 	public function getFloorY(){
-		return (int) $this->y;
+		return (int) floor($this->y);
 	}
 
 	public function getFloorZ(){
-		return (int) $this->z;
+		return (int) floor($this->z);
 	}
 
 	public function getRight(){
@@ -123,17 +123,15 @@ class Vector3{
 	}
 
 	public function ceil(){
-		return new Vector3((int) ($this->x + 1), (int) ($this->y + 1), (int) ($this->z + 1));
+		return new Vector3((int) ceil($this->x), (int) ceil($this->y), (int) ceil($this->z));
 	}
 
 	public function floor(){
-		$x = (int) $this->x;
-		$z = (int) $this->z;
-		return new Vector3($this->x >= $x ? $x : $x - 1, (int) round($this->y), $this->z >= $z ? $z : $z - 1);
+		return new Vector3((int) floor($this->x), (int) floor($this->y), (int) floor($this->z));
 	}
 
 	public function round(){
-		return new Vector3(round($this->x), round($this->y), round($this->z));
+		return new Vector3((int) round($this->x), (int) round($this->y), (int) round($this->z));
 	}
 
 	public function abs(){
@@ -201,16 +199,16 @@ class Vector3{
 	}
 
 	public function lengthSquared(){
-		return $this->x ** 2 + $this->y ** 2 + $this->z ** 2;
+		return $this->x * $this->x + $this->y * $this->y + $this->z * $this->z;
 	}
 
 	/**
 	 * @return Vector3
 	 */
 	public function normalize(){
-		$len = $this->length();
-		if($len != 0){
-			return $this->divide($len);
+		$len = $this->lengthSquared();
+		if($len > 0){
+			return $this->divide(sqrt($len));
 		}
 
 		return new Vector3(0, 0, 0);
@@ -246,7 +244,7 @@ class Vector3{
 		$yDiff = $v->y - $this->y;
 		$zDiff = $v->z - $this->z;
 
-		if(($xDiff ** 2) < 0.0000001){
+		if(($xDiff * $xDiff) < 0.0000001){
 			return null;
 		}
 
@@ -273,7 +271,7 @@ class Vector3{
 		$yDiff = $v->y - $this->y;
 		$zDiff = $v->z - $this->z;
 
-		if(($yDiff ** 2) < 0.0000001){
+		if(($yDiff * $yDiff) < 0.0000001){
 			return null;
 		}
 
@@ -300,7 +298,7 @@ class Vector3{
 		$yDiff = $v->y - $this->y;
 		$zDiff = $v->z - $this->z;
 
-		if(($zDiff ** 2) < 0.0000001){
+		if(($zDiff * $zDiff) < 0.0000001){
 			return null;
 		}
 

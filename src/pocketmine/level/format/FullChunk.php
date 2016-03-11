@@ -50,20 +50,6 @@ interface FullChunk{
 	 */
 	public function setProvider(LevelProvider $provider);
 
-
-	/**
-	 * Modifies $blockId and $meta
-	 *
-	 * @deprecated
-	 *
-	 * @param int $x 0-15
-	 * @param int $y 0-127
-	 * @param int $z 0-15
-	 * @param int &$blockId
-	 * @param int &$meta
-	 */
-	public function getBlock($x, $y, $z, &$blockId, &$meta = null);
-
 	/**
 	 * Gets block and meta in one go
 	 *
@@ -124,6 +110,23 @@ interface FullChunk{
 	 * @param int $y 0-127
 	 * @param int $z 0-15
 	 *
+	 * @return int (16-bit)
+	 */
+	public function getBlockExtraData($x, $y, $z);
+
+	/**
+	 * @param int $x    0-15
+	 * @param int $y    0-127
+	 * @param int $z    0-15
+	 * @param int $data (16-bit)
+	 */
+	public function setBlockExtraData($x, $y, $z, $data);
+
+	/**
+	 * @param int $x 0-15
+	 * @param int $y 0-127
+	 * @param int $z 0-15
+	 *
 	 * @return int 0-15
 	 */
 	public function getBlockSkyLight($x, $y, $z);
@@ -178,6 +181,8 @@ interface FullChunk{
 
 	public function recalculateHeightMap();
 
+	public function populateSkyLight();
+
 	/**
 	 * @param int $x 0-15
 	 * @param int $z 0-15
@@ -217,6 +222,10 @@ interface FullChunk{
 	 * @param int $B 0-255
 	 */
 	public function setBiomeColor($x, $z, $R, $G, $B);
+
+	public function isLightPopulated();
+
+	public function setLightPopulated($value = 1);
 
 	public function isPopulated();
 
@@ -306,6 +315,8 @@ interface FullChunk{
 
 	public function getBlockDataArray();
 
+	public function getBlockExtraDataArray();
+
 	public function getBlockSkyLightArray();
 
 	public function getBlockLightArray();
@@ -339,5 +350,14 @@ interface FullChunk{
 	 * @return FullChunk
 	 */
 	public static function fromFastBinary($data, LevelProvider $provider = null);
+
+	/**
+	 * @param int           $chunkX
+	 * @param int           $chunkZ
+	 * @param LevelProvider $provider
+	 *
+	 * @return FullChunk
+	 */
+	public static function getEmptyChunk($chunkX, $chunkZ, LevelProvider $provider = null);
 
 }

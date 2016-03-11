@@ -26,17 +26,26 @@ use pocketmine\level\format\generic\BaseLevelProvider;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\Level;
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\Byte;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Int;
-use pocketmine\nbt\tag\Long;
-use pocketmine\nbt\tag\String;
+use pocketmine\nbt\tag\ByteTag;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\LongTag;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\tile\Spawnable;
 use pocketmine\utils\Binary;
+use pocketmine\utils\BinaryStream;
 use pocketmine\utils\ChunkException;
 use pocketmine\utils\LevelException;
 
 class LevelDB extends BaseLevelProvider{
+
+	const ENTRY_VERSION = "v";
+	const ENTRY_FLAGS = "f";
+	const ENTRY_EXTRA_DATA = "4";
+	const ENTRY_TICKS = "3";
+	const ENTRY_ENTITIES = "2";
+	const ENTRY_TILES = "1";
+	const ENTRY_TERRAIN = "0";
 
 	/** @var Chunk[] */
 	protected $chunks = [];
@@ -53,18 +62,18 @@ class LevelDB extends BaseLevelProvider{
 		$nbt = new NBT(NBT::LITTLE_ENDIAN);
 		$nbt->read(substr(file_get_contents($this->getPath() . "level.dat"), 8));
 		$levelData = $nbt->getData();
-		if($levelData instanceof Compound){
+		if($levelData instanceof CompoundTag){
 			$this->levelData = $levelData;
 		}else{
 			throw new LevelException("Invalid level.dat");
 		}
 
 		if(!isset($this->levelData->generatorName)){
-			$this->levelData->generatorName = new String("generatorName", Generator::getGenerator("DEFAULT"));
+			$this->levelData->generatorName = new StringTag("generatorName", Generator::getGenerator("DEFAULT"));
 		}
 
 		if(!isset($this->levelData->generatorOptions)){
-			$this->levelData->generatorOptions = new String("generatorOptions", "");
+			$this->levelData->generatorOptions = new StringTag("generatorOptions", "");
 		}
 
 		$this->db = new \LevelDB($this->path . "/db", [
@@ -96,24 +105,24 @@ class LevelDB extends BaseLevelProvider{
 			mkdir($path . "/db", 0777, true);
 		}
 		//TODO, add extra details
-		$levelData = new Compound("", [
-			"hardcore" => new Byte("hardcore", 0),
-			"initialized" => new Byte("initialized", 1),
-			"GameType" => new Int("GameType", 0),
-			"generatorVersion" => new Int("generatorVersion", 1), //2 in MCPE
-			"SpawnX" => new Int("SpawnX", 128),
-			"SpawnY" => new Int("SpawnY", 70),
-			"SpawnZ" => new Int("SpawnZ", 128),
-			"version" => new Int("version", 19133),
-			"DayTime" => new Int("DayTime", 0),
-			"LastPlayed" => new Long("LastPlayed", microtime(true) * 1000),
-			"RandomSeed" => new Long("RandomSeed", $seed),
-			"SizeOnDisk" => new Long("SizeOnDisk", 0),
-			"Time" => new Long("Time", 0),
-			"generatorName" => new String("generatorName", Generator::getGeneratorName($generator)),
-			"generatorOptions" => new String("generatorOptions", isset($options["preset"]) ? $options["preset"] : ""),
-			"LevelName" => new String("LevelName", $name),
-			"GameRules" => new Compound("GameRules", [])
+		$levelData = new CompoundTag("", [
+			"hardcore" => new ByteTag("hardcore", 0),
+			"initialized" => new ByteTag("initialized", 1),
+			"GameType" => new IntTag("GameType", 0),
+			"generatorVersion" => new IntTag("generatorVersion", 1), //2 in MCPE
+			"SpawnX" => new IntTag("SpawnX", 128),
+			"SpawnY" => new IntTag("SpawnY", 70),
+			"SpawnZ" => new IntTag("SpawnZ", 128),
+			"version" => new IntTag("version", 19133),
+			"DayTime" => new IntTag("DayTime", 0),
+			"LastPlayed" => new LongTag("LastPlayed", microtime(true) * 1000),
+			"RandomSeed" => new LongTag("RandomSeed", $seed),
+			"SizeOnDisk" => new LongTag("SizeOnDisk", 0),
+			"Time" => new LongTag("Time", 0),
+			"generatorName" => new StringTag("generatorName", Generator::getGeneratorName($generator)),
+			"generatorOptions" => new StringTag("generatorOptions", isset($options["preset"]) ? $options["preset"] : ""),
+			"LevelName" => new StringTag("LevelName", $name),
+			"GameRules" => new CompoundTag("GameRules", [])
 		]);
 		$nbt = new NBT(NBT::LITTLE_ENDIAN);
 		$nbt->setData($levelData);
@@ -149,12 +158,20 @@ class LevelDB extends BaseLevelProvider{
 		$heightmap = pack("C*", ...$chunk->getHeightMapArray());
 		$biomeColors = pack("N*", ...$chunk->getBiomeColorArray());
 
+		$extraData = new BinaryStream();
+		$extraData->putLInt(count($chunk->getBlockExtraDataArray()));
+		foreach($chunk->getBlockExtraDataArray() as $key => $value){
+			$extraData->putLInt($key);
+			$extraData->putLShort($value);
+		}
+
 		$ordered = $chunk->getBlockIdArray() .
 			$chunk->getBlockDataArray() .
 			$chunk->getBlockSkyLightArray() .
 			$chunk->getBlockLightArray() .
 			$heightmap .
 			$biomeColors .
+			$extraData->getBuffer() .
 			$tiles;
 
 		$this->getLevel()->chunkRequestCallback($x, $z, $ordered);
@@ -197,10 +214,13 @@ class LevelDB extends BaseLevelProvider{
 		}
 
 		$this->level->timings->syncChunkLoadDataTimer->startTiming();
-		$chunk = $this->readChunk($chunkX, $chunkZ, $create); //generate empty chunk if not loaded
+		$chunk = $this->readChunk($chunkX, $chunkZ, $create);
+		if($chunk === null and $create){
+			$chunk = Chunk::getEmptyChunk($chunkX, $chunkZ, $this);
+		}
 		$this->level->timings->syncChunkLoadDataTimer->stopTiming();
 
-		if($chunk instanceof Chunk){
+		if($chunk !== null){
 			$this->chunks[$index] = $chunk;
 			return true;
 		}else{
@@ -211,18 +231,17 @@ class LevelDB extends BaseLevelProvider{
 	/**
 	 * @param      $chunkX
 	 * @param      $chunkZ
-	 * @param bool $create
 	 *
 	 * @return Chunk
 	 */
-	private function readChunk($chunkX, $chunkZ, $create = false){
+	private function readChunk($chunkX, $chunkZ){
 		$index = LevelDB::chunkIndex($chunkX, $chunkZ);
 
-		if(!$this->chunkExists($chunkX, $chunkZ) or ($data = $this->db->get($index . "\x30")) === false){
-			return $create ? $this->generateChunk($chunkX, $chunkZ) : null;
+		if(!$this->chunkExists($chunkX, $chunkZ) or ($data = $this->db->get($index . self::ENTRY_TERRAIN)) === false){
+			return null;
 		}
 
-		$flags = $this->db->get($index . "f");
+		$flags = $this->db->get($index . self::ENTRY_FLAGS);
 		if($flags === false){
 			$flags = "\x03";
 		}
@@ -230,19 +249,12 @@ class LevelDB extends BaseLevelProvider{
 		return Chunk::fromBinary($index . $data . $flags, $this);
 	}
 
-	private function generateChunk($chunkX, $chunkZ){
-		return new Chunk($this, $chunkX, $chunkZ, str_repeat("\x00", 32768) .
-			str_repeat("\x00", 16384) . str_repeat("\xff", 16384) . str_repeat("\x00", 16384) .
-			str_repeat("\x01", 256) .
-			str_repeat("\x00\x85\xb2\x4a", 256));
-	}
-
 	private function writeChunk(Chunk $chunk){
 		$binary = $chunk->toBinary(true);
 		$index = LevelDB::chunkIndex($chunk->getX(), $chunk->getZ());
-		$this->db->put($index . "\x30", substr($binary, 8, -1));
-		$this->db->put($index . "f", substr($binary, -1));
-		$this->db->put($index . "v", "\x02");
+		$this->db->put($index . self::ENTRY_TERRAIN, substr($binary, 8, -1));
+		$this->db->put($index . self::ENTRY_FLAGS, substr($binary, -1));
+		$this->db->put($index . self::ENTRY_VERSION, "\x02");
 	}
 
 	public function unloadChunk($x, $z, $safe = true){
@@ -316,7 +328,7 @@ class LevelDB extends BaseLevelProvider{
 	}
 
 	private function chunkExists($chunkX, $chunkZ){
-		return $this->db->get(LevelDB::chunkIndex($chunkX, $chunkZ) . "v") !== false;
+		return $this->db->get(LevelDB::chunkIndex($chunkX, $chunkZ) . self::ENTRY_VERSION) !== false;
 	}
 
 	public function isChunkGenerated($chunkX, $chunkZ){

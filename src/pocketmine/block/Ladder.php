@@ -23,6 +23,7 @@ namespace pocketmine\block;
 
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 use pocketmine\level\Level;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
@@ -48,7 +49,7 @@ class Ladder extends Transparent{
 	}
 
 	public function getHardness(){
-		return 2;
+		return 0.4;
 	}
 
 	public function onEntityCollide(Entity $entity){
@@ -131,6 +132,10 @@ class Ladder extends Transparent{
 		}
 
 		return false;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_AXE;
 	}
 
 	public function getDrops(Item $item){

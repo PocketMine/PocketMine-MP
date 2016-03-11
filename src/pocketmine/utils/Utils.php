@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____  
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- * 
+ *
  *
 */
 
@@ -23,6 +23,7 @@
  * Various Utilities used around the code
  */
 namespace pocketmine\utils;
+
 use pocketmine\ThreadManager;
 
 /**
@@ -32,6 +33,7 @@ class Utils{
 	public static $online = true;
 	public static $ip = false;
 	public static $os;
+	private static $serverUniqueId = null;
 
 	/**
 	 * Generates an unique identifier to a callable
@@ -48,25 +50,6 @@ class Utils{
 		}
 	}
 
-	public static function randomUUID(){
-		return Utils::toUUID(Binary::writeInt(time()) . Binary::writeShort(getmypid()) . Binary::writeShort(getmyuid()) . Binary::writeInt(mt_rand(-0x7fffffff, 0x7fffffff)) . Binary::writeInt(mt_rand(-0x7fffffff, 0x7fffffff)), 2);
-	}
-
-	public static function dataToUUID(...$params){
-		return Utils::toUUID(hash("md5", implode($params), true), 3);
-	}
-
-	public static function toUUID($data, $version = 2, $fixed = "8"){
-		if(strlen($data) !== 16){
-			throw new \InvalidArgumentException("Data bust be 16 bytes");
-		}
-
-		$hex = bin2hex($data);
-
-		//xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx 8-4-4-12
-		return substr($hex, 0, 8) . "-" . substr($hex, 8, 4) . "-" . hexdec($version) . substr($hex, 13, 3) . "-" . $fixed{0} . substr($hex, 17, 3) . "-" . substr($hex, 20, 12);
-	}
-
 	/**
 	 * Gets this machine / server instance unique ID
 	 * Returns a hash, the first 32 characters (or 16 if raw)
@@ -75,11 +58,15 @@ class Utils{
 	 *
 	 * @param string $extra optional, additional data to identify the machine
 	 *
-	 * @return string
+	 * @return UUID
 	 */
-	public static function getServerUniqueId($extra = ""){
+	public static function getMachineUniqueId($extra = ""){
+		if(self::$serverUniqueId !== null and $extra === ""){
+			return self::$serverUniqueId;
+		}
+
 		$machine = php_uname("a");
-		$machine .= file_exists("/proc/cpuinfo") ? implode(preg_grep("/model name/", file("/proc/cpuinfo"))) : "";
+		$machine .= file_exists("/proc/cpuinfo") ? implode(preg_grep("/(model name|Processor|Serial)/", file("/proc/cpuinfo"))) : "";
 		$machine .= sys_get_temp_dir();
 		$machine .= $extra;
 		$os = Utils::getOS();
@@ -95,16 +82,24 @@ class Utils{
 				$machine .= implode(" ", $matches[1]); //Mac Addresses
 			}
 		}elseif($os === "linux"){
-			@exec("ifconfig", $mac);
-			$mac = implode("\n", $mac);
-			if(preg_match_all("#HWaddr[ \t]{1,}([0-9a-f:]{17})#", $mac, $matches)){
-				foreach($matches[1] as $i => $v){
-					if($v == "00:00:00:00:00:00"){
-						unset($matches[1][$i]);
+			if(file_exists("/etc/machine-id")){
+				$machine .= file_get_contents("/etc/machine-id");
+			}else{
+				@exec("ifconfig 2>/dev/null", $mac);
+				$mac = implode("\n", $mac);
+				if(preg_match_all("#HWaddr[ \t]{1,}([0-9a-f:]{17})#", $mac, $matches)){
+					foreach($matches[1] as $i => $v){
+						if($v == "00:00:00:00:00:00"){
+							unset($matches[1][$i]);
+						}
 					}
+					$machine .= implode(" ", $matches[1]); //Mac Addresses
 				}
-				$machine .= implode(" ", $matches[1]); //Mac Addresses
 			}
+		}elseif($os === "android"){
+			$machine .= @file_get_contents("/system/build.prop");
+		}elseif($os === "mac"){
+			$machine .= `system_profiler SPHardwareDataType | grep UUID`;
 		}
 		$data = $machine . PHP_MAXPATHLEN;
 		$data .= PHP_INT_MAX;
@@ -114,7 +109,13 @@ class Utils{
 			$data .= $ext . ":" . phpversion($ext);
 		}
 
-		return Utils::dataToUUID($machine, $data);
+		$uuid = UUID::fromData($machine, $data);
+
+		if($extra === ""){
+			self::$serverUniqueId = $uuid;
+		}
+
+		return $uuid;
 	}
 
 	/**
@@ -192,10 +193,30 @@ class Utils{
 				self::$os = "other";
 			}
 		}
-		
+
 		return self::$os;
 	}
 
+
+	public static function getRealMemoryUsage(){
+		$stack = 0;
+		$heap = 0;
+
+		if(Utils::getOS() === "linux" or Utils::getOS() === "android"){
+			$mappings = file("/proc/self/maps");
+			foreach($mappings as $line){
+				if(preg_match("#([a-z0-9]+)\\-([a-z0-9]+) [rwxp\\-]{4} [a-z0-9]+ [^\\[]*\\[([a-zA-z0-9]+)\\]#", trim($line), $matches) > 0){
+					if(strpos($matches[3], "heap") === 0){
+						$heap += hexdec($matches[2]) - hexdec($matches[1]);
+					}elseif(strpos($matches[3], "stack") === 0){
+						$stack += hexdec($matches[2]) - hexdec($matches[1]);
+					}
+				}
+			}
+		}
+
+		return [$heap, $stack];
+	}
 
 	public static function getMemoryUsage($advanced = false){
 		$reserved = memory_get_usage();
@@ -240,8 +261,15 @@ class Utils{
 		return count(ThreadManager::getInstance()->getAll()) + 3; //RakLib + MainLogger + Main Thread
 	}
 
-	public static function getCoreCount(){
-		$processors = 0;
+	public static function getCoreCount($recalculate = false){
+		static $processors = 0;
+
+		if($processors > 0 and !$recalculate){
+			return $processors;
+		}else{
+			$processors = 0;
+		}
+
 		switch(Utils::getOS()){
 			case "linux":
 			case "android":
@@ -251,13 +279,16 @@ class Utils{
 							++$processors;
 						}
 					}
+				}else{
+					if(preg_match("/^([0-9]+)\\-([0-9]+)$/", trim(@file_get_contents("/sys/devices/system/cpu/present")), $matches) > 0){
+						$processors = (int) ($matches[2] - $matches[1]);
+					}
 				}
 				break;
 			case "bsd":
-				$processors = (int) `sysctl hw.ncpu | awk '{ print $2+1 }'`;
-				break;
 			case "mac":
-				$processors = (int) `sysctl hw.availcpu | awk '{ print $2+1 }'`;
+				$processors = (int) `sysctl -n hw.ncpu`;
+				$processors = (int) `sysctl -n hw.ncpu`;
 				break;
 			case "win":
 				$processors = (int) getenv("NUMBER_OF_PROCESSORS");
@@ -432,18 +463,19 @@ class Utils{
 	/**
 	 * GETs an URL using cURL
 	 *
-	 * @param     $page
-	 * @param int $timeout default 10
+	 * @param       $page
+	 * @param int   $timeout default 10
+	 * @param array $extraHeaders
 	 *
 	 * @return bool|mixed
 	 */
-	public static function getURL($page, $timeout = 10){
+	public static function getURL($page, $timeout = 10, array $extraHeaders = []){
 		if(Utils::$online === false){
 			return false;
 		}
 
 		$ch = curl_init($page);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, ["User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0 PocketMine-MP"]);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(["User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0 PocketMine-MP"], $extraHeaders));
 		curl_setopt($ch, CURLOPT_AUTOREFERER, true);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
@@ -452,6 +484,7 @@ class Utils{
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, (int) $timeout);
+		curl_setopt($ch, CURLOPT_TIMEOUT, (int) $timeout);
 		$ret = curl_exec($ch);
 		curl_close($ch);
 
@@ -464,10 +497,11 @@ class Utils{
 	 * @param              $page
 	 * @param array|string $args
 	 * @param int          $timeout
+	 * @param array        $extraHeaders
 	 *
 	 * @return bool|mixed
 	 */
-	public static function postURL($page, $args, $timeout = 10){
+	public static function postURL($page, $args, $timeout = 10, array $extraHeaders = []){
 		if(Utils::$online === false){
 			return false;
 		}
@@ -481,13 +515,32 @@ class Utils{
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $args);
 		curl_setopt($ch, CURLOPT_AUTOREFERER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, ["User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0 PocketMine-MP"]);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(["User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0 PocketMine-MP"], $extraHeaders));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, (int) $timeout);
+		curl_setopt($ch, CURLOPT_TIMEOUT, (int) $timeout);
 		$ret = curl_exec($ch);
 		curl_close($ch);
 
 		return $ret;
 	}
 
+	public static function javaStringHash($string){
+		$hash = 0;
+		for($i = 0; $i < strlen($string); $i++){
+			$ord = ord($string{$i});
+			if($ord & 0x80){
+				$ord -= 0x100;
+			}
+			$hash = 31 * $hash + $ord;
+			while($hash > 0x7FFFFFFF){
+				$hash -= 0x100000000;
+			}
+			while($hash < -0x80000000){
+				$hash += 0x100000000;
+			}
+			$hash &= 0xFFFFFFFF;
+		}
+		return $hash;
+	}
 }

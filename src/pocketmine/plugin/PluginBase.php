@@ -202,8 +202,8 @@ abstract class PluginBase implements Plugin{
 		}
 
 		$out = $this->dataFolder . $filename;
-		if(!file_exists($this->dataFolder)){
-			mkdir($this->dataFolder, 0755, true);
+		if(!file_exists(dirname($out))){
+			mkdir(dirname($out), 0755, true);
 		}
 
 		if(file_exists($out) and $replace !== true){
@@ -251,8 +251,9 @@ abstract class PluginBase implements Plugin{
 
 	public function saveDefaultConfig(){
 		if(!file_exists($this->configFile)){
-			$this->saveResource("config.yml", false);
+			return $this->saveResource("config.yml", false);
 		}
+		return false;
 	}
 
 	public function reloadConfig(){

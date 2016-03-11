@@ -1,4 +1,5 @@
 # ![PocketMine-MP](http://cdn.pocketmine.net/img/PocketMine-MP-h.png)
+[![Build Status](https://travis-ci.org/PocketMine/PocketMine-MP.svg?branch=master)](https://travis-ci.org/PocketMine/PocketMine-MP)
 
 
 	This program is free software: you can redistribute it and/or modify
@@ -44,6 +45,7 @@ __PocketMine-MP is a free, open-source software that creates Minecraft: Pocket E
 
 ## Third-party Libraries/Protocols Used
 * __[PHP Sockets](http://php.net/manual/en/book.sockets.php)__
+* __[PHP mbstring](http://php.net/manual/en/book.mbstring.php)__
 * __[PHP SQLite3](http://php.net/manual/en/book.sqlite3.php)__
 * __[PHP BCMath](http://php.net/manual/en/book.bc.php)__
 * __[PHP pthreads](http://pthreads.org/)__ by _[krakjoe](https://github.com/krakjoe)_: Threading for PHP - Share Nothing, Do Everything.

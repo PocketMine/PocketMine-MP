@@ -46,13 +46,6 @@ class PlayerChatEvent extends PlayerEvent implements Cancellable{
 		$this->player = $player;
 		$this->message = $message;
 
-		//TODO: @deprecated (backwards-compativility)
-		$i = 0;
-		while(($pos = strpos($format, "%s")) !== false){
-			$format = substr($format, 0, $pos) . "{%$i}" . substr($format, $pos + 2);
-			++$i;
-		}
-
 		$this->format = $format;
 
 		if($recipients === null){
@@ -76,9 +69,7 @@ class PlayerChatEvent extends PlayerEvent implements Cancellable{
 	 * @param Player $player
 	 */
 	public function setPlayer(Player $player){
-		if($player instanceof Player){
-			$this->player = $player;
-		}
+		$this->player = $player;
 	}
 
 	public function getFormat(){
@@ -86,13 +77,6 @@ class PlayerChatEvent extends PlayerEvent implements Cancellable{
 	}
 
 	public function setFormat($format){
-		//TODO: @deprecated (backwards-compativility)
-		$i = 0;
-		while(($pos = strpos($format, "%s")) !== false){
-			$format = substr($format, 0, $pos) . "{%$i}" . substr($format, $pos + 2);
-			++$i;
-		}
-
 		$this->format = $format;
 	}
 

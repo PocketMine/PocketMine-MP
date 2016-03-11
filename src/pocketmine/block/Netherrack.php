@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 
 class Netherrack extends Solid{
 
@@ -39,26 +40,12 @@ class Netherrack extends Solid{
 		return 2;
 	}
 
-	public function getBreakTime(Item $item){
-
-		switch($item->isPickaxe()){
-			case 5:
-				return 0.1;
-			case 4:
-				return 0.1;
-			case 3:
-				return 0.15;
-			case 2:
-				return 0.05;
-			case 1:
-				return 0.3;
-			default:
-				return 2;
-		}
+	public function getToolType(){
+		return Tool::TYPE_PICKAXE;
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= 1){
+		if($item->isPickaxe() >= Tool::TIER_WOODEN){
 			return [
 				[Item::NETHERRACK, 0, 1],
 			];

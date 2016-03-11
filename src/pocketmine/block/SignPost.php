@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
@@ -34,7 +35,7 @@ class SignPost extends Transparent{
 	}
 
 	public function getHardness(){
-		return 5;
+		return 1;
 	}
 
 	public function isSolid(){
@@ -87,7 +88,7 @@ class SignPost extends Transparent{
 	}
 
 	public function onBreak(Item $item){
-		$this->getLevel()->setBlock($this, new Air(), true, true, true);
+		$this->getLevel()->setBlock($this, new Air(), true, true);
 
 		return true;
 	}
@@ -96,5 +97,9 @@ class SignPost extends Transparent{
 		return [
 			[Item::SIGN, 0, 1],
 		];
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_AXE;
 	}
 }

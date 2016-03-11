@@ -23,6 +23,7 @@ namespace pocketmine\block;
 
 use pocketmine\event\block\BlockSpreadEvent;
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
@@ -39,8 +40,12 @@ class Mycelium extends Solid{
 		return "Mycelium";
 	}
 
+	public function getToolType(){
+		return Tool::TYPE_SHOVEL;
+	}
+
 	public function getHardness(){
-		return 2.5;
+		return 0.6;
 	}
 
 	public function getDrops(Item $item){

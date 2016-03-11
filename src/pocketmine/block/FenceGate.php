@@ -22,6 +22,8 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
+use pocketmine\level\sound\DoorSound;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 
@@ -38,11 +40,15 @@ class FenceGate extends Transparent{
 	}
 
 	public function getHardness(){
-		return 15;
+		return 2;
 	}
 
 	public function canBeActivated(){
 		return true;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_AXE;
 	}
 
 
@@ -102,7 +108,7 @@ class FenceGate extends Transparent{
 		];
 		$this->meta = ($faces[$player instanceof Player ? $player->getDirection() : 0] & 0x03) | ((~$this->meta) & 0x04);
 		$this->getLevel()->setBlock($this, $this, true);
-
+		$this->level->addSound(new DoorSound($this));
 		return true;
 	}
 }

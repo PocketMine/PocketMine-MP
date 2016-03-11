@@ -29,12 +29,9 @@ use pocketmine\utils\Binary;
 #endif
 
 class AddPlayerPacket extends DataPacket{
-	public static $pool = [];
-	public static $next = 0;
+	const NETWORK_ID = Info::ADD_PLAYER_PACKET;
 
-
-
-	public $clientID;
+	public $uuid;
 	public $username;
 	public $eid;
 	public $x;
@@ -46,15 +43,7 @@ class AddPlayerPacket extends DataPacket{
 	public $pitch;
 	public $yaw;
 	public $item;
-	public $meta;
 	public $metadata;
-
-	public $slim = false;
-	public $skin = null;
-
-	public function pid(){
-		return Info::ADD_PLAYER_PACKET;
-	}
 
 	public function decode(){
 
@@ -62,7 +51,7 @@ class AddPlayerPacket extends DataPacket{
 
 	public function encode(){
 		$this->reset();
-		$this->putLong($this->clientID);
+		$this->putUUID($this->uuid);
 		$this->putString($this->username);
 		$this->putLong($this->eid);
 		$this->putFloat($this->x);
@@ -74,10 +63,8 @@ class AddPlayerPacket extends DataPacket{
 		$this->putFloat($this->yaw);
 		$this->putFloat($this->yaw); //TODO headrot
 		$this->putFloat($this->pitch);
-		$this->putShort($this->item);
-		$this->putShort($this->meta);
-		$this->putByte($this->slim ? 1 : 0);
-		$this->putString($this->skin);
+		$this->putSlot($this->item);
+
 		$meta = Binary::writeMetadata($this->metadata);
 		$this->put($meta);
 	}

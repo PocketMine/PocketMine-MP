@@ -22,6 +22,7 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 use pocketmine\level\Level;
 use pocketmine\Player;
 
@@ -42,7 +43,11 @@ class SnowLayer extends Flowable{
 	}
 
 	public function getHardness(){
-		return 0.5;
+		return 0.1;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_SHOVEL;
 	}
 
 

@@ -22,14 +22,11 @@
 namespace pocketmine\block;
 
 use pocketmine\item\Item;
+use pocketmine\item\Tool;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\Player;
 
 abstract class Stair extends Transparent{
-
-	public function getHardness(){
-		return 30;
-	}
 
 	/*
 	public function collidesWithBB(AxisAlignedBB $bb, &$list = []){
@@ -147,9 +144,9 @@ abstract class Stair extends Transparent{
 	}
 
 	public function getDrops(Item $item){
-		if($item->isPickaxe() >= 1){
+		if($item->isPickaxe() >= Tool::TIER_WOODEN){
 			return [
-				[$this->id, 0, 1],
+				[$this->getId(), 0, 1],
 			];
 		}else{
 			return [];

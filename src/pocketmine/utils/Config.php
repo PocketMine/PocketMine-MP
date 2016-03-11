@@ -20,6 +20,7 @@
 */
 
 namespace pocketmine\utils;
+use pocketmine\scheduler\FileWriteTask;
 use pocketmine\Server;
 
 
@@ -41,6 +42,9 @@ class Config{
 
 	/** @var array */
 	private $config = [];
+
+	private $nestedCache = [];
+
 	/** @var string */
 	private $file;
 	/** @var boolean */
@@ -82,6 +86,7 @@ class Config{
 	 */
 	public function reload(){
 		$this->config = [];
+		$this->nestedCache = [];
 		$this->correct = false;
 		$this->load($this->file);
 		$this->load($this->file, $this->type);
@@ -170,9 +175,11 @@ class Config{
 	}
 
 	/**
+	 * @param bool $async
+	 *
 	 * @return boolean
 	 */
-	public function save(){
+	public function save($async = false){
 		if($this->correct === true){
 			try{
 				$content = null;
@@ -194,11 +201,16 @@ class Config{
 						$content = implode("\r\n", array_keys($this->config));
 						break;
 				}
-				file_put_contents($this->file, $content);
-			}catch(\Exception $e){
+
+				if($async){
+					Server::getInstance()->getScheduler()->scheduleAsyncTask(new FileWriteTask($this->file, $content));
+				}else{
+					file_put_contents($this->file, $content);
+				}
+			}catch(\Throwable $e){
 				$logger = Server::getInstance()->getLogger();
 				$logger->critical("Could not save Config " . $this->file . ": " . $e->getMessage());
-				if(\pocketmine\DEBUG > 1 and $logger instanceof MainLogger){
+				if(\pocketmine\DEBUG > 1){
 					$logger->logException($e);
 				}
 			}
@@ -265,6 +277,7 @@ class Config{
 		}
 
 		$base = $value;
+		$this->nestedCache[$key] = $value;
 	}
 
 	/**
@@ -274,6 +287,10 @@ class Config{
 	 * @return mixed
 	 */
 	public function getNested($key, $default = null){
+		if(isset($this->nestedCache[$key])){
+			return $this->nestedCache[$key];
+		}
+
 		$vars = explode(".", $key);
 		$base = array_shift($vars);
 		if(isset($this->config[$base])){
@@ -291,7 +308,7 @@ class Config{
 			}
 		}
 
-		return $base;
+		return $this->nestedCache[$key] = $base;
 	}
 
 	/**
@@ -305,51 +322,16 @@ class Config{
 	}
 
 	/**
-	 * @param string $path
-	 *
-	 * @deprecated
-	 *
-	 * @return mixed
-	 */
-	public function getPath($path){
-		$currPath =& $this->config;
-		foreach(explode(".", $path) as $component){
-			if(isset($currPath[$component])){
-				$currPath =& $currPath[$component];
-			}else{
-				$currPath = null;
-			}
-		}
-
-		return $currPath;
-	}
-
-	/**
-	 *
-	 * @deprecated
-	 *
-	 * @param string $path
-	 * @param mixed  $value
-	 */
-	public function setPath($path, $value){
-		$currPath =& $this->config;
-		$components = explode(".", $path);
-		$final = array_pop($components);
-		foreach($components as $component){
-			if(!isset($currPath[$component])){
-				$currPath[$component] = [];
-			}
-			$currPath =& $currPath[$component];
-		}
-		$currPath[$final] = $value;
-	}
-
-	/**
 	 * @param string $k key to be set
 	 * @param mixed  $v value to set key
 	 */
 	public function set($k, $v = true){
 		$this->config[$k] = $v;
+		foreach($this->nestedCache as $nestedKey => $nvalue){
+			if(substr($nestedKey, 0, strlen($k) + 1) === ($k . ".")){
+				unset($this->nestedCache[$nestedKey]);
+			}
+		}
 	}
 
 	/**
