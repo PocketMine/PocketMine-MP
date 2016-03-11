@@ -545,6 +545,41 @@ class Block extends Position implements Metadatable{
 	}
 
 	/**
+	 * @param string $str
+	 * @param bool   $multiple
+	 *
+	 * @return Block[]|Block
+	 */
+	public static function fromString(string $str, bool $multiple = false){
+		if($multiple === true){
+			$blocks = [];
+			foreach(explode(",", $str) as $b){
+				$blocks[] = self::fromString($b, false);
+			}
+
+			return $blocks;
+		}else{
+			$b = explode(":", str_replace([" ", "minecraft:"], ["_", ""], trim($str)));
+			if(!isset($b[1])){
+				$meta = 0;
+			}else{
+				$meta = $b[1] & 0xFFFF;
+			}
+
+			if(defined(Block::class . "::" . strtoupper($b[0]))){
+				$block = self::get(constant(Block::class . "::" . strtoupper($b[0])), $meta);
+				if($block->getId() === self::AIR and strtoupper($b[0]) !== "AIR"){
+					$block = self::get($b[0] & 0xFFFF, $meta);
+				}
+			}else{
+				$block = self::get($b[0] & 0xFFFF, $meta);
+			}
+
+			return $block;
+		}
+	}
+
+	/**
 	 * @param int $id
 	 * @param int $meta
 	 */
