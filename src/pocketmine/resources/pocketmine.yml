@@ -14,6 +14,8 @@ settings:
  query-plugins: true
  #Show a console message when a plugin uses deprecated API methods
  deprecated-verbose: true
+ #Load plugins even if they have incompatible API versions
+ incompatible-plugins: false
  #Enable plugin and core profiling by default
  enable-profiling: false
  #Will only add results when tick measurement is below or equal to given value (default 20)
