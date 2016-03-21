@@ -33,7 +33,6 @@ use pocketmine\event\TimingsHandler;
 use pocketmine\permission\Permissible;
 use pocketmine\permission\Permission;
 use pocketmine\Server;
-use pocketmine\utils\MainLogger;
 use pocketmine\utils\PluginException;
 
 /**
@@ -68,7 +67,7 @@ class PluginManager{
 	protected $defaultPermsOp = [];
 
 	/**
-	 * @var Permissible[]
+	 * @var Permissible[][]
 	 */
 	protected $permSubs = [];
 
@@ -212,6 +211,8 @@ class PluginManager{
 								continue;
 							}
 
+							$api = "none";
+
 							$compatible = false;
 							//Check multiple dependencies
 							foreach($description->getCompatibleApis() as $version){
@@ -220,10 +221,14 @@ class PluginManager{
 								$apiVersion = array_map("intval", explode(".", $this->server->getApiVersion()));
 								//Completely different API version
 								if($version[0] !== $apiVersion[0]){
+									if($api === "none"){
+										$api = $version;
+									}
 									continue;
 								}
 								//If the plugin requires new API features, being backwards compatible
 								if($version[1] > $apiVersion[1]){
+									$api = $version;
 									continue;
 								}
 
@@ -232,8 +237,12 @@ class PluginManager{
 							}
 
 							if($compatible === false){
-								$this->server->getLogger()->error($this->server->getLanguage()->translateString("pocketmine.plugin.loadError", [$name, "%pocketmine.plugin.incompatibleAPI"]));
-								continue;
+								if($this->server->getProperty("settings.incompatible-plugins", false)){
+									$this->server->getLogger()->warning("Loading plugin '$name' with incompatible API version ($api is not compatible with " . $this->server->getApiVersion()); // TODO translation
+								}else{
+									$this->server->getLogger()->error($this->server->getLanguage()->translateString("pocketmine.plugin.loadError", [$name, "%pocketmine.plugin.incompatibleAPI"]));
+									continue;
+								}
 							}
 
 							$plugins[$name] = $file;
