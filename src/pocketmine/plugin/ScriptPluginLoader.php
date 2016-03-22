@@ -109,7 +109,7 @@ class ScriptPluginLoader implements PluginLoader{
 				break;
 			}
 		}
-		if($insideHeader)){
+		if($insideHeader){
 			return new PluginDescription($data);
 		}
 
