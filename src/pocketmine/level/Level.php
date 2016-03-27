@@ -1756,11 +1756,10 @@ class Level implements ChunkManager, Metadatable{
 
 			Tile::createTile("Sign", $this->getChunk($block->x >> 4, $block->z >> 4), $nbt);
 		}
-		if ($player != null && $player->isCreative()) {
-			$item->setCount($item->getCount());
-		} else {
+		if ($player != null && !$player->isCreative()) {
 			$item->setCount($item->getCount() - 1);
 		}
+		
 		if($item->getCount() <= 0){
 			$item = Item::get(Item::AIR, 0, 0);
 		}
