@@ -590,7 +590,11 @@ class Block extends Position implements Metadatable{
 	 * @return mixed
 	 */
 	public function onBreak(Item $item){
-		return $this->getLevel()->setBlock($this, new Air(), true, true);
+		if($r = $this->getLevel()->setBlock($this, new Air(), true, true)){
+			$particle = new \pocketmine\level\particle\DestroyBlockParticle($this, $this);
+			$this->getLevel()->addParticle($particle);
+		}
+		return $r;
 	}
 
 	/**
