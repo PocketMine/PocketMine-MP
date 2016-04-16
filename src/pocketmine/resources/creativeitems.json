@@ -345,7 +345,7 @@
 	  "Light Gray Carpet":{"ID":171,"Damage":8},
 	  "Torch":{"ID":50,"Damage":0},
 	  "Bucket":{"ID":325,"Damage":0},
-	  "Milk":{"ID":325,"Damage":1},
+    "Milk":{"ID":325,"Damage":1},
 	  "Water Bucket":{"ID":325,"Damage":8},
 	  "Lava Bucket":{"ID":325,"Damage":10},
 	  "TNT":{"ID":46,"Damage":0},
