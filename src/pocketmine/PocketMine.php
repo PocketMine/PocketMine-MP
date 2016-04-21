@@ -72,11 +72,13 @@ namespace pocketmine {
 	use pocketmine\utils\Utils;
 	use pocketmine\wizard\Installer;
 
-	const VERSION = "1.6dev";
+	const VERSION = "1.6dev[";
 	const API_VERSION = "2.0.0";
 	const CODENAME = "[REDACTED]";
 	const MINECRAFT_VERSION = "v0.14.1.0 alpha";
+	$logger->notice("Be sure to use MCPE v0.14.1 to join the server.");
 	const MINECRAFT_VERSION_NETWORK = "0.14.1.0";
+	$logger->notice("Also, this is the MCPE version that the server uses. :)");
 
 	/*
 	 * Startup code. Do not look at it, it may harm you.
@@ -178,6 +180,7 @@ namespace pocketmine {
 		} else {
 			date_default_timezone_set($timezone);
 		}
+		
 	}
 
 	function detect_system_timezone(){
