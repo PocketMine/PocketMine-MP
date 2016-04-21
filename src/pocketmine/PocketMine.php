@@ -84,7 +84,7 @@ namespace pocketmine {
 	 * Startup code. Do not look at it, it may harm you.
 	 * Most of them are hacks to fix date-related bugs, or basic functions used after this
 	 * This is the only non-class based file on this project.
-	 * Enjoy it as much as I did writing it. I don't want to do it again.
+	 * Enjoy it as much as I did writing it. I don't want to do it again. 
 	 */
 
 	if(\Phar::running(true) !== ""){
