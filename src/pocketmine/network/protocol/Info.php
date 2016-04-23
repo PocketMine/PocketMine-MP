@@ -30,8 +30,8 @@ interface Info{
 	/**
 	 * Actual Minecraft: PE protocol version
 	 */
-	const CURRENT_PROTOCOL = 46;
-
+	const CURRENT_PROTOCOL = 45;
+	const ACCEPTED_PROTOCOLS = [45, 46];
 	const LOGIN_PACKET = 0x8f;
 	const PLAY_STATUS_PACKET = 0x90;
 	const DISCONNECT_PACKET = 0x91;
