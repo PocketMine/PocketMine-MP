@@ -75,14 +75,14 @@ namespace pocketmine {
 	const VERSION = "1.6dev";
 	const API_VERSION = "2.0.0";
 	const CODENAME = "[REDACTED]";
-	const MINECRAFT_VERSION = "v0.14.0.0 alpha";
-	const MINECRAFT_VERSION_NETWORK = "0.14.0.0";
+	const MINECRAFT_VERSION = "v0.14.x alpha";
+	const MINECRAFT_VERSION_NETWORK = "0.14.0";
 
 	/*
 	 * Startup code. Do not look at it, it may harm you.
 	 * Most of them are hacks to fix date-related bugs, or basic functions used after this
 	 * This is the only non-class based file on this project.
-	 * Enjoy it as much as I did writing it. I don't want to do it again.
+	 * Enjoy it as much as I did writing it. I don't want to do it again. 
 	 */
 
 	if(\Phar::running(true) !== ""){
@@ -178,6 +178,7 @@ namespace pocketmine {
 		} else {
 			date_default_timezone_set($timezone);
 		}
+		
 	}
 
 	function detect_system_timezone(){
