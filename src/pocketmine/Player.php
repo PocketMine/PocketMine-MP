@@ -607,6 +607,10 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	public function getInAirTicks(){
 		return $this->inAirTicks;
 	}
+	
+	public function getSpeed(){
+		return $this->speed;
+	}
 
 	protected function switchLevel(Level $targetLevel){
 		$oldLevel = $this->level;
