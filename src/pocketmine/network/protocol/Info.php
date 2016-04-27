@@ -30,7 +30,7 @@ interface Info{
 	/**
 	 * Actual Minecraft: PE protocol version
 	 */
-	const CURRENT_PROTOCOL = 47; //Don't know yet what has chnaged in 46->47
+	const CURRENT_PROTOCOL = 60; //Warning: MASSIVE CHANGES, TODO: Add them (BlockBreaking/Interacting)
 
 	const LOGIN_PACKET = 0x8f;
 	const PLAY_STATUS_PACKET = 0x90;
