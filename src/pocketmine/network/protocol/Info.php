@@ -30,7 +30,7 @@ interface Info{
 	/**
 	 * Actual Minecraft: PE protocol version
 	 */
-	const CURRENT_PROTOCOL = 45;
+	const CURRENT_PROTOCOL = 60; //Warning: MASSIVE CHANGES, TODO: Add them (BlockBreaking/Interacting)
 
 	const LOGIN_PACKET = 0x8f;
 	const PLAY_STATUS_PACKET = 0x90;
@@ -87,12 +87,12 @@ interface Info{
 	const PLAYER_LIST_PACKET = 0xc3;
 	// const TELEMETRY_EVENT_PACKET = 0xc4;
 	// const SPAWN_EXPERIENCE_ORB_PACKET = 0xc5
-	// const CLIENTBOUND_MAP_ITEM_DATA_PACKET = 0xc6;
+	// const CLIENTBOUND_MAP_ITEM_DATA_PACKET = 0xc6; 0.14.1
 	// const MAP_INFO_REQUEST_PACKET = 0xc7;
 	const REQUEST_CHUNK_RADIUS_PACKET = 0xc8;
 	const CHUNK_RADIUS_UPDATE_PACKET = 0xc9;
 	// const ITEM_FRAME_DROP_ITEM_PACKET = 0xca;
-	// const REPLACE_SELECTED_ITEM_PACKET = 0xcb;
+	// const REPLACE_SELECTED_ITEM_PACKET = 0xcb; 0.14.1
 }
 
 
