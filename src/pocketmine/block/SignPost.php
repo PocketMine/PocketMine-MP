@@ -25,6 +25,12 @@ use pocketmine\item\Item;
 use pocketmine\item\Tool;
 use pocketmine\level\Level;
 use pocketmine\Player;
+use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\StringTag;
+use pocketmine\tile\Tile;
+use pocketmine\nbt\tag\IntTag;
+use pocketmine\tile\Sign;
 
 class SignPost extends Transparent{
 
@@ -53,14 +59,37 @@ class SignPost extends Transparent{
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		if($face !== 0){
+			$nbt = new CompoundTag("", [
+				"id" => new StringTag("id", Tile::SIGN),
+				"x" => new IntTag("x", $block->x),
+				"y" => new IntTag("y", $block->y),
+				"z" => new IntTag("z", $block->z),
+				"Text1" => new StringTag("Text1", ""),
+				"Text2" => new StringTag("Text2", ""),
+				"Text3" => new StringTag("Text3", ""),
+				"Text4" => new StringTag("Text4", "")
+			]);
+
+			if($player !== null){
+				$nbt->Creator = new StringTag("Creator", $player->getRawUniqueId());
+			}
+
+			if($item->hasCustomBlockData()){
+				foreach($item->getCustomBlockData() as $key => $v){
+					$nbt->{$key} = $v;
+				}
+			}
+
 			if($face === 1){
 				$this->meta = floor((($player->yaw + 180) * 16 / 360) + 0.5) & 0x0F;
 				$this->getLevel()->setBlock($block, Block::get(Item::SIGN_POST, $this->meta), true);
+				Tile::createTile(Tile::SIGN, $this->getLevel()->getChunk($block->x >> 4, $block->z >> 4), $nbt);
 
 				return true;
 			}else{
 				$this->meta = $face;
 				$this->getLevel()->setBlock($block, Block::get(Item::WALL_SIGN, $this->meta), true);
+				Tile::createTile(Tile::SIGN, $this->getLevel()->getChunk($block->x >> 4, $block->z >> 4), $nbt);
 
 				return true;
 			}
@@ -71,7 +100,7 @@ class SignPost extends Transparent{
 
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
-			if($this->getSide(0)->getId() === self::AIR){
+			if($this->getSide(Vector3::SIDE_DOWN)->getId() === Block::AIR){
 				$this->getLevel()->useBreakOn($this);
 
 				return Level::BLOCK_UPDATE_NORMAL;
@@ -79,12 +108,6 @@ class SignPost extends Transparent{
 		}
 
 		return false;
-	}
-
-	public function onBreak(Item $item){
-		$this->getLevel()->setBlock($this, new Air(), true, true);
-
-		return true;
 	}
 
 	public function getDrops(Item $item){
