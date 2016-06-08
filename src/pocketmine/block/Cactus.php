@@ -28,7 +28,6 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 
@@ -56,7 +55,7 @@ class Cactus extends Transparent{
 
 		return new AxisAlignedBB(
 			$this->x + 0.0625,
-			$this->y + 0.0625,
+			$this->y,
 			$this->z + 0.0625,
 			$this->x + 0.9375,
 			$this->y + 0.9375,
@@ -72,9 +71,11 @@ class Cactus extends Transparent{
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
 			$down = $this->getSide(0);
+			$up = $this->getSide(1);
 			if($down->getId() !== self::SAND and $down->getId() !== self::CACTUS){
-				$this->getLevel()->useBreakOn($this);
-			}else{
+				$this->getLevel()->scheduleUpdate($this, 0);
+			}
+			else{
 				for($side = 2; $side <= 5; ++$side){
 					$b = $this->getSide($side);
 					if(!$b->canBeFlowedInto()){
@@ -82,42 +83,47 @@ class Cactus extends Transparent{
 					}
 				}
 			}
-		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
-			if($this->getSide(0)->getId() !== self::CACTUS){
-				if($this->meta == 0x0F){
-					for($y = 1; $y < 3; ++$y){
-						$b = $this->getLevel()->getBlock(new Vector3($this->x, $this->y + $y, $this->z));
-						if($b->getId() === self::AIR){
-							Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($b, new Cactus()));
-							if(!$ev->isCancelled()){
-								$this->getLevel()->setBlock($b, $ev->getNewState(), true);
-							}
+		}
+		elseif($type === Level::BLOCK_UPDATE_RANDOM){
+			if($this->getSide(0)->getId() !== self::SAND and $this->getSide(0)->getId() !== self::CACTUS){
+				$this->getLevel()->scheduleUpdate($this, 0);
+			}
+			elseif($this->getSide(1)->getId() === self::AIR){
+				if($this->meta === 15){
+					if(!($this->getSide(0)->getId() === self::CACTUS && $this->getSide(0, 2)->getId() === self::CACTUS)){
+						$b = $this->getSide(1);
+						Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($b, new Cactus()));
+						if(!$ev->isCancelled()){
+							$this->getLevel()->setBlock($b, $ev->getNewState(), true);
 						}
+						$this->meta = 0;
 					}
-					$this->meta = 0;
 					$this->getLevel()->setBlock($this, $this);
-				}else{
+				}
+				else{
 					++$this->meta;
 					$this->getLevel()->setBlock($this, $this);
 				}
 			}
 		}
-
+		elseif($type === Level::BLOCK_UPDATE_SCHEDULED){
+			$this->getLevel()->useBreakOn($this);
+		}
+		
 		return false;
 	}
 
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$down = $this->getSide(0);
 		if($down->getId() === self::SAND or $down->getId() === self::CACTUS){
-			$block0 = $this->getSide(2);
-			$block1 = $this->getSide(3);
-			$block2 = $this->getSide(4);
-			$block3 = $this->getSide(5);
-			if($block0->isTransparent() === true and $block1->isTransparent() === true and $block2->isTransparent() === true and $block3->isTransparent() === true){
-				$this->getLevel()->setBlock($this, $this, true);
-
-				return true;
+			for($side = 2; $side <= 5; ++$side){
+				$b = $this->getSide($side);
+				if(!$b->canBeFlowedInto()){
+					return false;
+				}
 			}
+			$this->getLevel()->setBlock($this, $this, true);
+			return true;
 		}
 
 		return false;
