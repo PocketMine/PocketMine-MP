@@ -92,7 +92,7 @@ class BaseLang{
 			$baseText = str_replace("{%$i}", $this->parseTranslation((string) $p), $baseText, $onlyPrefix);
 		}
 
-		return $baseText;
+		return str_replace("%0", "", $baseText);
 	}
 
 	public function translate(TextContainer $c){
