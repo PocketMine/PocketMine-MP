@@ -494,18 +494,22 @@ class Block extends Position implements Metadatable{
 					self::$hardness[$id] = $block->getHardness();
 					self::$light[$id] = $block->getLightLevel();
 
-					if($block->isSolid()){
-						if($block->isTransparent()){
-							if($block instanceof Liquid or $block instanceof Ice){
-								self::$lightFilter[$id] = 2;
+					if($block->getLightLevel()){
+						self::$lightFilter[$id] = 0;
+					}else{
+						if($block->isSolid()){
+							if($block->isTransparent()){
+								if($block instanceof Liquid or $block instanceof Ice){
+									self::$lightFilter[$id] = 2;
+								}else{
+									self::$lightFilter[$id] = 1;
+								}
 							}else{
-								self::$lightFilter[$id] = 1;
+								self::$lightFilter[$id] = 15;
 							}
 						}else{
-							self::$lightFilter[$id] = 15;
+							self::$lightFilter[$id] = 1;
 						}
-					}else{
-						self::$lightFilter[$id] = 1;
 					}
 				}else{
 					self::$lightFilter[$id] = 1;
