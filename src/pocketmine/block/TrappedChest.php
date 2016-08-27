@@ -49,6 +49,10 @@ class TrappedChest extends Transparent{
 		return 2.5;
 	}
 
+	public function getResistance(){
+		return 12.5;
+	}
+
 	public function getName(){
 		return "Trapped Chest";
 	}

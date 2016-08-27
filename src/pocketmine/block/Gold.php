@@ -40,6 +40,10 @@ class Gold extends Solid{
 		return 3;
 	}
 
+	public function getResistance(){
+		return 30;
+	}
+
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
 	}

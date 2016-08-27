@@ -43,6 +43,10 @@ class FenceGate extends Transparent{
 		return 2;
 	}
 
+	public function getResistance(){
+		return 15;
+	}
+
 	public function canBeActivated(){
 		return true;
 	}

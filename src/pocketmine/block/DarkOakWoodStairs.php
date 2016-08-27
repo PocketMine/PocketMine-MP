@@ -36,6 +36,10 @@ class DarkOakWoodStairs extends Stair{
 		return "Dark Oak Wood Stairs";
 	}
 
+	public function getResistance(){
+		return 15;
+	}
+
 	public function getToolType(){
 		return Tool::TYPE_AXE;
 	}

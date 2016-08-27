@@ -36,6 +36,10 @@ class DoubleWoodSlab extends Solid{
 		return 2;
 	}
 
+	public function getResistance(){
+		return 15;
+	}
+
 	public function getToolType(){
 		return Tool::TYPE_AXE;
 	}

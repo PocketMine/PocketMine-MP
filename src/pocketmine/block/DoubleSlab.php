@@ -36,6 +36,10 @@ class DoubleSlab extends Solid{
 		return 2;
 	}
 
+	public function getResistance(){
+		return $this->meta == 2 ? 15 : 30;
+	}
+
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
 	}

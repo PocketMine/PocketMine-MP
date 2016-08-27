@@ -36,6 +36,10 @@ class JungleWoodStairs extends Stair{
 		return "Jungle Wood Stairs";
 	}
 
+	public function getResistance(){
+		return 15;
+	}
+
 	public function getToolType(){
 		return Tool::TYPE_AXE;
 	}

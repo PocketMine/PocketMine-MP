@@ -40,6 +40,10 @@ class StoneBrickStairs extends Stair{
 		return 1.5;
 	}
 
+	public function getResistance(){
+		return 30;
+	}
+
 	public function getName(){
 		return "Stone Brick Stairs";
 	}

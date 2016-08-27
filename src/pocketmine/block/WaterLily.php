@@ -49,6 +49,10 @@ class WaterLily extends Flowable{
 		return 0.6;
 	}
 
+	public function getResistance(){
+		return 0;
+	}
+
 	public function canPassThrough(){
 		return true;
 	}
