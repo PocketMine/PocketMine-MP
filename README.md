@@ -1,4 +1,4 @@
-# ![PocketMine-MP](http://cdn.pocketmine.net/img/PocketMine-MP-h.png)
+# ![FireMine] (http://cdn.pocketmine.net/img/PocketMine-MP-h.png)
 [![Build Status](https://travis-ci.org/PocketMine/PocketMine-MP.svg?branch=master)](https://travis-ci.org/PocketMine/PocketMine-MP)
 
 
