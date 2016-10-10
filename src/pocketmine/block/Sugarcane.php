@@ -24,7 +24,6 @@ namespace pocketmine\block;
 use pocketmine\event\block\BlockGrowEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
-use pocketmine\math\Vector3 as Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
 
@@ -47,23 +46,29 @@ class Sugarcane extends Flowable{
 		];
 	}
 
-	public function onActivate(Item $item, Player $player = null){
+	public function onActivate(Item $item, Player $player = null){ //this will show to the client, but MCPE doesn't send interacting with fire and sugarcane to servers.
+	//if i would do print("hi sugarcane"); here, it wouldnt do anything.
 		if($item->getId() === Item::DYE and $item->getDamage() === 0x0F){ //Bonemeal
-			if($this->getSide(0)->getId() !== self::SUGARCANE_BLOCK){
-				for($y = 1; $y < 3; ++$y){
-					$b = $this->getLevel()->getBlock(new Vector3($this->x, $this->y + $y, $this->z));
+			$grow = false;
+			if($this->getSide(0)->getId() !== self::SUGARCANE_BLOCK && $this->getSide(0, 2)->getId() !== self::SUGARCANE_BLOCK){
+				for($y = 1; $y < 2; $y++){
+					$b = $this->getSide(1, $y);
 					if($b->getId() === self::AIR){
 						Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($b, new Sugarcane()));
 						if(!$ev->isCancelled()){
 							$this->getLevel()->setBlock($b, $ev->getNewState(), true);
+							$grow = true;
 						}
+						break;
+					}
+					else{
 						break;
 					}
 				}
 				$this->meta = 0;
 				$this->getLevel()->setBlock($this, $this, true);
 			}
-			if(($player->gamemode & 0x01) === 0){
+			if($grow && $player->isSurvival()){
 				$item->count--;
 			}
 
@@ -76,30 +81,43 @@ class Sugarcane extends Flowable{
 	public function onUpdate($type){
 		if($type === Level::BLOCK_UPDATE_NORMAL){
 			$down = $this->getSide(0);
-			if($down->isTransparent() === true and $down->getId() !== self::SUGARCANE_BLOCK){
-				$this->getLevel()->useBreakOn($this);
-
-				return Level::BLOCK_UPDATE_NORMAL;
+			$up = $this->getSide(1);
+			if(!in_array($down->getId(), array(self::SAND, self::DIRT, self::GRASS, self::SUGARCANE_BLOCK))){
+				$this->getLevel()->scheduleUpdate($this, 0);
 			}
-		}elseif($type === Level::BLOCK_UPDATE_RANDOM){
-			if($this->getSide(0)->getId() !== self::SUGARCANE_BLOCK){
-				if($this->meta === 0x0F){
-					for($y = 1; $y < 3; ++$y){
-						$b = $this->getLevel()->getBlock(new Vector3($this->x, $this->y + $y, $this->z));
-						if($b->getId() === self::AIR){
-							$this->getLevel()->setBlock($b, new Sugarcane(), true);
-							break;
-						}
+			else{
+				for($side = 2; $side <= 5; ++$side){
+					$b = $this->getSide($side);
+					if(!$b->canBeFlowedInto()){
+						$this->getLevel()->useBreakOn($this);
 					}
-					$this->meta = 0;
-					$this->getLevel()->setBlock($this, $this, true);
-				}else{
-					++$this->meta;
-					$this->getLevel()->setBlock($this, $this, true);
 				}
-
-				return Level::BLOCK_UPDATE_RANDOM;
 			}
+		}
+		elseif($type === Level::BLOCK_UPDATE_RANDOM){
+			if(!in_array($this->getSide(0)->getId(), array(self::SAND, self::DIRT, self::GRASS, self::SUGARCANE_BLOCK))){
+				$this->getLevel()->scheduleUpdate($this, 0);
+			}
+			elseif($this->getSide(1)->getId() === self::AIR){
+				if($this->meta === 15){
+					if(!($this->getSide(0)->getId() === self::SUGARCANE_BLOCK && $this->getSide(0, 2)->getId() === self::SUGARCANE_BLOCK)){
+						$b = $this->getSide(1);
+						Server::getInstance()->getPluginManager()->callEvent($ev = new BlockGrowEvent($b, new Sugarcane()));
+						if(!$ev->isCancelled()){
+							$this->getLevel()->setBlock($b, $ev->getNewState(), true);
+						}
+						$this->meta = 0;
+					}
+					$this->getLevel()->setBlock($this, $this);
+				}
+				else{
+					++$this->meta;
+					$this->getLevel()->setBlock($this, $this);
+				}
+			}
+		}
+		elseif($type === Level::BLOCK_UPDATE_SCHEDULED){
+			$this->getLevel()->useBreakOn($this);
 		}
 
 		return false;
