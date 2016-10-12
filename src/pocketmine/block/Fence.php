@@ -43,6 +43,10 @@ class Fence extends Transparent{
 		return 2;
 	}
 
+	public function getResistance(){
+		return 15;
+	}
+
 	public function getToolType(){
 		return Tool::TYPE_AXE;
 	}

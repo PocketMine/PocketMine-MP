@@ -36,6 +36,10 @@ class StainedClay extends Solid{
 		return 1.25;
 	}
 
+	public function getResistance(){
+		return 30;
+	}
+
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
 	}

@@ -40,6 +40,10 @@ class Netherrack extends Solid{
 		return 2;
 	}
 
+	public function getResistance(){
+		return 2;
+	}
+
 	public function getToolType(){
 		return Tool::TYPE_PICKAXE;
 	}

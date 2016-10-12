@@ -36,6 +36,10 @@ class Diamond extends Solid{
 		return 5;
 	}
 
+	public function getResistance(){
+		return 30;
+	}
+
 	public function getName(){
 		return "Diamond Block";
 	}

@@ -42,6 +42,10 @@ class Workbench extends Solid{
 		return 2.5;
 	}
 
+	public function getResistance(){
+		return 12.5;
+	}
+
 	public function getName(){
 		return "Crafting Table";
 	}

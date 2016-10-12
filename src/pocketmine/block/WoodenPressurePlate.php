@@ -32,4 +32,8 @@ class WoodenPressurePlate extends Solid{
 	public function getName(){
 		return "Wooden Pressure Plate";
 	}
+
+	public function getResistance(){
+		return 2.5;
+	}
 }

@@ -29,4 +29,7 @@ class StillLava extends Lava{
 		return "Still Lava";
 	}
 
+	public function getResistance(){
+		return 500;
+	}
 }

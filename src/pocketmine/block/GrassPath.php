@@ -60,6 +60,10 @@ class GrassPath extends Transparent{
 		return 0.6;
 	}
 
+	public function getResistance(){
+		return 3.25;
+	}
+
 	public function getDrops(Item $item){
 		return [
 			[Item::DIRT, 0, 1],

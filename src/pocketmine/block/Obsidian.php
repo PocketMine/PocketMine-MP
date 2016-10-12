@@ -44,6 +44,10 @@ class Obsidian extends Solid{
 		return 50;
 	}
 
+	public function getResistance(){
+		return 6000;
+	}
+
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= Tool::TIER_DIAMOND){
 			return [

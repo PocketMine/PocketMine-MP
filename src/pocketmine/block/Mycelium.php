@@ -48,6 +48,10 @@ class Mycelium extends Solid{
 		return 0.6;
 	}
 
+	public function getResistance(){
+		return 2.5;
+	}
+
 	public function getDrops(Item $item){
 		return [
 			[Item::DIRT, 0, 1],

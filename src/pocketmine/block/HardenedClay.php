@@ -43,4 +43,8 @@ class HardenedClay extends Solid{
 	public function getHardness(){
 		return 1.25;
 	}
+
+	public function getResistance(){
+		return 30;
+	}
 }

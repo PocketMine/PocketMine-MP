@@ -38,6 +38,10 @@ class WoodSlab extends Transparent{
 		return 2;
 	}
 
+	public function getResistance(){
+		return 15;
+	}
+
 	public function getName(){
 		static $names = [
 			0 => "Oak",

@@ -46,6 +46,10 @@ class Slab extends Transparent{
 		return 2;
 	}
 
+	public function getResistance(){
+		return $this->meta == self::WOODEN ? 15 : 30;
+	}
+
 	public function getName(){
 		static $names = [
 			self::STONE => "Stone",

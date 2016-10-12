@@ -44,6 +44,10 @@ class NetherBrick extends Solid{
 		return 2;
 	}
 
+	public function getResistance(){
+		return 30;
+	}
+
 	public function getDrops(Item $item){
 		if($item->isPickaxe() >= Tool::TIER_WOODEN){
 			return [

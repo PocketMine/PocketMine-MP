@@ -21,7 +21,7 @@
 
 namespace pocketmine\block;
 
-class LitRedstoneTorch extends Solid {
+class LitRedstoneTorch extends Flowable {
 
     protected $id = self::REDSTONE_TORCH;
 
@@ -32,4 +32,8 @@ class LitRedstoneTorch extends Solid {
     public function getName(){
         return "Lit Redstone Torch";
     }
+
+    public function getResistance(){
+		return 0;
+	}
 }

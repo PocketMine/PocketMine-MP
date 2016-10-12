@@ -32,4 +32,8 @@ class StonePressurePlate extends Solid {
 	public function getName(){
 		return "Stone Pressure Plate";
 	}
+
+	public function getResistance(){
+		return 2.5;
+	}
 }
