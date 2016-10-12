@@ -57,6 +57,13 @@ class ShapedRecipe implements Recipe{
 
 		$this->output = clone $result;
 	}
+	
+	/**
+	 * @return Item
+	 */
+	public function getResult(){
+		return clone $this->output;
+	}
 
 	public function getWidth(){
 		return count($this->ingredients[0]);
