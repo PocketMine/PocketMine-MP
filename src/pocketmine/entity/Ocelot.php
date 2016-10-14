@@ -22,6 +22,6 @@
 namespace pocketmine\entity;
 
 
-class Ozelot extends Animal implements Tameable{
+class Ocelot extends Animal implements Tameable{
 
 }
