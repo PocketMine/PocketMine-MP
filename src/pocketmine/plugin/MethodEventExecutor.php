@@ -33,7 +33,14 @@ class MethodEventExecutor implements EventExecutor{
 	}
 
 	public function execute(Listener $listener, Event $event){
-		$listener->{$this->getMethod()}($event);
+		$method = new \ReflectionMethod($listener, $this->method);
+		$arg0 = $method->getParameters()[0];
+		if($arg0 instanceof \ReflectionParameter and $arg0->getClass() instanceof \ReflectionClass){
+			$type = $arg0->getClass();
+			if($type->isInstance($event)){
+				$method->invoke($listener, $event);
+			}
+		}
 	}
 
 	public function getMethod(){
