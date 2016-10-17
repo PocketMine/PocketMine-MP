@@ -24,4 +24,5 @@ namespace pocketmine\entity;
 
 interface NPC{
 
+
 }
