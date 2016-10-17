@@ -19,23 +19,34 @@
  *
 */
 
-namespace pocketmine\block;
+namespace pocketmine\network\protocol;
+
+#include <rules/DataPacket.h>
 
 
-class GlowingObsidian extends Transparent{
+class ChangeDimensionPacket extends DataPacket{
+	const NETWORK_ID = Info::CHANGE_DIMENSION_PACKET;
 
-	protected $id = self::GLOWING_OBSIDIAN;
+	const DIMENSION_OVERWORLD = 0;
+	const DIMENSION_NETHER = 1;
 
-	public function __construct($meta = 0){
-		$this->meta = $meta;
+	public $dimension;
+	public $x;
+	public $y;
+	public $z;
+	public $unknown;
+
+	public function decode(){
+
 	}
 
-	public function getName(){
-		return "Glowing Obsidian";
-	}
-
-	public function getLightLevel(){
-		return 12;
+	public function encode(){
+		$this->reset();
+		$this->putByte($this->dimension);
+		$this->putFloat($this->x);
+		$this->putFloat($this->y);
+		$this->putFloat($this->z);
+		$this->putByte($this->unknown);
 	}
 
 }

@@ -104,6 +104,7 @@ use pocketmine\scheduler\SendUsageTask;
 use pocketmine\scheduler\ServerScheduler;
 use pocketmine\tile\Chest;
 use pocketmine\tile\EnchantTable;
+use pocketmine\tile\FlowerPot;
 use pocketmine\tile\Furnace;
 use pocketmine\tile\Sign;
 use pocketmine\tile\Skull;
@@ -1056,7 +1057,7 @@ class Server{
 			return false;
 		}
 
-		$seed = $seed === null ? Binary::readInt(@Utils::getRandomBytes(4, false)) : (int) $seed;
+		$seed = $seed === null ? Binary::readInt(random_bytes(4)) : (int) $seed;
 
 		if(!isset($options["preset"])){
 			$options["preset"] = $this->getConfigString("generator-settings", "");
@@ -1452,7 +1453,7 @@ class Server{
 				"level-type" => "DEFAULT",
 				"enable-query" => true,
 				"enable-rcon" => false,
-				"rcon.password" => substr(base64_encode(@Utils::getRandomBytes(20, false)), 3, 10),
+				"rcon.password" => substr(base64_encode(random_bytes(20)), 3, 10),
 				"auto-save" => true,
 			]);
 
@@ -2503,10 +2504,11 @@ class Server{
 
 	private function registerTiles(){
 		Tile::registerTile(Chest::class);
+		Tile::registerTile(EnchantTable::class);
+		Tile::registerTile(FlowerPot::class);
 		Tile::registerTile(Furnace::class);
 		Tile::registerTile(Sign::class);
 		Tile::registerTile(Skull::class);
-		Tile::registerTile(EnchantTable::class);
 	}
 
 }

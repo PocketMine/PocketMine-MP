@@ -609,10 +609,10 @@ class Level implements ChunkManager, Metadatable{
 	 * Changes to this function won't be recorded on the version.
 	 */
 	public function checkTime(){
-		if($this->stopTime == true){
+		if($this->stopTime === true){
 			return;
 		}else{
-			$this->time += 1.25;
+			$this->time += 1;
 		}
 	}
 
@@ -1016,6 +1016,7 @@ class Level implements ChunkManager, Metadatable{
 	 * @param Vector3 $pos
 	 */
 	public function updateAround(Vector3 $pos){
+		$pos = $pos->floor();
 		$this->server->getPluginManager()->callEvent($ev = new BlockUpdateEvent($this->getBlock($this->temporalVector->setComponents($pos->x, $pos->y - 1, $pos->z))));
 		if(!$ev->isCancelled()){
 			$ev->getBlock()->onUpdate(self::BLOCK_UPDATE_NORMAL);
@@ -1758,31 +1759,6 @@ class Level implements ChunkManager, Metadatable{
 			return false;
 		}
 
-		if($hand->getId() === Item::SIGN_POST or $hand->getId() === Item::WALL_SIGN){
-
-			$nbt = new CompoundTag("", [
-				"id" => new StringTag("id", Tile::SIGN),
-				"x" => new IntTag("x", $block->x),
-				"y" => new IntTag("y", $block->y),
-				"z" => new IntTag("z", $block->z),
-				"Text1" => new StringTag("Text1", ""),
-				"Text2" => new StringTag("Text2", ""),
-				"Text3" => new StringTag("Text3", ""),
-				"Text4" => new StringTag("Text4", "")
-			]);
-
-			if($player !== null){
-				$nbt->Creator = new StringTag("Creator", $player->getRawUniqueId());
-			}
-
-			if($item->hasCustomBlockData()){
-				foreach($item->getCustomBlockData() as $key => $v){
-					$nbt->{$key} = $v;
-				}
-			}
-
-			Tile::createTile("Sign", $this->getChunk($block->x >> 4, $block->z >> 4), $nbt);
-		}
 		$item->setCount($item->getCount() - 1);
 		if($item->getCount() <= 0){
 			$item = Item::get(Item::AIR, 0, 0);
@@ -2409,7 +2385,7 @@ class Level implements ChunkManager, Metadatable{
 			unset($this->players[$entity->getId()]);
 			$this->checkSleep();
 		}else{
-			$entity->kill();
+			$entity->close();
 		}
 
 		unset($this->entities[$entity->getId()]);

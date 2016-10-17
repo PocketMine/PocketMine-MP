@@ -980,7 +980,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		}
 
 		$this->sleeping = clone $pos;
-		$this->teleport(new Position($pos->x + 0.5, $pos->y - 0.5, $pos->z + 0.5, $this->level));
 
 		$this->setDataProperty(self::DATA_PLAYER_BED_POSITION, self::DATA_TYPE_POS, [$pos->x, $pos->y, $pos->z]);
 		$this->setDataFlag(self::DATA_PLAYER_FLAGS, self::DATA_PLAYER_FLAG_SLEEP, true);
@@ -1096,19 +1095,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$this->dataPacket($pk);
 		$this->sendSettings();
 
-		if($this->gamemode === Player::SPECTATOR){
-			$pk = new ContainerSetContentPacket();
-			$pk->windowid = ContainerSetContentPacket::SPECIAL_CREATIVE;
-			$this->dataPacket($pk);
-		}else{
-			$pk = new ContainerSetContentPacket();
-			$pk->windowid = ContainerSetContentPacket::SPECIAL_CREATIVE;
-			foreach(Item::getCreativeItems() as $item){
-				$pk->slots[] = clone $item;
-			}
-			$this->dataPacket($pk);
-		}
-
 		$this->inventory->sendContents($this);
 		$this->inventory->sendContents($this->getViewers());
 		$this->inventory->sendHeldItem($this->hasSpawned);
@@ -1183,20 +1169,29 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$this->dataPacket($pk);
 	}
 
-	public function isSurvival(){
+	/**
+	 * WARNING: This method does NOT return literal gamemode is survival, it will also return true for adventure mode players.
+	 */
+	public function isSurvival() : bool{
 		return ($this->gamemode & 0x01) === 0;
 	}
 
-	public function isCreative(){
-		return ($this->gamemode & 0x01) > 0;
+	/**
+	 * WARNING: This method does NOT return literal gamemode is creative, it will also return true for creative mode players.
+	 */
+	public function isCreative() : bool{
+		return ($this->gamemode & 0x01) === 1;
 	}
 
-	public function isSpectator(){
-		return $this->gamemode === 3;
-	}
-
-	public function isAdventure(){
+	/**
+	 * WARNING: This method does NOT return literal gamemode is adventure, it will also return true for spectator mode players.
+	 */
+	public function isAdventure() : bool{
 		return ($this->gamemode & 0x02) > 0;
+	}
+
+	public function isSpectator() : bool{
+		return $this->gamemode === 3;
 	}
 
 	public function getDrops(){
@@ -1495,8 +1490,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$this->timings->startTiming();
 
 		if($this->spawned){
-			$this->processMovement($tickDiff);
-
+			if(!$this->isSleeping()){
+				$this->processMovement($tickDiff);
+			}
 			$this->entityBaseTick($tickDiff);
 
 			if(!$this->isSpectator() and $this->speed !== null){
@@ -1552,12 +1548,13 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	}
 
 	public function canInteract(Vector3 $pos, $maxDistance, $maxDiff = 0.5){
-		if($this->distanceSquared($pos) > $maxDistance ** 2){
+		$eyePos = $this->getPosition()->add(0, $this->getEyeHeight(), 0);
+		if($eyePos->distanceSquared($pos) > $maxDistance ** 2){
 			return false;
 		}
 
 		$dV = $this->getDirectionPlane();
-		$dot = $dV->dot(new Vector2($this->x, $this->z));
+		$dot = $dV->dot(new Vector2($eyePos->x, $eyePos->z));
 		$dot1 = $dV->dot(new Vector2($pos->x, $pos->z));
 		return ($dot1 - $dot) >= -$maxDiff;
 	}
@@ -1631,7 +1628,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			$nbt->playerGameType = new IntTag("playerGameType", $this->gamemode);
 		}
 
-		$this->allowFlight = $this->isCreative();
+		$this->allowFlight = (bool) ($this->gamemode & 0x01);
 
 		if(($level = $this->server->getLevelByName($nbt["Level"])) === null){
 			$this->setLevel($this->server->getDefaultLevel());
@@ -1734,17 +1731,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 		if($this->isOp()){
 			$this->setRemoveFormat(false);
-		}
-
-		if($this->gamemode === Player::SPECTATOR){
-			$pk = new ContainerSetContentPacket();
-			$pk->windowid = ContainerSetContentPacket::SPECIAL_CREATIVE;
-			$this->dataPacket($pk);
-		}else{
-			$pk = new ContainerSetContentPacket();
-			$pk->windowid = ContainerSetContentPacket::SPECIAL_CREATIVE;
-			$pk->slots = Item::getCreativeItems();
-			$this->dataPacket($pk);
 		}
 
 		$this->forceMovement = $this->teleportPosition = $this->getPosition();
@@ -1884,8 +1870,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 					$this->setRotation($packet->yaw, $packet->pitch);
 					$this->newPosition = $newPos;
-					$this->forceMovement = null;
 				}
+				$this->forceMovement = null;
 
 				break;
 			case ProtocolInfo::MOB_EQUIPMENT_PACKET:
@@ -1927,7 +1913,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 						}
 					}else{
 						if($packet->selectedSlot >= 0 and $packet->selectedSlot < 9){
-							$this->inventory->setHeldItemIndex($packet->selectedSlot);
+							$this->inventory->setHeldItemIndex($packet->selectedSlot, false);
 							$this->inventory->setHeldItemSlot($packet->slot);
 						}else{
 							$this->inventory->sendContents($this);
@@ -1938,20 +1924,18 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 					$this->inventory->sendContents($this);
 					break;
 				}elseif($this->isCreative()){
-					$this->inventory->setHeldItemIndex($packet->selectedSlot);
+					$this->inventory->setHeldItemIndex($packet->selectedSlot, false);
 					$this->inventory->setItem($packet->selectedSlot, $item);
 					$this->inventory->setHeldItemSlot($packet->selectedSlot);
 				}else{
 					if($packet->selectedSlot >= 0 and $packet->selectedSlot < $this->inventory->getHotbarSize()){
-						$this->inventory->setHeldItemIndex($packet->selectedSlot);
+						$this->inventory->setHeldItemIndex($packet->selectedSlot, false);
 						$this->inventory->setHeldItemSlot($slot);
 					}else{
 						$this->inventory->sendContents($this);
 						break;
 					}
 				}
-
-				$this->inventory->sendHeldItem($this->hasSpawned);
 
 				$this->setDataFlag(self::DATA_FLAGS, self::DATA_FLAG_ACTION, false);
 				break;
@@ -2828,12 +2812,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 						if(!isset($t->namedtag->Creator) or $t->namedtag["Creator"] !== $this->getRawUniqueId()){
 							$ev->setCancelled();
-						}else{
-							foreach($ev->getLines() as $line){
-								if(mb_strlen($line, "UTF-8") > 16){
-									$ev->setCancelled();
-								}
-							}
 						}
 
 						$this->server->getPluginManager()->callEvent($ev);
@@ -3377,6 +3355,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			$this->resetFallDistance();
 			$this->nextChunkOrderRun = 0;
 			$this->newPosition = null;
+			$this->stopSleep();
 			return true;
 		}
 		return false;

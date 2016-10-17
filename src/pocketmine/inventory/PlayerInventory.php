@@ -68,11 +68,11 @@ class PlayerInventory extends BaseInventory{
 		return $this->itemInHandIndex;
 	}
 
-	public function setHeldItemIndex($index){
+	public function setHeldItemIndex($index, $send = true){
 		if($index >= 0 and $index < $this->getHotbarSize()){
 			$this->itemInHandIndex = $index;
 
-			if($this->getHolder() instanceof Player){
+			if($this->getHolder() instanceof Player and $send){
 				$this->sendHeldItem($this->getHolder());
 			}
 
@@ -310,7 +310,6 @@ class PlayerInventory extends BaseInventory{
 		$pk->eid = $this->getHolder()->getId();
 		$pk->slots = $armor;
 		$pk->encode();
-		$pk;
 		$pk->isEncoded = true;
 
 		foreach($target as $player){
@@ -384,16 +383,14 @@ class PlayerInventory extends BaseInventory{
 
 		$pk = new ContainerSetContentPacket();
 		$pk->slots = [];
-		$holder = $this->getHolder();
-		if($holder instanceof Player and $holder->isCreative()){
-			//TODO: Remove this workaround because of broken client
-			foreach(Item::getCreativeItems() as $i => $item){
-				$pk->slots[$i] = Item::getCreativeItem($i);
-			}
-		}else{
-			for($i = 0; $i < $this->getSize(); ++$i){ //Do not send armor by error here
-				$pk->slots[$i] = $this->getItem($i);
-			}
+
+		for($i = 0; $i < $this->getSize(); ++$i){ //Do not send armor by error here
+			$pk->slots[$i] = $this->getItem($i);
+		}
+
+		//Because PE is stupid and shows 9 less slots than you send it, give it 9 dummy slots so it shows all the REAL slots.
+		for($i = $this->getSize(); $i < $this->getSize() + $this->getHotbarSize(); ++$i){
+			$pk->slots[$i] = Item::get(Item::AIR, 0, 0);
 		}
 
 		foreach($target as $player){
@@ -401,7 +398,16 @@ class PlayerInventory extends BaseInventory{
 			if($player === $this->getHolder()){
 				for($i = 0; $i < $this->getHotbarSize(); ++$i){
 					$index = $this->getHotbarSlotIndex($i);
-					$pk->hotbar[] = $index <= -1 ? -1 : $index + 9;
+					$pk->hotbar[] = $index <= -1 ? -1 : $index + $this->getHotbarSize();
+				}
+				
+				if($player->getGamemode() & 0x01 === 0x01){ //Send special inventory for creative or spectator
+					$pk2 = new ContainerSetContentPacket();
+					$pk2->windowid = ContainerSetContentPacket::SPECIAL_CREATIVE;
+					if($player->getGamemode() === Player::CREATIVE){
+						$pk2->slots = Item::getCreativeItems();
+					}
+					$player->dataPacket($pk2);
 				}
 			}
 			if(($id = $player->getWindowId($this)) === -1 or $player->spawned !== true){
