@@ -243,7 +243,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 	public function getLeaveMessage(){
 		return new TranslationContainer(TextFormat::YELLOW . "%multiplayer.player.left", [
-			$this->getDisplayName()
+			$this->getDisplayName() . TextFormat::YELLOW
 		]);
 	}
 
@@ -755,7 +755,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 		$this->server->getPluginManager()->callEvent($ev = new PlayerJoinEvent($this,
 			new TranslationContainer(TextFormat::YELLOW . "%multiplayer.player.joined", [
-				$this->getDisplayName()
+				$this->getDisplayName() . TextFormat::YELLOW
 			])
 		));
 		if(strlen(trim($ev->getJoinMessage())) > 0){
@@ -2526,7 +2526,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 							}else{
 								$this->server->getPluginManager()->callEvent($ev = new PlayerChatEvent($this, $ev->getMessage()));
 								if(!$ev->isCancelled()){
-									$this->server->broadcastMessage($this->getServer()->getLanguage()->translateString($ev->getFormat(), [$ev->getPlayer()->getDisplayName(), $ev->getMessage()]), $ev->getRecipients());
+									$this->server->broadcastMessage($this->getServer()->getLanguage()->translateString($ev->getFormat(), [$ev->getPlayer()->getDisplayName() . TextFormat::RESET, $ev->getMessage()]), $ev->getRecipients());
 								}
 							}
 						}
