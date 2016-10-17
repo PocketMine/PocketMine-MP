@@ -24,7 +24,7 @@ namespace pocketmine\event\entity;
 use pocketmine\entity\Living;
 use pocketmine\item\Item;
 
-class EntityDeathEvent extends EntityEvent{
+class EntityDeathEvent extends EntityEvent implements Cancellable{
 	public static $handlerList = null;
 
 	/** @var Item[] */
