@@ -63,7 +63,7 @@ class Flat extends Generator{
 		$this->options = $options;
 		$this->chunk = null;
 
-		if(isset($this->options["decoration"])){
+		if(isset($this->options["decoration"]) and $this->options["decoration"]){
 			$ores = new Ore();
 			$ores->setOreTypes([
 				new object\OreType(new CoalOre(), 20, 16, 0, 128),
