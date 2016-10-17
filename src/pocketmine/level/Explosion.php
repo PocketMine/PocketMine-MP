@@ -62,6 +62,14 @@ class Explosion{
 		$this->size = max($size, 0);
 		$this->what = $what;
 	}
+	
+	public function getWhat(){
+		return $this->what;
+	}
+	
+	public function setWhat($what){
+		$this->what = $what;
+	}
 
 	/**
 	 * @return bool
