@@ -216,12 +216,20 @@ class MainLogger extends \AttachableThreadedLogger{
 		if(!is_resource($this->logResource)){
 			throw new \RuntimeException("Couldn't open log file");
 		}
+		fclose($this->logResource);
 
 		while($this->shutdown === false){
 			$this->synchronized(function(){
-				while($this->logStream->count() > 0){
-					$chunk = $this->logStream->shift();
-					fwrite($this->logResource, $chunk);
+				if($this->logStream->count() > 0){
+					$this->logResource = fopen($this->logFile, "a+b");
+					if(!is_resource($this->logResource)){
+						throw new \RuntimeException("Couldn't re-open log file");
+					}
+					while($this->logStream->count() > 0){
+						$chunk = $this->logStream->shift();
+						fwrite($this->logResource, $chunk);
+					}
+					fclose($this->logResource);
 				}
 
 				$this->wait(25000);
@@ -229,12 +237,15 @@ class MainLogger extends \AttachableThreadedLogger{
 		}
 
 		if($this->logStream->count() > 0){
+			$this->logResource = fopen($this->logFile, "a+b");
+			if(!is_resource($this->logResource)){
+				throw new \RuntimeException("Couldn't re-open log file");
+			}
 			while($this->logStream->count() > 0){
 				$chunk = $this->logStream->shift();
 				fwrite($this->logResource, $chunk);
 			}
+			fclose($this->logResource);
 		}
-
-		fclose($this->logResource);
 	}
 }
