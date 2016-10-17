@@ -73,18 +73,6 @@ class ExampleClass{
 }
 ```
 
-### RFC and Voting
-* These are big Pull Requests or contributions that change important behavior.
-* RFCs will be tagged with the *PR: RFC* label
-* A vote will be held once the RFC is ready. All users can vote commenting on the Pull Request
-* Comments MUST use "Yes" or "No" on the FIRST sentence to signify the vote, except when they don't want it to be counted.
-* If your comment is a voting comment, specify the reason of your vote or it won't be counted.
-* After voting has been closed, no further votes will be counted.
-* An RFC will be rejected if less than 50% + 1 (simple majority) has voted Yes.
-* If the RFC is approved, Team Members have the final word on its implementation or rejection.
-* RFCs with complex voting options will specify the vote percentage or other details.
-
-
 ## Bug Tracking for Collaborators
 
 ### Labels
@@ -138,3 +126,125 @@ For example:
 ```
 Alpha_1.4 beta2
 ```
+## Request for Comments
+A Request for Comments Pull Request is used to gather votes from developers democratically to allow the majority to rule in making important decisions to the project. This allows implementation of controversial changes and features to be conducted in an orderly fashion.
+
+A Request for Comments is critical to the autonomous governing of open source projects such as PocketMine, because it allows major decisions to be made by the community of developers, and not developers who just happen to be maintainers and have write access.
+
+Anyone may open a Request for Comments, not just developers.
+
+### When is Request for Comments required?
+In the PocketMine-MP project, The PocketMine Team (referred to as we from now on) has decided that changes, features, improvements and bug/pull requests matching any of the following criteria necessiate a Request for Comments.
+
+- Changes to the code syntax guidelines - so basically any edits to CONTRIBUTION.md (unless it is a minor fix).
+- Project-wide changes such as but not limited to:
+	- Namespace changes for all files
+	- Case changes for all files
+- Major API changes such as but not limited to:
+	- An entire re-work of an existing API(not the entire project but rather just one API - for example, a rework of the BanAPI) that will destroy all backwards compatibility, unless it is for a new major version.
+- Changes to the way The PocketMine Project is run. Such as but not limited to:
+	- New / or modifying labels (CONTRIBUTION.md)
+	- New / or modifying milestones
+	- Naming standards such as branch names
+- Changes affecting this Request for Comments guideline, existing project names (which includes codenames, versioning etc.) and LICENSE.
+
+### When is a Request for Comments NOT required?
+To avoid confusion, the following things as an example do not require a Request for Comments.
+
+Essentially, do not create Request for Comments for minor changes, features and bug fixes. They can go through the normal process of discussion in a Pull Request for necessary length of time, and then get merged without any voting.
+
+- Bug fixes
+- Feature implementations
+- And pretty much anything that you can think of - there should be minimal need for a Request for Comments.
+
+### How Requests for Comments are processed
+Firstly, every Request for Comments must follow a very specific format, which is described below. Anything that does not conform will either be edited, will pend until the submitter edits the RFC or removed. Anything that does not fit into the RFC criteria will also be removed.
+
+Secondly, after an RFC is in the correct format for presentation and voting, it will go into a **sunrise** period where the community will finalise the changes which will be made for the topic. This will either be a **1 week** long period **or** when the authors / editors of the RFC declares it finalised, whichever comes later.
+
+For example, if an RFC is finalised in 2 days, it must still wait another 5 days. If an RFC is past the week(12 days, for example) period but still not finalised, then it will stay in the sunrise period.
+
+After an RFC is finalised, it can no longer be edited. No more commits to that branch will be accepted(Maintainers, please do not disobey this rule. No exceptions.) If you wish to make changes to a finalised RFC, you must wait until it exits its **sunset** period (not sunrise!), and publish a new RFC or Pull Request, whichever is more appropriate.
+
+The reason for a sunrise period and finalisation is so that the votes know what they are voting for. Developers will have time to accept pull requests from others, and voters will know that what they vote for will be the final implementation.
+
+Thirdly, the RFC will be voted upon. The voting period of an RFC will start 1 day after its finalisation(with authorisation from a PocketMine-MP Maintainer). No more votes will be accepted after the voting period finishes.
+
+Fourthly and lastly, the sunset period starts immediately after voting finishes. Depending on the outcome of the vote, the RFC may either be merged (any conflicts during the merge is to be solved by PocketMine-MP Maintainers) or ignored.
+
+If significant challenges are introduced while trying to implement the change, the sunset period may take longer than expected.
+
+### Voting on an RFC
+An RFC will be open to vote after 1 day of its finalisation. When voting on an RFC, please make note of the following things:
+- You must either vote with a **Yes.** or a **No.** No vague answers please.
+- Your vote consisting of either **Yes.** or **No.** *MUST* come at the start of your comment. If you demonstrate your opinion mid-comment or at the end of your comment, your vote will not be counted. **This is a strict rule, and NO exceptions to this will be made.**
+- You may write a comment explaining your vote and decision. You may omit an explanation if you wish to. No one liners with a yes or no please. If you do this, your vote will not be counted.
+- Obviously, duplicate votes will not be counted.
+
+There are one type of majorities that can be used on a Request for Comments voting.
+- **Simple Majority** - This is where the yes vote must simply reach over 50% to be accepted. 50% will NOT count as accepted.
+
+### How to format a Request for Comments
+The title must be in the format of:
+
+	RFC: <Topic Sentence>
+
+The Pull Request must also be tagged with the tag `PR: RFC`. This will be done for you by one of the maintainers.
+
+In the body of the PR, your first paragraph should be the status. You can copy paste this in - it is static. Change the date and time to match your RFC.
+
+Next must be the introduction and preface. Introduce the issue clearly. Explain what the current issue is, why this change needs to be implemented/merged, what this change will do and how it will benefit PocketMine.
+
+Next must be your topic sentence. It must be one-sided to allow for a Yes or No voting. You must not introduce any new questions besides the topic sentence, as this may confuse the voters. Make this sentence as simple as possible. The format for displaying the topic sentence is static - you must follow it.
+
+Next is the How to vote section. It is the same for all RFCs. You can just copy paste it in. You must include it however.
+
+After the voting period finishes, the total votes counted table will go here. This will be done by maintainers, so you don't have to worry.
+
+You may also decide to put a Revision section in to indicate revisions.
+
+### Example RFC
+---
+Note: This is an example RFC. This issue has already been discussed internally. The topic is only for example's sake.
+
+Title: RFC: Should the namespace be changed to CamelCase?
+Label: PR: RFC
+
+## Status
+**Status:** Sunrise
+**RFC Created at:** {Date and time in UTC} UTC.
+
+## Introduction
+Currently, PocketMine uses the namespace `pocketmine`. However, the rest of the PHP world uses CamelCase for their namespacing. To ensure consistency and increase legibility for PHP developers, the namespace should be changed to `PocketMine`.
+
+## Topic Sentence
+The topic for this RFC is the following:
+**Should the namespace be changed to CamelCase?**
+
+## How to vote
+Votes must display their side clearly and must start with either **Yes.** or **No.** You may include an explanation for your vote, but it is not required.
+
+Examples:
+```
+Yes. I think it should be merged...
+
+```
+```
+Yes.
+```
+```
+No. It is of my opinion that this should not be merged due to...
+```
+
+**The voting period has not yet started.**
+
+## Revision
+**Revision 1** by @octocat at **{Date and time in UTC} UTC**: Fix grammar mistake.
+
+---
+
+### Keeping an RFC decision democratic
+If an RFC is approved, it should be accepted. No maintainer or developer may overturn this decision. However, The PocketMine Team may disallow a an RFC from being implemented or merged after a thorough internal discussion. Possible grounds for rejection are:
+- Security Issues with the implementation / suggestion
+- Licencing issue (e.g. GPL patch in LGPL PocketMine)
+- Not enough votes for the RFC to be considered "voted"
