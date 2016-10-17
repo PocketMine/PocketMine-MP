@@ -721,6 +721,10 @@ class Block extends Position implements Metadatable{
 	final public function getId(){
 		return $this->id;
 	}
+	
+	final public function getMeta(){
+		return $this->meta;
+	}
 
 	public function addVelocityToEntity(Entity $entity, Vector3 $vector){
 
