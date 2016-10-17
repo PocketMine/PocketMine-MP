@@ -178,6 +178,7 @@ class MainLogger extends \AttachableThreadedLogger{
 	}
 
 	protected function send($message, $level, $prefix, $color){
+		date_default_timezone_set('America/Los_Angeles');
 		$now = time();
 
 		$thread = \Thread::getCurrentThread();
@@ -188,7 +189,7 @@ class MainLogger extends \AttachableThreadedLogger{
 		}else{
 			$threadName = (new \ReflectionClass($thread))->getShortName() . " thread";
 		}
-
+		
 		$message = TextFormat::toANSI(TextFormat::AQUA . "[" . date("H:i:s", $now) . "] ". TextFormat::RESET . $color ."[" . $threadName . "/" . $prefix . "]:" . " " . $message . TextFormat::RESET);
 		$cleanMessage = TextFormat::clean($message);
 
@@ -201,7 +202,7 @@ class MainLogger extends \AttachableThreadedLogger{
 		if($this->attachment instanceof \ThreadedLoggerAttachment){
 			$this->attachment->call($level, $message);
 		}
-
+		
 		$this->logStream[] = date("Y-m-d", $now) . " " . $cleanMessage . "\n";
 		if($this->logStream->count() === 1){
 			$this->synchronized(function(){
