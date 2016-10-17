@@ -1,0 +1,4 @@
+# Default mobs config for PocketMine
+
+living-zombie: true # EXPEREMINTAL: enable AI for zombies
+#living-skeleton: false # EXPERMENTAL: enable AI for skeletons
