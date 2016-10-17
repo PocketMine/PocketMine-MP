@@ -195,7 +195,7 @@ LICENSE;
 		echo "[*] " . $this->lang->ip_get . "\n";
 
 		$externalIP = Utils::getIP();
-		$internalIP = gethostbyname(trim(`hostname`));
+		$internalIP = getHostByName(getHostName());
 
 		echo "[!] " . $this->lang->get("ip_warning", ["{{EXTERNAL_IP}}", "{{INTERNAL_IP}}"], [$externalIP, $internalIP]) . "\n";
 		echo "[!] " . $this->lang->ip_confirm;
