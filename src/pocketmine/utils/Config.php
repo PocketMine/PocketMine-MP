@@ -358,10 +358,25 @@ class Config{
 	}
 
 	/**
-	 * @param $k
+	 * @param string|int $k
+	 * @param bool $lowercase If true, search the Config for all cases case-insensitively
+	 * @return bool Whether the config has been changed
 	 */
-	public function remove($k){
-		unset($this->config[$k]);
+	public function remove($k, $lowercase = false){
+		if($lowercase === true){
+			$k = strotlower($k);
+			$keys = array_keys($this->config);
+			$offset = array_search($k, array_map("strtolower", $this->config));
+			if($offset !== false){
+				unset($this->config[$keys[$offset]]);
+				return true;
+			}
+			return false;
+		}elseif(isset($this->config[$k])){
+			unset($this->config[$k]);
+			return true;
+		}
+		return false;
 	}
 
 	/**
