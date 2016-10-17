@@ -28,10 +28,13 @@ class OceanBiome extends GrassyBiome{
 	public function __construct(){
 		parent::__construct();
 
-		$tallGrass = new TallGrass();
-		$tallGrass->setBaseAmount(5);
-
-		$this->addPopulator($tallGrass);
+		$this->setGroundCover([
+			Block::get(Block::DIRT, 0),
+			Block::get(Block::DIRT, 0),
+			Block::get(Block::DIRT, 0),
+			Block::get(Block::DIRT, 0),
+			Block::get(Block::DIRT, 0),
+		]);
 
 		$this->setElevation(46, 58);
 
