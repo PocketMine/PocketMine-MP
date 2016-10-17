@@ -344,6 +344,11 @@ class Level implements ChunkManager, Metadatable{
 		$this->updateQueue->setExtractFlags(\SplPriorityQueue::EXTR_BOTH);
 		$this->time = (int) $this->provider->getTime();
 
+		foreach($this->getServer()->getProperty("disable-block-ticking") as $id){
+			$ticked = isset($this->randomTickBlocks[$id]);
+			if($ticked === true) unset($this->randomTickBlocks[$id]);
+		}
+
 		$this->chunkTickRadius = min($this->server->getViewDistance(), max(1, (int) $this->server->getProperty("chunk-ticking.tick-radius", 4)));
 		$this->chunksPerTick = (int) $this->server->getProperty("chunk-ticking.per-tick", 40);
 		$this->chunkGenerationQueueSize = (int) $this->server->getProperty("chunk-generation.queue-size", 8);
