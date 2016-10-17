@@ -70,7 +70,7 @@ class Fire extends Flowable{
 			$ev->setCancelled();
 		}
 		Server::getInstance()->getPluginManager()->callEvent($ev);
-		if(!$ev->isCancelled()){
+		if(!$ev->isCancelled() && !$entity->isCreative()){
 			$entity->setOnFire($ev->getDuration());
 		}
 	}
