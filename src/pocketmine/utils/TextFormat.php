@@ -380,7 +380,7 @@ abstract class TextFormat{
 
 		return $newString;
 	}
-
+	
 	/**
 	 * Returns a string with colorized ANSI Escape codes
 	 *
@@ -392,77 +392,75 @@ abstract class TextFormat{
 		if(!is_array($string)){
 			$string = self::tokenize($string);
 		}
-
 		$newString = "";
 		foreach($string as $token){
 			switch($token){
 				case TextFormat::BOLD:
-					$newString .= Terminal::$FORMAT_BOLD;
 					break;
 				case TextFormat::OBFUSCATED:
-					$newString .= Terminal::$FORMAT_OBFUSCATED;
+					$newString .= "\x1b[8m";
 					break;
 				case TextFormat::ITALIC:
-					$newString .= Terminal::$FORMAT_ITALIC;
+					$newString .= "\x1b[3m";
 					break;
 				case TextFormat::UNDERLINE:
-					$newString .= Terminal::$FORMAT_UNDERLINE;
+					$newString .= "\x1b[4m";
 					break;
 				case TextFormat::STRIKETHROUGH:
-					$newString .= Terminal::$FORMAT_STRIKETHROUGH;
+					$newString .= "\x1b[9m";
 					break;
 				case TextFormat::RESET:
-					$newString .= Terminal::$FORMAT_RESET;
+					$newString .= "\x1b[0m";
 					break;
 
 				//Colors
 				case TextFormat::BLACK:
-					$newString .= Terminal::$COLOR_BLACK;
+					$newString .= "\x1b[0;30m";
 					break;
 				case TextFormat::DARK_BLUE:
-					$newString .= Terminal::$COLOR_DARK_BLUE;
+					$newString .= "\x1b[0;34m";
 					break;
 				case TextFormat::DARK_GREEN:
-					$newString .= Terminal::$COLOR_DARK_GREEN;
+					$newString .= "\x1b[0;32m";
 					break;
 				case TextFormat::DARK_AQUA:
-					$newString .= Terminal::$COLOR_DARK_AQUA;
+					$newString .= "\x1b[0;36m";
 					break;
 				case TextFormat::DARK_RED:
-					$newString .= Terminal::$COLOR_DARK_RED;
+					$newString .= "\x1b[0;31m";
 					break;
 				case TextFormat::DARK_PURPLE:
-					$newString .= Terminal::$COLOR_PURPLE;
+					$newString .= "\x1b[0;35m";
 					break;
 				case TextFormat::GOLD:
-					$newString .= Terminal::$COLOR_GOLD;
+					$newString .= "\x1b[0;33m";
 					break;
 				case TextFormat::GRAY:
-					$newString .= Terminal::$COLOR_GRAY;
+					$newString .= "\x1b[0;37m";
 					break;
 				case TextFormat::DARK_GRAY:
-					$newString .= Terminal::$COLOR_DARK_GRAY;
+					$newString .= "\x1b[30;1m";
 					break;
 				case TextFormat::BLUE:
-					$newString .= Terminal::$COLOR_BLUE;
+					$newString .= "\x1b[34;1m";
 					break;
 				case TextFormat::GREEN:
-					$newString .= Terminal::$COLOR_GREEN;
+					$newString .= "\x1b[32;1m";
 					break;
 				case TextFormat::AQUA:
-					$newString .= Terminal::$COLOR_AQUA;
+					$newString .= "\x1b[36;1m";
 					break;
 				case TextFormat::RED:
-					$newString .= Terminal::$COLOR_RED;
+					$newString .= "\x1b[31;1m";
 					break;
 				case TextFormat::LIGHT_PURPLE:
-					$newString .= Terminal::$COLOR_LIGHT_PURPLE;
+					$newString .= "\x1b[35;1m";
 					break;
 				case TextFormat::YELLOW:
-					$newString .= Terminal::$COLOR_YELLOW;
+					$newString .= "\x1b[33;1m";
 					break;
 				case TextFormat::WHITE:
-					$newString .= Terminal::$COLOR_WHITE;
+					$newString .= "\x1b[37;1m";
 					break;
 				default:
 					$newString .= $token;
