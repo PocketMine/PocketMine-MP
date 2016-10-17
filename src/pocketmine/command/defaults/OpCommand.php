@@ -35,7 +35,7 @@ class OpCommand extends VanillaCommand{
 			"%pocketmine.command.op.description",
 			"%commands.op.usage"
 		);
-		$this->setPermission("pocketmine.command.op.give");
+		$this->setPermission("pocketmine.command.op");
 	}
 
 	public function execute(CommandSender $sender, $currentAlias, array $args){
