@@ -228,6 +228,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	private $spawnPosition = null;
 
 	protected $inAirTicks = 0;
+	
+	protected $existY;
+	
 	protected $startAirTicks = 5;
 
 	protected $autoJump = true;
@@ -1505,14 +1508,13 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 						$this->startAirTicks = 5;
 					}
 					$this->inAirTicks = 0;
+					$this->existY = $this->y;
 				}else{
-					if(!$this->allowFlight and $this->inAirTicks > 10 and !$this->isSleeping() and $this->getDataProperty(self::DATA_NO_AI) !== 1){
-						$expectedVelocity = (-$this->gravity) / $this->drag - ((-$this->gravity) / $this->drag) * exp(-$this->drag * ($this->inAirTicks - $this->startAirTicks));
-						$diff = ($this->speed->y - $expectedVelocity) ** 2;
+					if(!$this->allowFlight and $this->inAirTicks > 2 and !$this->isSleeping() and $this->getDataProperty(self::DATA_NO_AI) !== 1){
 
-						if(!$this->hasEffect(Effect::JUMP) and $diff > 0.6 and $expectedVelocity < $this->speed->y and !$this->server->getAllowFlight()){
+						if(!$this->hasEffect(Effect::JUMP) and $this->speed->y < -0.25001 and !$this->server->getAllowFlight()){
 							if($this->inAirTicks < 100){
-								$this->setMotion(new Vector3(0, $expectedVelocity, 0));
+								$this->setMotion(new Vector3(0, -$this->existY, 0));
 							}elseif($this->kick("Flying is not enabled on this server")){
 								$this->timings->stopTiming();
 								return false;
