@@ -305,6 +305,7 @@ class Item{
 	const FLINT_AND_STEEL = 259;
 	const APPLE = 260;
 	const BOW = 261;
+	const FISHING_ROD =346; //
 	const ARROW = 262;
 	const COAL = 263;
 	const DIAMOND = 264;
