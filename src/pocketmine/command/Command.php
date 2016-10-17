@@ -74,12 +74,15 @@ abstract class Command{
 	 * @param string   $usageMessage
 	 * @param string[] $aliases
 	 */
-	public function __construct($name, $description = "", $usageMessage = null, array $aliases = []){
+	public function __construct($name, $description = "", $usageMessage = null, ...$aliases){
 		$this->name = $name;
 		$this->nextLabel = $name;
 		$this->label = $name;
 		$this->description = $description;
 		$this->usageMessage = $usageMessage === null ? "/" . $name : $usageMessage;
+		if(isset($aliases[0]) and is_array($aliases[0])){
+			$aliases = $aliases[0]; // backwards compatibility
+		}
 		$this->aliases = $aliases;
 		$this->activeAliases = (array) $aliases;
 		$this->timings = new TimingsHandler("** Command: " . $name);
